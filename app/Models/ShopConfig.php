@@ -41,6 +41,7 @@ class ShopConfig extends Model
     public const ICP_NUMBER = 'icp_number'; // ICP 备案号
 
     public const MANAGE_SETTINGS = 'manage_settings'; // 后台设置
+    public const CAN_PASSWORD_LOGIN = 'can_password_login'; // 是否允许账号密码登录
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
 

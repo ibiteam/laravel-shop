@@ -19,8 +19,9 @@ class ShopConfigTableSeeder extends Seeder
     private function addManageSettings(): void
     {
         $this->addItem(ShopConfig::MANAGE_SETTINGS);
-        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '', ShopConfig::BASE_SETTINGS);
+        $this->addItem(ShopConfig::CAN_PASSWORD_LOGIN, true, ShopConfig::MANAGE_SETTINGS);
+        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '', ShopConfig::MANAGE_SETTINGS);
+        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '', ShopConfig::MANAGE_SETTINGS);
     }
 
     private function addBaseSettings(): void
