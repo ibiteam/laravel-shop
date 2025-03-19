@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\Log;
 
 class NetEaseUtil
 {
+    private function __construct() {}
+
     /**
      * 校验验证码
      */
-    public function verifyCaptcha(string $validate): bool
+    public static function verifyCaptcha(string $validate): bool
     {
         // 组合参数
         $params = [
@@ -23,7 +25,7 @@ class NetEaseUtil
             'nonce' => sprintf('%d', rand()),
         ];
 
-        $res = $this->captchaDoPost($params);
+        $res = self::captchaDoPost($params);
 
         if (! $res || ! isset($res['result']) || ! $res['result']) {
             return false;
@@ -32,18 +34,16 @@ class NetEaseUtil
         return true;
     }
 
-    private function captchaDoPost(array $params): array
+    private static function captchaDoPost(array $params): array
     {
         $client = new Client([
             'timeout' => 10,
             'connect_timeout' => 10,
         ]);
 
-        $params['signature'] = $this->sign($params);
-
         try {
             $response = $client->post(config('custom.net_east_yi_dun.host'), [
-                'form_params' => $params,
+                'form_params' => self::sign($params),
             ]);
 
             return json_decode($response->getBody()->getContents(), true);
@@ -54,7 +54,7 @@ class NetEaseUtil
         }
     }
 
-    private function sign(array $params): string
+    private static function sign(array $params): array
     {
         ksort($params);
         $buff = '';
@@ -64,6 +64,8 @@ class NetEaseUtil
         }
         $buff .= config('custom.net_east_yi_dun.secret_key');
 
-        return md5(mb_convert_encoding($buff, 'utf8', 'auto'));
+        $params['signature'] = md5(mb_convert_encoding($buff, 'utf8', 'auto'));
+
+        return $params;
     }
 }

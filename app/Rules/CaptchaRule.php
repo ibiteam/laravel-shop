@@ -19,7 +19,7 @@ class CaptchaRule implements ValidationRule
             if (! $value) {
                 $fail('验证失败，请刷新页面后重试！');
             } else {
-                if (! app(NetEaseUtil::class)->verifyCaptcha($value)) {
+                if (! NetEaseUtil::verifyCaptcha($value)) {
                     $fail('验证失败，请刷新页面后重试~');
                 }
             }
