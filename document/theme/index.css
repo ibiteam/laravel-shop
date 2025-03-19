@@ -1,0 +1,16 @@
+.rspress-logo {
+    height: 2.6rem;
+}
+table thead tr {
+    background-color: #0088CC;
+    color: #ffffff;
+}
+.text-text-1{
+    color: #ffffff;
+}
+
+.rspress-doc [class^="language-"] .rspress-code-content > code {
+    padding: 16px 20px;
+    background-color: #384548;
+    color: #ffffff;
+}
