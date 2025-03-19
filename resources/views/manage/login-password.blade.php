@@ -283,9 +283,6 @@
             });
             const passwordVisible = ref(false);
             const loading = ref(false);
-            const captchaIns = ref(null);
-            const validateData = ref('');
-            const net_east_is_check = ref(@json(config('custom.net_east_yi_dun.enable')));
             const loginFormRef = ref(null);
 
             const rsaEncrypt = (val) => {
@@ -296,24 +293,6 @@
                 let rsaEncrypt = new JSEncrypt();
                 rsaEncrypt.setPublicKey(tmp_public_key);
                 return rsaEncrypt.encrypt(val);
-            };
-
-            const initCaptcha = () => {
-                initNECaptcha({
-                    captchaId: '{{ config('custom.net_east_yi_dun.slider_captcha') }}',
-                    element: '#login-submit-button',
-                    mode: 'popup',
-                    onReady: (instance) => {},
-                    onVerify: (err, data) => {
-                        if (err) return;
-                        validateData.value = data.validate;
-                        submitLogin(validateData.value);
-                    }
-                }, (instance) => {
-                    captchaIns.value = instance;
-                }, (err) => {
-                    ElMessage.error('验证码初始化失败，请重试');
-                });
             };
 
             const handleLogin = () => {
@@ -338,20 +317,15 @@
 
                 loading.value = true;
 
-                if (net_east_is_check.value == 1) {
-                    captchaIns.value && captchaIns.value.popUp();
-                } else {
-                    submitLogin();
-                }
+                submitLogin();
             };
 
-            const submitLogin = async (validateData = '') => {
+            const submitLogin = async () => {
                 try {
                     const encryptedPassword = rsaEncrypt(loginForm.value.password);
                     const response = await axios.post('{{route('manage.login.password')}}', {
                         'user_name': loginForm.value.username,
-                        'password': encryptedPassword,
-                        'validate': validateData
+                        'password': encryptedPassword
                     });
 
                     loading.value = false;
@@ -359,21 +333,14 @@
 
                     if (res.code == 200) {
                         window.location.href = '{{route('manage.home')}}';
-                    } else {
-                        captchaIns.value && captchaIns.value.refresh();
-                        ElMessage.error(res.message);
                     }
                 } catch (error) {
                     loading.value = false;
-                    captchaIns.value && captchaIns.value.refresh();
                     ElMessage.error('登录失败，请重试');
                 }
             };
 
             onMounted(() => {
-                if (net_east_is_check.value == 1) {
-                    initCaptcha();
-                }
                 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
             });
 

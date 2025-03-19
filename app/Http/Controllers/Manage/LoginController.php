@@ -7,7 +7,6 @@ use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
 use App\Models\AdminUserLoginLog;
 use App\Models\ShopConfig;
-use App\Rules\CaptchaRule;
 use App\Utils\RsaUtil;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -102,13 +101,9 @@ class LoginController extends BaseController
 
     protected function validateLogin(Request $request)
     {
-        $validate = config('custom.net_east_yi_dun.enable') ? 'required' : 'sometimes';
         $request->validate([
             $this->username() => 'required|string',
             'password' => 'required|string',
-            'validate' => [
-                $validate, new CaptchaRule,
-            ],
         ]);
     }
 
