@@ -22,7 +22,7 @@ class LoginController extends BaseController
 
     public function showLoginForm(Request $request, ShopConfigDao $shop_config_dao)
     {
-        $current_user = $this->guard()->user();
+        $current_user = $this->adminUser();
 
         if ($current_user instanceof AdminUser) {
             return redirect()->to($this->redirectTo());
@@ -116,7 +116,7 @@ class LoginController extends BaseController
 
     protected function guard()
     {
-        return Auth::guard('manage');
+        return Auth::guard(config('auth.manage.guard'));
     }
 
     /**
