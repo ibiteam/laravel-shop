@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Http\Dao\AdminUserLoginLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
+use App\Models\AdminUserLoginLog;
 use App\Models\ShopConfig;
 use App\Rules\CaptchaRule;
 use App\Utils\RsaUtil;
@@ -82,6 +84,12 @@ class LoginController extends BaseController
 
         if (! password_verify($tmp_password, $admin_user->password)) {
             $this->incrementLoginAttempts($request);
+            app(AdminUserLoginLogDao::class)->addLoginLogByAdminUser(
+                $admin_user,
+                AdminUserLoginLog::TYPE_PASSWORD,
+                AdminUserLoginLog::STATUS_FAILED,
+                '账号密码登录失败：密码错误。'
+            );
 
             return $this->error('用户名或密码错误~');
         }
@@ -91,6 +99,13 @@ class LoginController extends BaseController
         }
 
         $this->guard()->login($admin_user);
+
+        app(AdminUserLoginLogDao::class)->addLoginLogByAdminUser(
+            $admin_user,
+            AdminUserLoginLog::TYPE_PASSWORD,
+            AdminUserLoginLog::STATUS_SUCCESS,
+            '账号密码登录成功~'
+        );
 
         if ($request->hasSession()) {
             $request->session()->put('auth.password_confirmed_at', time());

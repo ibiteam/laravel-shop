@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -16,6 +18,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property int                             $status     状态：1启用 0禁用
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\AdminUserLoginLog|null $lastLoginLog
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminUserLoginLog> $loginLog
+ * @property-read int|null $login_log_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser newQuery()
@@ -40,6 +45,16 @@ class AdminUser extends Authenticatable
     protected $guarded = [];
 
     protected $hidden = ['password'];
+
+    public function loginLog(): HasMany
+    {
+        return $this->hasMany(AdminUserLoginLog::class, 'admin_user_id', 'id');
+    }
+
+    public function lastLoginLog(): HasOne
+    {
+        return $this->hasOne(AdminUserLoginLog::class, 'admin_user_id', 'id')->orderBy('id', 'desc');
+    }
 
     protected function password(): Attribute
     {

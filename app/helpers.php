@@ -42,3 +42,32 @@ if (! function_exists('shop_config')) {
         return app(ShopConfigDao::class)->config($code, $default);
     }
 }
+
+if (! function_exists('get_request_ip')) {
+    /**
+     * 获取请求ip.
+     */
+    function get_request_ip(): string
+    {
+        $ip_sources = [
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'REMOTE_ADDR',
+        ];
+        $ip = '';
+
+        foreach ($ip_sources as $key) {
+            if (isset($_SERVER[$key]) && ! empty($_SERVER[$key]) && strcasecmp($_SERVER[$key], 'unknown') !== 0) {
+                $ip = $_SERVER[$key];
+
+                break;
+            }
+        }
+
+        if (! isset($ip) || ! $ip) {
+            $ip = request()->getClientIp();
+        }
+
+        return strpos($ip, ',') ? substr($ip, 0, strpos($ip, ',')) : $ip;
+    }
+}
