@@ -18,6 +18,17 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Manage
+    |--------------------------------------------------------------------------
+    */
+    'manage' => [
+        'guard' => env('MANAGE_AUTH_GUARD', 'manage'),
+    ],
+
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards
@@ -39,6 +50,10 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+        'manage' => [
+            'driver' => 'session',
+            'provider' => 'admin_users',
         ],
     ],
 
@@ -65,10 +80,10 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admin_users' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\AdminUser::class,
+        ],
     ],
 
     /*
