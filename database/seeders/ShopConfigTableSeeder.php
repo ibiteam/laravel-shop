@@ -18,32 +18,30 @@ class ShopConfigTableSeeder extends Seeder
 
     private function addManageSettings(): void
     {
-        $this->addItem(ShopConfig::MANAGE_SETTINGS);
-        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '', ShopConfig::MANAGE_SETTINGS);
-        $this->addItem(ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '', ShopConfig::MANAGE_SETTINGS);
+        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '');
+        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '');
     }
 
     private function addBaseSettings(): void
     {
-        $this->addItem(ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_NAME, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_KEYWORDS, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_DESCRIPTION, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_ICON, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_LOGO, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_MANAGE_LOGIN_IMAGE, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::BANK_ACCOUNT, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SHOP_ADDRESS, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::SERVICE_MOBILE, '', ShopConfig::BASE_SETTINGS);
-        $this->addItem(ShopConfig::ICP_NUMBER, '', ShopConfig::BASE_SETTINGS);
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_NAME, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_KEYWORDS, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_DESCRIPTION, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_ICON, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_LOGO, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_MANAGE_LOGIN_IMAGE, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::BANK_ACCOUNT, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_ADDRESS, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SERVICE_MOBILE, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::ICP_NUMBER, '');
     }
 
-    private function addItem(string $code, mixed $value = null, string $parent_code = ''): void
+    private function addItem(string $group_name, string $code, mixed $value = null): void
     {
         $shop_config = ShopConfig::query()->firstOrNew(['code' => $code]);
 
         if (! $shop_config->exists) {
-            $shop_config->parent_id = $parent_code ? ShopConfig::query()->where('code', $parent_code)->value('id') : 0;
+            $shop_config->group_name = $group_name;
             $shop_config->value = $value;
             $shop_config->save();
         }

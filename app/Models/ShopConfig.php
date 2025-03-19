@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int                             $id
- * @property int                             $parent_id  父级ID
+ * @property string                          $group_name 分组名称
  * @property string                          $code       标识
- * @property string|null                     $value      值
+ * @property array<array-key, mixed>|null    $value      值
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -18,8 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereGroupName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShopConfig whereValue($value)
  *
@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Model;
 class ShopConfig extends Model
 {
     use DatetimeTrait;
-    public const BASE_SETTINGS = 'base_settings'; // 基础设置
+    public const GROUP_BASE_SETTINGS = 'base_settings'; // 基础设置组名
     public const SHOP_NAME = 'shop_name'; // 商城名称
     public const SHOP_KEYWORDS = 'shop_keywords'; // 商城关键词
     public const SHOP_DESCRIPTION = 'shop_description'; // 商城描述
@@ -40,7 +40,7 @@ class ShopConfig extends Model
     public const SERVICE_MOBILE = 'service_mobile'; // 服务热线
     public const ICP_NUMBER = 'icp_number'; // ICP 备案号
 
-    public const MANAGE_SETTINGS = 'manage_settings'; // 后台设置
+    public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置组名
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
 

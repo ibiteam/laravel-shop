@@ -16,12 +16,12 @@ class ShopConfigDao
     {
         if (is_local_env()) {
             return Cache::remember('shop_config_all_code', Carbon::now()->endOfDay(), function () {
-                return ShopConfig::query()->where('parent_id', '!=', 0)->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
+                return ShopConfig::query()->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
             });
         }
 
         return Cache::rememberForever('shop_config_all_code', function () {
-            return ShopConfig::query()->where('parent_id', '!=', 0)->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
+            return ShopConfig::query()->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
         });
     }
 
