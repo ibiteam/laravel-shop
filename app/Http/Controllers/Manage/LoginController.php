@@ -41,9 +41,6 @@ class LoginController extends BaseController
             ShopConfig::ICP_NUMBER,
         );
 
-        $can_password_login = true;
-
-        $rsa_public_key = shop_config(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '');
         $other_login_methods = [
             [
                 'name' => '企业微信',
@@ -61,7 +58,7 @@ class LoginController extends BaseController
             ],
         ];
 
-        return view('manage.login-password', compact('config', 'other_login_methods', 'rsa_public_key', 'can_password_login'));
+        return view('manage.login-password', compact('config', 'other_login_methods'));
     }
 
     public function login(Request $request)
@@ -81,8 +78,9 @@ class LoginController extends BaseController
         if (! $admin_user instanceof AdminUser) {
             return $this->error('用户名或密码错误');
         }
+        $tmp_password = shop_config(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '') ? RsaUtil::getDecodeData($validated['password']) : $validated['password'];
 
-        if (! password_verify(RsaUtil::getDecodeData($validated['password']), $admin_user->password)) {
+        if (! password_verify($tmp_password, $admin_user->password)) {
             $this->incrementLoginAttempts($request);
 
             return $this->error('用户名或密码错误~');

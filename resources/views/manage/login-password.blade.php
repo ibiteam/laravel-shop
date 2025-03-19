@@ -256,7 +256,7 @@
             @endif
             <div style="width:480px;">
                 <el-form ref="loginFormRef" :model="loginForm" @submit.prevent>
-                    @if($can_password_login)
+                    @if(shop_config(\App\Models\ShopConfig::CAN_PASSWORD_LOGIN, false))
                         <div class="box login_title" style="width:300px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">欢迎来到{{$config['shop_name']}}</div>
                         <div class="box" style="width:360px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">
                             <el-input v-model="loginForm.username" placeholder="用户名" :prefix-icon="User" style="width: 358px;"></el-input>
@@ -343,8 +343,12 @@
             const loginFormRef = ref(null);
 
             const rsaEncrypt = (val) => {
+                let tmp_public_key = @json(shop_config(\App\Models\ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, ''));
+                if (!tmp_public_key) {
+                    return val
+                }
                 let rsaEncrypt = new JSEncrypt();
-                rsaEncrypt.setPublicKey(@json($rsa_public_key));
+                rsaEncrypt.setPublicKey(tmp_public_key);
                 return rsaEncrypt.encrypt(val);
             };
 
@@ -366,11 +370,6 @@
                 });
             };
 
-            const validatePassword = (password, username) => {
-                const passwordPattern = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
-                return passwordPattern.test(password) || username === 'admin';
-            };
-
             const handleLogin = () => {
                 const username = loginForm.value.username;
                 const password = loginForm.value.password;
@@ -385,7 +384,8 @@
                     return;
                 }
 
-                if (!validatePassword(password, username)) {
+                const passwordPattern = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
+                if (!passwordPattern.test(password)) {
                     ElMessage.error('密码必须包含大写字母，小写字母，数字，特殊字符`@#$%^&*`~()-+=`中的任意三种。请联系管理员进行有修改。');
                     return;
                 }
