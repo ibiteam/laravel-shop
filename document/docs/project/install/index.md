@@ -3,7 +3,7 @@
 安装
 
 ```sh
-git clone git@github.com:ibiteam/laravel-shop.git
+git clone https://github.com/ibiteam/laravel-shop.git
 composer install
 cp .env.example .env
 ```
@@ -22,7 +22,6 @@ server {
     location / {
         try_files $uri $uri/ /index.php?$query_string;
     }
-   error_log /var/log/nginx/ai-error.log;
     location ~ \.php$ {
         try_files $uri /index.php =404;
         fastcgi_pass unix:/usr/local/php/php8.4-fpm.sock;

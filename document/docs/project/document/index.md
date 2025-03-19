@@ -2,7 +2,7 @@
 
 ### 1. 项目说明
 
-存放目录 `document`
+存放目录 `document`, 使用的是[Rspress](https://rspress.dev/zh/index) 进行构建的
 
 文档目录 `document/docs`  用于文档的书写
 
