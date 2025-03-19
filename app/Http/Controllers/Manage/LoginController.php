@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Exceptions\BusinessException;
 use App\Http\Dao\AdminUserLoginLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
@@ -10,7 +9,6 @@ use App\Models\AdminUserLoginLog;
 use App\Models\ShopConfig;
 use App\Rules\CaptchaRule;
 use App\Utils\RsaUtil;
-use App\Utils\WorkWechatUtil;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -100,21 +98,6 @@ class LoginController extends BaseController
         $this->clearLoginAttempts($request);
 
         return $this->success(['redirect' => $this->redirectTo()]);
-    }
-
-    public function workWechatLogin(Request $request)
-    {
-        try {
-            $current_user = WorkWechatUtil::userFromCode((string)$request->get('code'));
-            $work_wechat_user_id = $current_user->getAttribute('id');
-            if (!$work_wechat_user_id) {
-                throw new BusinessException('您没有授权访问，请联系商城管理员进行授权');
-            }
-        } catch (\Throwable $throwable) {
-            return $this->error('登录失败，请稍后再试');
-        }
-        dd($work_wechat_user_id);
-
     }
 
     protected function validateLogin(Request $request)
