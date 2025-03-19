@@ -106,24 +106,6 @@
         text-align: center;
     }
 
-    .other_login {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 30px;
-    }
-
-    .other_line {
-        width: 90px;
-        height: 0px;
-        border-bottom: 2px solid #E8E8E8;
-    }
-
-    .other_title {
-        margin: 0 20px;
-        color: #777777;
-    }
-
     .login_footer {
         position: fixed;
         bottom: 0;
@@ -140,25 +122,6 @@
     .login_footer_title {
         text-align: center;
         padding: 0 40px
-    }
-
-    .ding_talk {
-        width: 60px;
-        height: 60px;
-        background: #0177F6;
-        border-radius: 14px;
-        text-align: center;
-        line-height: 60px;
-    }
-
-    .work_wechat {
-        width: 60px;
-        height: 60px;
-        background: #ffffff;
-        border-radius: 14px;
-        text-align: center;
-        line-height: 60px;
-        border: 1px solid #EFEFEF;
     }
 
     @-webkit-keyframes bounce-down {
@@ -256,48 +219,31 @@
             @endif
             <div style="width:480px;">
                 <el-form ref="loginFormRef" :model="loginForm" @submit.prevent>
-                    @if(shop_config(\App\Models\ShopConfig::CAN_PASSWORD_LOGIN, false))
-                        <div class="box login_title" style="width:300px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">欢迎来到{{$config['shop_name']}}</div>
-                        <div class="box" style="width:360px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">
-                            <el-input v-model="loginForm.username" placeholder="用户名" :prefix-icon="User" style="width: 358px;"></el-input>
-                        </div>
-                        <div class="box" style="width:360px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">
-                            <el-input v-model="loginForm.password" placeholder="密码" :prefix-icon="Lock" :type="passwordVisible ? 'text' : 'password'" style="width: 358px;">
-                                <template #suffix>
-                                    <el-icon
-                                        class="cursor-pointer"
-                                        @mousedown="passwordVisible = true"
-                                        @mouseup="passwordVisible = false"
-                                        @mouseleave="passwordVisible = false">
-                                        <component :is="passwordVisible ? 'View' : 'Hide'" />
-                                    </el-icon>
-                                </template>
-                            </el-input>
-                        </div>
-                        <div class="box" style="width:360px;margin: 0px auto 30px;">
-                            <el-button id="login-submit-button"
-                                type="primary"
-                                style="width: 100%; height: 48px;"
-                                @click="handleLogin"
-                                :loading="loading">登录</el-button>
-                            <input type="hidden" value="" class="validate">
-                            @csrf
-                        </div>
-                        @if(!empty($other_login_methods))
-                            <div class="other_login">
-                                <div class="other_line"></div>
-                                <div class="other_title">其他方式登录</div>
-                                <div class="other_line"></div>
-                            </div>
-                        @endif
-                    @endif
-                    <div style="display: flex;justify-content: space-around;padding:0 65px;">
-                        @foreach($other_login_methods as $other_login_method)
-                            <a class="box" href="{{ $other_login_method['redirect'] }}" style="text-align: center;font-size: 12px;color: #333;">
-                                <div class="{{$other_login_method['class']}}"><img src="{{ $other_login_method['icon'] }}" alt=""></div>
-                                <p>{{ $other_login_method['name'] }}</p>
-                            </a>
-                        @endforeach
+                    <div class="box login_title" style="width:300px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">欢迎来到 {{$config['shop_name']}}</div>
+                    <div class="box" style="width:360px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">
+                        <el-input v-model="loginForm.username" placeholder="用户名" :prefix-icon="User" style="width: 358px;"></el-input>
+                    </div>
+                    <div class="box" style="width:360px;border-radius: 2px;-webkit-border-radius: 2px;margin: 0px auto;margin-bottom: 20px;">
+                        <el-input v-model="loginForm.password" placeholder="密码" :prefix-icon="Lock" :type="passwordVisible ? 'text' : 'password'" style="width: 358px;">
+                            <template #suffix>
+                                <el-icon
+                                    class="cursor-pointer"
+                                    @mousedown="passwordVisible = true"
+                                    @mouseup="passwordVisible = false"
+                                    @mouseleave="passwordVisible = false">
+                                    <component :is="passwordVisible ? 'View' : 'Hide'" />
+                                </el-icon>
+                            </template>
+                        </el-input>
+                    </div>
+                    <div class="box" style="width:360px;margin: 0px auto 30px;">
+                        <el-button id="login-submit-button"
+                            type="primary"
+                            style="width: 100%; height: 48px;"
+                            @click="handleLogin"
+                            :loading="loading">登录</el-button>
+                        <input type="hidden" value="" class="validate">
+                        @csrf
                     </div>
                 </el-form>
             </div>
