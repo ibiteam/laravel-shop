@@ -9,6 +9,6 @@ class WorkbenchController extends BaseController
 {
     public function index(Request $request)
     {
-        //
+        return '后台首页';
     }
 }
