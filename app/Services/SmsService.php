@@ -5,9 +5,11 @@ namespace App\Services;
 use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\PhoneMsgDao;
+use App\Http\Dao\UserDao;
 use App\Messages\BaseMessage;
 use App\Messages\PhoneCodeMessage;
 use App\Models\PhoneMsg;
+use App\Models\User;
 use App\Utils\SmsUtil;
 
 class SmsService
@@ -26,6 +28,12 @@ class SmsService
 
     public function sendLoginOtp(int $phone): bool
     {
+        $user = app(UserDao::class)->getInfoByPhone($phone);
+
+        if (! $user instanceof User) {
+            throw new BusinessException('该手机号未注册');
+        }
+
         $this->sendMessage($phone, new PhoneCodeMessage('登录短信', PhoneMsg::PHONE_LOGIN));
 
         return true;
@@ -33,6 +41,12 @@ class SmsService
 
     public function sendRegisterOtp(int $phone): bool
     {
+        $user = app(UserDao::class)->getInfoByPhone($phone);
+
+        if ($user instanceof User) {
+            throw new BusinessException('该手机号已被注册');
+        }
+
         $this->sendMessage($phone, new PhoneCodeMessage('注册短信', PhoneMsg::PHONE_REGISTER));
 
         return true;
