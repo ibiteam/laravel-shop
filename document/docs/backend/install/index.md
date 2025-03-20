@@ -1,6 +1,6 @@
 # 源码安装
 
-安装
+## 安装
 
 ```sh
 git clone https://github.com/ibiteam/laravel-shop.git
@@ -8,7 +8,7 @@ composer install
 cp .env.example .env
 ```
 
-本地nginx 配置
+## 本地nginx 配置
 
 ```sh
 server {
@@ -34,4 +34,20 @@ server {
     }
 }
 
+```
+
+## frontend
+
+develop
+
+```sh
+npm install
+npm run dev
+```
+
+production
+
+```sh
+npm install
+npm run build
 ```
