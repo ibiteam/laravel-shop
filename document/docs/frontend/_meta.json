@@ -1,0 +1,13 @@
+[
+    "index",
+    {
+        "type": "dir",
+        "name": "install",
+        "label": "安装"
+    },
+    {
+        "type": "dir",
+        "name": "document",
+        "label": "文档"
+    }
+]

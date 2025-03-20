@@ -2,11 +2,13 @@
     {
         "type": "dir",
         "name": "user",
-        "label": "用户"
+        "label": "用户",
+        "collapsed": true
     },
     {
         "type": "dir",
         "name": "order",
-        "label": "订单"
+        "label": "订单",
+        "collapsed": true
     }
 ]

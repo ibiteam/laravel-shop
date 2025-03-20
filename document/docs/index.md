@@ -4,11 +4,11 @@ pageType: home
 hero:
   name: Laravel Shop
   text: 你所期待的商城！
-  tagline: a awesome shop
+  tagline: An awesome shop~
   actions:
     - theme: brand
       text: 快速上手
-      link: /project/
+      link: /backend/
     - theme: alt
       text: GitHub
       link: https://github.com/ibiteam/laravel-shop

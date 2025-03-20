@@ -1,8 +1,13 @@
 [
   {
-    "text": "项目说明",
-    "link": "/project/",
-    "activeMatch": "/project/"
+    "text": "后端文档",
+    "link": "/backend/",
+    "activeMatch": "/backend/"
+  },
+  {
+    "text": "前端文档",
+    "link": "/frontend/",
+    "activeMatch": "/frontend/"
   },
   {
     "text": "API",
