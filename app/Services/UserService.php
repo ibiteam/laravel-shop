@@ -35,7 +35,7 @@ class UserService
     {
         $now = Carbon::now();
         $future = $now->copy()->addDay();
-        $token = $user->createToken($source->value, expiresAt: $future)->plainTextToken;
+        $token = $user->createToken('api', expiresAt: $future)->plainTextToken;
 
         $user_log = new UserLog;
         $user_log->user_id = $user->id;

@@ -20,5 +20,5 @@ Route::middleware([])->group(function () {
  * 登录可以访问路由.
  */
 Route::middleware('auth:sanctum')->group(function () {
-
+    //
 });
