@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\CommonEnum;
 use App\Http\Dao\ShopConfigDao;
 use Illuminate\Support\Facades\App;
 
@@ -84,4 +85,20 @@ if (! function_exists('is_phone')) {
 
         return (bool) preg_match('/^1[3456789]\d{9}$/', $phone);
     }
+}
+
+if (! function_exists('get_source')) {
+    /**
+     * 获取访问来源.
+     */
+    function get_source(): CommonEnum
+    {
+        return match (request()->header('source')) {
+            'h5' => CommonEnum::H5,
+            'pc' => CommonEnum::PC,
+            'app' => CommonEnum::APP,
+            'wechat_mini' => CommonEnum::WECHAT_MINI,
+            default => CommonEnum::H5,
+        };
+    };
 }

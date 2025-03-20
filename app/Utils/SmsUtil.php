@@ -30,9 +30,9 @@ class SmsUtil
         try {
             $this->toDatabase($phone, $message);
 
-            // if (is_pro_env()) {
+            if (is_pro_env()) {
                 $this->easySms->send($phone, $message);
-            // }
+            }
 
             return true;
         } catch (\Throwable $exception) {
