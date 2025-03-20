@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\AdminUser;
 use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 
 class PermissionTableSeeder extends Seeder
@@ -21,6 +23,33 @@ class PermissionTableSeeder extends Seeder
         $this->addToolPermission($guard_name);
         $this->addDataPermission($guard_name);
         $this->addProductPermission($guard_name);
+        // 初始化管理员角色
+        $this->initRole($guard_name);
+    }
+
+    private function initRole($guard_name)
+    {
+        $role = Role::query()->firstOrNew(['name' => 'root']);
+
+        if (! $role->exists) {
+            $role->guard_name = $guard_name;
+            $role->display_name = '超级管理员';
+            $role->save();
+
+            $admin_user = AdminUser::whereUserName('admin')->first();
+
+            if ($admin_user) {
+                $admin_user->assignRole($role);
+            }
+        }
+
+        $this->give_permission($role);
+    }
+
+    private function give_permission(Role $role)
+    {
+        $permissions = Permission::query()->get();
+        $role->givePermissionTo($permissions);
     }
 
     private function addSettingsPermission(string $guard_name): void

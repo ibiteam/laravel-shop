@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int                             $id
@@ -39,6 +40,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class AdminUser extends Authenticatable
 {
+    use HasRoles;
     use DatetimeTrait;
     public const STATUS_ENABLE = 1; // 启用
     public const STATUS_DISABLE = 0; // 禁用
@@ -68,5 +70,15 @@ class AdminUser extends Authenticatable
         return Attribute::make(
             get: fn ($value, array $attributes) => $value ?: '',
         );
+    }
+
+    /**
+     * 生成头像文字.
+     */
+    public function generateAvatarText(): string
+    {
+        $name = $this->getRawOriginal('user_name');
+
+        return mb_substr($name, -2, null, 'UTF-8');
     }
 }
