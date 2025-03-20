@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('ip_addresses', function (Blueprint $table) {
             $table->id();
             $table->string('ip', 20)->comment('IP');
-            $table->string('country_ad_code')->comment('国家AdCode');
-            $table->string('province_ad_code')->comment('省份AdCode');
-            $table->string('city_ad_code')->comment('城市AdCode');
-            $table->string('district_ad_code')->comment('区县AdCode');
+            $table->string('country')->comment('国家名称');
+            $table->string('province')->comment('省份名称');
+            $table->string('city')->comment('城市名称');
+            $table->string('district')->comment('区县名称');
             $table->timestamps();
         });
     }
