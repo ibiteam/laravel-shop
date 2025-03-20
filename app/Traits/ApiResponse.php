@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Enums\ResponseEnum;
+use App\Enums\CustomCodeEnum;
 use Illuminate\Http\JsonResponse;
 
 trait ApiResponse
@@ -10,11 +10,16 @@ trait ApiResponse
     /**
      * 成功函数.
      */
-    public function success(mixed $data = null, string $message = 'success', ResponseEnum $response_enum = ResponseEnum::SUCCESS): JsonResponse
+    public function success(mixed $data = null, string $message = 'success', CustomCodeEnum $response_enum = CustomCodeEnum::SUCCESS): JsonResponse
     {
+        if (is_string($data)) {
+            $message = $data;
+            $data = null;
+        }
+
         return response()->json([
             'code' => $response_enum->value,
-            'message' => is_string($data) ? $data : $message,
+            'message' => $message,
             'data' => $data,
         ]);
     }
@@ -22,7 +27,7 @@ trait ApiResponse
     /**
      * 失败函数，不携带返回数据.
      */
-    public function error(string $message = 'error', ResponseEnum $response_enum = ResponseEnum::ERROR): JsonResponse
+    public function error(string $message = 'error', CustomCodeEnum $response_enum = CustomCodeEnum::ERROR): JsonResponse
     {
         return response()->json([
             'code' => $response_enum->value,
@@ -34,7 +39,7 @@ trait ApiResponse
     /**
      * 失败函数，并携带返回数据.
      */
-    public function failed(mixed $data = null, string $message = 'error', ResponseEnum $response_enum = ResponseEnum::ERROR): JsonResponse
+    public function failed(mixed $data = null, string $message = 'error', CustomCodeEnum $response_enum = CustomCodeEnum::ERROR): JsonResponse
     {
         return response()->json([
             'code' => $response_enum->value,

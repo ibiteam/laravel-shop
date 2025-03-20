@@ -71,3 +71,17 @@ if (! function_exists('get_request_ip')) {
         return strpos($ip, ',') ? substr($ip, 0, strpos($ip, ',')) : $ip;
     }
 }
+
+if (! function_exists('is_phone')) {
+    /**
+     * 判断是否是合法的手机号.
+     */
+    function is_phone(int $phone): bool
+    {
+        if (! is_numeric($phone)) {
+            return false;
+        }
+
+        return (bool) preg_match('/^1[3456789]\d{9}$/', $phone);
+    }
+}

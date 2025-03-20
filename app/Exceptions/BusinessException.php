@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use App\Enums\ResponseEnum;
+use App\Enums\CustomCodeEnum;
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -13,18 +13,18 @@ class BusinessException extends Exception
 
     public function __construct(
         string $message = '',
-        protected ResponseEnum $error_code_enum = ResponseEnum::ERROR,
+        protected CustomCodeEnum $custom_code_enum = CustomCodeEnum::ERROR,
     ) {
-        parent::__construct($message, $this->error_code_enum->value);
+        parent::__construct($message, $this->custom_code_enum->value);
     }
 
     public function render($request): JsonResponse
     {
-        return $this->error($this->message, $this->error_code_enum);
+        return $this->error($this->message, $this->custom_code_enum);
     }
 
-    public function getErrorCodeEnum(): ResponseEnum
+    public function getCodeEnum(): CustomCodeEnum
     {
-        return $this->error_code_enum;
+        return $this->custom_code_enum;
     }
 }
