@@ -3,8 +3,11 @@
 use App\Enums\CommonEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
+use App\Services\MobileRouterService;
+use App\Utils\Constant;
 use App\Models\AdminUser;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -102,7 +105,156 @@ if (! function_exists('get_source')) {
             'wechat_mini' => CommonEnum::WECHAT_MINI,
             default => CommonEnum::H5,
         };
-    };
+    }
+}
+
+if (! function_exists('connectStr')) {
+    /**
+     * 获取路径地址连接符.
+     */
+    function connectStr($url)
+    {
+        if (strpos($url, '?')) {
+            return '&';
+        }
+
+        return '?';
+    }
+}
+if (! function_exists('cache_forever')) {
+    /**
+     * 永久缓存.
+     *
+     * @param $code
+     */
+    function cache_forever($key, $callback)
+    {
+        //测试环境数据不缓存
+        if (config('app.debug')) {
+            return $callback();
+        }
+
+        return Cache::rememberForever(config('cache.prefix').$key, $callback);
+    }
+}
+
+if (! function_exists('is_m_request')) {
+    /**
+     * 判断来源是否为H5.
+     */
+    function is_m_request(): bool
+    {
+        if (strtoupper(request()->header('Access-From', '')) == Constant::REFERER_H5) {
+            return true;
+        }
+        $m_host = shop_config(ShopConfig::M_URL);
+
+        if (! $m_host) {
+            return false;
+        }
+
+        return str_contains(request()->fullUrl(), $m_host);
+    }
+}
+
+if (! function_exists('is_app_request')) {
+    /**
+     * 判断来源是否为APP.
+     */
+    function is_app_request(): bool
+    {
+        if (strtoupper(request()->header('Access-From', '')) === Constant::REFERER_APP) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+if (! function_exists('is_miniProgram_request')) {
+    /**
+     * 请求的来源是否是小程序.
+     */
+    function is_miniProgram_request(): bool
+    {
+        /* deleted start */
+        $needle = 'miniProgram';
+
+        // 原小程序接口
+        if (str_contains(request()->fullUrl(), $needle)) {
+            return true;
+        }
+
+        // 新小程序接口
+        if (request()->header('Platform-Type', '') === $needle) {
+            return true;
+        }
+
+        /* deleted end */
+        if (strtoupper(request()->header('Access-From', '')) === Constant::REFERER_MINI) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+
+if (! function_exists('is_harmony_request')) {
+    /**
+     * 判断是否为鸿蒙系统请求.
+     */
+    function is_harmony_request(): bool
+    {
+        if (strtoupper(request()->header('System-Type', '')) === 'HARMONYOS') {
+            return true;
+        }
+
+        if (request()->header('System-Source') == 'harmonyOs') {
+            return true;
+        }
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        return str_contains($agent, 'harmonyOs');
+    }
+}
+
+if (! function_exists('is_android_request')) {
+    /**
+     * 判断是否为安卓系统请求
+     */
+    function is_android_request(): bool
+    {
+        return strtoupper(request()->header('System-Type', '')) === 'ANDROID';
+    }
+}
+
+if (! function_exists('is_ios_request')) {
+    /**
+     * 判断是否为IOS系统请求
+     */
+    function is_ios_request(): bool
+    {
+        return strtoupper(request()->header('System-Type', '')) === 'IOS';
+    }
+}
+
+if (! function_exists('sourcePort')) {
+    /**
+     * 获取来源.
+     */
+    function sourcePort()
+    {
+        if (is_miniProgram_request()) {
+            return MobileRouterService::SOURCE_MINI;
+        } elseif (is_m_request()) {
+            return MobileRouterService::SOURCE_H5;
+        } elseif (is_app_request()) {
+            return MobileRouterService::SOURCE_APP;
+        }
+
+        return '';
+    }
 }
 
 if (! function_exists('admin_operation_log')) {
