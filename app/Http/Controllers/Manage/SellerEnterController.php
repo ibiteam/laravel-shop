@@ -129,15 +129,15 @@ class SellerEnterController extends BaseController
                 $log_info = $check_status == SellerEnter::CHECK_APPROVED ? '审核通过' : '审核驳回:'.$check_desc;
                 admin_operation_log($this->adminUser(), $log_info, AdminOperationLog::SELLER_ENTER_CHECK, (new SellerEnter())->getTable(), $seller_enter->id);
 
-                return $this->success('审核成功');
+                return $this->success('操作成功');
             }
 
-            return $this->error('审核失败！');
+            return $this->error('操作失败');
 
         } catch (ValidationException $validationException) {
             return $this->error($validationException->validator->errors()->first());
         } catch (\Exception $exception) {
-            return $this->error('审核异常');
+            return $this->error('审核操作异常');
         }
     }
 

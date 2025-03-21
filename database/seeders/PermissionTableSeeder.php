@@ -61,6 +61,13 @@ class PermissionTableSeeder extends Seeder
     private function addStorePermission(string $guard_name): void
     {
         $this->addPermission($guard_name, '店铺', Permission::MANAGE_STORE, 99, '', Permission::IS_LEFT_NAV);
+
+        // 入驻管理
+        $this->addPermission($guard_name, '入驻管理',Permission::SELLER_ENTER_MANAGE,9,'',Permission::IS_LEFT_NAV,Permission::MANAGE_STORE);
+        $this->addPermission($guard_name, '商家注册项设置',Permission::SELLER_ENTER_CONFIG_INDEX,100,'',Permission::IS_LEFT_NAV,Permission::SELLER_ENTER_MANAGE);
+        $this->addPermission($guard_name, '商家注册项设置添加|编辑',Permission::SELLER_ENTER_CONFIG_UPDATE,99,'',Permission::NOT_IS_LEFT_NAV,Permission::SELLER_ENTER_MANAGE);
+        $this->addPermission($guard_name, '入驻商家列表',Permission::SELLER_ENTER_INDEX,90,'',Permission::IS_LEFT_NAV,Permission::SELLER_ENTER_MANAGE);
+        $this->addPermission($guard_name, '入驻商家添加|编辑',Permission::SELLER_ENTER_UPDATE,89,'',Permission::NOT_IS_LEFT_NAV,Permission::SELLER_ENTER_MANAGE);
     }
 
     private function addUserPermission(string $guard_name): void

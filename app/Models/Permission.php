@@ -61,6 +61,14 @@ class Permission extends SpatiePermission
     public const WEB_DECORATION_MANAGE = 'web_decoration_manage';
     public const APP_WEB_DECORATION_INDEX = 'manage.app_web_decoration.index'; // 移动端装修
 
+    // 入驻管理
+    public const SELLER_ENTER_MANAGE = 'seller_enter_manage';
+    public const SELLER_ENTER_CONFIG_INDEX = 'manage.seller_enter_config.index'; // 商家注册项设置
+    public const SELLER_ENTER_CONFIG_UPDATE = 'manage.seller_enter_config.update'; // 商家注册项设置添加|编辑
+    public const SELLER_ENTER_INDEX = 'manage.seller_enter.index'; // 入驻商家列表
+    public const SELLER_ENTER_UPDATE = 'manage.seller_enter.update'; // 入驻商家添加|编辑
+
+
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $this->guardName();
