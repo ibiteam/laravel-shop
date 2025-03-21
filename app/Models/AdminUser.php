@@ -40,8 +40,8 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class AdminUser extends Authenticatable
 {
-    use HasRoles;
     use DatetimeTrait;
+    use HasRoles;
     public const STATUS_ENABLE = 1; // 启用
     public const STATUS_DISABLE = 0; // 禁用
     protected $guarded = [];
@@ -58,20 +58,6 @@ class AdminUser extends Authenticatable
         return $this->hasOne(AdminUserLoginLog::class, 'admin_user_id', 'id')->orderBy('id', 'desc');
     }
 
-    protected function password(): Attribute
-    {
-        return Attribute::make(
-            set: fn ($value) => bcrypt($value),
-        );
-    }
-
-    protected function avatar(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value, array $attributes) => $value ?: '',
-        );
-    }
-
     /**
      * 生成头像文字.
      */
@@ -80,5 +66,19 @@ class AdminUser extends Authenticatable
         $name = $this->getRawOriginal('user_name');
 
         return mb_substr($name, -2, null, 'UTF-8');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => $value ?: '',
+        );
     }
 }
