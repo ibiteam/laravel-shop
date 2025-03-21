@@ -16,16 +16,28 @@ class SmsService
 {
     public const ACTION_LOGIN = 'login';
     public const ACTION_REGISTER = 'register';
+    public const ACTION_FORGET_PASSWORD = 'forget_password';
 
+    /**
+     * 发送短信验证码
+     *
+     * @throws BusinessException
+     */
     public function sendOtp(string $action, int $phone): bool
     {
         return match ($action) {
             self::ACTION_LOGIN => $this->sendLoginOtp($phone),
             self::ACTION_REGISTER => $this->sendRegisterOtp($phone),
+            self::ACTION_FORGET_PASSWORD => $this->sendForgetPasswordOtp($phone),
             default => throw new BusinessException('发送失败~'),
         };
     }
 
+    /**
+     * 登录短信验证码
+     *
+     * @throws BusinessException
+     */
     public function sendLoginOtp(int $phone): bool
     {
         $user = app(UserDao::class)->getInfoByPhone($phone);
@@ -39,6 +51,29 @@ class SmsService
         return true;
     }
 
+    /**
+     * 忘记密码短信验证码
+     *
+     * @throws BusinessException
+     */
+    public function sendForgetPasswordOtp(int $phone): bool
+    {
+        $user = app(UserDao::class)->getInfoByPhone($phone);
+
+        if (! $user instanceof User) {
+            throw new BusinessException('该手机号未注册');
+        }
+
+        $this->sendMessage($phone, new PhoneCodeMessage('忘记密码短信', PhoneMsg::PHONE_FORGET_PASSWORD));
+
+        return true;
+    }
+
+    /**
+     * 注册短信验证码
+     *
+     * @throws BusinessException
+     */
     public function sendRegisterOtp(int $phone): bool
     {
         $user = app(UserDao::class)->getInfoByPhone($phone);
@@ -78,6 +113,11 @@ class SmsService
         return true;
     }
 
+    /**
+     * 发送短信验证码
+     *
+     * @throws BusinessException
+     */
     private function sendMessage(int $phone, BaseMessage $message): void
     {
         // 检查是否在 60 秒内已发送未验证的验证码

@@ -8,6 +8,7 @@ use App\Http\Dao\UserDao;
 use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Rules\PhoneRule;
+use App\Services\PasswordRuleService;
 use App\Services\SmsService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -220,5 +221,55 @@ class AuthController extends BaseController
         }
 
         return $this->success('退出成功');
+    }
+
+    /**
+     * 忘记密码
+     */
+    public function forgetPassword(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'phone' => [
+                    'required',
+                    'integer',
+                    new PhoneRule,
+                ],
+                'code' => 'required|string',
+                'new_password' => [
+                    'required',
+                    'string',
+                    'confirmed',
+                    PasswordRuleService::userPasswordRule(),
+                ],
+            ], [], [
+                'phone' => '手机号',
+                'code' => '验证码',
+                'new_password' => '新密码',
+                'new_password_confirmation' => '确认密码',
+            ]);
+
+            $user = $user_dao->getInfoByPhone($validated['phone']);
+
+            if (! $user instanceof User) {
+                throw new BusinessException('该手机号未注册');
+            }
+
+            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_FORGET_PASSWORD)) {
+                throw new BusinessException('验证码输入错误');
+            }
+
+            if (! $user->update(['password' => $validated['new_password']])) {
+                throw new BusinessException('重置密码失败');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('注册失败');
+        }
+
+        return $this->success('重置密码成功');
     }
 }

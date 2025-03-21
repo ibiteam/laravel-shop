@@ -21,6 +21,7 @@ class SmsController extends BaseController
                     'in:'.implode(',', [
                         SmsService::ACTION_LOGIN,
                         SmsService::ACTION_REGISTER,
+                        SmsService::ACTION_FORGET_PASSWORD,
                     ]),
                 ],
                 'phone' => [

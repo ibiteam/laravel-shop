@@ -55,3 +55,15 @@ it('test logout api interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+it('test forget password api interface', function () {
+    $response = $this->doPost('api/v1/auth/forget-password',[
+        'phone'=>'13322221111',
+        'code' => '662595',
+        'new_password' => 'Aa123456',
+        'new_password_confirmation' => 'Aa123456'
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

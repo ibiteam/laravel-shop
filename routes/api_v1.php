@@ -11,9 +11,9 @@ Route::middleware([])->group(function () {
     Route::post('sms-action', [SmsController::class, 'handleAction']);
 
     Route::prefix('auth')->group(function () {
-        Route::post('check-phone', [AuthController::class, 'checkPhone']); // 检测手机号是否注册
+        Route::get('check-phone', [AuthController::class, 'checkPhone']); // 检测手机号是否注册
 
-        Route::post('check-login', [AuthController::class, 'checkLogin']); // 检测是否登录
+        Route::get('check-login', [AuthController::class, 'checkLogin']); // 检测是否登录
 
         Route::post('register-by-phone', [AuthController::class, 'registerByPhone']); // 手机号注册
 
@@ -22,6 +22,8 @@ Route::middleware([])->group(function () {
         Route::post('login-by-phone', [AuthController::class, 'loginByPhone']); // 手机号登录
 
         Route::post('login-register-by-phone', [AuthController::class, 'loginAndRegisterByPhone']); // 手机号登录或注册
+
+        Route::post('forget-password', [AuthController::class, 'forgetPassword']); // 忘记密码
     });
 });
 

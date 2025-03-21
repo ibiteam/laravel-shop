@@ -18,7 +18,7 @@ class UserService
 
         return User::query()->create([
             'user_name' => $tmp_user_name,
-            'password' => $tmp_user_name.time(),
+            'password' => PasswordRuleService::generatePassword(),
             'nickname' => $tmp_user_name,
             'phone' => $phone,
             'avatar' => '',
