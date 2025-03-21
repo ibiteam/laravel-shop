@@ -23,6 +23,7 @@ class PermissionTableSeeder extends Seeder
         $this->addToolPermission($guard_name);
         $this->addDataPermission($guard_name);
         $this->addProductPermission($guard_name);
+        $this->addTemplatePermission($guard_name);
         // 初始化管理员角色
         $this->initRole($guard_name);
     }
@@ -85,6 +86,19 @@ class PermissionTableSeeder extends Seeder
     private function addDataPermission(string $guard_name): void
     {
         $this->addPermission($guard_name, '数据', Permission::MANAGE_DATA, 95, '', Permission::IS_LEFT_NAV);
+    }
+    private function addTemplatePermission(string $guard_name): void
+    {
+        $this->addPermission($guard_name, '模板', Permission::MANAGE_TEMPLATE, 94, '', Permission::IS_LEFT_NAV);
+        $this->addTemplate($guard_name);
+    }
+
+    // 模板
+    private function addTemplate($guard_name)
+    {
+        // 模板-网站管理
+        $this->addPermission($guard_name, '网站管理', Permission::WEB_DECORATION_MANAGE, 10, '', Permission::IS_LEFT_NAV, Permission::MANAGE_TEMPLATE);
+        $this->addPermission($guard_name, '移动端装修', Permission::APP_WEB_DECORATION_INDEX, 90, '', Permission::IS_LEFT_NAV, Permission::WEB_DECORATION_MANAGE);
     }
 
     private function addPermission(
