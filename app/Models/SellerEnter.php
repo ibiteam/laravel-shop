@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int                             $id
  * @property int                             $user_id       会员id
- * @property string                          $enter_info    入驻信息
+ * @property array<array-key, mixed>         $enter_info    入驻信息
  * @property string                          $source        来源
  * @property int                             $check_status  审核状态：0未审核，1审核通过，2审核不通过
  * @property int                             $admin_user_id 审核人
@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null                     $remark        备注
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\AdminUser $adminUser
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SellerEnter newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SellerEnter newQuery()
@@ -40,4 +41,13 @@ class SellerEnter extends Model
     public const CHECK_APPROVED = 1; // 审核通过
     public const CHECK_NOT_APPROVED = 2; // 审核未通过
     protected $guarded = [];
+
+    protected $casts = [
+        'enter_info' => 'array',
+    ];
+
+    public function adminUser()
+    {
+        return $this->belongsTo(AdminUser::class, 'admin_user_id', 'id');
+    }
 }
