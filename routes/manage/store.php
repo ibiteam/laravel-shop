@@ -13,6 +13,7 @@ Route::prefix('seller_enter_config')->group(function () {
 // 商家入驻列表
 Route::prefix('seller_enter')->group(function () {
     Route::get('/', [SellerEnterController::class, 'index'])->name('manage.seller_enter.index');
-    Route::post('update_field', [SellerEnterController::class, 'updateField'])->name('manage.seller_enter.update_field');
+    Route::get('show', [SellerEnterController::class, 'show'])->name('manage.seller_enter.show');
     Route::post('check_status', [SellerEnterController::class, 'checkStatus'])->name('manage.seller_enter.check_status');
+    Route::post('update_field', [SellerEnterController::class, 'updateField'])->name('manage.seller_enter.update_field');
 });
