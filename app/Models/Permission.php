@@ -57,6 +57,9 @@ class Permission extends SpatiePermission
     public const MANAGE_TOOLS = 'manage.tools'; // 工具
     public const MANAGE_DATA = 'manage.data'; // 数据
     public const MANAGE_PRODUCT = 'manage.product'; // 产品
+    public const MANAGE_TEMPLATE = 'manage.template'; // 模板
+    public const WEB_DECORATION_MANAGE = 'web_decoration_manage';
+    public const APP_WEB_DECORATION_INDEX = 'manage.app_web_decoration.index'; // 移动端装修
 
     public function __construct(array $attributes = [])
     {

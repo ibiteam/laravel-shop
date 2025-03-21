@@ -689,7 +689,7 @@
         <div class="layout-left" :class="{'layout-left-hidden':!leftShow}">
             <div class="layout-left-header">
                 <div class="logo-imgs">
-                    <img :src="{{ shop_config('shop_logo') }}" alt="">
+                    <img src="{{ shop_config('shop_logo') }}" alt="">
                 </div>
                 <div class="indentation">
                     <el-icon @click="leftShow = false"><Fold /></el-icon>
