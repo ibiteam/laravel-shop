@@ -98,7 +98,7 @@ class SmsService
      */
     public function verifyOtp(int $phone, string $otp, int $send_type = PhoneMsg::PHONE_NOTICE): bool
     {
-        if (!is_pro_env() && '000000' == $otp) {
+        if (!is_pro_env() && '000000' === $otp) {
             return true;
         }
 
