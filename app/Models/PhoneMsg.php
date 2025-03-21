@@ -42,6 +42,7 @@ class PhoneMsg extends Model
     public const PHONE_LOGIN = 2; //登录短信验证码
     public const PHONE_FORGET_PASSWORD = 3; // 忘记密码短信验证码
     public const PHONE_NOTICE = 4; //通知类短信
+    public const PHONE_EDIT_PASSWORD = 5; // 修改密码
 
     public const CODE_TIME = 5; //验证码有效时间 5分钟
     public const STATUS_NOT_USED = 0; // 未使用

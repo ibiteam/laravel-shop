@@ -41,8 +41,7 @@ it('test register or login by phone api interface', function () {
     $this->assertEquals(200, $response['code']);
 });
 it('test login by password api interface', function () {
-    $response = $this->doPost('api/v1/auth/login-by-password',['account' => 'laravel-shop','password' => 'laravel-shop']);
-    dump($response);
+    $response = $this->doPost('api/v1/auth/login-by-password',['account' => 'laravel-shop','password' => 'laravel-shop-1']);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
@@ -61,6 +60,17 @@ it('test forget password api interface', function () {
         'code' => '662595',
         'new_password' => 'Aa123456',
         'new_password_confirmation' => 'Aa123456'
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test edit password api interface', function () {
+    $response = $this->doPost('api/v1/auth/edit-password',[
+        'code' => '344653',
+        'new_password' => 'laravel-shop-1',
+        'new_password_confirmation' => 'laravel-shop-1'
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);

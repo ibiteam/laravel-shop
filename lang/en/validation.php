@@ -153,4 +153,12 @@ return [
     'url'                    => 'The :attribute field must be a valid URL.',
     'uuid'                   => 'The :attribute field must be a valid UUID.',
     'is_phone'            => 'The :Attribute must be a valid phone number.',
+    'values' => [
+        'action' => [
+            'login' => 'Login',
+            'register' => 'Register',
+            'forget_password' => 'Forget Password',
+            'edit_password' => 'Edit Password',
+        ]
+    ]
 ];

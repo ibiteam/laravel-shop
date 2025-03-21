@@ -17,20 +17,36 @@ class SmsService
     public const ACTION_LOGIN = 'login';
     public const ACTION_REGISTER = 'register';
     public const ACTION_FORGET_PASSWORD = 'password-forget';
+    public const ACTION_EDIT_PASSWORD = 'password-edit'; // 修改密码
 
     /**
      * 发送短信验证码
      *
      * @throws BusinessException
      */
-    public function sendOtp(string $action, int $phone): bool
+    public function sendOtp(string $action, int $phone, ?User $user = null): bool
     {
         return match ($action) {
             self::ACTION_LOGIN => $this->sendLoginOtp($phone),
             self::ACTION_REGISTER => $this->sendRegisterOtp($phone),
             self::ACTION_FORGET_PASSWORD => $this->sendForgetPasswordOtp($phone),
+            self::ACTION_EDIT_PASSWORD => $this->sendEditPasswordOtp($user),
             default => throw new BusinessException('发送失败~'),
         };
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function sendEditPasswordOtp(?User $user): bool
+    {
+        if (! $user instanceof User) {
+            throw new BusinessException('用户未登录', CustomCodeEnum::UNAUTHORIZED);
+        }
+
+        $this->sendMessage($user->phone, new PhoneCodeMessage('修改密码短信', PhoneMsg::PHONE_EDIT_PASSWORD));
+
+        return true;
     }
 
     /**
@@ -98,7 +114,7 @@ class SmsService
      */
     public function verifyOtp(int $phone, string $otp, int $send_type = PhoneMsg::PHONE_NOTICE): bool
     {
-        if (!is_pro_env() && '000000' === $otp) {
+        if (! is_pro_env() && $otp === '000000') {
             return true;
         }
 

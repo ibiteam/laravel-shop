@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\CommonEnum;
+use App\Http\Dao\UserLogDao;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Support\Carbon;
@@ -31,20 +32,13 @@ class UserService
     /**
      * 登录成功处理token.
      */
-    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5): array
+    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5, string $token_name = 'api'): array
     {
         $now = Carbon::now();
         $future = $now->copy()->addDay();
-        $token = $user->createToken('api', expiresAt: $future)->plainTextToken;
+        $token = $user->createToken($token_name, expiresAt: $future)->plainTextToken;
 
-        $user_log = new UserLog;
-        $user_log->user_id = $user->id;
-        $user_log->type = UserLog::TYPE_LOGIN;
-        $user_log->source = $source->value;
-        $user_log->ip = get_request_ip();
-        $user_log->status = UserLog::STATUS_SUCCESS;
-        $user_log->description = '登录成功';
-        $user_log->save();
+        app(UserLogDao::class)->addLog($user, UserLog::TYPE_LOGIN, $source, '登录成功');
 
         return [
             'token' => $token,

@@ -33,5 +33,6 @@ Route::middleware([])->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']); // 退出登录
+        Route::post('edit-password', [AuthController::class, 'editPassword']); // 修改密码
     });
 });

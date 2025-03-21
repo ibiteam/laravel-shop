@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\DatetimeTrait;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -21,6 +22,10 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read int|null $tokens_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\UserLog> $userLogs
+ * @property-read int|null $user_logs_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -46,6 +51,11 @@ class User extends Authenticatable
     protected $guarded = [];
 
     protected $hidden = ['password'];
+
+    public function userLogs(): HasMany
+    {
+        return $this->hasMany(UserLog::class, 'user_id', 'id');
+    }
 
     protected function casts(): array
     {

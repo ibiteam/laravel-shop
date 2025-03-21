@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\UserDao;
+use App\Http\Dao\UserLogDao;
 use App\Models\PhoneMsg;
 use App\Models\User;
+use App\Models\UserLog;
 use App\Rules\PhoneRule;
 use App\Services\PasswordRuleService;
 use App\Services\SmsService;
@@ -226,22 +229,13 @@ class AuthController extends BaseController
     /**
      * 忘记密码
      */
-    public function forgetPassword(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service): JsonResponse
+    public function forgetPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao, UserDao $user_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
-                'phone' => [
-                    'required',
-                    'integer',
-                    new PhoneRule,
-                ],
+                'phone' => ['required', 'integer', new PhoneRule],
                 'code' => 'required|string',
-                'new_password' => [
-                    'required',
-                    'string',
-                    'confirmed',
-                    PasswordRuleService::userPasswordRule(),
-                ],
+                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
             ], [], [
                 'phone' => '手机号',
                 'code' => '验证码',
@@ -262,6 +256,48 @@ class AuthController extends BaseController
             if (! $user->update(['password' => $validated['new_password']])) {
                 throw new BusinessException('重置密码失败');
             }
+            $user_log_dao->addLog($user, UserLog::TYPE_OPERATE, get_source(), '重置密码成功');
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('注册失败');
+        }
+
+        return $this->success('重置密码成功');
+    }
+
+    /**
+     * 修改密码
+     */
+    public function editPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'code' => 'required|string',
+                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+            ], [], [
+                'code' => '短信验证码',
+                'new_password' => '新密码',
+                'new_password_confirmation' => '确认密码',
+            ]);
+
+            $user = $this->user();
+
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录', CustomCodeEnum::UNAUTHORIZED);
+            }
+
+            if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsg::PHONE_EDIT_PASSWORD)) {
+                throw new BusinessException('验证码输入错误');
+            }
+
+            if (! $user->update(['password' => $validated['new_password']])) {
+                throw new BusinessException('修改密码失败');
+            }
+
+            $user_log_dao->addLog($user, UserLog::TYPE_OPERATE, get_source(), '修改密码成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

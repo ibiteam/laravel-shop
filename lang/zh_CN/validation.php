@@ -153,4 +153,12 @@ return [
     'url'                    => ':attribute 格式不正确。',
     'uuid'                   => ':attribute 必须是有效的 UUID。',
     'is_phone'                   => ':attribute 必须是一个有效的手机号码',
+    'values' => [
+        'action' => [
+            'login' => '登录',
+            'register' => '注册',
+            'forget_password' => '忘记密码',
+            'edit_password' => '修改密码',
+        ]
+    ]
 ];

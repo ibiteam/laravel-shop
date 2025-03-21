@@ -22,17 +22,22 @@ class SmsController extends BaseController
                         SmsService::ACTION_LOGIN,
                         SmsService::ACTION_REGISTER,
                         SmsService::ACTION_FORGET_PASSWORD,
+                        SmsService::ACTION_EDIT_PASSWORD,
                     ]),
                 ],
                 'phone' => [
-                    'required', 'integer', new PhoneRule,
+                    'required_if:action,'.implode(',', [
+                        SmsService::ACTION_LOGIN,
+                        SmsService::ACTION_REGISTER,
+                        SmsService::ACTION_FORGET_PASSWORD,
+                    ]), 'integer', new PhoneRule,
                 ],
             ], [], [
                 'action' => '操作类型',
                 'phone' => '手机号',
             ]);
 
-            $sms_service->sendOtp($validated['action'], $validated['phone']);
+            $sms_service->sendOtp($validated['action'], $validated['phone'] ?? 0, $this->user());
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
