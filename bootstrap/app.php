@@ -69,25 +69,25 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return $api_response->error('未登录，请先登录。', CustomCodeEnum::UNAUTHORIZED);
         })->render(function (UnauthorizedHttpException $exception) {
-            $apiResponse = new class
+            $api_response = new class
             {
                 use ApiResponse;
             };
 
-            return $apiResponse->error('请重新登录', CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error('请重新登录', CustomCodeEnum::UNAUTHORIZED);
         })->render(function (ValidationException $validation_exception) {
-            $apiResponse = new class
+            $api_response = new class
             {
                 use ApiResponse;
             };
 
-            return $apiResponse->error($validation_exception->validator->errors()->first());
+            return $api_response->error($validation_exception->validator->errors()->first());
         })->render(function (UnauthorizedException $exception) {
-            $apiResponse = new class
+            $api_response = new class
             {
                 use ApiResponse;
             };
 
-            return $apiResponse->error($exception->getMessage(), CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error($exception->getMessage(), CustomCodeEnum::UNAUTHORIZED);
         });
     })->create();

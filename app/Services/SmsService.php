@@ -16,7 +16,7 @@ class SmsService
 {
     public const ACTION_LOGIN = 'login';
     public const ACTION_REGISTER = 'register';
-    public const ACTION_FORGET_PASSWORD = 'forget_password';
+    public const ACTION_FORGET_PASSWORD = 'password-forget';
 
     /**
      * 发送短信验证码
@@ -105,13 +105,13 @@ class SmsService
         $message = app(PhoneMsgDao::class)->getInfoByCheckCode($phone, $otp, $send_type);
 
         if (! $message instanceof PhoneMsg) {
-            throw new BusinessException('短信验证码输入错误', CustomCodeEnum::OTP_INVALID);
+            throw new BusinessException('短信验证码输入错误');
         }
         $message->status = PhoneMsg::STATUS_USED;
         $message->save();
 
         if ($message->end_time < time()) {
-            throw new BusinessException('验证码已经失效，请重新获取', CustomCodeEnum::OTP_EXPIRED);
+            throw new BusinessException('验证码已经失效，请重新获取');
         }
 
         return true;
@@ -131,20 +131,20 @@ class SmsService
             $tmp_timestamp = time();
 
             if ($phone_msg->start_time < $tmp_timestamp && $phone_msg->start_time + 60 > $tmp_timestamp) {
-                throw new BusinessException('请在 60 秒后再尝试发送验证码。', CustomCodeEnum::OTP_TOO_FREQUENT);
+                throw new BusinessException('请在 60 秒后再尝试发送验证码。');
             }
         }
 
         if (app(PhoneMsgDao::class)->getCountByDay($phone, $message->getSendType()) >= 5) {
-            throw new BusinessException('您今日发送短信验证码次数已超过限制。', CustomCodeEnum::OTP_TOO_FREQUENT);
+            throw new BusinessException('您今日发送短信验证码次数已超过限制。');
         }
 
         try {
             app(SmsUtil::class)->send($phone, $message);
         } catch (BusinessException $business_exception) {
-            throw new BusinessException($business_exception->getMessage(), CustomCodeEnum::OTP_SENT_FAILED);
+            throw new BusinessException($business_exception->getMessage());
         } catch (\Throwable $throwable) {
-            throw new BusinessException('短信发送失败！', CustomCodeEnum::OTP_SENT_FAILED);
+            throw new BusinessException('短信发送失败！');
         }
     }
 }
