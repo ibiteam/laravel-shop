@@ -43,7 +43,7 @@ class SelectComponent extends PageComponent
     public function validate(array $data): array
     {
         $validator = Validator::make($data, [
-            'id' => 'present|nullable|exists:\App\Models\InviteTemplateItem,id',
+            'id' => 'present|nullable|exists:\App\Models\SellerEnterConfig,id',
             'name' => 'required',
             'type' => 'required|in:'.$this->getComponentName(),
             'is_need' => 'required|boolean', // 是否必填
