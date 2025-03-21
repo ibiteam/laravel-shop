@@ -208,7 +208,7 @@ class AuthController extends BaseController
     /**
      * 退出登录.
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(Request $request, UserService $user_service): JsonResponse
     {
         try {
             $user = $this->user();
@@ -216,7 +216,7 @@ class AuthController extends BaseController
             if (! $user instanceof User) {
                 throw new BusinessException('用户未登录');
             }
-            $user->currentAccessToken()->delete();
+            $user_service->logout($user);
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
@@ -262,7 +262,7 @@ class AuthController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('注册失败');
+            return $this->error('重置密码失败');
         }
 
         return $this->success('重置密码成功');
@@ -271,7 +271,7 @@ class AuthController extends BaseController
     /**
      * 修改密码
      */
-    public function editPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao): JsonResponse
+    public function editPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao, UserService $user_service): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -298,14 +298,16 @@ class AuthController extends BaseController
             }
 
             $user_log_dao->addLog($user, UserLog::TYPE_OPERATE, get_source(), '修改密码成功');
+
+            $user_service->logout($user);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('注册失败');
+            return $this->error('修改密码失败');
         }
 
-        return $this->success('重置密码成功');
+        return $this->success('修改密码成功');
     }
 }

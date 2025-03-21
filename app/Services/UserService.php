@@ -47,6 +47,14 @@ class UserService
     }
 
     /**
+     * 退出登录.
+     */
+    public function logout(User $user): void
+    {
+        $user->currentAccessToken()->delete();
+    }
+
+    /**
      * 系统生成用户名.
      */
     private function generateUserName(): string
