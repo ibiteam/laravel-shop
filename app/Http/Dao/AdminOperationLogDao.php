@@ -11,12 +11,12 @@ class AdminOperationLogDao
     /**
      * 添加后台操作日志.
      */
-    public function addOperationLogByAdminUser(AdminUser $admin_user, string $description, int $type, string $table_name, int $table_id): void
+    public function addOperationLogByAdminUser(AdminUser $admin_user, string $description, int $type, ?string $table_name, int $table_id): void
     {
         $admin_user->operationLog()->create([
             'description' => $description,
             'type' => $type,
-            'table_name' => $table_name,
+            'table' => $table_name,
             'table_id' => $table_id,
             'ip' => get_request_ip(),
         ]);
@@ -28,7 +28,7 @@ class AdminOperationLogDao
     public function getSellerEnterCheckByLog(int $seller_enter_id)
     {
         return AdminOperationLog::query()
-            ->where('table_name', (new SellerEnter())->getTable())
+            ->where('table', (new SellerEnter())->getTable())
             ->where('table_id', $seller_enter_id)
             ->where('type', AdminOperationLog::SELLER_ENTER_CHECK)
             ->orderByDesc('id')

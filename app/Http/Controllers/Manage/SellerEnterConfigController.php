@@ -23,7 +23,7 @@ class SellerEnterConfigController extends BaseController
      */
     public function index(Request $request)
     {
-        $enterConfigs = SellerEnterConfig::query()->get()
+        $enterConfigs = SellerEnterConfig::query()->orderByDesc('sort')->get()
             ->map(function (SellerEnterConfig $sellerEnterConfig) {
                 return ComponentFactory::getSellerEnterComponent($sellerEnterConfig->type, $sellerEnterConfig->name)->display($sellerEnterConfig->toArray());
             })->toArray();
@@ -74,7 +74,7 @@ class SellerEnterConfigController extends BaseController
      *
      * @throws BusinessException|\Throwable
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         try {
             $validated = $request->validate([
@@ -103,7 +103,7 @@ class SellerEnterConfigController extends BaseController
             return $this->error('存在名称重复的问题，请调整后重新提交');
         }
 
-        $itemCreatedData = $itemUpdateData = $itemDeletedIds = [];
+        $itemCreatedData = $itemUpdateData = $itemDeletedIds = $itemCreatedIds = [];
 
         $tableItemIds = SellerEnterConfig::query()->get()->pluck('id')->toArray();
 
@@ -132,9 +132,12 @@ class SellerEnterConfigController extends BaseController
         DB::beginTransaction();
 
         try {
+            $log_info = '编辑了商家入驻配置:';
+
             // 处理需要删除的数据
             if (! empty($itemDeletedIds)) {
                 SellerEnterConfig::query()->whereIn('id', $itemDeletedIds)->delete();
+                $log_info .= '删除了id['.implode(',', $itemDeletedIds).'];';
             }
 
             // 处理需要更新的数据
@@ -142,14 +145,20 @@ class SellerEnterConfigController extends BaseController
                 foreach ($itemUpdateData as $itemUpdateDatum) {
                     SellerEnterConfig::query()->where('id', $itemUpdateDatum['id'])->update($itemUpdateDatum);
                 }
+                $log_info .= '更新了id['.implode(',', array_column($itemUpdateData, 'id')).'];';
             }
 
             // 处理需要新增的数据
             if (! empty($itemCreatedData)) {
                 foreach ($itemCreatedData as $itemCreatedDatum) {
-                    SellerEnterConfig::query()->create($itemCreatedDatum);
+                    $seller_enter_config = SellerEnterConfig::query()->create($itemCreatedDatum);
+                    $itemCreatedIds[] = $seller_enter_config->id;
                 }
+
+                $log_info .= '新增了id['.implode(',', $itemCreatedIds).']';
             }
+
+            admin_operation_log($this->adminUser(), $log_info);
 
             DB::commit();
 

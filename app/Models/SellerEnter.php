@@ -16,7 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null                     $remark        备注
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\AdminUser $adminUser
+ * @property-read \App\Models\AdminUser|null $adminUser
+ * @property-read \App\Models\User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SellerEnter newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SellerEnter newQuery()
@@ -45,6 +46,11 @@ class SellerEnter extends Model
     protected $casts = [
         'enter_info' => 'array',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
     public function adminUser()
     {
