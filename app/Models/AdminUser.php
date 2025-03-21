@@ -22,10 +22,18 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read \App\Models\AdminUserLoginLog|null $lastLoginLog
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminUserLoginLog> $loginLog
  * @property-read int|null $login_log_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminOperationLog> $operationLog
+ * @property-read int|null $operation_log_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
+ * @property-read int|null $permissions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
+ * @property-read int|null $roles_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser permission($permissions, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser role($roles, $guard = null, $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereAvatar($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereId($value)
@@ -35,6 +43,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser whereUserName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser withoutPermission($permissions)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminUser withoutRole($roles, $guard = null)
  *
  * @mixin \Eloquent
  */
@@ -56,6 +66,11 @@ class AdminUser extends Authenticatable
     public function lastLoginLog(): HasOne
     {
         return $this->hasOne(AdminUserLoginLog::class, 'admin_user_id', 'id')->orderBy('id', 'desc');
+    }
+
+    public function operationLog(): HasMany
+    {
+        return $this->hasMany(AdminOperationLog::class, 'admin_user_id', 'id');
     }
 
     /**
