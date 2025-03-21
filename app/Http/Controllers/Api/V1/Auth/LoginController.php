@@ -10,13 +10,14 @@ use App\Models\User;
 use App\Rules\PhoneRule;
 use App\Services\SmsService;
 use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends BaseController
 {
-    public function loginByPhone(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service)
+    public function loginByPhone(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service): JsonResponse
     {
         try {
             $validated = $request->validate([
