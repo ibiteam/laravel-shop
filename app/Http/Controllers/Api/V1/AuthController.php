@@ -200,4 +200,25 @@ class AuthController extends BaseController
 
         return $this->success($data);
     }
+
+    /**
+     * 退出登录.
+     */
+    public function logout(Request $request): JsonResponse
+    {
+        try {
+            $user = $this->user();
+
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录');
+            }
+            $user->currentAccessToken()->delete();
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('退出登录失败');
+        }
+
+        return $this->success('退出成功');
+    }
 }

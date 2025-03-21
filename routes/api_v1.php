@@ -29,5 +29,7 @@ Route::middleware([])->group(function () {
  * 登录可以访问路由.
  */
 Route::middleware('auth:sanctum')->group(function () {
-    //
+    Route::prefix('auth')->group(function () {
+        Route::post('logout', [AuthController::class, 'logout']); // 退出登录
+    });
 });
