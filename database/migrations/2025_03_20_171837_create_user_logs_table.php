@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,13 +14,15 @@ return new class extends Migration
     {
         Schema::create('user_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->comment('用户ID')->index();
+            $table->unsignedBigInteger('user_id')->comment('用户ID')->index();
             $table->string('type')->comment('类型');
             $table->string('source')->comment('来源');
             $table->string('ip')->comment('IP');
             $table->string('status')->comment('状态');
             $table->string('description')->comment('描述');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on((new User)->getTable());
         });
     }
 
