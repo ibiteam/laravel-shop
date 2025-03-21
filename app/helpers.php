@@ -77,7 +77,7 @@ if (! function_exists('is_phone')) {
     /**
      * 判断是否是合法的手机号.
      */
-    function is_phone(int $phone): bool
+    function is_phone(int|string $phone): bool
     {
         if (! is_numeric($phone)) {
             return false;

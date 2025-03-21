@@ -13,4 +13,12 @@ class UserDao
     {
         return User::query()->wherePhone($phone)->first();
     }
+
+    /**
+     * 根据用户名获取用户信息.
+     */
+    public function getInfoByUserName(string $user_name): ?User
+    {
+        return User::query()->whereUserName($user_name)->first();
+    }
 }
