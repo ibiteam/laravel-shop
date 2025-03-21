@@ -34,7 +34,8 @@
 </script>
 
 <script>
-    Vue.component('card-cmp',{
+    const cardCmp = {
+        template: '#card-cmp',
         data: function(){
             return {
                 isV:false
@@ -45,8 +46,6 @@
                 type:Boolean,
                 default:false
             },
-            // name:String,
-            // src:String,
             tops:String,
             lefts:String
         },
@@ -61,6 +60,5 @@
             },
         },
         mounted: function(){},
-        'template':'#card-cmp'
-    })
+    };
 </script>
