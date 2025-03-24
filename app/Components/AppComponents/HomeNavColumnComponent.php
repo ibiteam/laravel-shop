@@ -4,7 +4,6 @@ namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
 use App\Exceptions\BusinessException;
-use App\Http\Daos\NotifyItemDao;
 use App\Models\AppWebsiteDecoration;
 use App\Models\AppWebsiteDecorationItem;
 use App\Models\Router;
@@ -125,9 +124,7 @@ class HomeNavColumnComponent extends PageComponent
         $app = app(MobileRouterService::class);
         $notice = $base_data['notice'];
         if (Constant::ONE == ($notice['is_show'] ?? Constant::ZERO) && $source === MobileRouterService::SOURCE_APP && !is_harmony_request()) {
-            $user = $data['user'] ?? null;
-            $not_read_data = $user instanceof User ? app(NotifyItemDao::class)->getNotifyNotReadNum($user->user_id, $user->reg_time ?? time()) : ['not_read_count' => 0];
-            $not_read_number = $not_read_data['not_read_count'] ?? 0;
+            $not_read_number = 0; // 消息数量 0 暂时未开发 - 前台隐藏
             $is_show_number = Constant::ONE;
             if ($not_read_number > 99) {
                 $not_read_number = '···';
@@ -157,11 +154,10 @@ class HomeNavColumnComponent extends PageComponent
             ];
         }
         /* 搜索处理 */
-        $server_is_show = shop_config(ShopConfig::SERVER_IS_SHOW);
         $temp_search_data = [];
         $search_items = collect($search_data['items'])->sortByDesc('sort')->values()->toArray();
         foreach ($search_items as $search_datum) {
-            if ($search_datum['type'] === Router::CUSTOMER_SERVICE && !$server_is_show) {
+            if ($search_datum['type'] === Router::CUSTOMER_SERVICE) {
                 continue;
             }
             $temp_search_data[] = [
@@ -259,6 +255,7 @@ class HomeNavColumnComponent extends PageComponent
         $content['nav_data']['items'] = collect($content['nav_data']['items'] ?? [])->map(function ($item) {
             $default_selection_data = [];
             $temp_app_website_decoration = AppWebsiteDecoration::query()->whereId($item['value'])->first();
+
             if ($temp_app_website_decoration) {
                 switch ($item['fixed_position'] ?? '') {
                     case self::HOME_FIXED_POSITION:

@@ -124,47 +124,41 @@
 @endsection
 @section('js')
     <!--侧边广告固定组件-->
-    @include('admin.app_website_decoration.components.home.slide-advertising')
+    @include('manage.app_website_decoration.components.home.slide-advertising')
     <!--导航栏固定组件-->
-    @include('admin.app_website_decoration.components.home.home-navigation')
+    @include('manage.app_website_decoration.components.home.home-navigation')
     <!--广告位1拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-advertising-one')
+    @include('manage.app_website_decoration.components.home.home-advertising-one')
     <!--广告位2拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-advertising-two')
+    @include('manage.app_website_decoration.components.home.home-advertising-two')
     <!--广告位3拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-advertising-three')
+    @include('manage.app_website_decoration.components.home.home-advertising-three')
     <!--金刚区拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-menu')
-    <!--新闻拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-new')
+    @include('manage.app_website_decoration.components.home.home-menu')
     <!--频道广场拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-channel')
+    @include('manage.app_website_decoration.components.home.home-channel')
     <!--主题广告拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-theme')
-    <!--热力榜拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-hot')
+    @include('manage.app_website_decoration.components.home.home-theme')
     <!--限时抢购拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-time-shopping')
-    <!--品牌精选拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-brand')
+    @include('manage.app_website_decoration.components.home.home-time-shopping')
     <!--推荐商家拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-recommend-seller')
+    @include('manage.app_website_decoration.components.home.home-recommend-seller')
     <!--为您推荐拖拽组件-->
-    @include('admin.app_website_decoration.components.home.home-recommend')
+    @include('manage.app_website_decoration.components.home.home-recommend')
     <!--热销商品拖拽组件-->
-    @include('admin.app_website_decoration.components.home.hot-sale-goods')
+    @include('manage.app_website_decoration.components.home.hot-sale-goods')
     <!--加载动画-->
-    @include('admin.app_website_decoration.components.save-load')
+    @include('manage.app_website_decoration.components.save-load')
     <!--模块遮罩组件-->
-    @include('admin.app_website_decoration.components.template-mark-setting')
+    @include('manage.app_website_decoration.components.template-mark-setting')
     <!--Header Tab组件-->
-    @include('admin.app_website_decoration.components.basic-tabs-line')
+    @include('manage.app_website_decoration.components.basic-tabs-line')
     <!--广告轮播组件-->
-    @include('admin.app_website_decoration.components.carousel-swiper')
+    @include('manage.app_website_decoration.components.carousel-swiper')
     <!--价格公共组件-->
-    @include('admin.app_website_decoration.components.form-price')
+    @include('manage.app_website_decoration.components.form-price')
     <!--标签栏组件-->
-    @include('admin.app_website_decoration.components.bottom-nav-bar')
+    @include('manage.app_website_decoration.components.bottom-nav-bar')
     <script>
         const vm = new Vue({
             el: '#app',
@@ -251,7 +245,7 @@
                     },
                     drawerKey: Math.round(new Date() / 1000),
                     shop_color: '{{ $app_shop_color }}',
-                    shop_tel: "{{ shop_config(\App\Models\ShopConfig::SERVICE_PHONE) ?? '' }}",
+                    shop_tel: "",
                     web_nav_name: '',
                     web_nav_alias: '',
                     setting_info: {},   //  设置弹窗数据

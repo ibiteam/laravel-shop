@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // 网站颜色
+        view()->share('app_shop_color', shop_config('shop_color'));
     }
 }

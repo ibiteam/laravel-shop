@@ -5,25 +5,14 @@ namespace App\Components;
 use App\Components\AppComponents\AdvertComponent;
 use App\Components\AppComponents\AdvertisingComponent;
 use App\Components\AppComponents\AdvertisingThreeComponent;
-use App\Components\AppComponents\BuyAndSellComponent;
 use App\Components\AppComponents\ChannelSquareComponent;
 use App\Components\AppComponents\HomeNavColumnComponent;
+use App\Components\AppComponents\HotSaleGoodComponent;
 use App\Components\AppComponents\LabelColumnComponent;
-use App\Components\AppComponents\MineCustomComponent;
-use App\Components\AppComponents\MyAssetComponent;
-use App\Components\AppComponents\OrderCenterComponent;
 use App\Components\AppComponents\QuickLinkComponent;
 use App\Components\AppComponents\RecommendComponent;
 use App\Components\AppComponents\RecommendSellerComponent;
 use App\Components\AppComponents\ThemeAdvertisingComponent;
-use App\Components\SellerCenterComponents\AdvertisingComponent as SellerAdvertisingComponent;
-use App\Components\SellerCenterComponents\BusinessDataComponent;
-use App\Components\SellerCenterComponents\GoodsDataComponent;
-use App\Components\SellerCenterComponents\HelpCenterComponent;
-use App\Components\SellerCenterComponents\LabelComponent as SellerLabelComponent;
-use App\Components\SellerCenterComponents\OrderDataComponent;
-use App\Components\SellerCenterComponents\ShopInfoComponent;
-use App\Components\SellerCenterComponents\StoreNavComponent;
 use App\Components\SellerEnter\CheckboxComponent;
 use App\Components\SellerEnter\DateComponent;
 use App\Components\SellerEnter\FileComponent;
@@ -89,21 +78,16 @@ class ComponentFactory
             AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO => AdvertisingComponent::class, // 广告位2
             AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE => AdvertisingThreeComponent::class, // 广告位3
             AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING => ThemeAdvertisingComponent::class, // 主题广告
-            // 我的
-            AppWebsiteDecorationItem::COMPONENT_NAME_ORDER_CENTER => OrderCenterComponent::class, // 我的-订单中心 -
-            AppWebsiteDecorationItem::COMPONENT_NAME_MY_ASSET => MyAssetComponent::class, // 我的-我的资产 -
-            AppWebsiteDecorationItem::COMPONENT_NAME_MINE_CUSTOM => MineCustomComponent::class, // 我的-自定义板块 -
             //为您推荐
             AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_THEME => RecommendComponent::class,// 标题+主题
             AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_LEFT => RecommendComponent::class,// 标题居左
             AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_CAT_OR_CENTER => RecommendComponent::class,// 推荐分类
-            // 常买常逛
-            AppWebsiteDecorationItem::COMPONENT_NAME_BUY_AND_SELL => BuyAndSellComponent::class, // 常买常逛 -
             // 推荐店铺
             AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_SELLER => RecommendSellerComponent::class, // 推荐商家 -
             //公共组件
             AppWebsiteDecorationItem::COMPONENT_NAME_HOT_SALE_GOOD => HotSaleGoodComponent::class, // 热销商品
         ];
+
         if (!isset($components[$alias])) {
             throw new BusinessException('没有找到' . $alias . '组件！');
         }
@@ -113,6 +97,7 @@ class ComponentFactory
         if (!$page_component instanceof PageComponent) {
             throw new BusinessException($class . ' is not instance of PageComponent');
         }
+
         return $page_component;
     }
 

@@ -57,14 +57,6 @@ class AppWebsiteDecorationItem extends Model
     public const OS_UNEVALUATE = 5; // 待评价
     public const OS_AFTERSALES = 6; // 退款/售后
 
-    /* 价格指数类型枚举 */
-    public const INDEX_PRICE_PVC = 'index_price_pvc'; // 价格指数:PVC
-    public const INDEX_PRICE_ZIR = 'index_price_zir'; // 价格指数:ZIR
-    public const INDEX_PRICE_TITANIUM = 'index_price_titanium'; // 价格指数:钛白粉
-    public const INDEX_PRICE_INFO = 'index_price_info'; // 价格指数:除上述3个以外的数据
-    public const INDEX_PRICE_CATEGORIES_ITEMS = 'index_price_categories_items'; // 价格指数:多多指数表中数据
-    public const INDEX_NEW_ZIXUN = 'index_new_zixun'; // 价格指数:新版价格指数
-
     public const MINE_CUSTOM_STYLE_ONE = 1; // 我的-自定义板块--轮播样式-横向滚动
     public const MINE_CUSTOM_STYLE_TWO = 2; // 我的-自定义板块--轮播样式整屏翻页
 
@@ -187,22 +179,9 @@ class AppWebsiteDecorationItem extends Model
     public const NUMBER_ROWS_FIVE = '3'; // 每行个数5
     public const MORE_DEFAULT_TYPE = '1'; // 默认样式
     public const MORE_CUSTOM_PAGE = '2'; // 自定义页面
-    // 行情指数
-    public const INDEX_GOOD = '1'; // 商品涨跌
-    public const INDEX_INDEX = '2'; // 多多指数
-    public const INDEX_INDEX_PRODUCT = '1'; // 获取各产品的价格指数
-    public const INDEX_INDEX_INDEX = '2'; // 获取“多多指数”表中数据
-
-    // 新闻组件
-    public const ONE_PER_PAGE = '1'; // 轮播样式-1条每页
-    public const TWO_PER_PAGE = '2'; // 轮播样式-2条每页
-    public const THREE_PER_PAGE = '3'; // 轮播样式-3条每页
     // 广告位展示样式
     public const AD_SHOW_STYLE_TILE = 1; // 展示样式-平铺展示
     public const AD_SHOW_STYLE_CAROUSEL = 2; // 展示样式-滚动轮播
-    // 新闻展示样式
-    public const NEW_SHOW_STYLE_LIST = 1; // 展示样式-静态列表
-    public const NEW_SHOW_STYLE_CAROUSEL = 2; // 展示样式-滚动轮播
 
     // 资讯组件
     public const COMPONENT_NAME_ZIXUN_QUICK_LINK = 'zixun_quick_link'; // 资讯移动版金刚区

@@ -186,15 +186,8 @@ class ThemeAdvertisingComponent extends PageComponent
         $source = $data['source'] ?? null;
         $content = $data['content'];
         $mobileRouterService = app(MobileRouterService::class);
-        $server_is_show = shop_config(ShopConfig::SERVER_IS_SHOW);
         $items = collect($content['data'])->sortByDesc('sort')
-            ->filter(function ($item) use ($server_is_show) {
-                if ($item['url']['alias'] === Router::CUSTOMER_SERVICE && !$server_is_show) {
-                    return false;
-                }
-
-                return true;
-            })
+            ->filter()
             ->map(function ($item) use (&$items, $mobileRouterService, $source) {
             $item['url_alias'] = $item['url']['alias'] ?? '';
             if (($item['url']['alias'] ?? '')) {

@@ -62,8 +62,7 @@ class RouterDao
             $query->whereIn('alias', $alias_arr);
         }
 
-        return $query->query()
-            ->select('name', 'alias', 'params', 'app_url', 'harmony_url', 'h5_url', 'mini_url', 'ios_is_open', 'android_is_open', 'harmony_is_open', 'mini_is_open')
+        return $query->select('name', 'alias', 'params', 'app_url', 'harmony_url', 'h5_url', 'mini_url', 'ios_is_open', 'android_is_open', 'harmony_is_open', 'mini_is_open')
             ->get()->map(function (Router $item) {
                 $item->params = json_decode($item->params);
 

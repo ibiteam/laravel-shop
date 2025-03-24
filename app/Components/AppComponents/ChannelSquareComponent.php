@@ -2,21 +2,14 @@
 
 namespace App\Components\AppComponents;
 
+use App\Components\PageComponent;
 use App\Exceptions\BusinessException;
-use App\Http\Daos\PriceIndexDao;
 use App\Models\AppWebsiteDecorationItem;
-use App\Models\DdProduce;
-use App\Models\DdProduceUpDown;
-use App\Models\IndexItem;
 use App\Models\Router;
-use App\Models\ShopConfig;
 use App\Models\User;
-use App\Models\WebsiteDecorationItem;
-use App\Models\ZixunPriceIndice;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Utils\Route;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 /**
@@ -119,14 +112,6 @@ class ChannelSquareComponent extends PageComponent
                 $url = '';
                 $url_alias = '';
                 switch ($item['type']) {
-                    case AppWebsiteDecorationItem::CHANNEL_TYPE_UP_DOWN:
-                        $data = $this->appGetUpDownData($user,$item['goods_up_down_data_type']??AppWebsiteDecorationItem::GOODS_UP_DOWN_DATA_TYPE_DATE,$item['goods_up_down_num']??0);
-
-                        break;
-                    case AppWebsiteDecorationItem::CHANNEL_TYPE_PRICE_INDEX:
-                        $data = $this->getPriceIndexInfoData(($item['price_index'] ?? ''));
-
-                        break;
                     case AppWebsiteDecorationItem::CHANNEL_TYPE_CUSTOM:
                         $image = [];
                         collect($item['image_items'] ?? [])->sortByDesc('sort')->map(function ($img_item) use (&$image, $mobileRouterService, $source) {
@@ -152,14 +137,6 @@ class ChannelSquareComponent extends PageComponent
                     if ($item['url']['alias'] ?? '') {
                         $url = $mobileRouterService->handleUrl($item['url']['alias'], $item['url']['value'] ?? '', $source);
                         $url_alias = $item['url']['alias'];
-                    }
-                    if (!$url) {
-                        if (AppWebsiteDecorationItem::CHANNEL_TYPE_UP_DOWN == $item['type']) {
-                            $url = get_h5_url(Route::ZIXUN_GOOD_CHANGE);
-                        } elseif (AppWebsiteDecorationItem::CHANNEL_TYPE_PRICE_INDEX == $item['type']) {
-                            //移动端上线更换为新的价格指数页
-                            $url = get_h5_url(Route::ZOXUN_EXPONENT_TINDEX);
-                        }
                     }
 
                     $result = [
@@ -373,120 +350,6 @@ class ChannelSquareComponent extends PageComponent
             'sort' => (int) ($validate['sort'] ?? 0),
             'content' => $validate['content'],
         ];
-    }
-
-    /**
-     * 价格指数.
-     *
-     * @return array
-     */
-    public function getPriceIndexInfoData(array $price_indexes)
-    {
-        $data = [];
-        $price_index_dao = app(PriceIndexDao::class);
-        foreach ($price_indexes['price_item'] ?? [] as $price_item) {
-            $temp_price_produce = $price_index_dao->getProduceByType(($price_item['type'] ?? ''), ($price_item['product_id'] ?? ''));
-            if ($temp_price_produce) {
-
-                if (WebsiteDecorationItem::INDEX_PRICE_CATEGORIES_ITEMS == $temp_price_produce->type) { //2获取多多指数表中数据
-                    /* 趋势图数据处理 */
-                    $temp_index_item = IndexItem::whereIndexCategoryId($temp_price_produce->id)->orderByDesc('add_date')->first();
-                    $index_price = $temp_index_item->avg_price ?? 0;
-                    $low_change = $temp_index_item->low_change??0;
-                    $high_change = $temp_index_item->high_change??0;
-                    $change = ($low_change+$high_change)/2;
-                }else{
-                    $temp_price_indice = ZixunPriceIndice::whereProduceId($temp_price_produce->id)->orderByDesc('date')->first();
-                    $index_price = $temp_price_indice->index_price ?? 0;
-                    $change = $temp_price_indice->change ?? 0;
-                }
-                if ($index_price) {
-                    $data[] = [
-                        'produce_name' => $temp_price_produce->name,
-                        'index_price' => format_num($index_price),
-                        'change' => $change,
-                    ];
-                }
-            }
-        }
-        if (!$data) {
-            return [];
-        }
-
-        return $data;
-    }
-
-    /**
-     * 移动端商品涨跌.
-     *
-     * @param $user 用户
-     *
-     * @return mixed
-     */
-    private function appGetUpDownData($user = null,$goods_up_down_data_type,$goods_up_down_num)
-    {
-        $is_login = $user instanceof User ? true : false;
-        $produce_up_down = DdProduceUpDown::query()->orderByDesc('created_at')->orderByDesc('id')->first();
-        if (!$produce_up_down) {
-            return [];
-        }
-        //按日期显示
-        $latest_date = date('Y-m-d', strtotime($produce_up_down->created_at));
-        $vip_status = zixun_is_need_vip_second();
-        if(in_array($vip_status,[ShopConfig::ZIXUN_TIME_LIMIT_ONE,ShopConfig::ZIXUN_TIME_LIMIT_TWO,ShopConfig::ZIXUN_TIME_LIMIT_THREE])){
-            if($vip_status == ShopConfig::ZIXUN_TIME_LIMIT_ONE){ //可见3个月内的数据
-                $start_time = strtotime('-3 month',time());
-            }elseif($vip_status == ShopConfig::ZIXUN_TIME_LIMIT_TWO){
-                $start_time = strtotime('-1 year',time());
-            }elseif($vip_status == ShopConfig::ZIXUN_TIME_LIMIT_THREE){
-                $start_time = strtotime('-3 year',time());
-            }
-            if(($start_time??'') && $latest_date<date('Y-m-d',$start_time)){
-                return [];
-            }
-        }
-
-        $query = DdProduceUpDown::query()->with(['dd_produce'])->whereHas('dd_produce', function ($query) {
-            $query->where('is_show', DdProduce::IS_SHOW);
-        });
-        if($goods_up_down_data_type==AppWebsiteDecorationItem::GOODS_UP_DOWN_DATA_TYPE_DATE){
-            $query_data = $query->whereDate('created_at', $latest_date)->orderByDesc('created_at')
-                ->orderByDesc('id');
-        }else{
-            //按数量显示
-            $produce_ids = DdProduceUpDown::query()->with(['dd_produce'])->whereHas('dd_produce', function ($query) {
-                $query->where('is_show', DdProduce::IS_SHOW);
-            })->groupBy('produce_id')->orderByDesc('id')->pluck('produce_id');
-            $query_data = $query->whereIn('produce_id',$produce_ids)->orderByDesc('created_at');
-        }
-        $latest_date_time = Carbon::parse($latest_date)->startOfDay()->toDateString();
-        $produce_up_downs = $query_data->get()->unique('produce_id')->values()->map(function (DdProduceUpDown $dd_produce_up_down) use ($is_login, $latest_date_time) {
-            $item = [
-                'produce_name' => $dd_produce_up_down->dd_produce->name ?? '',
-                'change' => '--',
-                'price' => '--',
-            ];
-            if (!$is_login) {
-                return $item;
-            }
-            $item['price'] = get_new_price($dd_produce_up_down->price);
-            /* 获取前一条有没有数据  没有数据则涨跌/环比均为-- */
-            $yesterday_produce_up_down_data = DdProduceUpDown::query()
-                ->whereProduceId($dd_produce_up_down->produce_id)
-                /* 昨天最新一条数据 */
-                ->where('created_at', '<', $latest_date_time)
-                ->orderByDesc('created_at')
-                ->first();
-            if ($yesterday_produce_up_down_data) {
-                $item['change'] = get_new_price($dd_produce_up_down->change);
-            }
-
-            return $item;
-        })->toArray();
-        if($goods_up_down_data_type==AppWebsiteDecorationItem::GOODS_UP_DOWN_DATE_NUM_TYPE){
-            $produce_up_downs = array_slice($produce_up_downs,0,$goods_up_down_num);
-        }
-        return array_chunk($produce_up_downs, 2);
     }
 
     private function message()

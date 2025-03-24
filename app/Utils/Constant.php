@@ -12,4 +12,5 @@ class Constant
     public const REFERER_APP = 'APP';
     public const REFERER_H5 = 'H5';
     public const REFERER_MINI = 'MINI';
+    public const TRUE = true;
 }

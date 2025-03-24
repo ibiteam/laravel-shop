@@ -50,6 +50,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Router extends Model
 {
+    protected $table = 'routers';
+
     public const CACHE_APP_ROUTER_LIST = 'cache_app_router_list'; // APP路由列表缓存
     public const HTTPS = 'https';  // HTTPS
     public const IS_SHOW = 1;

@@ -145,18 +145,16 @@ class HotSaleGoodComponent extends PageComponent
         if(!$goods){
             return [];
         }
-        $sellerRankDao = app(SellerRankDao::class);
         $ziying_sign = shop_config(ShopConfig::IS_SHOW_ZIYING);
         $no_ziying_sign = shop_config(ShopConfig::IS_SHOW_CROP);
         $is_show_attribute_source = shop_config(ShopConfig::IS_SHOW_ATTRIBUTE_SOURCE);
-        return $goods->map(function (Good $good) use ($user_id, $sellerRankDao, $ziying_sign, $no_ziying_sign,$is_show_attribute_source) {
-            $good_info = app(FavourableGoodsDao::class)->goodsActivityPrice($good, $sellerRankDao, $user_id);
+        return $goods->map(function (Good $good) use ($user_id, $ziying_sign, $no_ziying_sign,$is_show_attribute_source) {
             $good_list['goods_id'] = $good->goods_id;
-            $good_list['goods_name'] = $good_info->goods_name;
+            $good_list['goods_name'] = $good->goods_name;
             $good_list['goods_thumb'] = $good->goods_thumb;
-            $good_list['shop_price'] = get_new_price($good_info->shop_price);
-            $good_list['format_shop_price'] = price_format(get_new_price($good_info->shop_price));
-            $good_list['unit'] = $good_info->unit;
+            $good_list['shop_price'] = get_new_price($good->shop_price);
+            $good_list['format_shop_price'] = price_format(get_new_price($good->shop_price));
+            $good_list['unit'] = $good->unit;
             $is_ziying = $good->shopInfo->is_ziying ?? 0;
             $good_list['is_ziying'] = $is_ziying;
             $good_list['sign'] = '';

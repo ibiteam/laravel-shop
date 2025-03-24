@@ -6,7 +6,6 @@ use App\Components\ComponentFactory;
 use App\Components\PageDefaultDict;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AppWebsiteDecorationItemDao;
-use App\Models\AdminLog;
 use App\Models\AppWebsiteDecoration as AppWebsiteDecorationModel;
 use App\Models\AppWebsiteDecorationItem;
 use App\Services\MobileRouterService;
@@ -71,9 +70,9 @@ class AppWebsiteDecorationController extends BaseController
                     'updated_at' => $app_website_decoration->updated_at->format('Y-m-d H:i:s'),
                     'is_show_bottom' => in_array($app_website_decoration->alias, AppWebsiteDecorationModel::$notShowBottomMapAlias) ? false : true,
                     'is_dir' => in_array($app_website_decoration->alias, AppWebsiteDecorationModel::$storeMapAlias, true) ? true : false, // 判断图标|是否允许装修（是否展示查看页面）
-                    'is_allow_decoration' => in_array($app_website_decoration->alias, [AppWebsiteDecorationModel::ALIAS_INDUSTRIAL, AppWebsiteDecorationModel::ALIAS_PUBLIC, AppWebsiteDecorationModel::ALIAS_CATEGORY_LIST, AppWebsiteDecorationModel::ALIAS_DISTRIBUTION, AppWebsiteDecorationModel::ALIAS_ZIXUN_CATEGORY_PAGE, AppWebsiteDecorationModel::ALIAS_VR_FACTORY, AppWebsiteDecorationModel::ALIAS_LIVE_SQUARE], true) ? false : true, // 判断是否允许装修
+                    'is_allow_decoration' => true, // 判断是否允许装修
                     'children_count' => $app_website_decoration->children_count,
-                    'is_show_edit' => in_array($app_website_decoration->alias, [AppWebsiteDecorationModel::ALIAS_HOME, AppWebsiteDecorationModel::ALIAS_INDEX, AppWebsiteDecorationModel::ALIAS_CATEGORY, AppWebsiteDecorationModel::ALIAS_DISTRIBUTION, AppWebsiteDecorationModel::ALIAS_SELLER_HOME, AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH, AppWebsiteDecorationModel::ALIAS_ZIXUN_HOME_PAGE, AppWebsiteDecorationModel::ALIAS_TRY_CENTER, AppWebsiteDecorationModel::ALIAS_VR_FACTORY, AppWebsiteDecorationModel::ALIAS_LIVE_SQUARE], true) ? true : false, // 判断是否允许装修
+                    'is_show_edit' => in_array($app_website_decoration->alias, [AppWebsiteDecorationModel::ALIAS_HOME, AppWebsiteDecorationModel::ALIAS_SELLER_HOME, AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH], true) ? true : false, // 判断是否允许装修
                     'url' => $app_website_decoration->url,
                 ];
             });
@@ -159,34 +158,7 @@ class AppWebsiteDecorationController extends BaseController
 
             return $this->success($data->toArray());
         }
-
-        switch ($alias) {
-            case AppWebsiteDecorationModel::ALIAS_INDUSTRIAL:
-                $check_data = [
-                    ['label' => '一级页面', 'value' => AppWebsiteDecorationModel::TYPE_FIRST_LEVEL],
-                ];
-
-                break;
-
-            case AppWebsiteDecorationModel::ALIAS_PUBLIC:
-                $check_data = [
-                    ['label' => '底部菜单', 'value' => AppWebsiteDecorationModel::TYPE_BOTTOM_MENU],
-                    ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
-                ];
-
-                break;
-
-            case AppWebsiteDecorationModel::ALIAS_CATEGORY_LIST:
-                $check_data = [
-                    ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
-                    ['label' => '底部菜单', 'value' => AppWebsiteDecorationModel::TYPE_BOTTOM_MENU],
-                ];
-
-                break;
-
-            default:
-                $check_data = [];
-        }
+        $check_data = [];
         $parent = AppWebsiteDecorationModel::query()->whereAlias($alias)->where('parent_id', Constant::ZERO)->first();
         $parent_name = $parent->name ?? '';
         $parent_id = $parent->id ?? '';
@@ -250,26 +222,12 @@ class AppWebsiteDecorationController extends BaseController
             return $this->error('该页面已装修,不支持删除');
         }
 
-        /* 产业链专题校验是否正在使用 */
-        if ($app_website_decoration->alias == AppWebsiteDecorationModel::ALIAS_INDUSTRIAL) {
-            // 查询导航栏是否在使用
-            $app_website_decoration_item = AppWebsiteDecorationItem::query()->whereComponentName(AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV)->with('app_website_decoration:id,name')->first();
-            $default_items = $app_website_decoration_item->content['nav_data']['items'] ?? [];
-
-            foreach ($default_items as $default_item) {
-                if ($app_website_decoration->id == ($default_item['value'] ?? -1)) {
-                    $temp_name = $app_website_decoration_item->app_website_decoration->name ?? '';
-
-                    return $this->error($temp_name ? "页面正在被【{$temp_name}】使用，不能关闭！" : '页面正在被使用，不能关闭！');
-                }
-            }
-        }
         DBFacade::beginTransaction();
 
         try {
             $message = "删除了移动端装修页面:{$app_website_decoration->name},ID:{$app_website_decoration->id}";
             $app_website_decoration->delete();
-            manage_operation_log(AdminLog::TYPE_TEMPLATE, $message, ['id' => $app_website_decoration->id], (new AppWebsiteDecorationModel)->getTable(), $app_website_decoration->id);
+            admin_operation_log($request->user(), $message);
             DBFacade::commit();
         } catch (\Exception $exception) {
             DBFacade::rollBack();
@@ -292,21 +250,6 @@ class AppWebsiteDecorationController extends BaseController
             return $this->error('暂不支持此类型的变更状态');
         }
         $change_is_show = ! $app_website_decoration->is_show;
-
-        /* 产业链专题校验是否正在使用 */
-        if ($app_website_decoration->alias == AppWebsiteDecorationModel::ALIAS_INDUSTRIAL && ! $change_is_show) {
-            // 查询导航栏是否在使用
-            $app_website_decoration_item = AppWebsiteDecorationItem::query()->whereComponentName(AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV)->with('app_website_decoration:id,name')->first();
-            $default_items = $app_website_decoration_item->content['nav_data']['items'] ?? [];
-
-            foreach ($default_items as $default_item) {
-                if ($app_website_decoration->id == ($default_item['value'] ?? -1)) {
-                    $temp_name = $app_website_decoration_item->app_website_decoration->name ?? '';
-
-                    return $this->error($temp_name ? "页面正在被【{$temp_name}】使用，不能关闭！" : '页面正在被使用，不能关闭！');
-                }
-            }
-        }
 
         try {
             $app_website_decoration->is_show = $change_is_show;
@@ -336,36 +279,11 @@ class AppWebsiteDecorationController extends BaseController
         }
         $app_website_decoration->is_show = (string) $app_website_decoration->is_show;
 
-        switch ($app_website_decoration->alias) {
-            case AppWebsiteDecorationModel::ALIAS_INDUSTRIAL:
-                $type_map_data = [
-                    ['label' => '一级页面', 'value' => AppWebsiteDecorationModel::TYPE_FIRST_LEVEL],
-                ]; // {label:"一级页面",value:2}
-
-                break;
-
-            case AppWebsiteDecorationModel::ALIAS_PUBLIC:
-                $type_map_data = [
-                    ['label' => '底部菜单', 'value' => AppWebsiteDecorationModel::TYPE_BOTTOM_MENU],
-                    ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
-                ]; // [{label:"底部菜单",value:1},{label:"二级页面",value:3}]
-
-                break;
-
-            case AppWebsiteDecorationModel::ALIAS_CATEGORY_LIST:
-                $type_map_data = [
-                    ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
-                ]; //  [{label:"二级页面",value:3}]
-
-                break;
-
-            default:
-                $type_map_data = [
-                    ['label' => '底部菜单', 'value' => AppWebsiteDecorationModel::TYPE_BOTTOM_MENU],
-                    ['label' => '一级页面', 'value' => AppWebsiteDecorationModel::TYPE_FIRST_LEVEL],
-                    ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
-                ];
-        }
+        $type_map_data = [
+            ['label' => '底部菜单', 'value' => AppWebsiteDecorationModel::TYPE_BOTTOM_MENU],
+            ['label' => '一级页面', 'value' => AppWebsiteDecorationModel::TYPE_FIRST_LEVEL],
+            ['label' => '二级页面', 'value' => AppWebsiteDecorationModel::TYPE_SECONDARY],
+        ];
         $info = $app_website_decoration->toArray();
 
         return $this->success([
@@ -510,24 +428,6 @@ class AppWebsiteDecorationController extends BaseController
         $app_website_data = $app_website_decoration->toArray();
         // 各个组件针对 home 的依赖(产业链专题装修页面 依赖 首页的 导航栏与标签栏)
         $component_rely_on = [
-            AppWebsiteDecorationModel::ALIAS_INDUSTRIAL => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-            ],
-            AppWebsiteDecorationModel::ALIAS_PUBLIC => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-            ],
-            AppWebsiteDecorationModel::ALIAS_ORDER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-            ],
-            AppWebsiteDecorationModel::ALIAS_MINE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-            ],
-            AppWebsiteDecorationModel::ALIAS_CATEGORY => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-            ],
             AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL,
             ],
@@ -553,31 +453,10 @@ class AppWebsiteDecorationController extends BaseController
         $item_data = $app_website_decoration->item;
         /* 不参与循环的组件 */
         $not_for_names = [
-            AppWebsiteDecorationModel::ALIAS_PUBLIC => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-            ],
-            AppWebsiteDecorationModel::ALIAS_INDUSTRIAL => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-            ],
-            AppWebsiteDecorationModel::ALIAS_CATEGORY => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-            ],
-            AppWebsiteDecorationModel::ALIAS_ORDER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-            ],
-            AppWebsiteDecorationModel::ALIAS_MINE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-            ],
             AppWebsiteDecorationModel::ALIAS_HOME => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
                 AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
                 AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-                AppWebsiteDecorationItem::COMPONENT_NAME_RED_ENVELOPE,
                 AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
                 AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
             ],
@@ -588,33 +467,18 @@ class AppWebsiteDecorationController extends BaseController
             AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL,
             ],
-            AppWebsiteDecorationModel::ALIAS_TRY_CENTER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_TRY_LABEL,
-            ],
-
-            AppWebsiteDecorationModel::ALIAS_ZIXUN_HOME_PAGE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_LABEL,
-            ],
         ];
 
         try {
             [$component_icon, $component_value, $not_items_fixed_value] = app(PageDefaultDict::class)->commonMap($app_website_decoration->alias);
-
             if ($item_data->isEmpty()) {
                 $temp_data = $not_items_fixed_value;
             } else {
                 $temp_data = $item_data->map(function (AppWebsiteDecorationItem $item) {
                     return ComponentFactory::getComponent($item->component_name)->display($item->toArray());
                 })->toArray();
-
-                // 资讯首页-标签
-                if ($app_website_decoration->alias == AppWebsiteDecorationModel::ALIAS_ZIXUN_HOME_PAGE) {
-                    if (! $item_data->where('component_name', AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_LABEL)->first()) {
-                        $label = collect($not_items_fixed_value)->where('component_name', AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_LABEL)->first();
-                        array_push($temp_data, $label);
-                    }
-                }
             }
+
             $temp_data = collect($temp_data)->merge($rely_on_data)->values();
             $data = $temp_data->whereNotIn('component_name', $not_for_names[$app_website_decoration->alias] ?? [])->values()->toArray();
             $not_for_data = $temp_data->whereIn('component_name', $not_for_names[$app_website_decoration->alias] ?? [])->values()->toArray();
@@ -658,40 +522,6 @@ class AppWebsiteDecorationController extends BaseController
             AppWebsiteDecorationModel::ALIAS_HOME => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
                 AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOT_LIST,
-            ],
-            AppWebsiteDecorationModel::ALIAS_INDUSTRIAL => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOT_LIST,
-            ],
-            AppWebsiteDecorationModel::ALIAS_PUBLIC => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOT_LIST,
-            ],
-            AppWebsiteDecorationModel::ALIAS_CATEGORY => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_CATEGORY,
-            ],
-            AppWebsiteDecorationModel::ALIAS_INDEX => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_PRODUCT,
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_INDEX,
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_MACRO_FUTURES,
-                AppWebsiteDecorationItem::COMPONENT_NAME_COLLEGE_EXPERT,
-                AppWebsiteDecorationItem::COMPONENT_NAME_VIDEO,
-                AppWebsiteDecorationItem::COMPONENT_NAME_MEETING,
-            ],
-            AppWebsiteDecorationModel::ALIAS_ORDER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_BUY_AND_SELL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_LEFT,
-            ],
-            AppWebsiteDecorationModel::ALIAS_MINE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_BUY_AND_SELL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_LEFT,
-                AppWebsiteDecorationItem::COMPONENT_NAME_ORDER_CENTER,
-                AppWebsiteDecorationItem::COMPONENT_NAME_MY_ASSET,
             ],
             AppWebsiteDecorationModel::ALIAS_SELLER_HOME => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL,
@@ -703,19 +533,6 @@ class AppWebsiteDecorationController extends BaseController
             AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV,
             ],
-            AppWebsiteDecorationModel::ALIAS_TRY_CENTER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_TRY_LABEL,
-                AppWebsiteDecorationItem::COMPONENT_NAME_TRY_NOTICE,
-            ],
-            AppWebsiteDecorationModel::ALIAS_ZIXUN_HOME_PAGE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_LABEL,
-            ],
-        ];
-        // 多个组件 模块名称重复限制
-        $repeat_name = [
-            AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_INDEX,
-            AppWebsiteDecorationItem::COMPONENT_NAME_BRAND_CHOICE,
-            AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING,
         ];
         $only_names = $page_only_names[$app_website_decoration->alias] ?? [];
 
@@ -734,13 +551,8 @@ class AppWebsiteDecorationController extends BaseController
                 AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
                 AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
                 AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-                AppWebsiteDecorationItem::COMPONENT_NAME_RED_ENVELOPE,
                 AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
                 AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
-            ],
-            AppWebsiteDecorationModel::ALIAS_MINE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_ORDER_CENTER,
-                AppWebsiteDecorationItem::COMPONENT_NAME_MY_ASSET,
             ],
             AppWebsiteDecorationModel::ALIAS_SELLER_HOME => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL,
@@ -748,12 +560,6 @@ class AppWebsiteDecorationController extends BaseController
             ],
             AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH => [
                 AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV,
-            ],
-            AppWebsiteDecorationModel::ALIAS_TRY_CENTER => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_TRY_LABEL,
-            ],
-            AppWebsiteDecorationModel::ALIAS_ZIXUN_HOME_PAGE => [
-                AppWebsiteDecorationItem::COMPONENT_NAME_ZIXUN_LABEL,
             ],
         ];
         /* 组件中文名称 */
@@ -764,8 +570,6 @@ class AppWebsiteDecorationController extends BaseController
             AppWebsiteDecorationItem::COMPONENT_NAME_RED_ENVELOPE => '签到送红包',
             AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING => '侧边广告位',
             AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT => '二楼广告位',
-            AppWebsiteDecorationItem::COMPONENT_NAME_ORDER_CENTER => '订单中心',
-            AppWebsiteDecorationItem::COMPONENT_NAME_MY_ASSET => '资产中心',
             AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL => '标签栏',
             AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_SHOP_INFO => '店铺信息',
             AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV => '店铺导航',

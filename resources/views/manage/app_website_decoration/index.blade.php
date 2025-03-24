@@ -145,7 +145,7 @@
             <p style="font-size: 14px;color: #333;" v-else>没有搜索到符合条件的数据！</p>
         </div>
     </div>
-    @include('admin.components.footer')
+    @include('manage.components.footer')
     <el-dialog
             title="创建页面"
             :visible.sync="dialogVisible"
@@ -284,8 +284,6 @@
 @endsection
 
 @section('js')
-    <!--素材列表弹窗-->
-    @include('admin.components.material-lib')
     <script>
         var vm = new Vue({
             el: '#app',
@@ -425,11 +423,7 @@
                         return;
                     }
                     this.storeDataLoading = true;
-                    if (this.formSet.alias == 'zixun_category_page') {
-                        var store_url = "{!! route('manage.zixun_app_web_decoration.store') !!}"
-                    } else {
-                        var store_url = '{!! route('manage.app_web_decoration.store') !!}'
-                    }
+                    var store_url = '{!! route('manage.app_web_decoration.store') !!}'
                     this.doPost(store_url, this.formSet).then(res => {
                         this.storeDataLoading = false;
                         // 关闭当前页面 并重新获取数据
@@ -442,9 +436,7 @@
                                 parent.openTab('公共页面合集', '{!! route('manage.app_web_decoration.children_index') !!}' + '?alias=' + this.formSet.alias);
                             } else if (this.formSet.alias == '{{ \App\Models\AppWebsiteDecoration::ALIAS_CATEGORY_LIST }}') {
                                 parent.openTab('分类页面合集', '{!! route('manage.app_web_decoration.children_index') !!}' + '?alias=' + this.formSet.alias);
-                            } else if (this.formSet.alias == '{{ \App\Models\AppWebsiteDecoration::ALIAS_ZIXUN_CATEGORY_PAGE }}') {
-                                parent.openTab('', '{!! route('manage.zixun_app_web_decoration.index') !!}' + '?alias=' + this.formSet.alias);
-                            } else {
+                            }  else {
                                 this.getData();
                             }
                         } else {
@@ -458,7 +450,7 @@
                  * 设置分页数据
                  * @param pageInfo
                  */
-                @include('admin.components.footer-js')
+                @include('manage.components.footer-js')
                 /**
                  * 列表  范围处理
                  * @param command
@@ -508,11 +500,7 @@
 
                 },
                 openDirVisible(item) {
-                    if (item.alias == 'zixun_category_page') {
-                        parent.openTab(item.name, "{!! route('manage.zixun_app_web_decoration.index') !!}" + '?alias=' + item.alias)
-                    } else {
-                        parent.openTab(item.name, "{!! route('manage.app_web_decoration.children_index') !!}" + '?alias=' + item.alias)
-                    }
+                    parent.openTab(item.name, "{!! route('manage.app_web_decoration.children_index') !!}" + '?alias=' + item.alias)
 
                 },
                 /**
@@ -559,7 +547,7 @@
                     if (isPNG && isSize && isLt129k) {
                         var fromdata = new FormData();
                         fromdata.append('file', js_file);
-                        this.doPost('{!! route('manage.upload') !!}', fromdata).then(res => {
+                        this.doPost('{!! route('manage.common.upload') !!}', fromdata).then(res => {
                             if (res.code == 200) {
                                 this.formSet.image_url = res.data.file;
                             } else {

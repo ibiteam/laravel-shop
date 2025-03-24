@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="{{ shop_config('wap_logo_color') }}">
     <title>{{ shop_config(\App\Models\ShopConfig::SHOP_NAME) }}--管理中心</title>
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="{{ asset('font/iconfont.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/fonts/element-iconfont.css')}}">
     <!--<link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/05/30/app.css?t=1685520761">-->
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/05/31/nprogress.css?t=1685520761">
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/05/30/draggableResizable.css?key=1.0"/>
@@ -17,8 +17,8 @@
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/06/25/element-2.15.13.css?key=1.0"/>
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/05/30/swiper.css"/>
     <!--页面基础样式-->
-    @include('admin.app_website_decoration.style.home-template-style')
-    @include('admin.app_website_decoration.style.dialog-setting')
+    @include('manage.app_website_decoration.style.home-template-style')
+    @include('manage.app_website_decoration.style.dialog-setting')
     <style>
         @font-face {
             font-family: 'iconfont';  /* Project id 2575177 */

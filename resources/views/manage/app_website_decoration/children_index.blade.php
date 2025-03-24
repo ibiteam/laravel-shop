@@ -269,8 +269,6 @@
 @endsection
 
 @section('js')
-    <!--素材列表弹窗-->
-    @include('admin.components.material-lib')
     <script>
         var vm = new Vue({
             el: '#app',
@@ -600,7 +598,7 @@
                     if (isPNG && isSize && isLt129k) {
                         var fromdata = new FormData();
                         fromdata.append('file', js_file);
-                        this.doPost('{!! route('manage.upload') !!}', fromdata).then(res => {
+                        this.doPost('{!! route('manage.common.upload') !!}', fromdata).then(res => {
                             if (res.code == 200) {
                                 this.formSet.image_url = res.data.file;
                             } else {

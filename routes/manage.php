@@ -17,3 +17,5 @@ Route::middleware('manage.auth')->group(function () {
 
 // 店铺
 require __DIR__.'/manage/store.php';
+// 模板
+require __DIR__.'/manage/template.php';

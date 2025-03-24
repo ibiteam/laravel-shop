@@ -6,7 +6,6 @@ use App\Components\PageComponent;
 use App\Exceptions\BusinessException;
 use App\Models\AppWebsiteDecorationItem;
 use App\Models\Router;
-use App\Models\ShopConfig;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -118,11 +117,7 @@ class QuickLinkComponent extends PageComponent
         $content = $data['content'];
         $source = $data['source'] ?? MobileRouterService::SOURCE_APP;
         $mobileRouterService = app(MobileRouterService::class);
-        $server_is_show = shop_config(ShopConfig::SERVER_IS_SHOW);
-        $items = collect($content['items'])->sortByDesc('sort')->map(function ($item) use (&$items, $source, $mobileRouterService, $server_is_show) {
-            if ($item['url']['alias'] === Router::CUSTOMER_SERVICE && !$server_is_show) {
-                return false;
-            }
+        $items = collect($content['items'])->sortByDesc('sort')->map(function ($item) use (&$items, $source, $mobileRouterService) {
             $data['image'] = $item['image'] ?? '';
             $data['gif'] = $item['gif'] ?? '';
             $data['title'] = $item['title'] ?? '';
