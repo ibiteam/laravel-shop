@@ -1104,20 +1104,21 @@
             const chooseIndex = (e) => {
                 const findIndexRecursively = (items) => {
                     let found = false;
-                    items.some(item => {
-                        if (item.children) {
-                            found = findIndexRecursively(item.children); // 递归调用自身处理更深层级的 children
-                        }
-                        if (found) return true; // 如果在子层级找到了目标索引，立即停止遍历
-                        if (item.index === e.index) {
-                            found = true;
-                            return true; // 找到目标索引，立即停止遍历
-                        }
-                        return false; // 继续遍历
-                    });
+                    if(items && items.length > 0){
+                        items.some(item => {
+                            if (item.children) {
+                                found = findIndexRecursively(item.children); // 递归调用自身处理更深层级的 children
+                            }
+                            if (found) return true; // 如果在子层级找到了目标索引，立即停止遍历
+                            if (item.index === e.index) {
+                                found = true;
+                                return true; // 找到目标索引，立即停止遍历
+                            }
+                            return false; // 继续遍历
+                        });
+                    }
                     return found;
                 };
-
                 const index = menus.value.findIndex(a => findIndexRecursively(a.children));
                 return index !== -1 ? index : -1;
             };
