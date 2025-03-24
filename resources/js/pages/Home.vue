@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Welcome to Laravel + Vue SPA</h1>
+        <h1>1111111111111111111</h1>
         <router-link to="/register">Go to Register</router-link>
     </div>
 </template>
