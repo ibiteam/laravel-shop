@@ -1,0 +1,16 @@
+:root {
+    --el-color-primary: var(--main-color);
+    --el-color-danger: var(--red-color);
+}
+
+.el-button--primary {
+    --el-button-hover-bg-color: var(--main-color);
+}
+
+.el-form-item.is-error .el-input-tag__wrapper.is-focus, .el-form-item.is-error .el-input-tag__wrapper:focus, .el-form-item.is-error .el-input-tag__wrapper:hover, .el-form-item.is-error .el-input__wrapper.is-focus, .el-form-item.is-error .el-input__wrapper:focus, .el-form-item.is-error .el-input__wrapper:hover, .el-form-item.is-error .el-select__wrapper.is-focus, .el-form-item.is-error .el-select__wrapper:focus, .el-form-item.is-error .el-select__wrapper:hover, .el-form-item.is-error .el-textarea__inner.is-focus, .el-form-item.is-error .el-textarea__inner:focus, .el-form-item.is-error .el-textarea__inner:hover{
+    box-shadow: 0 0 0 1px var(--main-color) inset;
+}
+
+.el-form-item.is-error .el-input-tag__wrapper, .el-form-item.is-error .el-input__wrapper,.el-form-item.is-error .el-select__wrapper, .el-form-item.is-error .el-textarea__inner{
+    box-shadow: 0 0 0 1px var(--el-input-border-color,var(--el-border-color)) inset;
+}

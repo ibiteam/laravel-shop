@@ -1,11 +1,12 @@
 import axios from 'axios'
-import router from '../router'
+import router from '@/router'
 import dialog from "./dialog";
 // 请求超时时间
 axios.defaults.timeout = 15000
 
 // 如果用的JSONP，可以配置此参数带上cookie凭证，如果是代理和CORS不用设置
 // axios.defaults.withCredentials = true
+axios.defaults.baseURL = 'api/'
 // post请求头
 axios.defaults.headers.Accept = 'application/json'
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'
