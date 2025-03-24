@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int                             $id
@@ -17,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\AdminUser|null $adminUser
+ * @property-read \App\Models\SellerShop|null $sellerShop
  * @property-read \App\Models\User $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SellerEnter newModelQuery()
@@ -38,22 +41,30 @@ use Illuminate\Database\Eloquent\Model;
 class SellerEnter extends Model
 {
     use DatetimeTrait;
+
+    // 审核状态
     public const CHECK_NOT_YET = 0; // 还未审核
     public const CHECK_APPROVED = 1; // 审核通过
     public const CHECK_NOT_APPROVED = 2; // 审核未通过
+
     protected $guarded = [];
 
     protected $casts = [
         'enter_info' => 'array',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function adminUser()
+    public function adminUser(): BelongsTo
     {
         return $this->belongsTo(AdminUser::class, 'admin_user_id', 'id');
+    }
+
+    public function sellerShop(): HasOne
+    {
+        return $this->hasOne(SellerShop::class, 'seller_id', 'id');
     }
 }

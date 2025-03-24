@@ -48,6 +48,8 @@ use Illuminate\Database\Eloquent\Model;
 class SellerEnterConfig extends Model
 {
     use DatetimeTrait;
+
+    // 组件类型
     public const TYPE_TEXT = 'text';  // 文本框
     public const TYPE_TEXTAREA = 'textarea'; // 多行文本
     public const TYPE_RADIO = 'radio';  // 单选框
@@ -56,5 +58,14 @@ class SellerEnterConfig extends Model
     public const TYPE_DATE = 'date'; // 时间
     public const TYPE_FILE = 'file';  // 单文件
     public const TYPE_MORE_FILE = 'more_file'; // 多文件
+
+    // 是否显示
+    public const IS_SHOW_YES = 1;
+    public const IS_SHOW_NO = 0;
+
+    // 是否必须
+    public const IS_NEED_YES = 1;
+    public const IS_NEED_NO = 0;
+
     protected $guarded = [];
 }
