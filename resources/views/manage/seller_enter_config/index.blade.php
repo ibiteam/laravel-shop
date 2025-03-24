@@ -113,7 +113,6 @@
                 inviteSetForm: @json($content),    //  设置弹窗表单数据,
                 component_icons: @json($component_icons),
                 component_values: @json($component_values),
-                shop_color: '{{ $app_shop_color }}',
                 public_options_down: [],
                 upload_size: 2,
             }

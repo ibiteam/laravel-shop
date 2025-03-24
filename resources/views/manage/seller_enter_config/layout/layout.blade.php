@@ -17,8 +17,8 @@
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/06/25/element-2.15.13.css?key=1.0"/>
     <link rel="stylesheet" href="https://cdn.toodudu.com/uploads/2023/05/30/swiper.css"/>
     <!--页面基础样式-->
-    @include('admin.invite_template.style.invite-template-style')
-    @include('admin.invite_template.style.dialog-setting')
+    @include('manage.seller_enter_config.style.invite-template-style')
+    @include('manage.seller_enter_config.style.dialog-setting')
     <style>
         @font-face {
             font-family: 'iconfont';  /* Project id 2575177 */
