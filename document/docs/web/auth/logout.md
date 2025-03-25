@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/v1/auth/logout
+* /api/home/auth/logout
 
 ### 请求方式
 * POST

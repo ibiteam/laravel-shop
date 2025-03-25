@@ -89,14 +89,14 @@ class AuthController extends BaseController
                 'password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
                 'phone' => ['required', 'integer', new PhoneRule],
                 'code' => 'required|string',
-                'agreement' => 'required|accepted'
+                // 'agreement' => 'required|accepted',
             ], [], [
                 'account' => '用户名',
                 'password' => '密码',
                 'password_confirmation' => '确认密码',
                 'phone' => '手机号',
                 'code' => '验证码',
-                'agreement' => '协议'
+                // 'agreement' => '协议',
             ]);
 
             $user = $user_dao->getInfoByUserName($validated['account']);
@@ -117,7 +117,7 @@ class AuthController extends BaseController
 
             $user = $user_service->registerByUserNameAndPhone($validated, $source);
 
-            $data = $user_service->loginSuccess($user, $source);
+            $data = $user_service->loginSuccess($user, $source,User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -158,7 +158,7 @@ class AuthController extends BaseController
                 throw new BusinessException('该手机号未注册');
             }
 
-            $data = $user_service->loginSuccess($user, get_source());
+            $data = $user_service->loginSuccess($user, get_source(),User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -198,7 +198,7 @@ class AuthController extends BaseController
                 throw new BusinessException('账号或密码错误~');
             }
 
-            $data = $user_service->loginSuccess($user, get_source());
+            $data = $user_service->loginSuccess($user, get_source(),User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -208,5 +208,111 @@ class AuthController extends BaseController
         }
 
         return $this->success($data);
+    }
+
+    /**
+     * 退出登录.
+     */
+    public function logout(Request $request, UserService $user_service): JsonResponse
+    {
+        try {
+            $user = $this->user();
+
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录');
+            }
+            $user_service->logout($user);
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('退出登录失败');
+        }
+
+        return $this->success('退出成功');
+    }
+
+    /**
+     * 忘记密码
+     */
+    public function forgetPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao, UserDao $user_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'phone' => ['required', 'integer', new PhoneRule],
+                'code' => 'required|string',
+                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+            ], [], [
+                'phone' => '手机号',
+                'code' => '验证码',
+                'new_password' => '新密码',
+                'new_password_confirmation' => '确认密码',
+            ]);
+
+            $user = $user_dao->getInfoByPhone($validated['phone']);
+
+            if (! $user instanceof User) {
+                throw new BusinessException('该手机号未注册');
+            }
+
+            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_FORGET_PASSWORD)) {
+                throw new BusinessException('验证码输入错误');
+            }
+
+            if (! $user->update(['password' => $validated['new_password']])) {
+                throw new BusinessException('重置密码失败');
+            }
+            $user_log_dao->addLog($user, UserLog::TYPE_OPERATE, get_source(), '重置密码成功');
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('重置密码失败');
+        }
+
+        return $this->success('重置密码成功');
+    }
+
+    /**
+     * 修改密码
+     */
+    public function editPassword(Request $request, SmsService $sms_service, UserLogDao $user_log_dao, UserService $user_service): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'code' => 'required|string',
+                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+            ], [], [
+                'code' => '短信验证码',
+                'new_password' => '新密码',
+                'new_password_confirmation' => '确认密码',
+            ]);
+
+            $user = $this->user();
+
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录', CustomCodeEnum::UNAUTHORIZED);
+            }
+
+            if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsg::PHONE_EDIT_PASSWORD)) {
+                throw new BusinessException('验证码输入错误');
+            }
+
+            if (! $user->update(['password' => $validated['new_password']])) {
+                throw new BusinessException('修改密码失败');
+            }
+
+            $user_log_dao->addLog($user, UserLog::TYPE_OPERATE, get_source(), '修改密码成功');
+
+            $user_service->logout($user);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('修改密码失败');
+        }
+
+        return $this->success('修改密码成功');
     }
 }

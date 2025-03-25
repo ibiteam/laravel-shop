@@ -14,4 +14,9 @@ Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']); // 用户注册
     Route::post('login-by-password', [AuthController::class, 'loginByPassword']); // 账号(用户名+手机号)密码登录
     Route::post('login-by-phone', [AuthController::class, 'loginByPhone']); // 手机号验证码登录
+    Route::post('forget-password', [AuthController::class, 'forgetPassword']); // 忘记密码
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']); // 退出登录
+    Route::post('edit-password', [AuthController::class, 'editPassword']); // 修改密码
 });
