@@ -3,11 +3,9 @@
         <div class="public-inner s-flex ai-ct jc-bt">
             <div class="s-flex ai-ct">
                 <div class="logo">
-                    <a href="/" title="多多商城">
-                        <img alt=""
-                             src="https://testcdn.ibisaas.com/2025/02/08/5bpXJOozRKBAO7rqv77jAmDX6id5Bo8C2YYkonyQ.png">
+                    <a href="/" title="laravel-shop">
+                        <img src="@/assets/images/logo.png" alt="laravel-shop">
                     </a>
-
                 </div>
                 <span class="title" v-if="title">{{ title }}</span>
             </div>
@@ -18,7 +16,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, getCurrentInstance } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;

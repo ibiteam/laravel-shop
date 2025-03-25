@@ -93,7 +93,7 @@ const submitForm = () => {
             const { phone } = passwordForm;
             checkPhone(phone).then(res=>{
                 if (res.data.is_register) {
-                    let formData = {
+                    const formData = {
                         password: md5(passwordForm.password),
                         password_confirmation: md5(passwordForm.password_confirmation),
                         phone: passwordForm.phone,
@@ -124,7 +124,7 @@ const sendPhoneCode = () => {
         if (valid) {
             checkPhone(passwordForm.phone).then(res=>{
                 if (res.data.is_register) {
-                    let info = {
+                    const info = {
                         phone: passwordForm.phone,
                         action: 'password-forget'
                     }

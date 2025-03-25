@@ -101,7 +101,7 @@
                 const { phone } = registerForm;
                 checkPhone(phone).then(res=>{
                     if (!res.data.is_register) {
-                        let formData = {
+                        const formData = {
                             account: registerForm.account,
                             password: md5(registerForm.password),
                             password_confirmation: md5(registerForm.password_confirmation),
@@ -132,7 +132,7 @@
             if (valid) {
                 checkPhone(registerForm.phone).then(res=>{
                     if (!res.data.is_register) {
-                        let info = {
+                        const info = {
                             phone: registerForm.phone,
                             action: 'register'
                         }
