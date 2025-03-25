@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('sms-action', [SmsController::class, 'handleAction']);
 /* 授权相关路由 */
 Route::prefix('auth')->group(function () {
+    Route::get('check-login', [AuthController::class, 'checkLogin']); // 检测是否登录
     Route::get('check-name', [AuthController::class, 'checkUserName']); // 检测用户名是否注册
     Route::get('check-phone', [AuthController::class, 'checkPhone']); // 检测手机号是否注册
     Route::post('register', [AuthController::class, 'register']); // 用户注册
