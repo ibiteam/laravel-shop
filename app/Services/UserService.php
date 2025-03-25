@@ -30,6 +30,23 @@ class UserService
     }
 
     /**
+     * 根据用户名+手机号注册用户.
+     */
+    public function registerByUserNameAndPhone(array $params, CommonEnum $source = CommonEnum::PC): User
+    {
+        return User::query()->create([
+            'user_name' => $params['user_name'],
+            'password' => $params['password'],
+            'nickname' => $params['user_name'],
+            'phone' => $params['phone'],
+            'avatar' => '',
+            'register_ip' => get_request_ip(),
+            'is_modify' => false,
+            'source' => $source->value,
+        ]);
+    }
+
+    /**
      * 登录成功处理token.
      */
     public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5, string $token_name = 'api'): array
