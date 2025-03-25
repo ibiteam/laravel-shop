@@ -15,10 +15,11 @@ use Illuminate\Validation\ValidationException;
 
 class SellerEnterController extends BaseController
 {
-    const STATUS_NOT_ENTERED = 1;   // 未入驻
-    const STATUS_CHECK_FAILED = 2;  // 未通过审核
-    const STATUS_SUCCESS = 3;       // 成功
-    const STATUS_NO_SHOP = 4;       // 没有店铺
+    const ENTER_STATUS_NOT_SUBMIT = 1;      // 入驻信息未提交
+    const ENTER_STATUS_CHECK_ONGOING = 2;   // 入驻信息审核中
+    const ENTER_STATUS_CHECK_FAILED = 3;    // 入驻信息审核未通过
+    const ENTER_STATUS_CHECK_APPROVED = 4;  // 入驻信息审核通过，没有配置店铺
+    const ENTER_STATUS_FINISH_ALL = 5;      // 入驻信息审核通过，配置完店铺
 
     /**
      * 入驻状态检测.
@@ -27,38 +28,86 @@ class SellerEnterController extends BaseController
     {
         $user = $this->user();
 
-        $seller_enter = SellerEnter::query()->whereUserId($user->id)->first();
-        if (!$seller_enter) {
-            $status = self::STATUS_NOT_ENTERED;
-        } else {
+        $seller_enter = SellerEnter::select(['id', 'check_status', 'check_desc'])
+            ->with(['sellerShop'])->whereUserId($user->id)->first();
+
+        $enter_status = self::ENTER_STATUS_NOT_SUBMIT;
+
+        if ($seller_enter) {
             // 审核状态
-            if ($seller_enter->check_status == SellerEnter::CHECK_APPROVED) {
-                $shop = $seller_enter->sellerShop ?? '';
-                if (!$shop) {
-                    $status = self::STATUS_NO_SHOP;
-                } else {
-                    $status = self::STATUS_SUCCESS;
-                }
+            if ($seller_enter->check_status == SellerEnter::CHECK_NOT_YET) {
+                $enter_status = self::ENTER_STATUS_CHECK_ONGOING;
+            } elseif ($seller_enter->check_status == SellerEnter::CHECK_NOT_APPROVED) {
+                $enter_status = self::ENTER_STATUS_CHECK_FAILED;
             } else {
-                $status = self::STATUS_CHECK_FAILED;
+                $enter_status = self::ENTER_STATUS_CHECK_APPROVED;
+
+                if ($seller_enter->sellerShop ?? '') {
+                    $enter_status = self::ENTER_STATUS_FINISH_ALL;
+                }
             }
         }
 
-        return $this->success(['status' => $status]);
-    }
+        $data['seller_enter'] = $seller_enter ? $seller_enter->toArray() : [];
+        $data['enter_status'] = $enter_status;
 
+        return $this->success($data);
+    }
 
     /**
      * 入驻表单信息.
      */
     public function enterConfigs(Request $request)
     {
-        $enterConfigs = SellerEnterConfig::query()->whereIsShow(SellerEnterConfig::IS_SHOW_YES)->orderByDesc('sort')->get()
-            ->map(function (SellerEnterConfig $sellerEnterConfig) {
-                return ComponentFactory::getSellerEnterComponent($sellerEnterConfig->type, $sellerEnterConfig->name)->display($sellerEnterConfig->toArray());
-            })->toArray();
+        $user = $this->user();
 
-        return $this->success(['enter_configs' => $enterConfigs]);
+        try {
+            $validated = $request->validate([
+                'id' => 'nullable|int',
+            ], [], [
+                'id' => '商家ID',
+            ]);
+
+            $id = $validated['id'] ?? 0;
+
+            $enterConfigs = SellerEnterConfig::query()->whereIsShow(SellerEnterConfig::IS_SHOW_YES)
+                ->orderByDesc('sort')->get()->map(function (SellerEnterConfig $sellerEnterConfig) {
+                    $display_data = ComponentFactory::getSellerEnterComponent($sellerEnterConfig->type, $sellerEnterConfig->name)->display($sellerEnterConfig->toArray());
+                    $display_data['value'] = '';
+
+                    return $display_data;
+                });
+
+            if ($id) {
+                // 编辑
+                $seller_enter = SellerEnter::query()->whereId($id)->whereUserId($user->id)->first();
+
+                if (! $seller_enter) {
+                    throw new BusinessException('入驻信息不存在');
+                }
+
+                if ($seller_enter->enter_info) {
+                    $enterInfoMap = $seller_enter->enter_info->keyBy('id'); // 缓存配置 ID 映射关系
+                    $enterConfigs = $enterConfigs->map(function ($sellerEnterConfig) use ($enterInfoMap) {
+                        if ($sellerEnterConfig instanceof SellerEnterConfig && isset($enterInfoMap[$sellerEnterConfig->id])) {
+                            $sellerEnterConfig->value = $enterInfoMap[$sellerEnterConfig->id]['value'] ?? '';
+                        } else {
+                            $sellerEnterConfig->value = '';
+                        }
+
+                        return $sellerEnterConfig;
+                    });
+                }
+            }
+
+            return $this->success(['id' => $id, 'enter_configs' => $enterConfigs->toArray()]);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('获取入驻表单信息异常');
+        }
     }
 
     /**
@@ -72,7 +121,7 @@ class SellerEnterController extends BaseController
             $validated = $request->validate([
                 'id' => 'nullable|int',
                 'enter_info' => 'required|array',
-                'enter_info.*.config_id' => 'required|int',
+                'enter_info.*.id' => 'required|int',
                 'enter_info.*.type' => 'required|string',
                 'enter_info.*.name' => 'required|string',
                 'enter_info.*.value' => 'nullable|string',
@@ -85,34 +134,38 @@ class SellerEnterController extends BaseController
             $enter_info = $validated['enter_info'];
 
             foreach ($enter_info as $enter_info_item) {
-                $config = SellerEnterConfig::query()->whereId($enter_info_item['config_id'])->first();
-                if (!$config) {
+                $config = SellerEnterConfig::query()->whereId($enter_info_item['id'])->first();
+
+                if (! $config) {
                     throw new BusinessException('入驻信息配置不存在');
                 }
-                if ($config->is_need == SellerEnterConfig::IS_NEED_YES && !$enter_info_item['value']) {
-                    throw new BusinessException('必须填写' . $config->name);
+
+                if ($config->is_need == SellerEnterConfig::IS_NEED_YES && ! $enter_info_item['value']) {
+                    throw new BusinessException('必须填写'.$config->name);
                 }
             }
-
 
             if ($id) {
                 // 编辑
                 $seller_enter = SellerEnter::query()->whereId($id)->whereUserId($user->id)->first();
-                if (!$seller_enter) {
+
+                if (! $seller_enter) {
                     throw new BusinessException('入驻信息不存在');
                 }
+
                 if ($seller_enter->check_status == SellerEnter::CHECK_APPROVED) {
                     throw new BusinessException('审核已通过，不需要编辑');
                 }
 
                 $seller_enter->enter_info = $enter_info;
-                if (!$seller_enter->save()) {
+
+                if (! $seller_enter->save()) {
                     throw new BusinessException('编辑失败');
                 }
-
             } else {
                 // 新增
                 $seller_enter = SellerEnter::query()->whereUserId($user->id)->first();
+
                 if ($seller_enter) {
                     throw new BusinessException('不允许重复申请入驻');
                 }
@@ -123,15 +176,12 @@ class SellerEnterController extends BaseController
                     'source' => get_source(),
                 ]);
 
-                if (!$seller_enter) {
+                if (! $seller_enter) {
                     throw new BusinessException('新增失败');
                 }
             }
 
-            // todo 发送商家入驻通知
-
             return $this->success('操作成功');
-
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -163,10 +213,6 @@ class SellerEnterController extends BaseController
                 'ship_address' => 'required|string',
                 'main_cate' => 'required|string',
                 'kf_phone' => 'required|string',
-                'leader_name' => 'nullable|string',
-                'leader_position' => 'nullable|string',
-                'leader_phone' => 'nullable|string',
-                'leader_email' => 'nullable|string',
             ], [], [
                 'seller_id' => '商家ID',
                 'name' => '店铺名称',
@@ -181,24 +227,21 @@ class SellerEnterController extends BaseController
                 'ship_address' => '发货地址',
                 'main_cate' => '主营类目',
                 'kf_phone' => '客服电话',
-                'leader_name' => '负责人姓名',
-                'leader_position' => '负责人职位',
-                'leader_phone' => '负责人电话',
-                'leader_email' => '负责人邮箱',
             ]);
 
             $seller_enter = SellerEnter::query()->with('sellerShop')
                 ->whereId($validated['seller_id'])->whereUserId($user->id)
                 ->first();
-            if (!$seller_enter) {
+
+            if (! $seller_enter) {
                 throw new BusinessException('入驻信息不存在');
             }
 
-            if (!empty($seller_enter->sellerShop)) {
+            if (! empty($seller_enter->sellerShop)) {
                 throw new BusinessException('店铺信息已存在');
             }
 
-            if(SellerShop::whereName($validated['name'])->first()){
+            if (SellerShop::whereName($validated['name'])->first()) {
                 throw new BusinessException('店铺名称已被使用');
             }
 
@@ -224,10 +267,6 @@ class SellerEnterController extends BaseController
                     'ship_address' => $validated['ship_address'],
                     'main_cate' => $validated['main_cate'],
                     'kf_phone' => $validated['kf_phone'],
-                    'leader_name' => $validated['leader_name'] ?? '',
-                    'leader_position' => $validated['leader_position'] ?? '',
-                    'leader_phone' => $validated['leader_phone'] ?? '',
-                    'leader_email' => $validated['leader_email'] ?? '',
                 ]);
 
                 // 更新用户表中的 seller_id
@@ -236,11 +275,11 @@ class SellerEnterController extends BaseController
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
+
                 throw $e;
             }
 
             return $this->success('操作成功');
-
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -249,6 +288,4 @@ class SellerEnterController extends BaseController
             return $this->error('更新店铺信息异常');
         }
     }
-
-
 }
