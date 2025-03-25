@@ -107,7 +107,7 @@ const submitForm = () => {
                 const { account, password } = loginForm;
                 accountLogin({account,password:md5(password)}).then(res => {
                     if(res.code == 200){
-                        cns.$cookies.set('pc-token', res.data.token)
+                        cns.$cookies.set('pc-token', res.data.token, res.data.expires_at)
                         cns.$message.success('登录成功')
                     }else {
                         cns.$message.error(res.message)
@@ -119,7 +119,7 @@ const submitForm = () => {
                     if (res.data.is_register) {
                         registerOrPhoneLogin({info:{phone,code}, action:'login'}).then(ret => {
                             if(ret.code == 200){
-                                cns.$cookies.set('pc-token', res.data.token)
+                                cns.$cookies.set('pc-token', res.data.token, res.data.expires_at)
                                 cns.$message.success('登录成功')
                             }else {
                                 cns.$message.error(ret.message)

@@ -79,7 +79,7 @@
             return callback(new Error('请输入用户名'));
         }
         checkUsername(value).then(res => {
-            if (res.code == 400) {
+            if (res.data.is_register) {
                 return callback(new Error('该用户名已被使用'));
             }
             return callback();
