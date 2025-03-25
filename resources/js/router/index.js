@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Register from '@/pages/Register.vue'
-import Login from '@/pages/Login.vue'
-import ForgetPassword from '@/pages/ForgetPassword.vue'
-import Home from '@/pages/Home.vue';
+import Register from '@/pages/front/Register.vue'
+import Login from '@/pages/front/Login.vue'
+import ForgetPassword from '@/pages/front/ForgetPassword.vue'
+import Home from '@/pages/front/Home.vue';
 
 const router = createRouter({
     history: createWebHistory(),

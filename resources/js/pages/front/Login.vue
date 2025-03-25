@@ -2,7 +2,7 @@
     <div class="login-body-wrap">
         <div class="wrap header-wrap">
             <div class="logo">
-                <a href="/" title="多多商城">
+                <a href="/public" title="多多商城">
                     <img alt="" src="https://testcdn.ibisaas.com/2025/02/08/5bpXJOozRKBAO7rqv77jAmDX6id5Bo8C2YYkonyQ.png">
                 </a>
             </div>
