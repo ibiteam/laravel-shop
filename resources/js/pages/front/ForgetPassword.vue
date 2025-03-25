@@ -94,15 +94,15 @@ const submitForm = () => {
             checkPhone(phone).then(res=>{
                 if (res.data.is_register) {
                     let formData = {
-                        password: md5(passwordForm.password),
-                        password_confirmation: md5(passwordForm.password_confirmation),
+                        new_password: md5(passwordForm.password),
+                        new_password_confirmation: md5(passwordForm.password_confirmation),
                         phone: passwordForm.phone,
                         code: passwordForm.code
                     }
                     updatePassword({info:formData, action:'password-forget'}).then(ret => {
                         if(ret.code == 200){
                             cns.$message.success('操作成功')
-                            router.push({name: 'login'})
+                            router.replace({name: 'login'})
                         }else {
                             cns.$message.error(ret.message)
                         }

@@ -1,5 +1,5 @@
 <template>
-    <div class="public-footer">
+    <div class="public-footer public-inner">
         <div class="wrap" style="border-top: 0px;">
             <div style=" line-height: 30px;text-align:center;">
                 <span>Copyright ©2015 - 现在 北京涂多多电子商务股份有限公司 版权所有</span>
@@ -14,7 +14,6 @@
 
 <style scoped>
 .public-footer {
-    width: 1440px;
     margin: 0 auto;
     padding-bottom: 42px;
 }

@@ -3,6 +3,7 @@ import App from './App.vue'
 
 import router from '@/router'
 import ElementPlus from 'element-plus'
+import VueCookies from 'vue3-cookies'
 import 'element-plus/dist/index.css'
 import '@/css/app.css'
 import '@/css/element-reset.css'
@@ -18,4 +19,5 @@ app.config.globalProperties.$dialog = http
 app.config.globalProperties.$public = $public;
 app.use(router);
 app.use(ElementPlus);
+app.use(VueCookies);
 app.mount('#app');

@@ -34,7 +34,6 @@
         <PublicFooter></PublicFooter>
     </div>
 </template>
-
 <script setup>
     import { ref, getCurrentInstance, reactive, watch } from 'vue';
     import PublicHeader from '@/components/PublicHeader.vue';
@@ -44,7 +43,7 @@
     import { useRouter } from 'vue-router';
     const router = useRouter();
 
-    import { checkPhone, sendCode, registerOrPhoneLogin} from '@/api/user';
+    import { checkPhone, sendCode, registerOrPhoneLogin, checkUsername } from '@/api/user';
     import md5 from 'js-md5'
 
     const timerCode = ref(null);
@@ -75,9 +74,22 @@
         return callback();
     }
 
+    const validateUsername = (rule, value, callback) => {
+        if (!value) {
+            return callback(new Error('请输入用户名'));
+        }
+        checkUsername(value).then(res => {
+            if (res.code == 400) {
+                return callback(new Error('该用户名已被使用'));
+            }
+            return callback();
+        });
+    }
+
     const registerRules = reactive({
         account: [
-            { required: true, message: '请输入用户名/登录手机', trigger: 'blur' }
+            { required: true, message: '请输入用户名/登录手机', trigger: 'blur' },
+            { validator: validateUsername, trigger: 'blur' }
         ],
         password: [
             { required: true, message: '请输入登录密码', trigger: 'blur' }
@@ -111,6 +123,7 @@
                         registerOrPhoneLogin({ info: formData, action:'register', is_register:0}).then(ret => {
                             if(ret.code == 200){
                                 cns.$message.success('注册成功')
+                                router.replace({name: 'login'})
                             }else {
                                 cns.$message.error(ret.message)
                             }
@@ -161,7 +174,6 @@
                         }).catch(() => {})
                     }
                 })
-
             }
         })
     }
