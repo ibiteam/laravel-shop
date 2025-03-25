@@ -21,12 +21,14 @@
 {
     "code": 200,
     "message": "success",
-    "data": null
+    "data": {
+        "is_register": true,
+    }
 }
 
 {
     "code": 400,
-    "message": "该用户名已被注册",
+    "message": "请求失败",
     "data": null
 }
 ```
