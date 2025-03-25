@@ -16,5 +16,11 @@
         "name": "auth",
         "label": "授权",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "seller",
+        "label": "商家",
+        "collapsed": true
     }
 ]
