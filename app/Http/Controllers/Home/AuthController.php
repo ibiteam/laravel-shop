@@ -18,6 +18,14 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends BaseController
 {
     /**
+     * 检测是否登录.
+     */
+    public function checkLogin(Request $request, UserService $user_service): JsonResponse
+    {
+        return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
+    }
+
+    /**
      * 检测用户名是否注册.
      */
     public function checkUserName(Request $request, UserDao $user_dao): JsonResponse

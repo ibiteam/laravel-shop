@@ -16,7 +16,7 @@
     },
     {
         "text": "WEB",
-        "link": "/web/auth/check-name",
+        "link": "/web/description",
         "activeMatch": "/web/"
     }
 ]

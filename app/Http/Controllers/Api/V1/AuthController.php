@@ -41,11 +41,9 @@ class AuthController extends BaseController
     /**
      * 检测是否登录.
      */
-    public function checkLogin(Request $request): JsonResponse
+    public function checkLogin(Request $request, UserService $user_service): JsonResponse
     {
-        $user = $this->user();
-
-        return $this->success(['is_login' => $user instanceof User]);
+        return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
     }
 
     public function loginByPassword(Request $request, UserDao $user_dao, UserService $user_service): JsonResponse

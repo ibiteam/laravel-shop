@@ -1,5 +1,11 @@
 [
     {
+        "type": "file",
+        "name": "description",
+        "label": "说明",
+        "collapsed": true
+    },
+    {
         "type": "dir",
         "name": "auth",
         "label": "授权",
