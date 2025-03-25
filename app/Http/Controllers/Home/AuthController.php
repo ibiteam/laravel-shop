@@ -86,12 +86,14 @@ class AuthController extends BaseController
                 'password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
                 'phone' => ['required', 'integer', new PhoneRule],
                 'code' => 'required|string',
+                'agreement' => 'required|accepted'
             ], [], [
                 'user_name' => '用户名',
                 'password' => '密码',
                 'password_confirmation' => '确认密码',
                 'phone' => '手机号',
                 'code' => '验证码',
+                'agreement' => '协议'
             ]);
 
             $user = $user_dao->getInfoByUserName($validated['user_name']);
@@ -124,6 +126,9 @@ class AuthController extends BaseController
         return $this->success($data);
     }
 
+    /**
+     * 手机号登录.
+     */
     public function loginByPhone(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service): JsonResponse
     {
         try {
@@ -162,6 +167,9 @@ class AuthController extends BaseController
         return $this->success($data);
     }
 
+    /**
+     * 账号密码登录.
+     */
     public function loginByPassword(Request $request, UserDao $user_dao, UserService $user_service): JsonResponse
     {
         try {

@@ -46,6 +46,9 @@ class AuthController extends BaseController
         return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
     }
 
+    /**
+     * 账号密码登录.
+     */
     public function loginByPassword(Request $request, UserDao $user_dao, UserService $user_service): JsonResponse
     {
         try {
