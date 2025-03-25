@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Seller;
 
 use App\Components\ComponentFactory;
 use App\Exceptions\BusinessException;
-use App\Http\Controllers\Api\BaseController;
 use App\Models\SellerEnter;
 use App\Models\SellerEnterConfig;
 use App\Models\SellerShop;
@@ -203,9 +202,9 @@ class SellerEnterController extends BaseController
                 'seller_id' => 'required|int',
                 'name' => 'required|string',
                 'logo' => 'required|string',
-                'title' => 'required|string',
-                'keyword' => 'required|string',
-                'description' => 'required|string',
+                'title' => 'nullable|string',
+                'keyword' => 'nullable|string',
+                'description' => 'nullable|string',
                 'country' => 'required|int',
                 'province' => 'required|int',
                 'city' => 'required|int',
@@ -257,9 +256,9 @@ class SellerEnterController extends BaseController
                     'seller_id' => $validated['seller_id'],
                     'name' => $validated['name'],
                     'logo' => $validated['logo'],
-                    'title' => $validated['title'],
-                    'keyword' => $validated['keyword'],
-                    'description' => $validated['description'],
+                    'title' => $validated['title'] ?? '',
+                    'keyword' => $validated['keyword'] ?? '',
+                    'description' => $validated['description'] ?? '',
                     'country' => $validated['country'],
                     'province' => $validated['province'],
                     'city' => $validated['city'],

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Seller\DashboardController;
 use App\Http\Controllers\Seller\SellerEnterController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,11 @@ Route::middleware([/*'auth:sanctum'*/])->group(function () {
         Route::get('configs', [SellerEnterController::class, 'enterConfigs']); // 入驻表单信息
         Route::post('store', [SellerEnterController::class, 'store']); // 提交入驻信息
         Route::post('shop/create', [SellerEnterController::class, 'shopCreate']); // 创建店铺信息
+    });
+
+    // 首页
+    Route::prefix('home')->group(function () {
+        Route::get('/', [DashboardController::class, 'index']);
     });
 });
 
