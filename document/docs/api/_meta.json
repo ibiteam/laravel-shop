@@ -1,14 +1,14 @@
 [
     {
-        "type": "dir",
-        "name": "user",
-        "label": "用户",
+        "type": "file",
+        "name": "description",
+        "label": "说明",
         "collapsed": true
     },
     {
         "type": "dir",
-        "name": "order",
-        "label": "订单",
+        "name": "auth",
+        "label": "授权",
         "collapsed": true
     }
 ]
