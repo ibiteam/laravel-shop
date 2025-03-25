@@ -1,17 +1,22 @@
 [
-  {
-    "text": "后端文档",
-    "link": "/backend/",
-    "activeMatch": "/backend/"
-  },
-  {
-    "text": "前端文档",
-    "link": "/frontend/",
-    "activeMatch": "/frontend/"
-  },
-  {
-    "text": "API",
-    "link": "/api/user/login",
-    "activeMatch": "/api/"
+    {
+        "text": "后端文档",
+        "link": "/backend/",
+        "activeMatch": "/backend/"
+    },
+    {
+        "text": "前端文档",
+        "link": "/frontend/",
+        "activeMatch": "/frontend/"
+    },
+    {
+        "text": "API",
+        "link": "/api/description",
+        "activeMatch": "/api/"
+    },
+    {
+        "text": "WEB",
+        "link": "/web/description",
+        "activeMatch": "/web/"
     }
 ]

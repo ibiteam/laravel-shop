@@ -53,6 +53,8 @@ class User extends Authenticatable
 {
     use DatetimeTrait, HasApiTokens, Notifiable;
 
+    public const HOME_ACCESS_TOKEN_NAME = 'home'; // web端登录token名称
+
     protected $guarded = [];
 
     protected $hidden = ['password'];

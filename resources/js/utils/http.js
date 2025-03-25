@@ -1,9 +1,23 @@
 import axios from 'axios'
 import router from '@/router'
 import dialog from "./dialog";
+import { useCookies } from 'vue3-cookies'
+const { cookies } = useCookies()
 // 请求超时时间
 axios.defaults.timeout = 15000
+function generateUUID() {
+    var d = new Date().getTime()
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0
+        d = Math.floor(d / 16)
+        return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(36)
+    })
+    return uuid
+}
 
+if (!localStorage.getItem('visitorId')) {
+    localStorage.setItem('visitorId', generateUUID())
+}
 // 如果用的JSONP，可以配置此参数带上cookie凭证，如果是代理和CORS不用设置
 // axios.defaults.withCredentials = true
 axios.defaults.baseURL = 'api/'
@@ -16,6 +30,16 @@ axios.defaults.headers['Access-From'] = 'pc'
 // 请求拦截器
 axios.interceptors.request.use(
     config => {
+        let token = cookies.get('pc-token')
+        let visitorId = ''
+        if (localStorage.getItem('visitorId')) {
+            visitorId = localStorage.getItem('visitorId')
+        } else {
+            visitorId = generateUUID()
+            localStorage.setItem('visitorId', visitorId)
+        }
+        config.headers['Device-Id'] = visitorId
+        config.headers['Authorization'] = token ? 'Bearer ' + token : ''
         return config
     },
     error => {

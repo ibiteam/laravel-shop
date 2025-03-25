@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Home;
 
 use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
-use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\UserDao;
 use App\Http\Dao\UserLogDao;
 use App\Models\PhoneMsg;
@@ -22,12 +21,41 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends BaseController
 {
     /**
+     * 检测是否登录.
+     */
+    public function checkLogin(Request $request, UserService $user_service): JsonResponse
+    {
+        return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
+    }
+
+    /**
+     * 检测用户名是否注册.
+     */
+    public function checkUserName(Request $request, UserDao $user_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate(['account' => 'required|string'], [], ['account' => '用户名']);
+
+            $user = $user_dao->getInfoByUserName($validated['account']);
+
+            return $this->success([
+                'is_register' => $user instanceof User,
+            ]);
+        } catch (\Throwable $throwable) {
+            return $this->error('请求失败');
+        }
+    }
+
+    /**
      * 检测手机号是否注册.
+     *
+     * @return void
      */
     public function checkPhone(Request $request, UserDao $user_dao): JsonResponse
     {
         try {
-            $validated = $request->validate(['phone' => ['required', 'integer', new PhoneRule]], [], ['phone' => '手机号']);
+            $validated = $request->validate(['phone' => 'required|integer'], [], ['phone' => '手机号']);
+
             $user = $user_dao->getInfoByPhone($validated['phone']);
 
             return $this->success([
@@ -39,48 +67,51 @@ class AuthController extends BaseController
     }
 
     /**
-     * 检测是否登录.
+     * 用户注册.
      */
-    public function checkLogin(Request $request, UserService $user_service): JsonResponse
-    {
-        return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
-    }
-
-    /**
-     * 账号密码登录.
-     */
-    public function loginByPassword(Request $request, UserDao $user_dao, UserService $user_service): JsonResponse
+    public function register(Request $request, UserDao $user_dao, SmsService $sms_service, UserService $user_service): JsonResponse
     {
         try {
             $validated = $request->validate([
                 'account' => 'required|string',
-                'password' => 'required|string',
+                'password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+                'phone' => ['required', 'integer', new PhoneRule],
+                'code' => 'required|string',
+                // 'agreement' => 'required|accepted',
             ], [], [
-                'account' => '账号',
+                'account' => '用户名',
                 'password' => '密码',
+                'password_confirmation' => '确认密码',
+                'phone' => '手机号',
+                'code' => '验证码',
+                // 'agreement' => '协议',
             ]);
 
-            if (is_phone($validated['account'])) {
-                $user = $user_dao->getInfoByPhone($validated['account']);
-            } else {
-                $user = $user_dao->getInfoByUserName($validated['account']);
+            $user = $user_dao->getInfoByUserName($validated['account']);
+
+            if ($user instanceof User) {
+                throw new BusinessException('该用户名已注册');
+            }
+            $user = $user_dao->getInfoByPhone($validated['phone']);
+
+            if ($user instanceof User) {
+                throw new BusinessException('该手机号已注册');
             }
 
-            if (! $user instanceof User) {
-                throw new BusinessException('账号或密码错误');
+            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_REGISTER)) {
+                throw new BusinessException('验证码输入错误');
             }
+            $source = get_source();
 
-            if (! password_verify($validated['password'], $user->password)) {
-                throw new BusinessException('账号或密码错误~');
-            }
+            $user = $user_service->registerByUserNameAndPhone($validated, $source);
 
-            $data = $user_service->loginSuccess($user, get_source());
+            $data = $user_service->loginSuccess($user, $source,User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('登录失败');
+            return $this->error('注册失败');
         }
 
         return $this->success($data);
@@ -115,7 +146,7 @@ class AuthController extends BaseController
                 throw new BusinessException('该手机号未注册');
             }
 
-            $data = $user_service->loginSuccess($user, get_source());
+            $data = $user_service->loginSuccess($user, get_source(),User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -128,79 +159,40 @@ class AuthController extends BaseController
     }
 
     /**
-     * 手机号登录或注册.
+     * 账号密码登录.
      */
-    public function loginAndRegisterByPhone(Request $request, SmsService $sms_service, UserDao $user_dao, UserService $user_service): JsonResponse
+    public function loginByPassword(Request $request, UserDao $user_dao, UserService $user_service): JsonResponse
     {
         try {
             $validated = $request->validate([
-                'phone' => [
-                    'required',
-                    'integer',
-                    new PhoneRule,
-                ],
-                'code' => 'required|string',
+                'account' => 'required|string',
+                'password' => 'required|string',
             ], [], [
-                'phone' => '手机号',
-                'code' => '验证码',
+                'account' => '账号',
+                'password' => '密码',
             ]);
 
-            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_REGISTER)) {
-                throw new BusinessException('验证码输入错误');
+            if (is_phone($validated['account'])) {
+                $user = $user_dao->getInfoByPhone($validated['account']);
+            } else {
+                $user = $user_dao->getInfoByUserName($validated['account']);
             }
-            $source = get_source();
-
-            $user = $user_dao->getInfoByPhone($validated['phone']);
 
             if (! $user instanceof User) {
-                $user = $user_service->registerByPhone($validated['phone'], $source);
+                throw new BusinessException('账号或密码错误');
             }
 
-            $data = $user_service->loginSuccess($user, $source);
+            if (! password_verify($validated['password'], $user->password)) {
+                throw new BusinessException('账号或密码错误~');
+            }
+
+            $data = $user_service->loginSuccess($user, get_source(),User::HOME_ACCESS_TOKEN_NAME);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('登录失败');
-        }
-
-        return $this->success($data);
-    }
-
-    /**
-     * 手机号注册.
-     */
-    public function registerByPhone(Request $request, SmsService $sms_service, UserService $user_service): JsonResponse
-    {
-        try {
-            $validated = $request->validate([
-                'phone' => [
-                    'required',
-                    'integer',
-                    new PhoneRule,
-                    Rule::unique((new User)->getTable(), 'phone'),
-                ],
-                'code' => 'required|string',
-            ], [], [
-                'phone' => '手机号',
-                'code' => '验证码',
-            ]);
-
-            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_REGISTER)) {
-                throw new BusinessException('验证码输入错误');
-            }
-            $source = get_source();
-
-            $user = $user_service->registerByPhone($validated['phone'], $source);
-
-            $data = $user_service->loginSuccess($user, $source);
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (\Throwable $throwable) {
-            return $this->error('注册失败');
         }
 
         return $this->success($data);

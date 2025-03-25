@@ -93,16 +93,16 @@ const submitForm = () => {
             const { phone } = passwordForm;
             checkPhone(phone).then(res=>{
                 if (res.data.is_register) {
-                    const formData = {
-                        password: md5(passwordForm.password),
-                        password_confirmation: md5(passwordForm.password_confirmation),
+                    let formData = {
+                        new_password: md5(passwordForm.password),
+                        new_password_confirmation: md5(passwordForm.password_confirmation),
                         phone: passwordForm.phone,
                         code: passwordForm.code
                     }
                     updatePassword({info:formData, action:'password-forget'}).then(ret => {
                         if(ret.code == 200){
                             cns.$message.success('操作成功')
-                            router.push({name: 'login'})
+                            router.replace({name: 'login'})
                         }else {
                             cns.$message.error(ret.message)
                         }
@@ -124,7 +124,7 @@ const sendPhoneCode = () => {
         if (valid) {
             checkPhone(passwordForm.phone).then(res=>{
                 if (res.data.is_register) {
-                    const info = {
+                    let info = {
                         phone: passwordForm.phone,
                         action: 'password-forget'
                     }

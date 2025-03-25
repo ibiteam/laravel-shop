@@ -9,4 +9,7 @@ Route::prefix('v1')->middleware([])->group(function () {
 Route::prefix('seller')->middleware([])->group(function () {
     require __DIR__.'/api_seller.php';
 });
+Route::prefix('home')->middleware([])->group(function () {
+    require __DIR__.'/api_home.php';
+});
 

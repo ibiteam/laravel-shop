@@ -7,6 +7,7 @@ use App\Http\Dao\UserLogDao;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Support\Carbon;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class UserService
 {
@@ -26,6 +27,46 @@ class UserService
             'register_ip' => get_request_ip(),
             'is_modify' => false,
             'source' => $source->value,
+        ]);
+    }
+
+    /**
+     * 根据用户名+手机号注册用户.
+     */
+    public function registerByUserNameAndPhone(array $params, CommonEnum $source = CommonEnum::PC): User
+    {
+        return User::query()->create([
+            'user_name' => $params['account'],
+            'password' => $params['password'],
+            'nickname' => $params['account'],
+            'phone' => $params['phone'],
+            'avatar' => '',
+            'register_ip' => get_request_ip(),
+            'is_modify' => false,
+            'source' => $source->value,
+        ]);
+    }
+
+    /**
+     * 检测用户是否登录.
+     */
+    public function checkIsLogin(?User $user, string $token): array
+    {
+        $res = [
+            'is_login' => false,
+            'token' => '',
+            'expires_at' => 0,
+        ];
+        $access_token = $user->currentAccessToken();
+
+        if (! $access_token instanceof PersonalAccessToken) {
+            return $res;
+        }
+
+        return array_merge($res, [
+            'is_login' => true,
+            'token' => $token,
+            'expires_at' => $access_token->expires_at->diffInSeconds(Carbon::now()),
         ]);
     }
 
