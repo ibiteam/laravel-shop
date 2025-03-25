@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Home;
 
+use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\UserDao;
+use App\Http\Dao\UserLogDao;
 use App\Models\PhoneMsg;
 use App\Models\User;
+use App\Models\UserLog;
 use App\Rules\PhoneRule;
 use App\Services\PasswordRuleService;
 use App\Services\SmsService;
@@ -31,9 +34,9 @@ class AuthController extends BaseController
     public function checkUserName(Request $request, UserDao $user_dao): JsonResponse
     {
         try {
-            $validated = $request->validate(['user_name' => 'required|string'], [], ['user_name' => '用户名']);
+            $validated = $request->validate(['account' => 'required|string'], [], ['account' => '用户名']);
 
-            $user = $user_dao->getInfoByUserName($validated['user_name']);
+            $user = $user_dao->getInfoByUserName($validated['account']);
 
             if ($user instanceof User) {
                 throw new BusinessException('该用户名已注册');
@@ -82,13 +85,13 @@ class AuthController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'user_name' => 'required|string',
+                'account' => 'required|string',
                 'password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
                 'phone' => ['required', 'integer', new PhoneRule],
                 'code' => 'required|string',
                 'agreement' => 'required|accepted'
             ], [], [
-                'user_name' => '用户名',
+                'account' => '用户名',
                 'password' => '密码',
                 'password_confirmation' => '确认密码',
                 'phone' => '手机号',
@@ -96,7 +99,7 @@ class AuthController extends BaseController
                 'agreement' => '协议'
             ]);
 
-            $user = $user_dao->getInfoByUserName($validated['user_name']);
+            $user = $user_dao->getInfoByUserName($validated['account']);
 
             if ($user instanceof User) {
                 throw new BusinessException('该用户名已注册');

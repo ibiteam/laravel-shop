@@ -11,14 +11,14 @@
 
 ### 请求参数
 
-| 字段        |是否必填| 字段类型    | 说明   |
-|:----------| :--- |:--------|:-----|
-| user_name |Y| string  | 用户名  |
-| password  |Y| string  | 密码   |
-| password_confirmation  |Y| string  | 确认密码 |
-| phone  |Y| integer | 手机号  |
-| code  |Y| string  | 验证码  |
-| agreement  |Y| true    | 是否同意 协议 |
+| 字段                    |是否必填| 字段类型    | 说明   |
+|:----------------------| :--- |:--------|:-----|
+| account               |Y| string  | 用户名  |
+| password              |Y| string  | 密码   |
+| password_confirmation |Y| string  | 确认密码 |
+| phone                 |Y| integer | 手机号  |
+| code                  |Y| string  | 验证码  |
+| agreement             |Y| true    | 是否同意 协议 |
 
 ### 返回示例
 

@@ -36,9 +36,9 @@ class UserService
     public function registerByUserNameAndPhone(array $params, CommonEnum $source = CommonEnum::PC): User
     {
         return User::query()->create([
-            'user_name' => $params['user_name'],
+            'user_name' => $params['account'],
             'password' => $params['password'],
-            'nickname' => $params['user_name'],
+            'nickname' => $params['account'],
             'phone' => $params['phone'],
             'avatar' => '',
             'register_ip' => get_request_ip(),
