@@ -38,18 +38,12 @@ class AuthController extends BaseController
 
             $user = $user_dao->getInfoByUserName($validated['account']);
 
-            if ($user instanceof User) {
-                throw new BusinessException('该用户名已注册');
-            }
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+            return $this->success([
+                'is_register' => $user instanceof User,
+            ]);
         } catch (\Throwable $throwable) {
-            return $this->error('校验失败');
+            return $this->error('请求失败');
         }
-
-        return $this->success([]);
     }
 
     /**
@@ -64,18 +58,12 @@ class AuthController extends BaseController
 
             $user = $user_dao->getInfoByPhone($validated['phone']);
 
-            if ($user instanceof User) {
-                throw new BusinessException('该手机号已注册');
-            }
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+            return $this->success([
+                'is_register' => $user instanceof User,
+            ]);
         } catch (\Throwable $throwable) {
-            return $this->error('校验失败');
+            return $this->error('请求失败');
         }
-
-        return $this->success([]);
     }
 
     /**
