@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/home/auth/login-by-password
+* /api/pc/auth/login-by-password
 
 ### 请求方式
 * POST

@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/home/auth/login-by-phone
+* /api/pc/auth/login-by-phone
 
 ### 请求方式
 * POST

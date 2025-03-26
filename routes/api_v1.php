@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\SmsController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,9 @@ Route::prefix('auth')->group(function () {
     Route::post('login-register-by-phone', [AuthController::class, 'loginAndRegisterByPhone']); // 手机号登录或注册
     Route::post('forget-password', [AuthController::class, 'forgetPassword']); // 忘记密码
 });
+
+// 分类
+Route::get('category', [CategoryController::class, 'index']);
 
 /**
  * 登录可以访问路由.

@@ -206,11 +206,11 @@
 
     /*Editor Area*/
     .invite-drag-parent { width: calc(100% - 360px); height: 100vh; margin: 0 auto 0 360px; }
-    .invite-drag-child { height: calc(100vh - 80px); min-width: 1236px; padding: 0 0 20px 0; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .invite-drag-child { height: calc(100vh - 60px); min-width: 1236px; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
     /*.temp-drag-perview { width: 600px; padding: 20px 0; margin: 0 auto; background-color: #f3f5f7; }*/
     .temp-drag-perview .temp-not-nest { width: 100%; margin: 0 auto; /*padding-bottom: 30px;*/ position: relative; }
     .temp-drag-perview .temp-not-nest.custom-width { width: auto; max-width: 1920px; }
-    .invite-form-box .temp-item { /*padding: 20px;*/ margin-top: 20px; margin-bottom: 14px; box-shadow: 0px 0px 16px 0px #e5e5e6; background-color: #ffffff; border-radius: 14px; position: relative; box-sizing: border-box; }
+    .invite-form-box .temp-item { margin-top: 20px; margin-bottom: 14px; box-shadow: 0px 0px 16px 0px #e5e5e6; background-color: #ffffff; border-radius: 14px; position: relative; box-sizing: border-box; }
     .invite-form-box .temp-item.default { width: 750px; min-height: 300px; margin: 0 auto 30px auto; cursor: move; position: relative; }
     .invite-form-box .temp-item.drag { border: 2px dashed #409EFF; }
     /*.invite-form-box .temp-item.active { !*margin-top: 115px !important;*! !*margin-top: 80px !important;*! border: 2px dashed #409EFF; }*/
@@ -785,8 +785,8 @@
 
     /*.invite-form-parent { width: 44%; min-width: 600px; margin: 20px 0 0 0; }*/
     .invite-form-parent, .invite-form-view { width: 760px; margin: 20px 0 0 0; flex-shrink: 0; }
-    .invite-form-box { padding: 20px 20px 0 20px; background-color: #F4F5F7; border-radius: 10px 10px 0 0; }
-    .invite-page-set { padding: 20px 20px 10px 20px; margin-bottom: 20px; background-color: #ffffff; border-radius: 10px; box-sizing: border-box; }
+    .invite-form-box { padding: 20px 20px 0 20px; background-color: #F4F5F7; border-radius: 10px 10px 0 0;height: 100%;box-sizing: border-box; }
+    .invite-page-set { padding: 20px 20px 10px 20px; margin-bottom: 20px; background-color: #ffffff; border-radius: 10px; box-sizing: border-box;height: 100%; }
     .invite-page-set:last-child { border-radius: 10px 10px 0 0; }
 
     .invite-form { padding: 20px; position: relative; }
@@ -812,8 +812,6 @@
     .invite-setting-item em { margin-right: 5px; }
     .invite-setting-item:hover { color: #278ff0; }
 
-    .invite-form-title { padding-left: 20px; line-height: 50px; position: relative; }
-    .invite-form-title::before { content: ''; width: 4px; height: 20px; background-color: #278ff0; position: absolute; top: 15px; left: 0; }
     .invite-required { margin-right: 4px; color: #F56C6C; }
     .invite-title { width: 100%; }
     .invite-label { width: 52px; line-height: 28px; font-size: 20px; font-weight: 500; }

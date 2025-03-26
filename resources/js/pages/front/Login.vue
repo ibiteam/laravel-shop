@@ -2,8 +2,8 @@
     <div class="login-body-wrap">
         <div class="wrap header-wrap">
             <div class="logo">
-                <a href="/public" title="多多商城">
-                    <img alt="" src="https://testcdn.ibisaas.com/2025/02/08/5bpXJOozRKBAO7rqv77jAmDX6id5Bo8C2YYkonyQ.png">
+                <a href="/" title="多多商城">
+                    <img alt="" src="@/assets/images/logo.png">
                 </a>
             </div>
         </div>
@@ -48,7 +48,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup  lang="ts">
 import { ref, reactive, getCurrentInstance, watch } from 'vue';
 import PublicFooter from '@/components/PublicFooter.vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -139,7 +139,7 @@ const sendPhoneCode = () => {
         if (valid) {
             checkPhone(loginForm.phone).then(res=>{
                 if (res.data.is_register) {
-                    let info = {
+                    const info = {
                         phone: registerForm.phone,
                         action: 'login'
                     }

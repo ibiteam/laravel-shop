@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/home/auth/register
+* /api/pc/auth/register
 
 ### 请求方式
 * POST

@@ -64,8 +64,8 @@ function isEmail(value) {
  * 例如 13355558888 -> 133****8888
  **/
 
-const getPrivacyPhone = (phone)=>{
-    return phone.substr(0,3) + '****' + phone.substr(7,4)
+export function getPrivacyPhone(phone){
+    return phone.substring(0, 3) + '****' + phone.substring(7);
 }
 
 export default {
