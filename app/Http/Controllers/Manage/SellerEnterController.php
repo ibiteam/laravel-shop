@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Components\ComponentFactory;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Models\AdminOperationLog;
 use App\Models\SellerEnter;
+use App\Models\SellerEnterConfig;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -78,17 +80,43 @@ class SellerEnterController extends BaseController
      */
     public function show(Request $request)
     {
-        $id = $request->get('id');
+        if ($request->expectsJson()) {
 
-        $seller_enter = SellerEnter::whereId($id)->first();
-        if (! $seller_enter) {
-            return $this->error('入驻商家信息不存在');
+            $id = $request->get('id');
+
+            $seller_enter = SellerEnter::whereId($id)->first();
+            if (!$seller_enter) {
+                return $this->error('入驻信息不存在');
+            }
+
+            $enterConfigs = SellerEnterConfig::query()->whereIsShow(SellerEnterConfig::IS_SHOW_YES)
+                ->orderByDesc('sort')->get()->map(function (SellerEnterConfig $sellerEnterConfig) {
+                    $display_data = ComponentFactory::getSellerEnterComponent($sellerEnterConfig->type, $sellerEnterConfig->name)->display($sellerEnterConfig->toArray());
+                    $display_data['value'] = '';
+
+                    return $display_data;
+                });
+
+            if ($seller_enter->enter_info) {
+                $enterInfoMap = collect($seller_enter->enter_info)->keyBy('id');
+                $enterConfigs = $enterConfigs->map(function ($enterConfig) use ($enterInfoMap) {
+                    if (isset($enterInfoMap[$enterConfig['id']])) {
+                        $enterConfig['value'] = $enterInfoMap[$enterConfig['id']]['value'] ?? '';
+                    } else {
+                        $enterConfig['value'] = '';
+                    }
+
+                    return $enterConfig;
+                });
+            }
+
+            $data['enter_configs'] = $enterConfigs->toArray();
+            $data['check_logs'] = app(AdminOperationLogDao::class)->getSellerEnterCheckByLog($seller_enter->id);
+
+            return $this->success($data);
         }
 
-        $data['enter_info'] = $seller_enter->enter_info;
-        $data['check_logs'] = app(AdminOperationLogDao::class)->getSellerEnterCheckByLog($seller_enter->id);
-
-        return $this->success($data);
+        return view('manage.seller_enter.show');
     }
 
     /**
