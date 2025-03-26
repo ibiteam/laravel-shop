@@ -229,7 +229,7 @@
                                         @start="handleDragTempStart"
                                         @end="handleDragTempEnd"
                                         :move="handleDragTempMove">
-                                    <div class="template-icon-list"
+                                    <div class="template-icon-list template-icon-list-usual"
                                          v-for="(item, index) in component_icons.commonly_used_components"
                                          :index="index"
                                         @click="handleClickAddTempStart(item)"
@@ -243,7 +243,6 @@
                 </div>
             </template>
         </div>
-        <!--<div class="template-content-text" v-else>页面组件</div>-->
     </div>
     <!--Content-->
     <div class="template-content-box">

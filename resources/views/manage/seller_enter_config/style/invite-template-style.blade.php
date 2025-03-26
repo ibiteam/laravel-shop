@@ -100,7 +100,7 @@
     .invite-source-switch em { width: 10px; transform: rotate(180deg); font-size: 8px; color: #ffffff; }
     .nav-switch { height: 105px; }
     .nav-switch p{ line-height: 1.2;}
-    .invite-content-source { width: 300px; height: 100%; transition: all 0.2s ease; position: fixed; left: 0; top: 0; z-index: 991; }
+    .invite-content-source { width: 420px; height: 100%; transition: all 0.2s ease; position: fixed; left: 0; top: 0; z-index: 991; }
     .check-item { width: 130px; height: 50px; line-height: 48px; text-align: center; background: linear-gradient(0deg, #F9F9F9, #EEEEEE); border: 1px solid #EEEEEE; border-radius: 10px 10px 0px 0px; font-size: 14px; font-weight: 600; cursor: pointer; }
     .check-item.active,
     .check-item:hover { background: #ffffff; border-bottom-color: #ffffff; color: #409EFF; }
@@ -158,16 +158,17 @@
     .template-group-icon dl dt h1 { margin-bottom: 10px; font-size: 14px; font-weight: 600; color: #333333; }
     .template-group-icon dl dt p { font-size: 11px; color: #999999; }
     .template-group-icon dl dd {  }
-    .template-group-icon dl dd .template-group-list { padding: 0 12.5px; margin-top: 20px; }
-    .template-group-icon dl dd .template-icon-list { width: 27.88%; padding: 15px 0; margin: 0 7.5px 7px 7.5px; border-radius: 4px; /*background-color: #F4F6FA;*/ cursor: pointer; position: relative; }
+    .template-group-icon dl dd .template-group-list { padding: 0 20px; margin-top: 20px; }
+    .template-group-icon dl dd .template-icon-list { width: 65px; margin:0 15px 10px 15px; border-radius: 7px; cursor: pointer; position: relative;padding: 15px 0;box-sizing: border-box }
     .template-group-icon dl dd .usually-item .template-icon-list,
     .template-group-icon dl dd .template-icon-list:hover { background-color: #EDE8E8; }
     .template-group-icon dl dd .template-icon-list.disabled::before { content: '\5df2\8fbe\A\6dfb\52a0\4e0a\9650'; white-space: pre; width: 102%; height: 100%; line-height: 1.6; padding: 30px 10px; text-align: center; background-color: rgba(0, 0, 0, 0.5); font-size: 14px; color: #ffffff; box-sizing: border-box; position: absolute; left: 0; top: 0; cursor: not-allowed; }
-    .template-group-icon dl dd .template-icon-list > div { /*width: 74px; height: 74px; background-color: #F5F7FB; border: 1px solid #E0E4EF;*/  margin-bottom: 14px; cursor: grab; }
-    .template-group-icon dl dd .template-icon-list > div em { font-size: 22px; }
-    .template-group-icon dl dd .template-icon-list p { text-align: center; /*margin-bottom: 10px;*/ font-size: 14px; color: #666666; }
+    .template-group-icon dl dd .template-icon-list > div {margin-bottom: 10px; cursor: grab; }
+    .template-group-icon dl dd .template-icon-list > div em { font-size: 16px; }
+    .template-group-icon dl dd .template-icon-list p { text-align: center;  font-size: 14px; color: #666666; }
+    .template-group-icon dl dd .template-icon-list.template-icon-list-usual{height: 30px;line-height: 30px;width: auto;padding: 0 17px;font-size: 12px;background: #EBE9E9;color: #3D3D3D;}
     /*Tree*/
-    .template-content-box { /*height: 100%;*/ background-color: #e9ebed; /*box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 10%);*/ }
+    .template-content-box {background-color: #e9ebed;  }
     .template-group { height: 100%; overflow-y: auto; /*background-color: #F0F8FF;*/ }
     .template-group-nodata { display: table; margin: 40px auto; text-align: center; }
     .template-group-nodata p { margin: 20px 0 12px 0; font-size: 14px; color: #777777; }
@@ -205,8 +206,8 @@
     .temp-drag-perview .template-icon-list.group-tm.sortable-ghost:before { content: '\70b9\51fb\201c\8bbe\7f6e\201d\ff0c\914d\7f6e\7ec4\4ef6\5185\9700\8981\5c55\793a\7684\5185\5bb9\5427'; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; /*background-color: #F5F7FB;*/ position: absolute; font-size: 28px; color: #D5DEF0; z-index: 1; }
 
     /*Editor Area*/
-    .invite-drag-parent { width: calc(100% - 360px); height: 100vh; margin: 0 auto 0 360px; }
-    .invite-drag-child { height: calc(100vh - 60px); min-width: 1236px; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .invite-drag-parent { width: calc(100% - 540px); height: 100vh; margin: 0 auto 0 540px; }
+    .invite-drag-child { height: calc(100vh - 80px); min-width: 1236px; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
     /*.temp-drag-perview { width: 600px; padding: 20px 0; margin: 0 auto; background-color: #f3f5f7; }*/
     .temp-drag-perview .temp-not-nest { width: 100%; margin: 0 auto; /*padding-bottom: 30px;*/ position: relative; }
     .temp-drag-perview .temp-not-nest.custom-width { width: auto; max-width: 1920px; }
@@ -784,10 +785,10 @@
     .submit-form .input-error-margin .el-form-item__error { margin-left: 64px; }
 
     /*.invite-form-parent { width: 44%; min-width: 600px; margin: 20px 0 0 0; }*/
-    .invite-form-parent, .invite-form-view { width: 760px; margin: 20px 0 0 0; flex-shrink: 0; }
-    .invite-form-box { padding: 20px 20px 0 20px; background-color: #F4F5F7; border-radius: 10px 10px 0 0;height: 100%;box-sizing: border-box; }
-    .invite-page-set { padding: 20px 20px 10px 20px; margin-bottom: 20px; background-color: #ffffff; border-radius: 10px; box-sizing: border-box;height: 100%; }
-    .invite-page-set:last-child { border-radius: 10px 10px 0 0; }
+    .invite-form-parent, .invite-form-view { width: 780px; flex-shrink: 0; }
+    .invite-form-box { background-color: #ffffff; border-radius: 10px;height: 100%;box-sizing: border-box; }
+    .invite-form-title{font-weight: bold;color: #3D3D3D;font-size: 24px;padding-top: 20px;text-align: center}
+    .invite-page-set { padding: 0 30px 20px;  background-color: #ffffff; box-sizing: border-box;height: 100%;border-radius: 10px 10px 0 0; }
 
     .invite-form { padding: 20px; position: relative; }
     .invite-form .public-handle-drag { content: ''; width: 100%; height: 20px; cursor: move; position: absolute; left: 0; top: 0; }
@@ -827,12 +828,11 @@
     .invite-form:hover .public-handle-drag { display: block; }
     .public-handle-drag { display: none; font-size: 20px; font-weight: bold; color: #999999; cursor: move; position: absolute; left: 10px; top: 30px; z-index: 9; }
 
-    .invite-add-temp { width: 100%; height: 90px; margin: 20px auto; border: 1px solid #cccccc; border-radius: 4px; box-sizing: border-box; }
-    .invite-add-temp em { font-size: 20px; color: #278ff0; }
-    .invite-add-temp p { margin-left: 6px; font-size: 16px; color: #278ff0; }
+    .invite-add-temp { width: 100%; height: 78px; margin: 20px auto; border: 1px solid #cccccc; border-radius: 4px; box-sizing: border-box; }
+    .invite-add-temp p { font-size: 14px; color: #409EFF; }
     .invite-add-temp:hover { border-color: #278ff0; }
-    .invite-drag-footer { width: 760px; padding: 0 20px; background-color: #F4F5F7; border-radius: 0 0 10px 10px; box-sizing: border-box; position: fixed; bottom: 0; left: 360px; z-index: 9; }
-    .invite-drag-footer .footer-btn { width: 100%; height: 60px; line-height: 60px; text-align: center; margin: 0 auto; border-radius: 0 0 10px 10px; background-color: #FA5151; font-size: 18px; color: #ffffff; }
+    .invite-drag-footer { width: 780px; background-color: #ffffff; border-radius: 0 0 10px 10px; box-sizing: border-box; position: fixed; bottom: 0; left: 540px; z-index: 9; }
+    .invite-drag-footer .footer-btn { width: 100%; height: 80px; line-height: 80px; text-align: center; margin: 0 auto; border-radius: 10px; background-color: #EA0000; font-size: 24px; color: #ffffff; }
 
 
     /*图标样式*/
