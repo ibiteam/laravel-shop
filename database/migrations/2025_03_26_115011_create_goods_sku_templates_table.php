@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('goods_sku_templates', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('seller_id')->comment('入驻商家ID');
             $table->string('name')->comment('模板名称');
             $table->json('values')->comment('模板值');
             $table->timestamps();

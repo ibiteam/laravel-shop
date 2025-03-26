@@ -15,9 +15,7 @@ return new class extends Migration
     {
         Schema::create('goods', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('seller_id')->comment('入驻商家ID');
             $table->unsignedBigInteger('category_id')->comment('分类ID');
-            $table->unsignedBigInteger('seller_category_id')->comment('商家分类ID');
             $table->unsignedBigInteger('brand_id')->comment('品牌ID');
             $table->string('goods_sn',80)->comment('商品编号')->unique();
             $table->string('goods_name')->comment('商品标题');

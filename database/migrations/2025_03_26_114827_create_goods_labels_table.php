@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('goods_labels', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('seller_id')->comment('入驻商家ID');
             $table->string('name')->comment('标签名称');
             $table->string('type')->comment('标签类型：1文字标签 2图片标签');
             $table->string('image')->nullable()->comment('图片标签地址');

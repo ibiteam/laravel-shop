@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('goods_specs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('seller_id')->comment('入驻商家ID');
             $table->string('name')->comment('规格名');
             $table->json('value')->comment('规格值');
             $table->boolean('is_show')->comment('是否展示 1展示 0不展示');
