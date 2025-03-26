@@ -7,5 +7,5 @@ Route::middleware('manage')->prefix(config('app.manage_prefix'))->group(base_pat
 //home
 Route::get('/{any?}', function () {
     return view('app');
-})->where('any', '^(?!api).*$');
+})->where('any', '^(?!api|storage).*$');
 
