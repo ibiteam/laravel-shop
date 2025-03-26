@@ -21,14 +21,4 @@ class UserDao
     {
         return User::query()->whereUserName($user_name)->first();
     }
-
-    /**
-     * 校验字符串不能用特殊字符 和空格
-     */
-    public function checkUserName(string $user_name): bool
-    {
-        $str = str_replace('_', '', $user_name);
-
-        return preg_match('/([[:space:]]|[[:punct:]])+/U', $str) === 1;
-    }
 }

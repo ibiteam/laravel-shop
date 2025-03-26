@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
-use App\Http\Dao\UserDao;
 use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Rules\PhoneRule;
+use App\Rules\ValidUserName;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -38,47 +38,42 @@ class AccountSetController extends BaseController
     // 设置用户名
     public function setUserName(Request $request)
     {
-        $user = $this->user;
-        $user_id = $user->user_id;
-        $user_name = $request->input('user_name');
-
-        if (get_sensitive_words($user_name)) {
-            return $this->error('抱歉，用户名中包含敏感词，请重新填写');
-        }
-        $repeat = User::whereUserName($user_name)->where('user_id', '<>', $user_id)->first();
-
-        if ($repeat) {
-            return $this->error('该用户名已被注册，请重新输入');
-        }
-
-        if ($user->is_modify == User::IS_MODIFY_YES) {
-            return $this->error('用户名仅支持修改一次哦');
-        }
-
-        if (app(UserDao::class)->checkUserName($user_name)) {
-            return $this->error('输入的用户名不能包含特殊字符。');
-        }
-
-        // 用户名3-22个字符，支持字母（区分大小写）、数字、下划线组合，不支持以下划线开头
-        if (strpos($user_name, '_') === 0) {
-            return $this->error('用户名不能以“_”开头');
-        }
-
-        if (preg_match('/^[\d_]+$/', $user_name)) {
-            return $this->error('用户名不能设置为纯数字');
-        }
-
-        if (! preg_match('/^(?=.*[a-zA-Z])[a-zA-Z0-9]\w{2,21}$/', $user_name)) {
-            return $this->error('用户名3-22个字符，支持字母（区分大小写）、数字、下划线，不支持以下划线开头');
-        }
-        $user->user_name = $user_name;
-        $user->is_modify = User::IS_MODIFY_YES;
-
-        if ($user->save()) {
-            return $this->success('保存成功');
+        try {
+            $validated = $request->validate([
+                'user_name' => [
+                    'required',
+                    'string',
+                    new ValidUserName(),
+                    Rule::unique((new User)
+                        ->getTable(), 'user_name')
+                        ->ignore($this->user->id),
+                ],
+            ], [
+                'user_name.unique' => '该用户名已被注册，请重新填写',
+            ], [
+                'user_name' => '用户名',
+            ]);
+            $user_name = $validated['user_name'];
+            if (get_sensitive_words($user_name)) {
+                return $this->error('抱歉，用户名中包含敏感词，请重新填写');
+            }
+            if ($this->user->is_modify == User::IS_MODIFY_YES) {
+                return $this->error('用户名仅支持修改一次哦');
+            }
+            $this->user->user_name = $user_name;
+            $this->user->is_modify = User::IS_MODIFY_YES;
+            if (! $this->user->save()) {
+                throw new BusinessException('保存失败');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable) {
+            return $this->error('保存失败');
         }
 
-        return $this->error('保存失败');
+        return $this->success('保存成功');
     }
 
     // 设置用户昵称

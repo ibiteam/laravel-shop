@@ -15,7 +15,7 @@ it('test account_set get_info', function () {
 
 it('test account_set user_name', function () {
     $data = [
-        'user_name' => 'jeck',
+        'user_name' => 'laravel_shop',
     ];
     $response = $this->doPost('api/v1/account_set/user_name', $data);
     dd($response);
