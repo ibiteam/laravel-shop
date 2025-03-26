@@ -15,8 +15,8 @@
         "activeMatch": "/api/"
     },
     {
-        "text": "WEB",
-        "link": "/web/description",
-        "activeMatch": "/web/"
+        "text": "PC-API",
+        "link": "/pc/description",
+        "activeMatch": "/pc/"
     }
 ]

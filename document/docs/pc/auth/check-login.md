@@ -2,7 +2,7 @@
 
 ### 请求URL
 
-* /api/home/auth/check-login
+* /api/pc/auth/check-login
 
 ### 请求方式
 * GET
