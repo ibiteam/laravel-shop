@@ -49,7 +49,7 @@ export function copyText(text){ //复制到剪切栏
     }
 }
 
-function isEmail(value) {
+export function isEmail(value) {
     let email = /^([a-zA-Z\d])((\w|-)+\.?)+@([a-zA-Z\d]+\.)+[a-zA-Z]{2,6}$/
     if (!email.test(value)) {
         return false
