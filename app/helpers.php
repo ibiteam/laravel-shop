@@ -354,3 +354,16 @@ if (! function_exists('is_mobile_request')) {
         return false;
     }
 }
+if (! function_exists('phone_hidden')) {
+    /**
+     * 隐藏手机号中间4位.
+     */
+    function phone_hidden($phone)
+    {
+        if (! $phone) {
+            return '';
+        }
+
+        return preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $phone);
+    }
+}

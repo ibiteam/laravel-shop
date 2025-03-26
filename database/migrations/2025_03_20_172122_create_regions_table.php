@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('parent_id')->nullable()->comment('父级ID');
             $table->integer('code')->comment('行政区划代码');
             $table->string('name')->comment('区域名称');
+            $table->string('pinyin')->comment('区域名称拼音');
             $table->tinyInteger('type')->comment('区域类型 1、省 2、市 3、区');
             $table->timestamps();
         });

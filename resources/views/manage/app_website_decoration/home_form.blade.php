@@ -98,21 +98,15 @@
                        :upload_size_validate="upload_size"
                        @save="handleTemplateSettingSave" :is_no_seting="false" :temp_list="contentForm"
                        :options="public_options_down"></slide-advertising>
-    <!-- 签到送红包 -->
-    <slide-advertising v-if="dataTempalteRedEnvelope" :temp_item="dataTempalteRedEnvelope"
-                       :temp_index="dataTempalteRedEnvelope.component_name" title="签到送红包广告位" top="175px"
-                       :upload_size_validate="upload_size"
-                       @save="handleTemplateSettingSave" :is_no_seting="false" :temp_list="contentForm"
-                       :options="public_options_down"></slide-advertising>
     <!-- 侧边广告 -->
     <slide-advertising v-if="dataTempalteSideAdvertising" :temp_item="dataTempalteSideAdvertising"
-                       :temp_index="dataTempalteSideAdvertising.component_name" title="侧边广告位" top="285px"
+                       :temp_index="dataTempalteSideAdvertising.component_name" title="侧边广告位" top="175px"
                        :upload_size_validate="upload_size"
                        @save="handleTemplateSettingSave" :is_no_seting="false" :temp_list="contentForm"
                        :options="public_options_down"></slide-advertising>
     <!-- 二楼广告位 -->
     <slide-advertising v-if="dataTempalteSecondAdvertisement" :temp_item="dataTempalteSecondAdvertisement"
-                       :temp_index="dataTempalteSecondAdvertisement.component_name" title="二楼广告位" top="395px"
+                       :temp_index="dataTempalteSecondAdvertisement.component_name" title="二楼广告位" top="285px"
                        :upload_size_validate="upload_size"
                        @save="handleTemplateSettingSave" :is_no_seting="false" :temp_list="contentForm"
                        :options="public_options_down"></slide-advertising>
@@ -399,9 +393,7 @@
                     this.item_data = this.dataTempalteForm.item_data
                     //  初始化页面固定组件
                     await this.initPageFixedData()
-
                     this.contentForm = JSON.parse(JSON.stringify(this.item_data))
-                    console.log('contentForm', this.contentForm)
                     this.contentForm.length && this.contentForm.map(item => {
                         item.tabIndex = 0
                         item.slideIndex = 0

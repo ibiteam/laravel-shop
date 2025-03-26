@@ -42,6 +42,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class UserAddress extends Model
 {
+
+    // 默认地址
+    public const DEFAULT = 1;
+    // 非默认地址
+    public const NOT_DEFAULT = 0;
+
+    protected $guarded = [];
+
     /**
      * 获取用户的详细地址
      *
@@ -91,5 +99,4 @@ class UserAddress extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
-
 }
