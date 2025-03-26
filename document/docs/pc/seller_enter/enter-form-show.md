@@ -1,7 +1,7 @@
 # 入驻表单信息
 
 ### 请求路由
-* api/seller/seller_enter/configs
+* api/pc/seller_enter/configs
 
 ### 请求方式
 * get

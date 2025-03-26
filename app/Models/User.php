@@ -66,7 +66,7 @@ class User extends Authenticatable
 
     public function sellerEnter(): HasOne
     {
-        return $this->hasOne(SellerEnter::class, 'user_id', 'user_id');
+        return $this->hasOne(SellerEnter::class, 'user_id', 'id');
     }
 
     public function sellerShop(): HasOne
