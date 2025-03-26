@@ -242,7 +242,7 @@
                 if (is_file) {
                     const fromdata = new FormData()
                     fromdata.append('file', file)
-                    this.doPost('{!! route('manage.upload') !!}', fromdata).then(res => {
+                    this.doPost('{!! route('manage.common.upload') !!}', fromdata).then(res => {
                         if (res.code == 200) {
                             if (this.uploadType) {
                                 let newValue = this.getNestedProperty(this.temp_item, this.uploadType)
