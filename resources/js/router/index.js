@@ -3,7 +3,7 @@ import Register from '@/pages/front/Register.vue'
 import Login from '@/pages/front/Login.vue'
 import ForgetPassword from '@/pages/front/ForgetPassword.vue'
 import Home from '@/pages/front/Home.vue';
-
+import GoodsForm from '@/pages/seller/GoodsForm.vue';
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -11,6 +11,7 @@ const router = createRouter({
         { path: '/login', component: Login, name: 'login' },
         { path: '/register', component: Register , name: 'register' },
         { path: '/forget-password', component: ForgetPassword , name: 'forgetPassword' },
+        { path: '/seller/goods-form', component: GoodsForm , name: 'goodsForm' },
         {
             path:'/seller',
             component: () => import('@/components/SellerLayout.vue'),

@@ -11,8 +11,8 @@ export function checkPhone(phone) {
     return $http.doGet('pc/auth/check-phone', {phone})
 }
 
-export function registerOrPhoneLogin({info, action, is_register=0}) {
-    const URL = action == 'register' ? is_register == 0 ? 'pc/auth/login-register-by-phone' : 'pc/auth/register' : 'pc/auth/login-by-phone'
+export function registerOrPhoneLogin({info, action}) {
+    const URL = action == 'register' ? 'pc/auth/register' : 'pc/auth/login-by-phone'
     return $http.doPost(URL, info)
 }
 
