@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/v1/address/destory
+* /api/v1/address/destroy
 
 ### 请求方式
 * POST
