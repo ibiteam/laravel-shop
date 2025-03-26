@@ -2,12 +2,11 @@
 
 @section('content')
 <!--拖拽模版-->
-<div class="invite-drag-parent" :style="{'--main-color': inviteSetForm.bg_color}">
+<div class="invite-drag-parent">
     <div class="invite-drag-child s-flex">
         <div class="invite-form-parent">
             <el-form :model="inviteSetForm" ref="inviteSetForm" class="invite-form-box">
                 <div class="invite-page-set">
-                    <h1 class="invite-form-title">问题设置</h1>
                     <vuedraggable tag="div" v-model="inviteSetForm.invite_items" group="name" chosenClass="temp-drag-chosen" filter=".temp-nocan-drag"
                                   handle=".public-handle-drag" :forceFallback="false" animation="300"
                                   class="temp-drag-perview invite-drag-perview"
@@ -110,7 +109,10 @@
 
 
                 direction: 'rtl',
-                inviteSetForm: @json($content),    //  设置弹窗表单数据,
+                inviteSetForm: {
+                    id:0,
+                    invite_items:@json($content)
+                },    //  设置弹窗表单数据,
                 component_icons: @json($component_icons),
                 component_values: @json($component_values),
                 public_options_down: [],
@@ -141,21 +143,11 @@
             }
         },
         methods: {
-            /** 获取公共下拉数据 */
-            {{--getPublicDownOptions () {--}}
-            {{--    this.doGet('{!! route('manage.invite_template.design_drop') !!}').then(res => {--}}
-            {{--        if (res.code == 200) {--}}
-            {{--            this.public_options_down = res.data--}}
-            {{--        } else {--}}
-            {{--            this.$message.error(res.message)--}}
-            {{--        }--}}
-            {{--    })--}}
-            {{--    this.save_loading = false--}}
-            {{--},--}}
             /** 页面初始化设置 */
             initPageSet () {
                 document.querySelector('body').classList.add('template-edit-page')
                 this.initPageData()
+                this.save_loading = false
             },
             /** 页面初始化数据 */
             async initPageData () {
@@ -395,8 +387,6 @@
                                 }
                                 if (is_save == 'ctrl' || is_save == 'confirm') {
                                     this.save_loading = true
-                                    /*console.log('info',info)
-                                    return*/
                                     this.doPost('{!! route('manage.seller_enter_config.update') !!}', info).then(res => {
                                         if (res.code == 200) {
                                             this.inviteSetForm.id = res.data.id
@@ -446,10 +436,10 @@
             },
         },
         mounted () {
+            console.log(this.inviteSetForm)
             console.log(this.component_icons)
             console.log(this.component_values)
             this.save_loading = true
-            // this.getPublicDownOptions()
             this.initPageSet()
         },
         destroyed () {
