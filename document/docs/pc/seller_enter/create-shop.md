@@ -1,7 +1,7 @@
 # 创建店铺信息
 
 ### 请求路由
-* api/seller/seller_enter/shop/create
+* api/pc/seller_enter/shop/create
 
 ### 请求方式
 * post

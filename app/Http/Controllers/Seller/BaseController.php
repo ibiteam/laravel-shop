@@ -10,12 +10,12 @@ class BaseController extends Controller
 {
     use ApiResponse;
 
-    final public function user(): ?User
+    final public function seller_user(): ?User
     {
         $user = request()->user('sanctum');
 
-        if ($user && ! $user->seller_id && isset($user->sellerEnter->sellerShop)) {
-            $user->seller_id = $user->sellerEnter->sellerShop->seller_id;
+        if ($user && !$user->seller_id) {
+            return null;
         }
 
         return $user;

@@ -19,8 +19,8 @@
     },
     {
         "type": "dir",
-        "name": "seller",
-        "label": "商家",
+        "name": "seller_enter",
+        "label": "商家入驻",
         "collapsed": true
     }
 ]

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Seller;
+namespace App\Http\Controllers\Home;
 
 use App\Components\ComponentFactory;
 use App\Exceptions\BusinessException;
@@ -86,15 +86,15 @@ class SellerEnterController extends BaseController
                 }
 
                 if ($seller_enter->enter_info) {
-                    $enterInfoMap = $seller_enter->enter_info->keyBy('id'); // 缓存配置 ID 映射关系
-                    $enterConfigs = $enterConfigs->map(function ($sellerEnterConfig) use ($enterInfoMap) {
-                        if ($sellerEnterConfig instanceof SellerEnterConfig && isset($enterInfoMap[$sellerEnterConfig->id])) {
-                            $sellerEnterConfig->value = $enterInfoMap[$sellerEnterConfig->id]['value'] ?? '';
+                    $enterInfoMap = collect($seller_enter->enter_info)->keyBy('id'); // 缓存配置 ID 映射关系
+                    $enterConfigs = $enterConfigs->map(function ($enterConfig) use ($enterInfoMap) {
+                        if (isset($enterInfoMap[$enterConfig['id']])) {
+                            $enterConfig['value'] = $enterInfoMap[$enterConfig['id']]['value'] ?? '';
                         } else {
-                            $sellerEnterConfig->value = '';
+                            $enterConfig['value'] = '';
                         }
 
-                        return $sellerEnterConfig;
+                        return $enterConfig;
                     });
                 }
             }
@@ -228,10 +228,7 @@ class SellerEnterController extends BaseController
                 'kf_phone' => '客服电话',
             ]);
 
-            $seller_enter = SellerEnter::query()->with('sellerShop')
-                ->whereId($validated['seller_id'])->whereUserId($user->id)
-                ->first();
-
+            $seller_enter = SellerEnter::query()->with('sellerShop')->whereId($validated['seller_id'])->whereUserId($user->id)->first();
             if (! $seller_enter) {
                 throw new BusinessException('入驻信息不存在');
             }
@@ -244,7 +241,7 @@ class SellerEnterController extends BaseController
                 throw new BusinessException('店铺名称已被使用');
             }
 
-            if (preg_match('/[^\w\u4e00-\u9fa5]/u', $validated['name'])) {
+            if (preg_match('/([[:space:]]|[[:punct:]])+/U', $validated['name'])) {
                 throw new BusinessException('店铺名称中不能包含特殊字符');
             }
 
@@ -284,7 +281,7 @@ class SellerEnterController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('更新店铺信息异常');
+            return $this->error('创建店铺信息异常');
         }
     }
 }

@@ -1,7 +1,7 @@
 # 提交入驻信息
 
 ### 请求路由
-* api/seller/seller_enter/store
+* api/pc/seller_enter/store
 
 ### 请求方式
 * post

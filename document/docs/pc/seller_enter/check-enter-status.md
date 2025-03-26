@@ -1,7 +1,7 @@
 # 检测入驻状态
 
 ### 请求路由
-* api/seller/seller_enter/check
+* api/pc/seller_enter/check
 
 ### 请求方式
 * get
