@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(ShopConfigTableSeeder::class);
         $this->call(PermissionTableSeeder::class);
+        $this->call(RoleTableSeeder::class);
         $this->call(AppWebsiteDecorationTableSeeder::class);
     }
 }
