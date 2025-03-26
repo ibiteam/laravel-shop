@@ -3,13 +3,13 @@
 use App\Enums\CommonEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
+use App\Models\AdminUser;
 use App\Models\SensitiveWord;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
-use App\Models\AdminUser;
+use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
-use App\Utils\Sensitive\Helper as SensitiveHelper;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -110,6 +110,16 @@ if (! function_exists('get_source')) {
     }
 }
 
+if (! function_exists('is_md5')) {
+    /**
+     * 判断字符串是否是MD5字符串.
+     */
+    function is_md5(string $str): bool
+    {
+        return (bool) preg_match('/^[a-z0-9]{32}$/', $str);
+    }
+}
+
 if (! function_exists('connectStr')) {
     /**
      * 获取路径地址连接符.
@@ -123,6 +133,7 @@ if (! function_exists('connectStr')) {
         return '?';
     }
 }
+
 if (! function_exists('cache_forever')) {
     /**
      * 永久缓存.
@@ -201,7 +212,6 @@ if (! function_exists('is_miniProgram_request')) {
     }
 }
 
-
 if (! function_exists('is_harmony_request')) {
     /**
      * 判断是否为鸿蒙系统请求.
@@ -268,6 +278,7 @@ if (! function_exists('admin_operation_log')) {
         app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user, $description, $type, $table_name, $table_id);
     }
 }
+
 if (! function_exists('format_number')) {
     /**
      * 格式化数量.
@@ -356,6 +367,7 @@ if (! function_exists('is_mobile_request')) {
         return false;
     }
 }
+
 if (! function_exists('phone_hidden')) {
     /**
      * 隐藏手机号中间4位.

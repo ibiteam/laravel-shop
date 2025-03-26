@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Rules\PhoneRule;
-use App\Rules\ValidUserName;
+use App\Rules\UserNameRule;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -43,7 +43,7 @@ class AccountSetController extends BaseController
                 'user_name' => [
                     'required',
                     'string',
-                    new ValidUserName(),
+                    new UserNameRule(),
                     Rule::unique((new User)
                         ->getTable(), 'user_name')
                         ->ignore($this->user->id),

@@ -20,7 +20,7 @@ class UserService
 
         return User::query()->create([
             'user_name' => $tmp_user_name,
-            'password' => PasswordRuleService::generatePassword(),
+            'password' => md5($tmp_user_name.time()),
             'nickname' => $tmp_user_name,
             'phone' => $phone,
             'avatar' => '',
@@ -100,6 +100,19 @@ class UserService
      */
     private function generateUserName(): string
     {
-        return strtolower('lc_'.time().'_'.mt_rand(1000, 9999).'_'.mt_rand(10, 99));
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        $characters_length = strlen($characters);
+
+        do {
+            $random_string = '';
+
+            for ($i = 0; $i < 15; $i++) {
+                $random_string .= $characters[rand(0, $characters_length - 1)];
+            }
+
+            $user_name = $random_string.'_'.mt_rand(100000, 999999);
+        } while (User::query()->whereUserName($user_name)->exists());
+
+        return $user_name;
     }
 }

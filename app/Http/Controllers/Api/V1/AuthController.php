@@ -10,8 +10,8 @@ use App\Http\Dao\UserLogDao;
 use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Models\UserLog;
+use App\Rules\PasswordRule;
 use App\Rules\PhoneRule;
-use App\Services\PasswordRuleService;
 use App\Services\SmsService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -236,7 +236,7 @@ class AuthController extends BaseController
             $validated = $request->validate([
                 'phone' => ['required', 'integer', new PhoneRule],
                 'code' => 'required|string',
-                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+                'new_password' => ['required', 'string', 'confirmed', new PasswordRule],
             ], [], [
                 'phone' => '手机号',
                 'code' => '验证码',
@@ -277,7 +277,7 @@ class AuthController extends BaseController
         try {
             $validated = $request->validate([
                 'code' => 'required|string',
-                'new_password' => ['required', 'string', 'confirmed', PasswordRuleService::userPasswordRule()],
+                'new_password' => ['required', 'string', 'confirmed', new PasswordRule],
             ], [], [
                 'code' => '短信验证码',
                 'new_password' => '新密码',
