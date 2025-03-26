@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Exceptions\BusinessException;
+use App\Models\SellerShop;
 use Illuminate\Http\Request;
 
 class DashboardController extends BaseController
@@ -18,9 +19,15 @@ class DashboardController extends BaseController
         }
 
         try {
-            $seller_shop = $seller_user->sellerEnter->sellerShop;
+            $seller_shop = SellerShop::query()->select(['id', 'seller_id', 'name', 'logo'])
+                ->whereSellerId($seller_user->seller_id)->first();
+            if (!$seller_shop) {
+                throw new BusinessException('商家店铺不存在');
+            }
 
-            return $this->success($seller_shop);
+            $data['seller_shop'] = $seller_shop;
+
+            return $this->success($data);
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {

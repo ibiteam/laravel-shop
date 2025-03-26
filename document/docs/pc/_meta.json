@@ -22,5 +22,11 @@
         "name": "seller_enter",
         "label": "商家入驻",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "seller",
+        "label": "商家后台",
+        "collapsed": true
     }
 ]

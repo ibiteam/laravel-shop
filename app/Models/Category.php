@@ -17,19 +17,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null                     $logo        图标
  * @property int                             $sort        排序
  * @property int                             $is_show     是否显示
- * @property int                             $goods_count 商品数量
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
- * @property-read int|null $children_count
- * @property-read Category|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $allChildren
+ * @property-read int|null $all_children_count
+ * @property-read Category|null $allParent
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereGoodsCount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereIsShow($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category whereKeywords($value)
@@ -49,18 +47,18 @@ class Category extends Model
     protected $guarded = [];
 
     /**
-     * 获取父分类.
+     * 下级分类的所有父级.
      */
-    public function parent(): BelongsTo
+    public function allParent(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'parent_id', 'id');
+        return $this->belongsTo(Category::class, 'parent_id', 'id')->with('allParent');
     }
 
     /**
-     * 获取子分类.
+     * 父级分类的所有下级.
      */
-    public function children(): HasMany
+    public function allChildren(): HasMany
     {
-        return $this->hasMany(Category::class, 'parent_id', 'id');
+        return $this->hasMany(Category::class, 'parent_id', 'id')->with('allChildren');
     }
 }

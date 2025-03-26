@@ -1,19 +1,23 @@
 <?php
 
-beforeEach(function () {
-    $this->source = 'pc';
-});
-
 it('seller enter check', function () {
     $response = $this->doGet('api/pc/seller_enter/check');
-    dump($response);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
 });
 
 it('seller enter configs', function () {
     $response = $this->doGet('api/pc/seller_enter/configs', [
         'id' => 1,
     ]);
-    dump($response);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
 });
 
 it('seller enter store', function () {
@@ -34,14 +38,18 @@ it('seller enter store', function () {
             ],
         ],
     ]);
-    dump($response);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
 });
 
 it('seller enter shop create', function () {
     $response = $this->doPost('api/pc/seller_enter/shop/create', [
         'seller_id' => '1',
         'name' => 'shop1',
-        'logo' => 'required|string',
+        'logo' => 'a.jpg',
         'title' => '',
         'keyword' => '',
         'description' => '',
@@ -53,5 +61,9 @@ it('seller enter shop create', function () {
         'main_cate' => '鞋',
         'kf_phone' => '123456',
     ]);
-    dump($response);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
 });

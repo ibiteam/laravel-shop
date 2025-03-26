@@ -22,5 +22,11 @@
         "name": "user_address",
         "label": "用户地址",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "category",
+        "label": "商品分类",
+        "collapsed": true
     }
 ]
