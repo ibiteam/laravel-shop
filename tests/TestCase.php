@@ -3,10 +3,13 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Http\JsonResponse;
 
 abstract class TestCase extends BaseTestCase
 {
-    public string $token = '';
+    public string $account = 'laravel-shop';
+
+    public string $password = 'laravel-shop-1';
 
     public string $source = 'h5';
 
@@ -14,7 +17,7 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->postJson(url($url),$data,[
             'X-Requested-With' => 'XMLHttpRequest',
-            'Authorization' => 'Bearer '.$this->token,
+            'Authorization' => 'Bearer '. $this->getAccountToken(),
             'source' => $this->source,
         ])->json();
     }
@@ -23,8 +26,37 @@ abstract class TestCase extends BaseTestCase
     {
         return $this->getJson(url($url) . '?' . http_build_query($data), [
             'X-Requested-With' => 'XMLHttpRequest',
-            'Authorization' => 'Bearer '.$this->token,
+            'Authorization' => 'Bearer '. $this->getAccountToken(),
             'source' => $this->source,
         ])->json();
+    }
+
+
+    public function getAccountToken()
+    {
+        $token = '';
+        $access_token_file = $this->access_token_file();
+        if (! file_exists($access_token_file)) {
+            $data = [
+                'account' => $this->account,
+                'password' => $this->password,
+            ];
+            $res = $this->json('post', url('api/v1/auth/login-by-password'), $data, [
+                'X-Requested-With' => 'XMLHttpRequest',
+            ])->json();
+            if ($res && isset($res['code']) && (int) $res['code'] === JsonResponse::HTTP_OK) {
+                $token = $res['data']['token'];
+                file_put_contents($access_token_file, $token);
+            }
+        } else {
+            $token = file_get_contents($access_token_file);
+        }
+
+        return $token;
+    }
+
+    private function access_token_file()
+    {
+        return storage_path('logs/access_token');
     }
 }
