@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AccountSetController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -43,5 +44,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('update', [AddressController::class, 'update']); // 添加|编辑 收货地址
         Route::post('destroy', [AddressController::class, 'destroy']); // 删除一条收货地址
         Route::post('batch_destroy', [AddressController::class, 'batch_destroy']); // 批量删除
+    });
+
+    // 个人信息设置
+    Route::prefix('account_set')->group(function () {
+        Route::get('get_info', [AccountSetController::class, 'getUserInfo']); // 获取用户信息 - 账户设置页面信息
+        Route::post('user_name', [AccountSetController::class, 'setUserName']); // 修改用户名
+        Route::post('nickname', [AccountSetController::class, 'setNickname']); // 修改昵称
+        Route::post('avatar', [AccountSetController::class, 'setUserAvatar']); // 修改头像
+        Route::post('phone', [AccountSetController::class, 'setUserPhone']); // 修改注册手机号
     });
 });

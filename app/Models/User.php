@@ -55,6 +55,9 @@ class User extends Authenticatable
 
     public const HOME_ACCESS_TOKEN_NAME = 'home'; // web端登录token名称
 
+    // 修改过用户名
+    public const IS_MODIFY_YES = 1;
+
     protected $guarded = [];
 
     protected $hidden = ['password'];
