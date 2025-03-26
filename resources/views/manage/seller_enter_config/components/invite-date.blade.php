@@ -1,18 +1,18 @@
 <style>
     /*文本*/
-    .invite-title .invite-title-box { display: inline-flex; margin-left: 36px; border-radius: 6px; border: 1px solid #ebebeb; }
-    .invite-title dl { width: 118px; }
-    .invite-title dl dt,
-    .invite-title dl dd { height: 34px; line-height: 34px; padding: 0 10px; font-size: 12px; cursor: pointer; }
-    .invite-title dl dt { font-weight: 500; }
-    .invite-title dl dt:hover { background-color: #ebebeb; }
-    .invite-title dl dd { border-top: 1px solid #ebebeb; }
-    .invite-title dl:not(:last-child) dt,
-    .invite-title dl:not(:last-child) dd { border-right: 1px solid #ebebeb; }
+    .invite-date .invite-date-box { display: inline-flex; margin-left: 36px; border-radius: 6px; border: 1px solid #ebebeb; }
+    .invite-date dl { width: 118px; }
+    .invite-date dl dt,
+    .invite-date dl dd { height: 34px; line-height: 34px; padding: 0 10px; font-size: 12px; cursor: pointer; }
+    .invite-date dl dt { font-weight: 500; }
+    .invite-date dl dt:hover { background-color: #ebebeb; }
+    .invite-date dl dd { border-top: 1px solid #ebebeb; }
+    .invite-date dl:not(:last-child) dt,
+    .invite-date dl:not(:last-child) dd { border-right: 1px solid #ebebeb; }
 </style>
 
-<script type="text/x-template" id="invite-title">
-    <div class="temp-item invite-title template-banner template-public-width">
+<script type="text/x-template" id="invite-date">
+    <div class="temp-item invite-date template-banner template-public-width">
         <template>
             <el-form :model="temp_item" :rules="temp_item" ref="temp_item" class="" v-load="set_save_loading">
                 <div class="invite-form s-flex jc-bt">
@@ -69,7 +69,7 @@
      * icon_top 图标上下偏移量
      * initial_index 指定选中项
      * **/
-    Vue.component('invite-title', {
+    Vue.component('invite-date', {
         props: {
             temp_index: {
                 type: Number,
@@ -126,7 +126,7 @@
                 }
             }
         },
-        template: '#invite-title',
+        template: '#invite-date',
         methods: {
             /** 点击打开组件设置弹窗 */
             handleClickOpenTemplateSetting (data) {

@@ -14,11 +14,20 @@
                                   @end="handleTemplatePreviewDratEnd" id="tempDragPerview"
                     >
                         <div class="temp-not-nest" v-for="(parent, value) in sellerEnterForm"
-                             v-if="parent.component_name != 'home_nav' && parent.component_name != 'label'"
                              ref="contentForm" :key="value" :data-type="parent.component_name" :data-index="value"
                              @click="tempActiveId = parent.id">
-                            <!--自定义标题-->
-                            <invite-title :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'title' || parent.type == 'date'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-title>
+                            <!--文本/多行文本-->
+                            <invite-text :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'text' || parent.type == 'textarea'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-text>
+                            <!--自定义单选-->
+                            <invite-radio :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'radio'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-radio>
+                            <!--自定义复选-->
+                            <invite-checkbox :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'checkbox'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-checkbox>
+                            <!--下拉-->
+                            <invite-select :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'select'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-select>
+                            <!--时间-->
+                            <invite-date :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'date'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-date>
+                            <!--上传文件-->
+                            <invite-upload :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'file' || parent.type == 'more_file'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-upload>
                         </div>
                     </vuedraggable>
                     <div class="invite-add-temp s-flex ai-ct jc-ct cursorp" @click="is_show_add = true">
@@ -68,7 +77,12 @@
 <!--导航栏固定组件-->
 @include('manage._select_date')
 <!--广告位1拖拽组件-->
-@include('manage.seller_enter_config.components.invite-title')
+@include('manage.seller_enter_config.components.invite-text')
+@include('manage.seller_enter_config.components.invite-radio')
+@include('manage.seller_enter_config.components.invite-checkbox')
+@include('manage.seller_enter_config.components.invite-select')
+@include('manage.seller_enter_config.components.invite-date')
+@include('manage.seller_enter_config.components.invite-upload')
 
 <!--加载动画-->
 @include('manage.seller_enter_config.components.save-load')

@@ -113,37 +113,10 @@
                 templateSetFormIndex: '',    //  设置组件索引值
                 templateSetForm: {},    //  设置表单数据
                 templateSetRule: {},
-                swiperKey: Math.round(new Date() / 1000),
-                pickerOptions: {    //  日期选择范围限制
-                    disabledDate: (time) => {
-                        return time.getTime() < Date.now() - (24*60*60*1000)
-                    }
-                },
                 msg_error: null
             }
         },
         computed: {
-            /** 获取公共下拉数据返回输入框占位 */
-            computedOptionsPlaceholder () {
-                return function(value) {
-                    const filter = this.options.filter(item => item.alias == value)
-                    return filter.length ? filter[0].desc : ''
-                }
-            },
-            /** 获取公共URL链接配置是否可以进行下拉搜索 */
-            computedOptionsCanRemote () {
-                return function(value) {
-                    const filter = this.options.filter(item => item.alias == value)
-                    return filter.length ? filter[0].need_remote_search : false
-                }
-            },
-            /** 获取字段类型 */
-            computedDataType () {
-                return function (value) {
-                    const type = Object.prototype.toString.call(value).slice(8, -1)
-                    return type
-                }
-            },
             computedTemplateSerialNumber () {
                 return function (value) {
                     return (value * 1 + 1).toString().padStart(2, '0')
@@ -169,96 +142,6 @@
                 this.templateSetFormType = item.component_name
                 this.is_show_drawer = true
             },
-            /** 点击记录图片上传类型 **/
-            handleClickUploadFile (data) {
-                const { parent, validate, target, index, size } = data
-                setTimeout(() => {
-                    this.uploadType = parent || ''
-                    this.uploadValidateType = validate
-                    this.uploadTarget = target || null
-                    this.uploadIndex = !isNaN(index) ? index : 'null'
-                    this.$refs['upload_file'].click()
-                }, 300)
-            },
-            /** 校验图片格式 **/
-            beforeAvatarUpload(file) {
-                return new Promise(resolve => {
-                    let resovlt = true
-                    if (file && file.type) {
-                        const isPNG = file.type === 'image/png'
-                        const isJPEG = file.type === 'image/jpeg'
-                        const isJPG = file.type === 'image/jpg'
-                        const isLt500KB = file.size / 1024  / 1024 < this.upload_size_validate;
-                        const isGIF = file.type === 'image/gif'
-                        if (this.uploadValidateType >= 2) {
-                            if (!isPNG && !isJPEG && !isJPG && !isGIF) {
-                                this.msg_error && this.msg_error.close()
-                                this.msg_error = this.$message.error('仅限上传jpg、jpeg、png、gif格式的图片');
-                                resolve(false)
-                                return false
-                            }
-                        } else {
-                            if (!isPNG && !isJPEG && !isJPG) {
-                                this.msg_error && this.msg_error.close()
-                                this.msg_error = this.$message.error('仅限上传jpg、jpeg、png格式的图片');
-                                resolve(false)
-                                return false
-                            }
-                        }
-                        if (!isLt500KB) {
-                            this.msg_error && this.msg_error.close()
-                            this.msg_error = this.$message.error(`图片大小不能超过${this.upload_size_validate}M`);
-                            resovlt = false
-                        }
-                    } else {
-                        resovlt = false
-                    }
-                    resolve(resovlt)
-                })
-            },
-            /** 执行上传图片操作 **/
-            async handleChangeUploadFile (event) {
-                if (this.uploadType) {
-                    const [file] = event.srcElement.files
-                    const is_file = await this.beforeAvatarUpload(file)
-                    if (is_file) {
-                        let blob
-                        let reader = new FileReader()
-                        //转化为binary类型
-                        reader.readAsArrayBuffer(file)
-                        reader.onload = (e) => {
-                            if (typeof e.target.result === 'object') {
-                                blob = new Blob([e.target.result])
-                            } else {
-                                blob = e.target.result
-                            }
-                            const fromdata = new FormData()
-                            fromdata.append('file', blob)
-                            this.doPost('{!! route('manage.upload') !!}', fromdata).then(res => {
-                                if (res.code == 200) {
-                                    let newValue = this.getNestedProperty(this.templateSetForm, this.uploadType)
-                                    this.$set(newValue, this.uploadTarget, res.data.file)
-                                    this.clearFormValidate(`templateSetForm`)
-                                } else {
-                                    this.msg_error && this.msg_error.close()
-                                    this.msg_error = this.$message.error('图片上传失败');
-                                }
-                            })
-                        }
-                    }
-                    this.$refs['upload_file'].value = ''
-                }
-            },
-            /** 删除图片操作 **/
-            handleClickDeleteFile (data) {
-                const { parent, target } = data
-                if (parent) {
-                    let newValue = this.getNestedProperty(this.templateSetForm, parent)
-                    this.$set(newValue, target, '');
-                } else {
-                    this.$set(this.templateSetForm, target, '')
-                }
-            },
             /** 深度对象调用 */
             getNestedProperty (obj, propertyPath) {
                 if (typeof propertyPath === 'string') {
@@ -271,76 +154,6 @@
                     let nextPath = propertyPath.slice(1);
                     return this.getNestedProperty(nextObj, nextPath);
                 }
-            },
-            /** 初始化对象字段值 */
-            clearFormObjectFields (item) {
-                return new Promise(resolve => {
-                    Object.keys(item).forEach(key => {
-                        if (isNaN(item[key]) && key != 'type') {
-                            //  检验数据类型
-                            const getType = (value) => {
-                                return Object.prototype.toString.call(value).slice(8, -1)
-                            }
-                            switch (getType(item[key])) {
-                                case 'String':
-                                    item[key] = ''
-                                    break
-                                case 'Array':
-                                    item[key] = []
-                                    break
-                                case 'Object':
-                                    item[key] = {}
-                                    break
-                            }
-                        }
-                    })
-                    resolve(item)
-                })
-            },
-            /** 远程搜索下拉数据 */
-            handleRemoteSearchChange (data) {
-                const { path, method, params, parent, target } = data
-                const url = path
-                const post_method = method == 'post' ? 'doGet' : 'doPost'
-                let newList = null
-                parent && (newList = this.getNestedProperty(this.templateSetForm, parent))
-                let info = JSON.parse(JSON.stringify(params))
-                this[post_method](url, info).then(res => {
-                    if (res.code == 200) {
-                        const list = res.data
-                        if (newList) {
-                            this.$set(newList, target, list)
-                        } else {
-                            this.$set(this.templateSetForm, target, list)
-                        }
-                    } else {
-                        this.msg_error && this.msg_error.close()
-                        this.msg_error = this.$message.error(res.message)
-                    }
-                })
-            },
-            /** 下拉选中禁用 */
-            handleRemoteSearchChose (data) {
-                setTimeout(() => {
-                    const { parent, list, index, chose, value = 'value', child_value, ref, selected } = data
-                    const choseType = Object.prototype.toString.call(chose).slice(8, -1)
-                    const newList = this.getNestedProperty(this.templateSetForm, parent)
-                    if (newList && newList.length) {
-                        if (choseType == 'Array') {
-                            newList.map(item => chose.some(child => item.is_disabled = item[value] == child[child_value]))
-                        } else {
-                            newList.map(item => item.is_disabled = item[value] == chose)
-                        }
-                    }
-                    //  针对易企秀下拉选择更换广告图片
-                    /*if (selected && selected.alias == 'yi_qi_xiu') {
-                        const find_data = selected.default_selection_data.find(option => option.value == selected.value)
-                        if (find_data) list[index].image = find_data.image
-                    }*/
-                    ref && this.clearFormValidate(ref)
-                    this.$forceUpdate()
-                }, 200)
-                // (newList && newList.length) && (newList.map(item => item.is_disabled = item[value] == chose))
             },
             /** 点击添加组件数据 */
             async handleClickAddData (dom, len, warning_text, data) {

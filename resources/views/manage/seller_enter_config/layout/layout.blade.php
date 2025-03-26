@@ -184,35 +184,6 @@
                                 </vuedraggable>
                             </dd>
                         </dl>
-                        <dl v-if="component_icons.advanced_components && component_icons.advanced_components.length">
-                            <dt>
-                                <h1>高级组件</h1>
-                            </dt>
-                            <dd>
-                                <vuedraggable
-                                        v-model="component_icons.advanced_components"
-                                        tag="div"
-                                        class="template-group-list s-flex flex-wrap"
-                                        animation="1000"
-                                        :options="{ group: { name: 'name', pull: 'clone', put: false }, sort: false}"
-                                        filter=".disabled"
-                                        :clone="(dragitem) => handleTempDragClone(dragitem, 'data_component')"
-                                        @start="handleDragTempStart"
-                                        @end="handleDragTempEnd"
-                                        :move="handleDragTempMove">
-                                    <div class="template-icon-list"
-                                         v-for="(item, index) in component_icons.advanced_components"
-                                         :index="index"
-                                        @click="handleClickAddTempStart(item)"
-                                    >
-                                        <div class="s-flex ai-ct jc-ct">
-                                            <em class="iconfont" :data-type="item.type" v-html="item.icon"></em>
-                                        </div>
-                                        <p>@{{item.name}}</p>
-                                    </div>
-                                </vuedraggable>
-                            </dd>
-                        </dl>
                         <dl v-if="component_icons.commonly_used_components && component_icons.commonly_used_components.length">
                             <dt>
                                 <h1>常用组件</h1>

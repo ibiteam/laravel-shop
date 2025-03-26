@@ -786,9 +786,9 @@
 
     /*.invite-form-parent { width: 44%; min-width: 600px; margin: 20px 0 0 0; }*/
     .invite-form-parent, .invite-form-view { width: 780px; flex-shrink: 0; }
-    .invite-form-box { background-color: #ffffff; border-radius: 10px;height: 100%;box-sizing: border-box; }
+    .invite-form-box { background-color: #ffffff; border-radius: 10px 10px 0 0;height: 100%;box-sizing: border-box; }
     .invite-form-title{font-weight: bold;color: #3D3D3D;font-size: 24px;padding-top: 20px;text-align: center}
-    .invite-page-set { padding: 0 30px 20px;  background-color: #ffffff; box-sizing: border-box;height: 100%;border-radius: 10px 10px 0 0; }
+    .invite-page-set { padding: 0 30px 20px;  background-color: #ffffff; box-sizing: border-box;border-radius: 10px 10px 0 0; }
 
     .invite-form { padding: 20px; position: relative; }
     .invite-form .public-handle-drag { content: ''; width: 100%; height: 20px; cursor: move; position: absolute; left: 0; top: 0; }
