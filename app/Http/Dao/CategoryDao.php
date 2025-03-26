@@ -3,33 +3,43 @@
 namespace App\Http\Dao;
 
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
 class CategoryDao
 {
     /**
-     * 构建分类树状结构
-     *
-     * @param Collection $categories
-     * @param int $parentId
-     * @return array
+     * 获取树状分类.
      */
-    public function categoryTree(Collection $categories, int $parentId = 0): array
+    public function getTreeList(): EloquentCollection|Collection
     {
-        $tree = [];
+        return Category::query()
+            ->with('allChildren')
+            ->whereParentId(0)
+            ->get()
+            ->map(fn (Category $category) => $this->categoryFormat($category));
+    }
 
-        foreach ($categories as $category) {
-            if ($category->parent_id == $parentId) {
-                $children = $this->categoryTree($categories, $category->id);
-                if ($children) {
-                    $category->children = $children;
-                } else {
-                    $category->children = [];
-                }
-                $tree[] = $category;
-            }
+    /**
+     * 递归处理树状结构数据.
+     */
+    private function categoryFormat(Category $category): array
+    {
+        if ($category->allChildren->isEmpty()) {
+            return [
+                'id' => $category->id,
+                'parent_id' => $category->parent_id,
+                'name' => $category->name,
+                'logo' => $category->logo,
+            ];
         }
 
-        return $tree;
+        return [
+            'id' => $category->id,
+            'parent_id' => $category->parent_id,
+            'name' => $category->name,
+            'logo' => $category->logo,
+            'children' => $category->allChildren->map(fn (Category $category) => $this->categoryFormat($category))->toArray(),
+        ];
     }
 }

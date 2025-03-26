@@ -14,8 +14,8 @@ import $public from "@/utils/public";
 
 
 const app = createApp(App);
-app.config.globalProperties.$http = dialog
-app.config.globalProperties.$dialog = http
+app.config.globalProperties.$http = http
+app.config.globalProperties.$dialog = dialog
 app.config.globalProperties.$public = $public;
 app.use(router);
 app.use(ElementPlus);

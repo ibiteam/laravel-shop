@@ -2,28 +2,36 @@
 
 @section('content')
 <!--拖拽模版-->
-<div class="invite-drag-parent" :style="{'--main-color': inviteSetForm.bg_color}">
+<div class="invite-drag-parent">
     <div class="invite-drag-child s-flex">
         <div class="invite-form-parent">
-            <el-form :model="inviteSetForm" ref="inviteSetForm" class="invite-form-box">
+            <el-form :model="sellerEnterForm" ref="sellerEnterForm" class="invite-form-box">
+                <div class="invite-form-title">商家入驻</div>
                 <div class="invite-page-set">
-                    <h1 class="invite-form-title">问题设置</h1>
-                    <vuedraggable tag="div" v-model="inviteSetForm.invite_items" group="name" chosenClass="temp-drag-chosen" filter=".temp-nocan-drag"
+                    <vuedraggable tag="div" v-model="sellerEnterForm" group="name" chosenClass="temp-drag-chosen" filter=".temp-nocan-drag"
                                   handle=".public-handle-drag" :forceFallback="false" animation="300"
                                   class="temp-drag-perview invite-drag-perview"
                                   @end="handleTemplatePreviewDratEnd" id="tempDragPerview"
                     >
-                        <div class="temp-not-nest" v-for="(parent, value) in inviteSetForm.invite_items"
-                             v-if="parent.component_name != 'home_nav' && parent.component_name != 'label'"
+                        <div class="temp-not-nest" v-for="(parent, value) in sellerEnterForm"
                              ref="contentForm" :key="value" :data-type="parent.component_name" :data-index="value"
                              @click="tempActiveId = parent.id">
-                            <!--自定义标题-->
-                            <invite-title :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'title' || parent.type == 'date'" :temp_info="inviteSetForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-title>
+                            <!--文本/多行文本-->
+                            <invite-text :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'text' || parent.type == 'textarea'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-text>
+                            <!--自定义单选-->
+                            <invite-radio :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'radio'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-radio>
+                            <!--自定义复选-->
+                            <invite-checkbox :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'checkbox'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-checkbox>
+                            <!--下拉-->
+                            <invite-select :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'select'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-select>
+                            <!--时间-->
+                            <invite-date :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'date'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-date>
+                            <!--上传文件-->
+                            <invite-upload :temp_item="parent" :ref="`childForm${value}`" :temp_index="value" :upload_size_validate="upload_size" v-if="parent.type == 'file' || parent.type == 'more_file'" :temp_info="sellerEnterForm" :active_index="tempActiveId" @delete="handleTemplateEventDeleteCallback" @copy="handleTemplateEventCopyCallback"></invite-upload>
                         </div>
                     </vuedraggable>
                     <div class="invite-add-temp s-flex ai-ct jc-ct cursorp" @click="is_show_add = true">
-                        <em class="iconfont">&#xe64e;</em>
-                        <p>添加问题</p>
+                        <p>添加入驻项</p>
                     </div>
                 </div>
             </el-form>
@@ -31,8 +39,49 @@
                 <div class="footer-btn" @click="handleSaveAllTemplate">保存</div>
             </div>
         </div>
+        <!--预览-->
+        <div class="invite-form-view" style="margin:0 0 0 135px;">
+            <div class="invite-page-set">
+                <div>
+                    <template v-if="sellerEnterForm.length">
+                        <div class="invite-view-list" v-for="(item, index) in sellerEnterForm">
+                            <div class="list-item">
+                                <div class="s-flex ai-ct">
+                                    <div class="list-number invite-label">
+                                        <span class="list-required" v-if="item.is_need">*</span>
+                                    </div>
+                                    <span v-if="item.type == 'checkbox' || item.type == 'more_file'" class="list-comment">[@{{ item.type == 'more_file' ? '多文件' : '多选' }}]</span>
+                                    <h1 class="list-title">@{{ item.name ? item.name : '暂未填写' }}</h1>
+                                    <p class="list-label">(@{{ item.is_need ? '必填' : '选填' }})</p>
+                                </div>
+                                <div class="list-desc list-margin">@{{ item.tips }}</div>
+                                <div class="list-input list-margin s-flex ai-ct " :class="{ 'jc-fe': item.type == 'select', 'jc-bt': item.type != 'select', 'list-textarea': item.type == 'textarea'}" v-if="item.type != 'radio' && item.type != 'checkbox' && item.type != 'file' && item.type != 'more_file'">
+                                    <em class="iconfont" v-if="item.type == 'select'" style="color:#999999;">&#xe642;</em>
+                                    <em class="el-icon-date" v-if="item.type == 'date'" style="color:#999999;"></em>
+                                </div>
+                                <div class="list-radio list-margin" v-if="item.type == 'radio' || item.type == 'checkbox'">
+                                    <div class="radio-item s-flex ai-ct" v-for="(child, childIndex) in item.select_options"}">
+                                        <em class="iconfont" v-if="item.type == 'radio'" :style="{ marginRight: childIndex != 0 ? '6px' : '', fontSize: childIndex != 0 ? '17px' : '' }">@{{ childIndex == 0 ? '&#xe83b;' : '&#xe83a;' }}</em>
+                                        <em class="iconfont" v-if="item.type == 'checkbox'">@{{ childIndex == 0 ? '&#xe771;' : '&#xe770;' }}</em>
+                                        <label>@{{ child.name ? child.name : '暂未填写' }}</label>
+                                    </div>
+                                </div>
+                                <div class="list-upload-parent list-margin s-flex ai-fe" v-if="item.type == 'file' || item.type == 'more_file'">
+                                    <div class="list-upload s-flex ai-ct jc-ct">
+                                        <em class="iconfont">&#xe64e;</em>
+                                    </div>
+                                    <p class="cursorp">@{{ item.template_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invite-view-submit cursorp" v-if="sellerEnterForm.length">提交</div>
+                    </template>
+                    <div class="invite-view-empty s-flex ai-ct jc-ct" v-else>设置好页面即可预览</div>
+                </div>
+            </div>
+        </div>
     </div>
-    <el-dialog title="添加问题" :visible.sync="is_show_add" width="400px">
+    <el-dialog title="添加入驻项" :visible.sync="is_show_add" width="480px">
         <div class="template-group-icon">
             <dl v-if="component_icons.basic_components && component_icons.basic_components.length">
                 <dt>
@@ -49,28 +98,13 @@
                     </div>
                 </dd>
             </dl>
-            <dl v-if="component_icons.advanced_components && component_icons.advanced_components.length">
-                <dt>
-                    <h1>高级组件</h1>
-                </dt>
-                <dd>
-                    <div class="template-group-list s-flex flex-wrap">
-                        <div class="template-icon-list" v-for="(item, index) in component_icons.advanced_components" :index="index" @click="handleClickAddTempStart(item, 'dialog')">
-                            <div class="s-flex ai-ct jc-ct">
-                                <em class="iconfont" :data-type="item.type" v-html="item.icon"></em>
-                            </div>
-                            <p>@{{item.name}}</p>
-                        </div>
-                    </div>
-                </dd>
-            </dl>
             <dl v-if="component_icons.commonly_used_components && component_icons.commonly_used_components.length">
                 <dt>
                     <h1>常用组件</h1>
                 </dt>
                 <dd>
                     <div class="template-group-list s-flex flex-wrap">
-                        <div class="template-icon-list" v-for="(item, index) in component_icons.commonly_used_components" :index="index" @click="handleClickAddTempStart(item, 'dialog')">
+                        <div class="template-icon-list template-icon-list-usual" v-for="(item, index) in component_icons.commonly_used_components" :index="index" @click="handleClickAddTempStart(item, 'dialog')">
                             <p>@{{item.name}}</p>
                         </div>
                     </div>
@@ -82,9 +116,14 @@
 @endsection
 @section('js')
 <!--导航栏固定组件-->
-@include('manage.seller_enter_config.components.select-date')
+@include('manage._select_date')
 <!--广告位1拖拽组件-->
-@include('manage.seller_enter_config.components.invite-title')
+@include('manage.seller_enter_config.components.invite-text')
+@include('manage.seller_enter_config.components.invite-radio')
+@include('manage.seller_enter_config.components.invite-checkbox')
+@include('manage.seller_enter_config.components.invite-select')
+@include('manage.seller_enter_config.components.invite-date')
+@include('manage.seller_enter_config.components.invite-upload')
 
 <!--加载动画-->
 @include('manage.seller_enter_config.components.save-load')
@@ -96,7 +135,7 @@
                 tempActiveId: null,  //  模块选中id
                 is_start: false,    //  当页面组件为第一个时，为 true
                 is_show_warn: false,    //  是否展示右上角页面数据保存提示
-                is_show_add: false,    //  添加问题弹窗
+                is_show_add: false,    //  添加入驻项弹窗
                 is_load_source: false,    //  左侧数据加载
                 is_check_source: true,    //  是否展示素材列表
                 controlOnStart: true,   //  是否允许 vuedraggable 开始 put 行为实现嵌套
@@ -110,7 +149,7 @@
 
 
                 direction: 'rtl',
-                inviteSetForm: @json($content),    //  设置弹窗表单数据,
+                sellerEnterForm: @json($content),    //  设置弹窗表单数据,
                 component_icons: @json($component_icons),
                 component_values: @json($component_values),
                 public_options_down: [],
@@ -141,21 +180,11 @@
             }
         },
         methods: {
-            /** 获取公共下拉数据 */
-            {{--getPublicDownOptions () {--}}
-            {{--    this.doGet('{!! route('manage.invite_template.design_drop') !!}').then(res => {--}}
-            {{--        if (res.code == 200) {--}}
-            {{--            this.public_options_down = res.data--}}
-            {{--        } else {--}}
-            {{--            this.$message.error(res.message)--}}
-            {{--        }--}}
-            {{--    })--}}
-            {{--    this.save_loading = false--}}
-            {{--},--}}
             /** 页面初始化设置 */
             initPageSet () {
                 document.querySelector('body').classList.add('template-edit-page')
                 this.initPageData()
+                this.save_loading = false
             },
             /** 页面初始化数据 */
             async initPageData () {
@@ -172,9 +201,9 @@
             },
             /** 获取页面数据 */
             getPageData () {
-                this.doGet('{!! route('manage.seller_enter_config.index') !!}' + '?id=' + this.inviteSetForm.id).then(res => {
+                this.doGet('{!! route('manage.seller_enter_config.index') !!}').then(res => {
                     if (res.code == 200) {
-                        this.$set(this, 'inviteSetForm', res.data);
+                        this.$set(this, 'sellerEnterForm', res.data);
                         this.initPageData()
                     } else {
                         this.$message.error(res.message)
@@ -227,9 +256,9 @@
                 /*//  获取模块标题，过滤掉素材组件
                 item.name = item.name && item.act_type != 'source' ? item.name : this.getTemplateName(item.act_type, item)*/
                 //  判断拖拽的模版标题是否一致，如有标题一致情况，则重命名标题(1)，diffname对比名称是否相同，diffnumber获取相同类型组件的个数
-                const diffname = this.inviteSetForm.invite_items.filter(temp => temp.name == item.name)
-                const diffNextName = this.inviteSetForm.invite_items.filter(temp => temp.name == `${item.name}(${diffname.length + 1})` || temp.name == `${item.name}(${diffname.length - 1})`)
-                let diffnumber = this.inviteSetForm.invite_items.filter(temp => temp.type == item.type)
+                const diffname = this.sellerEnterForm.filter(temp => temp.name == item.name)
+                const diffNextName = this.sellerEnterForm.filter(temp => temp.name == `${item.name}(${diffname.length + 1})` || temp.name == `${item.name}(${diffname.length - 1})`)
+                let diffnumber = this.sellerEnterForm.filter(temp => temp.type == item.type)
                 if (diffNextName.length) {
                     diffnumber = diffnumber.concat(diffNextName)
                 }
@@ -250,7 +279,7 @@
                 const data = JSON.parse(JSON.stringify(find))
                 const copy = JSON.parse(JSON.stringify(item))
                 const result = { ...copy, ...data }
-                this.inviteSetForm.invite_items.push(result)
+                this.sellerEnterForm.push(result)
                 const scroll_main = document.querySelector('.invite-drag-child')
                 scroll_main.scrollTo({
                     top: scroll_main.scrollHeight,
@@ -307,7 +336,7 @@
             /*************************************************************** 设置相关 **************************************************************/
             /** 删除组件 */
             handleTemplateEventDeleteCallback (index) {
-                this.inviteSetForm.invite_items.splice(index, 1)
+                this.sellerEnterForm.splice(index, 1)
                 this.$forceUpdate()
                 setTimeout(() => {
                     this.handleClearFormValidate()
@@ -315,8 +344,8 @@
             },
             /** 复制组件 */
             handleTemplateEventCopyCallback (index) {
-                const data = JSON.parse(JSON.stringify(this.inviteSetForm.invite_items[index]))
-                this.inviteSetForm.invite_items.splice(index, 0, data)
+                const data = JSON.parse(JSON.stringify(this.sellerEnterForm[index]))
+                this.sellerEnterForm.splice(index, 0, data)
                 this.$forceUpdate()
                 setTimeout(() => {
                     this.handleClearFormValidate()
@@ -325,7 +354,7 @@
             },
             /** 清楚表单错误校验提示 */
             handleClearFormValidate () {
-                this.inviteSetForm.invite_items.forEach((item, index) => {
+                this.sellerEnterForm.forEach((item, index) => {
                     this.$refs[`childForm${index}`][0].$refs.temp_item.clearValidate()
                 })
             },
@@ -346,7 +375,7 @@
             /** 校验页面设置表单是否合法 */
             isFormValidate () {
                 return new Promise(resolve => {
-                    this.$refs['inviteSetForm'].validate((valid) => {
+                    this.$refs['sellerEnterForm'].validate((valid) => {
                         resolve(valid)
                     })
                 })
@@ -368,13 +397,13 @@
                 }
 
                 //  同步等待循环操作结束后，执行下一步操作
-                asyncForEach(this.inviteSetForm.invite_items, async () => {
-                    if (validateLists.length === this.inviteSetForm.invite_items.length) {
+                asyncForEach(this.sellerEnterForm, async () => {
+                    if (validateLists.length === this.sellerEnterForm.length) {
                         const filter_data = validateLists.filter(item => !item)
                         if (!filter_data.length && is_valid) {
                             if (this.is_can_save) {
                                 this.is_can_save = false
-                                if (!this.inviteSetForm.invite_items.length) {
+                                if (!this.sellerEnterForm.length) {
                                     this.$confirm('页面未装修，请装修后再发布！', '', {
                                         confirmButtonText: '确定',
                                         showCancelButton: false,
@@ -383,11 +412,11 @@
                                     this.is_can_save = true
                                     return false
                                 }
-                                this.inviteSetForm.invite_items.map(item => {
+                                this.sellerEnterForm.map(item => {
                                     if (isNaN(item.id)) item.id = ''
                                 })
 
-                                let info = this.inviteSetForm
+                                let info = this.sellerEnterForm
 
                                 let is_save = 'ctrl'
                                 if (type == 'save') {
@@ -395,11 +424,8 @@
                                 }
                                 if (is_save == 'ctrl' || is_save == 'confirm') {
                                     this.save_loading = true
-                                    /*console.log('info',info)
-                                    return*/
                                     this.doPost('{!! route('manage.seller_enter_config.update') !!}', info).then(res => {
                                         if (res.code == 200) {
-                                            this.inviteSetForm.id = res.data.id
                                             this.is_can_save = true
                                             this.$message.success('保存成功！')
                                             // this.getPageData()
@@ -446,10 +472,10 @@
             },
         },
         mounted () {
+            console.log(this.sellerEnterForm)
             console.log(this.component_icons)
             console.log(this.component_values)
             this.save_loading = true
-            // this.getPublicDownOptions()
             this.initPageSet()
         },
         destroyed () {

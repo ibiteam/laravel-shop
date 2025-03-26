@@ -32,8 +32,11 @@
       "vitest-browser-vue": "^0.2.0"
    },
    "dependencies": {
+      "@wangeditor/editor": "^5.1.23",
+      "@wangeditor/editor-for-vue": "^5.1.12",
       "axios": "^1.8.4",
       "element-plus": "^2.9.7",
+      "html2canvas-pro": "^1.5.8",
       "js-md5": "^0.7.3",
       "loadsh": "^0.0.4",
       "sass": "^1.86.0",

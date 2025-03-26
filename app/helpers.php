@@ -3,11 +3,13 @@
 use App\Enums\CommonEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
+use App\Models\SensitiveWord;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Models\AdminUser;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use App\Utils\Sensitive\Helper as SensitiveHelper;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -352,5 +354,37 @@ if (! function_exists('is_mobile_request')) {
         }
 
         return false;
+    }
+}
+if (! function_exists('phone_hidden')) {
+    /**
+     * 隐藏手机号中间4位.
+     */
+    function phone_hidden($phone)
+    {
+        if (! $phone) {
+            return '';
+        }
+
+        return preg_replace('/(\d{3})\d{4}(\d{4})/', '$1****$2', $phone);
+    }
+}
+
+if (! function_exists('get_sensitive_words')) {
+    /**
+     * 检测文字中的敏感词，存在返回数组.
+     */
+    function get_sensitive_words($content): array
+    {
+        if (! $content) {
+            return [];
+        }
+        $sensitiveWords = SensitiveWord::query()->pluck('name')->toArray();
+
+        try {
+            return SensitiveHelper::getInstance()->setTree($sensitiveWords)->getBadWord($content);
+        } catch (\Exception) {
+            return [];
+        }
     }
 }

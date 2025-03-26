@@ -20,7 +20,7 @@ if (!localStorage.getItem('visitorId')) {
 }
 // 如果用的JSONP，可以配置此参数带上cookie凭证，如果是代理和CORS不用设置
 // axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'api/'
+axios.defaults.baseURL = window.location.origin + '/api/'
 // post请求头
 axios.defaults.headers.Accept = 'application/json'
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data'

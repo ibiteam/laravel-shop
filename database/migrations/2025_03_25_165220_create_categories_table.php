@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('logo')->nullable()->comment('图标');
             $table->integer('sort')->default(0)->comment('排序');
             $table->tinyInteger('is_show')->default(1)->comment('是否显示');
-            $table->integer('goods_count')->default(0)->comment('商品数量');
             $table->timestamps();
         });
     }
