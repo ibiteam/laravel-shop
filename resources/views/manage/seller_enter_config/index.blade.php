@@ -142,16 +142,16 @@
         },
         methods: {
             /** 获取公共下拉数据 */
-            getPublicDownOptions () {
-                this.doGet('{!! route('manage.invite_template.design_drop') !!}').then(res => {
-                    if (res.code == 200) {
-                        this.public_options_down = res.data
-                    } else {
-                        this.$message.error(res.message)
-                    }
-                })
-                this.save_loading = false
-            },
+            {{--getPublicDownOptions () {--}}
+            {{--    this.doGet('{!! route('manage.invite_template.design_drop') !!}').then(res => {--}}
+            {{--        if (res.code == 200) {--}}
+            {{--            this.public_options_down = res.data--}}
+            {{--        } else {--}}
+            {{--            this.$message.error(res.message)--}}
+            {{--        }--}}
+            {{--    })--}}
+            {{--    this.save_loading = false--}}
+            {{--},--}}
             /** 页面初始化设置 */
             initPageSet () {
                 document.querySelector('body').classList.add('template-edit-page')
@@ -172,7 +172,7 @@
             },
             /** 获取页面数据 */
             getPageData () {
-                this.doGet('{!! route('manage.invite_template.design') !!}' + '?id=' + this.inviteSetForm.id).then(res => {
+                this.doGet('{!! route('manage.seller_enter_config.index') !!}' + '?id=' + this.inviteSetForm.id).then(res => {
                     if (res.code == 200) {
                         this.$set(this, 'inviteSetForm', res.data);
                         this.initPageData()
@@ -397,13 +397,13 @@
                                     this.save_loading = true
                                     /*console.log('info',info)
                                     return*/
-                                    this.doPost('{!! route('manage.invite_template.design_store') !!}', info).then(res => {
+                                    this.doPost('{!! route('manage.seller_enter_config.update') !!}', info).then(res => {
                                         if (res.code == 200) {
                                             this.inviteSetForm.id = res.data.id
                                             this.is_can_save = true
                                             this.$message.success('保存成功！')
                                             // this.getPageData()
-                                            parent.closeSelf('邀约模板列表', '{!! route('manage.invite_template.index') !!}');
+                                            parent.closeSelf('邀约模板列表', '{!! route('manage.seller_enter.index') !!}');
                                         } else {
                                             this.$message.error(res.message)
                                             this.is_can_save = true
@@ -449,7 +449,7 @@
             console.log(this.component_icons)
             console.log(this.component_values)
             this.save_loading = true
-            this.getPublicDownOptions()
+            // this.getPublicDownOptions()
             this.initPageSet()
         },
         destroyed () {
