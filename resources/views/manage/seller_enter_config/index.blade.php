@@ -39,6 +39,47 @@
                 <div class="footer-btn" @click="handleSaveAllTemplate">保存</div>
             </div>
         </div>
+        <!--预览-->
+        <div class="invite-form-view" style="margin:0 0 0 135px;">
+            <div class="invite-page-set">
+                <div>
+                    <template v-if="sellerEnterForm.length">
+                        <div class="invite-view-list" v-for="(item, index) in sellerEnterForm">
+                            <div class="list-item">
+                                <div class="s-flex ai-ct">
+                                    <div class="list-number invite-label">
+                                        <span class="list-required" v-if="item.is_need">*</span>
+                                    </div>
+                                    <span v-if="item.type == 'checkbox' || item.type == 'more_file'" class="list-comment">[@{{ item.type == 'more_file' ? '多文件' : '多选' }}]</span>
+                                    <h1 class="list-title">@{{ item.name ? item.name : '暂未填写' }}</h1>
+                                    <p class="list-label">(@{{ item.is_need ? '必填' : '选填' }})</p>
+                                </div>
+                                <div class="list-desc list-margin">@{{ item.tips }}</div>
+                                <div class="list-input list-margin s-flex ai-ct " :class="{ 'jc-fe': item.type == 'select', 'jc-bt': item.type != 'select', 'list-textarea': item.type == 'textarea'}" v-if="item.type != 'radio' && item.type != 'checkbox' && item.type != 'file' && item.type != 'more_file'">
+                                    <em class="iconfont" v-if="item.type == 'select'" style="color:#999999;">&#xe642;</em>
+                                    <em class="el-icon-date" v-if="item.type == 'date'" style="color:#999999;"></em>
+                                </div>
+                                <div class="list-radio list-margin" v-if="item.type == 'radio' || item.type == 'checkbox'">
+                                    <div class="radio-item s-flex ai-ct" v-for="(child, childIndex) in item.select_options"}">
+                                        <em class="iconfont" v-if="item.type == 'radio'" :style="{ marginRight: childIndex != 0 ? '6px' : '', fontSize: childIndex != 0 ? '17px' : '' }">@{{ childIndex == 0 ? '&#xe83b;' : '&#xe83a;' }}</em>
+                                        <em class="iconfont" v-if="item.type == 'checkbox'">@{{ childIndex == 0 ? '&#xe771;' : '&#xe770;' }}</em>
+                                        <label>@{{ child.name ? child.name : '暂未填写' }}</label>
+                                    </div>
+                                </div>
+                                <div class="list-upload-parent list-margin s-flex ai-fe" v-if="item.type == 'file' || item.type == 'more_file'">
+                                    <div class="list-upload s-flex ai-ct jc-ct">
+                                        <em class="iconfont">&#xe64e;</em>
+                                    </div>
+                                    <p class="cursorp">@{{ item.template_name }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="invite-view-submit cursorp" v-if="sellerEnterForm.length">提交</div>
+                    </template>
+                    <div class="invite-view-empty s-flex ai-ct jc-ct" v-else>设置好页面即可预览</div>
+                </div>
+            </div>
+        </div>
     </div>
     <el-dialog title="添加入驻项" :visible.sync="is_show_add" width="480px">
         <div class="template-group-icon">

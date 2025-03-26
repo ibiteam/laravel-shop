@@ -207,7 +207,7 @@
 
     /*Editor Area*/
     .invite-drag-parent { width: calc(100% - 540px); height: 100vh; margin: 0 auto 0 540px; }
-    .invite-drag-child { height: calc(100vh - 80px); min-width: 1236px; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
+    .invite-drag-child { height: 100vh; min-width: 1236px; background-color: #e9ebed; position: relative; overflow-y: auto; overflow-x: hidden; position: relative; }
     /*.temp-drag-perview { width: 600px; padding: 20px 0; margin: 0 auto; background-color: #f3f5f7; }*/
     .temp-drag-perview .temp-not-nest { width: 100%; margin: 0 auto; /*padding-bottom: 30px;*/ position: relative; }
     .temp-drag-perview .temp-not-nest.custom-width { width: auto; max-width: 1920px; }
@@ -786,7 +786,7 @@
 
     /*.invite-form-parent { width: 44%; min-width: 600px; margin: 20px 0 0 0; }*/
     .invite-form-parent, .invite-form-view { width: 780px; flex-shrink: 0; }
-    .invite-form-box { background-color: #ffffff; border-radius: 10px 10px 0 0;height: 100%;box-sizing: border-box; }
+    .invite-form-box { background-color: #ffffff; border-radius: 10px 10px 0 0;height: 100%;box-sizing: border-box;padding-bottom: 100px; }
     .invite-form-title{font-weight: bold;color: #3D3D3D;font-size: 24px;padding-top: 20px;text-align: center}
     .invite-page-set { padding: 0 30px 20px;  background-color: #ffffff; box-sizing: border-box;border-radius: 10px 10px 0 0; }
 
@@ -846,4 +846,41 @@
     em.iconfont[data-type="more_file"] { background: -webkit-linear-gradient(#FFDCA4, #FFB12B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     em.iconfont[data-type="address"] { background: -webkit-linear-gradient(#8FF7FD, #1589FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
+    /*预览*/
+    .invite-form-view { /*width: calc(100vw - 400px - 50%); height: 100%; position: absolute; left: 50%;*/ }
+    .invite-form-view .invite-page-set { height: 100%; padding: 30px 20px 10px 20px; margin-bottom: 0; border-radius: 10px; }
+    .invite-form-view .invite-view-title { line-height: 44px; text-align: center; font-size: 24px; font-weight: bold; color: #3D3D3D; }
+    .invite-form-view .invite-view-desc { line-height: 1.4; text-align: center; margin-top: 30px; word-wrap: break-word; font-size: 14px; color: #cccccc; }
+    .invite-form-view .invite-view-list { width: 440px; margin: 0 auto; }
+    .invite-form-view .list-item { margin-top: 30px; }
+    .invite-form-view .list-number { text-align: right; padding-right: 12px; }
+    .invite-form-view .list-required { margin: 0; font-weight: bold; color: #FF3D2D; }
+    .invite-form-view .list-comment,
+    .invite-form-view .list-title { font-size: 16px; font-weight: bold; }
+    .invite-form-view .list-label { color: #999999; }
+    .invite-form-view .list-desc { line-height: 1.2; margin-top: 16px; font-size: 16px; color: #999999; }
+    .invite-form-view .list-margin { margin-left: 64px; }
+    .invite-form-view .list-input { width: 350px; height: 38px; padding: 0 10px; margin-top: 20px; border: 1px solid #f1f1f1; border-radius: 4px; box-sizing: border-box; }
+    .invite-form-view .list-placeholder { font-size: 16px; color: #cccccc; }
+    .invite-form-view .list-textarea { height: 110px; }
+    .invite-form-view .list-upload { width: 110px; height: 110px; border: 1px dashed #E1E4E3; background-color: #F8FAFB; border-radius: 6px; }
+    .invite-form-view .list-upload em { font-size: 26px; color: #EBEBEB; }
+    .invite-form-view .list-upload-parent p { line-height: 1.1; margin-left: 20px; font-size: 16px; color: #FF3D2D; }
+    .invite-form-view .list-radio { margin-top: 20px; }
+    .invite-form-view .list-radio .radio-item { margin-top: 16px; }
+    .invite-form-view .list-radio em { margin-right: 5px; font-size: 18px; }
+    .invite-form-view .invite-view-submit { width: 400px; height: 50px; line-height: 50px; margin: 40px auto 20px auto; text-align: center; background-color: #0062EA; border-radius: 6px; font-size: 18px; color: #ffffff; }
+    .invite-view-empty { width: 100%;height: calc(100vh - 40px); font-size: 24px; color: #3D3D3D; }
+
+    @media only screen and (max-width: 1918px) {
+        .invite-drag-footer,
+        .invite-form-parent, .invite-form-view { width: 600px; }
+        .invite-form-view .invite-view-banner { width: 560px; }
+    }
+    @media only screen and (max-width: 1515px) {
+        .invite-drag-footer,
+        .invite-form-parent, .invite-form-view { width: 560px; }
+        .invite-form-view .invite-view-banner,
+        .invite-form-view .invite-view-submit { width: 520px; }
+    }
 </style>
