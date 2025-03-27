@@ -68,9 +68,32 @@ export function getPrivacyPhone(phone){
     return phone.substring(0, 3) + '****' + phone.substring(7);
 }
 
+const throttle = (fnc,delay) => {
+    let lasttimer:number|null = null
+    return function (args){
+        const nowDate:number = Date.now()
+        if(nowDate - lasttimer > delay){
+            fnc.apply(this,args)
+            lasttimer = nowDate
+        }
+    }
+}
+
+const double = (fnc,delay) => {
+    let timer = null
+    return function (args){
+        if(timer) clearTimeout(timer)
+        timer = setTimeout(() => {
+            fnc.apply(this,args)
+        },delay)
+    }
+}
+
 export default {
     isTelPhone,
     isPassWord,
     isEmail,
-    getPrivacyPhone
+    getPrivacyPhone,
+    throttle,
+    double
 }

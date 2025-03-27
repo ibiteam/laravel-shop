@@ -13,6 +13,6 @@ class BaseController extends Controller
 
     final public function user(): ?User
     {
-        return Auth::guard('api')->user();
+        return Auth::guard(config('auth.api.guard'))->user();
     }
 }

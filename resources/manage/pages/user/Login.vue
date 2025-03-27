@@ -3,7 +3,7 @@
         <div class="bg-img">
             <div class="top-head">
                 <div class="top-img">
-                    <img :alt="pageData.shop_name" :src="pageData.shop_logo || '/manage/assets/images/user/login-logo-sitting.png'" height="77" >
+                    <img :alt="pageData.shop_name" :src="pageData.shop_logo || defaultImages.logo" height="77" >
                 </div>
                 <div class="top-icon">
                     <div class="top-icon-line"></div>
@@ -11,7 +11,7 @@
                 <div class="top-title">后台管理系统</div>
             </div>
             <div class="manage-shop">
-                <img :src="pageData.shop_manage_login_image || '/manage/assets/images/user/login-left-bg-img.png'" style="width:420px;height: 560px;"/>
+                <img :src="pageData.shop_manage_login_image || defaultImages.bgImage" style="width:420px;height: 560px;"/>
                 <div style="width:480px;">
                     <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
                         <div class="login-title" style="width:300px;margin: 0px auto;margin-bottom: 36px;">欢迎来到 {{ pageData.shop_name}}</div>
@@ -48,14 +48,21 @@
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { accountLogin, getLoginInfo } from '@/api/user.js';
-import md5 from 'js-md5'
+import { useRouter } from 'vue-router'
 import _ from 'lodash'
+// 导入图片资源
+import logoImage from '@/assets/images/user/login-logo-sitting.png'
+import leftBgImage from '@/assets/images/user/login-left-bg-img.png'
 
 const loginForm = reactive({ username: '', password: '' });
 const passwordVisible = ref(false);
 const loading = ref(false);
 const loginFormRef = ref(null);
 const pageData = ref({})
+const router = useRouter()
+// 添加默认图片资源
+const defaultImages = { logo: logoImage, bgImage: leftBgImage }
+
 const validatePassword = (rule, value, callback) => {
     if (!value) {
         return callback(new Error('请输入登录密码'));
@@ -95,11 +102,11 @@ const changePasswordShow = () => {
 }
 
 const submitLogin = () => {
-    accountLogin({user_name:loginForm.username,password:md5(loginForm.password)}).then(res=>{
+    accountLogin({user_name:loginForm.username,password:loginForm.password}).then(res=>{
         loading.value = false;
         if (res.code == 200) {
             cns.$cookies.set('manage-token', res.data.token, res.data.expires_at)
-            window.location.href = '';
+            router.push({name:'home'})
         } else {
             cns.$message.error(res.message);
         }
@@ -109,7 +116,10 @@ const submitLogin = () => {
 onMounted(() => {
     getLoginInfo().then(res => {
         if(res.code == 200){
-            pageData.value = res.data
+            pageData.value = res.data?.config;
+            if (res.data?.is_login) {
+                router.push({name:'home'})
+            }
         } else {
             cns.$message.error(res.message);
         }
