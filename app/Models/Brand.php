@@ -32,11 +32,4 @@ class Brand extends Model
     use DatetimeTrait;
 
     protected $guarded = [];
-
-    protected function casts(): array
-    {
-        return [
-            'is_show' => 'boolean',
-        ];
-    }
 }
