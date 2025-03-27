@@ -774,7 +774,7 @@
         }
 
         .temp-drag-perview.home-drag-perview {
-            height: calc(100vh - 226px - 98px - 100px);
+            height: calc(100% - 158px - 98px - 20px);
             background-size: 750px auto;
             background-position: top center;
             background-repeat: no-repeat;

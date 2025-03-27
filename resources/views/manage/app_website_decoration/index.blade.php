@@ -132,19 +132,19 @@
                 </li>
             </ul>
         </dd>
-    </dl>
-    <div v-if="!tableData.length&&!loading">
-        <div style="text-align: center;padding-bottom: 50px;">
-            <div style="padding: 50px 0 20px;">
-                <img src="https://cdn.toodudu.com/uploads/2022/01/04/order-no.png" alt="" style="width: 221px;"
-                     v-if="!is_search">
-                <img src="https://cdn.toodudu.com/uploads/2022/01/04/order-search-no.png" alt="" style="width: 221px;"
-                     v-else>
+        <div v-if="!tableData.length&&!loading">
+            <div style="text-align: center;padding-bottom: 50px;">
+                <div style="padding: 50px 0 20px;">
+                    <img src="https://cdn.toodudu.com/uploads/2022/01/04/order-no.png" alt="" style="width: 221px;"
+                         v-if="!is_search">
+                    <img src="https://cdn.toodudu.com/uploads/2022/01/04/order-search-no.png" alt="" style="width: 221px;"
+                         v-else>
+                </div>
+                <p style="font-size: 14px;color: #333;" v-if="!is_search">暂无数据！</p>
+                <p style="font-size: 14px;color: #333;" v-else>没有搜索到符合条件的数据！</p>
             </div>
-            <p style="font-size: 14px;color: #333;" v-if="!is_search">暂无数据！</p>
-            <p style="font-size: 14px;color: #333;" v-else>没有搜索到符合条件的数据！</p>
         </div>
-    </div>
+    </dl>
     @include('manage.components.footer')
     <el-dialog
             title="创建页面"
@@ -705,7 +705,7 @@
             cursor: pointer;
         }
 
-        .decoration-list-parent { overflow-x: auto; }
+        .decoration-list-parent { overflow-x: auto; height: 100%;}
 
         .decoration-list {
             min-width: 1580px;

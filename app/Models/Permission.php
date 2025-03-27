@@ -61,7 +61,7 @@ class Permission extends SpatiePermission
     public const MANAGE_GOODS_SKU_TEMPLATE = 'manage.goods.sku_template'; // 商品SKU模板
 
     public const MANAGE_USER = 'manage.user'; // 用户
-    public const MANAGE_ORDER = 'manage.order'; // 用户
+    public const MANAGE_ORDER = 'manage.order'; // 订单
     public const MANAGE_ARTICLE = 'manage.article'; // 文章
     public const MANAGE_TOOLS = 'manage.tools'; // 工具
     public const MANAGE_DATA = 'manage.data'; // 数据
