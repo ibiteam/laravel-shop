@@ -152,7 +152,9 @@ return [
     'uppercase'              => ':attribute 必须大写',
     'url'                    => ':attribute 格式不正确。',
     'uuid'                   => ':attribute 必须是有效的 UUID。',
-    'is_phone'                   => ':attribute 必须是一个有效的手机号码',
+    'is_phone'               => ':attribute 必须是一个有效的手机号码',
+    'is_md5'                 => ':attribute 格式不正确',
+    'user_name_validated'    => ':attribute 6-22个字符，支持字母（区分大小写）、数字、下划线，不支持以下划线开头，不能设置为纯数字',
     'values' => [
         'action' => [
             'login' => '登录',

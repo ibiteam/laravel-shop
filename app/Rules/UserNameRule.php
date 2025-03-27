@@ -14,8 +14,8 @@ class UserNameRule implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!(preg_match('/^(?!_)(?=.*[a-zA-Z])[a-zA-Z0-9_]{3,22}$/', $value) === 1)) {
-            $fail('用户名3-22个字符，支持字母（区分大小写）、数字、下划线，不支持以下划线开头，不能设置为纯数字');
+        if (!(preg_match('/^(?!_)(?=.*[a-zA-Z])[a-zA-Z0-9_]{6,22}$/', $value) === 1)) {
+            $fail('validation.user_name_validated')->translate();
         }
     }
 }
