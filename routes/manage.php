@@ -13,8 +13,6 @@ Route::middleware('manage.auth')->group(function () {
     Route::post('upload', [UploadController::class, 'upload'])->name('manage.common.upload');
     Route::get('home', [WorkbenchController::class, 'index'])->name('manage.home');
 
-    // 店铺
-    require __DIR__.'/manage/store.php';
     // 模板
     require __DIR__.'/manage/template.php';
 });

@@ -273,9 +273,9 @@ if (! function_exists('admin_operation_log')) {
     /**
      * 记录后台管理员操作日志.
      */
-    function admin_operation_log(AdminUser $admin_user, string $description, int $type = 0, ?string $table_name = null, int $table_id = 0): void
+    function admin_operation_log(AdminUser $admin_user, string $description, int $type = 0): void
     {
-        app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user, $description, $type, $table_name, $table_id);
+        app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user, $description, $type);
     }
 }
 

@@ -7,10 +7,6 @@ Route::prefix('v1')->middleware([])->group(function () {
     require __DIR__.'/api_v1.php';
 });
 
-Route::prefix('seller')->middleware([])->group(function () {
-    require __DIR__.'/api_seller.php';
-});
-
 Route::prefix('pc')->middleware([])->group(function () {
     Route::get('region', [RegionController::class, 'getRegion']);  // 获取省市区信息
 
