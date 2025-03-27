@@ -28,5 +28,11 @@
         "name": "category",
         "label": "商品分类",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "account_set",
+        "label": "账户设置",
+        "collapsed": true
     }
 ]

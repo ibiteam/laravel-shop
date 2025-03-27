@@ -7,7 +7,7 @@ use Illuminate\Http\JsonResponse;
 
 abstract class TestCase extends BaseTestCase
 {
-    public string $account = 'laravel-shop';
+    public string $account = 'laravel_shop';
 
     public string $password = 'laravel-shop-1';
 

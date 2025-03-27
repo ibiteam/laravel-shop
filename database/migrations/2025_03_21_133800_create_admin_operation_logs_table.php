@@ -17,8 +17,6 @@ return new class extends Migration
             $table->unsignedBigInteger('admin_user_id')->comment('管理员id')->index();
             $table->text('description')->nullable()->comment('操作描述');
             $table->tinyInteger('type')->default(0)->comment('类型');
-            $table->string('table')->nullable()->comment('表名');
-            $table->integer('table_id')->default(0)->comment('表名主键ID');
             $table->string('ip')->comment('操作IP');
             $table->timestamps();
 

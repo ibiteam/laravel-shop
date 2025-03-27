@@ -21,6 +21,28 @@ class CategoryDao
     }
 
     /**
+     * 获取顶级分类.
+     *
+     * @param bool $is_show 是否只获取显示的顶级分类
+     */
+    public function getTopCategory(bool $is_show = false): EloquentCollection|Collection
+    {
+        return Category::query()
+            ->whereParentId(0)
+            ->when($is_show, fn (Builder $query) => $query->where('is_show', $is_show))
+            ->select(['parent_id', 'name', 'title', 'keywords', 'description', 'logo', 'sort', 'is_show'])
+            ->get();
+    }
+
+    /**
+     * 获取分类信息.
+     */
+    public function getInfoById(int $id): ?Category
+    {
+        return Category::query()->whereId($id)->first();
+    }
+
+    /**
      * 递归处理树状结构数据.
      */
     private function categoryFormat(Category $category): array

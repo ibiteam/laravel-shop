@@ -4,12 +4,10 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int                             $id
- * @property int                             $seller_id        入驻商家ID
  * @property string                          $name             标签名称
  * @property string                          $type             标签类型：1文字标签 2图片标签
  * @property string|null                     $image            图片标签地址
@@ -21,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Goods> $goods
  * @property-read int|null $goods_count
- * @property-read \App\Models\SellerShop|null $shopInfo
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel newQuery()
@@ -34,7 +31,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereIsShow($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereSellerId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsLabel whereUpdatedAt($value)
  *
@@ -49,11 +45,6 @@ class GoodsLabel extends Model
     public const TYPE_IMAGE = 2; // 图片标签
 
     protected $guarded = [];
-
-    public function shopInfo(): BelongsTo
-    {
-        return $this->belongsTo(SellerShop::class, 'seller_id', 'seller_id');
-    }
 
     public function goods(): BelongsToMany
     {

@@ -11,8 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int                             $admin_user_id 管理员id
  * @property string|null                     $description   操作描述
  * @property int                             $type          类型
- * @property string|null                     $table         表名
- * @property int                             $table_id      表名主键ID
  * @property string                          $ip            操作IP
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -26,8 +24,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereIp($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereTable($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereTableId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog whereUpdatedAt($value)
  *
@@ -36,10 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AdminOperationLog extends Model
 {
     use DatetimeTrait;
-
-    // 日志类型
-    public const BASIC_OPERATIONS = 0; // 基本操作日志
-    public const SELLER_ENTER_CHECK = 1; // 商家入驻审核日志
 
     protected $guarded = [];
 

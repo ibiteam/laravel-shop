@@ -51,22 +51,20 @@ class Permission extends SpatiePermission
     public const NOT_IS_LEFT_NAV = 0;
     public const IS_LEFT_NAV = 1;
     public const MANAGE_SETTINGS = 'manage.settings'; // 设置
-    public const MANAGE_STORE = 'manage.store'; // 店铺
+    public const MANAGE_GOODS = 'manage.goods'; // 商品
+    public const MANAGE_GOODS_SETTINGS = 'manage.goods.settings'; // 商品管理
+    public const MANAGE_GOODS_INDEX = 'manage.goods.index'; // 商品列表
+    public const MANAGE_GOODS_CATEGORY = 'manage.goods.category'; // 商品分类
+    public const MANAGE_GOODS_BRAND = 'manage.goods.brand'; // 商品品牌
+    public const MANAGE_GOODS_LABELS = 'manage.goods.label'; // 商品标签
+    public const MANAGE_GOODS_GUARANTEE = 'manage.goods.guarantee'; // 商品保障
+    public const MANAGE_GOODS_SKU_TEMPLATE = 'manage.goods.sku_template'; // 商品SKU模板
+
     public const MANAGE_USER = 'manage.user'; // 用户
+    public const MANAGE_ORDER = 'manage.order'; // 订单
     public const MANAGE_ARTICLE = 'manage.article'; // 文章
     public const MANAGE_TOOLS = 'manage.tools'; // 工具
     public const MANAGE_DATA = 'manage.data'; // 数据
-    public const MANAGE_PRODUCT = 'manage.product'; // 产品
-    public const MANAGE_TEMPLATE = 'manage.template'; // 模板
-    public const WEB_DECORATION_MANAGE = 'web_decoration_manage';
-    public const APP_WEB_DECORATION_INDEX = 'manage.app_web_decoration.index'; // 移动端装修
-
-    // 入驻管理
-    public const SELLER_ENTER_MANAGE = 'seller_enter_manage';
-    public const SELLER_ENTER_CONFIG_INDEX = 'manage.seller_enter_config.index'; // 商家注册项设置
-    public const SELLER_ENTER_CONFIG_UPDATE = 'manage.seller_enter_config.update'; // 商家注册项设置添加|编辑
-    public const SELLER_ENTER_INDEX = 'manage.seller_enter.index'; // 入驻商家列表
-    public const SELLER_ENTER_UPDATE = 'manage.seller_enter.update'; // 入驻商家添加|编辑
 
 
     public function __construct(array $attributes = [])

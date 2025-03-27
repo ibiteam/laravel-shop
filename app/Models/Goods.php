@@ -13,9 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int                             $id
- * @property int                             $seller_id             入驻商家ID
  * @property int                             $category_id           分类ID
- * @property int                             $seller_category_id    商家分类ID
  * @property int                             $brand_id              品牌ID
  * @property string                          $goods_sn              商品编号
  * @property string                          $goods_name            商品标题
@@ -26,6 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int                             $buy_min_number        最小起订量
  * @property int                             $check_status          审核状态 1审核通过 2审核驳回 0未审核
  * @property string|null                     $check_status_datetime 审核时间
+ * @property string|null                     $reason                驳回原因
  * @property int                             $status                上下架状态 1上架 0下架
  * @property int                             $sort                  排序，值越大越靠前
  * @property string                          $goods_original        商品主图
@@ -42,7 +41,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $images_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsLabel> $labels
  * @property-read int|null $labels_count
- * @property-read \App\Models\SellerShop|null $shopInfo
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsSku> $skus
  * @property-read int|null $skus_count
  *
@@ -67,8 +65,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Goods whereKeywords($value)
  * @method static Builder<static>|Goods whereNumber($value)
  * @method static Builder<static>|Goods wherePrice($value)
- * @method static Builder<static>|Goods whereSellerCategoryId($value)
- * @method static Builder<static>|Goods whereSellerId($value)
+ * @method static Builder<static>|Goods whereReason($value)
  * @method static Builder<static>|Goods whereSort($value)
  * @method static Builder<static>|Goods whereStatus($value)
  * @method static Builder<static>|Goods whereUpdatedAt($value)
@@ -113,11 +110,6 @@ class Goods extends Model
     public function skus(): HasMany
     {
         return $this->hasMany(GoodsSku::class, 'goods_id', 'id');
-    }
-
-    public function shopInfo(): BelongsTo
-    {
-        return $this->belongsTo(SellerShop::class, 'seller_id', 'seller_id');
     }
 
     public function labels(): BelongsToMany
