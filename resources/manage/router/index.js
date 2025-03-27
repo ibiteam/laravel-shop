@@ -21,9 +21,9 @@ const router = createRouter({
         },
         {
             path: '/decoration',
-            component: () => import('@/pages/front/decoration/DecorationLayout.vue'),
+            component: () => import('@/pages/decoration/DecorationLayout.vue'),
             children: [
-                { path: 'app', component: import('@/pages/front/decoration/DecorationApp.vue'), name: 'decorationApp' },
+                { path: 'app', component: import('@/pages/decoration/DecorationApp.vue'), name: 'decorationApp' },
             ]
         }
     ],
