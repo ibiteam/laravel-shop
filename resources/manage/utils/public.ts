@@ -79,7 +79,7 @@ const throttle = (fnc,delay) => {
     }
 }
 
-const double = (fnc,delay) => {
+const debounce = (fnc,delay) => {
     let timer = null
     return function (args){
         if(timer) clearTimeout(timer)
@@ -95,5 +95,5 @@ export default {
     isEmail,
     getPrivacyPhone,
     throttle,
-    double
+    debounce
 }

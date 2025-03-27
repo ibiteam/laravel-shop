@@ -122,13 +122,36 @@
                     </div>
                 </div>
             </div>
-            <el-drawer
-                class="collection-drawer"
-                :visible.sync="collectionVisible"
-                size="80%"
-                direction="ltr">
-                <div class="collection-box s-flex jc-bt">
-                    <div class="left-collection">
+        </div>
+        <el-drawer
+            class="collection-drawer"
+            v-model="collectionVisible"
+            size="80%"
+            :append-to-body='false'
+            direction="rtl">
+            <div class="collection-box s-flex jc-bt">
+                <div class="right-collection flex-1">
+                    <template v-if="my_collect.length">
+                        <div class="menu-listRouter" v-for="(item,index) in my_collect" :key="item.value">
+                            <span>@{{ item.title }}</span>
+                            <i class="el-icon-error" style="display: none;color: #ccc;"></i>
+                        </div>
+                    </template>
+                    <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
+                        <span>暂无收藏</span>
+                    </div>
+                </div>
+                <div class="left-collection">
+                    <div class="search-menu">
+                        <el-input placeholder="请输入关键词" v-model="searchtools">
+                            <template #prefix>
+                                <div style='font-size: 20px' class='s-flex ai-ct jc-ct'>
+                                    <Search style='width: 1.5em;height: 1.5em;color: var(--main-color)' />
+                                </div>
+                            </template>
+                        </el-input>
+                    </div>
+                    <div class='menu-overflow'>
                         <div class="menu-scroll">
                             <div class="menu-list" v-for="(item,index) in menus" :key="item.value">
                                 <div class="menu-title"><span>{{ item.title }}</span></div>
@@ -142,12 +165,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="right-collection flex-1">
-                        <div class="menu-listRouter" v-for="item in my_collect" :key="item.value"><span>{{ item.title }}</span></div>
-                    </div>
                 </div>
-            </el-drawer>
-        </div>
+
+            </div>
+        </el-drawer>
     </div>
 </template>
 
@@ -155,10 +176,14 @@
 import { nextTick, onMounted, ref , reactive , onUnmounted } from 'vue';
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
+import { Search } from '@element-plus/icons-vue'
+
 
 let lineRef = null
 let saleRef = null
 let sourceRef = null
+
+const searchtools = ref('')
 
 const recent_access_records = ref([{"name":"应用分组","url":"https://testdoc.ptdplat.com/manage/config_center/group","icon":"el-icon-tickets"},{"name":"应用列表","url":"https://testdoc.ptdplat.com/manage/config_center/application","icon":"el-icon-tickets"},{"name":"服务器","url":"https://testdoc.ptdplat.com/manage/serve_organ","icon":"el-icon-tickets"},{"name":"机器人列表","url":"https://testdoc.ptdplat.com/manage/chat/application_program_robot/list","icon":"el-icon-tickets"},{"name":"应用列表","url":"https://testdoc.ptdplat.com/manage/chat/application_program/list","icon":"el-icon-tickets"},{"name":"服务器分组","url":"https://testdoc.ptdplat.com/manage/serve_cate","icon":"el-icon-tickets"},{"name":"用户分组","url":"https://testdoc.ptdplat.com/manage/member_group","icon":"el-icon-tickets"},{"name":"消息","url":"","icon":"el-icon-chat-round"}])
 const my_collect = ref([])
@@ -264,7 +289,7 @@ const resizeFnc = () => {
     lineRef.resize()
 }
 
-const doubleResize = $public.double(resizeFnc,100)
+const debounceResize = $public.debounce(resizeFnc,100)
 
 onMounted(() => {
     nextTick(() => {
@@ -368,15 +393,16 @@ onMounted(() => {
         });
     });
 
-    window.addEventListener('resize', doubleResize)
+    window.addEventListener('resize', debounceResize)
 });
 onUnmounted(() => {
-    window.removeEventListener('resize', doubleResize)
+    window.removeEventListener('resize', debounceResize)
 });
 </script>
 
 <style scoped lang='scss'>
 .seller-home {
+    transform: translate(0, 0);
     .container.member {
         overflow-y: hidden;
     }
@@ -392,7 +418,6 @@ onUnmounted(() => {
     .home-container {
         width: 100%;
         height: 100%;
-        background: #f7f8fa;
 
         .home-content {
 
@@ -570,63 +595,6 @@ onUnmounted(() => {
         }
     }
 
-    /*  首页收藏弹窗  */
-    .collection-drawer .collection-box {
-        width: 100%;
-        height: 100%;
-        padding: 20px;
-        box-sizing: border-box;
-
-        .left-collection {
-            width: 85%;
-            height: 100%;
-            overflow: hidden;
-            overflow-y: auto;
-
-            .menu-scroll {
-                columns: 4;
-                column-gap: 12px;
-            }
-
-            .menu-list {
-                display: inline-block;
-                width: 100%;
-                break-inside: avoid;
-
-                .menu-title span {
-                    color: #ff822c;
-                    font-size: 18px;
-                    line-height: 3;
-                }
-
-                .menu-second .menu-title span {
-                    font-size: 16px;
-                    color: #333;
-                    line-height: 3;
-                }
-            }
-        }
-
-        .menu-listRouter {
-            width: 150px;
-
-            span {
-                cursor: pointer;
-                color: #9b9b9b;
-                font-size: 14px;
-                line-height: 3;
-            }
-        }
-
-        .right-collection {
-            width: 0;
-            height: 100%;
-            overflow: hidden;
-            overflow-y: auto;
-            padding: 20px;
-        }
-    }
-
     .table-title {
         -webkit-line-clamp: 2;
         display: -webkit-box;
@@ -636,5 +604,195 @@ onUnmounted(() => {
         overflow: hidden;
     }
 
+}
+/*  首页收藏弹窗  */
+:deep(.collection-drawer) {
+    .collection-box {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        padding-left: 0;
+    }
+
+    &.el-drawer {
+        border-radius: 20px 0 0 0;
+    }
+
+    .el-drawer__header span {
+        font-weight: 500;
+        font-size: 20px;
+        color: #333333;
+    }
+
+    .el-drawer__body {
+        height: 0;
+        padding: 0;
+        overflow: hidden !important;
+    }
+
+    .collection-box .left-collection {
+        width: 85%;
+        height: 100%;
+        overflow: hidden;
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
+
+        .menu-overflow {
+            height: 0;
+            flex: 1;
+            overflow-y: auto;
+            margin-top: 74px;
+        }
+
+        .menu-scroll {
+            columns: 4;
+            column-gap: 20px;
+        }
+
+        .menu-list {
+            display: inline-block;
+            width: 100%;
+            break-inside: avoid;
+
+            .menu-title span, .menu-title i {
+                color: #ff822c;
+                font-size: 18px;
+                line-height: 3;
+            }
+
+            .menu-second .menu-title span {
+                font-size: 16px;
+                color: #333;
+                line-height: 3;
+                font-weight: 500;
+            }
+        }
+
+        .search-menu .el-input__wrapper {
+            height: 36px;
+            background: #F5F7FA;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            box-shadow: none;
+        }
+
+        .search-menu .el-input__prefix {
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+        }
+    }
+
+    .menu-list .menu-second .menu-title span {
+        font-size: 16px;
+        color: #333;
+        line-height: 3;
+        font-weight: 500;
+    }
+
+    .collection-box .menu-listRouter {
+        height: 30px;
+        border-radius: 10px;
+        padding: 0 10px;
+        cursor: pointer;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+    }
+
+    .collection-box .menu-listRouter {
+        &:hover {
+            background-color: #f4f6f7;
+
+            i {
+                display: block !important;
+            }
+        }
+
+        i &:hover {
+            color: rgb(124, 124, 124) !important;
+        }
+    }
+
+    .collection-box .menu-listRouter span,
+    .collection-box .menu-listRouter i {
+        cursor: pointer;
+        color: #333;
+        font-size: 14px;
+        line-height: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .collection-box .right-collection {
+        width: 0;
+        height: 100%;
+        overflow: hidden;
+        overflow-y: auto;
+        padding: 20px;
+        flex: 1;
+        box-shadow: 1px 0px 6px 0px rgba(16, 43, 76, 0.08);
+        border-radius: 0px 20px 20px 0px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+        }
+
+        &::-webkit-scrollbar-track {
+            display: none;
+        }
+    }
+
+    .menu-overflow .menu-listRouter {
+        padding: 0 20px;
+        border-radius: 10px;
+        height: 30px;
+
+        &:hover {
+            background-color: #f4f6f7;
+        }
+
+        .hideIcon {
+            display: none;
+        }
+
+        &:hover .hideIcon {
+            display: block;
+        }
+    }
+
+    .remind {
+        background: #E90013;
+        border-radius: 60px;
+        height: 20px;
+        min-width: 20px;
+        text-align: center;
+        line-height: 1;
+        padding: 0 5px;
+        margin-left: 10px;
+
+        span {
+            font-weight: 500;
+            font-size: 12px;
+            color: #FFFFFF;
+        }
+    }
+}
+
+
+/**/
+.no-data{
+    display: flex;align-items: center;justify-content: center;
+}
+.no-data span{
+    font-size: 16px;color: #ccc;font-weight: 400;
 }
 </style>
