@@ -49,6 +49,7 @@ import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { accountLogin, getLoginInfo } from '@/api/user.js';
 import md5 from 'js-md5'
+import _ from 'lodash'
 
 const loginForm = reactive({ username: '', password: '' });
 const passwordVisible = ref(false);
@@ -79,7 +80,7 @@ const loginRules = reactive({
         { validator: validatePassword, trigger: 'blur' }
     ]
 })
-const handleLogin = () => {
+const handleLogin = _.throttle(() => {
     loginFormRef.value.validate((valid) => {
         if (valid) {
             loading.value = true;
@@ -87,14 +88,14 @@ const handleLogin = () => {
         }else {
         }
     })
-};
+},1000)
 
 const changePasswordShow = () => {
     passwordVisible.value = !passwordVisible.value;
 }
 
 const submitLogin = () => {
-    accountLogin({user_name:loginForm.username,password:md5(oginForm.password)}).then(res=>{
+    accountLogin({user_name:loginForm.username,password:md5(loginForm.password)}).then(res=>{
         loading.value = false;
         if (res.code == 200) {
             cns.$cookies.set('manage-token', res.data.token, res.data.expires_at)
