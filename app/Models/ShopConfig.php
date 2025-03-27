@@ -43,6 +43,7 @@ class ShopConfig extends Model
     public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置组名
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
+    public const MANAGE_SHOP_COLOR = 'shop_color'; // 主题色
 
     protected $guarded = [];
 
