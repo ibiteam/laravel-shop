@@ -18,6 +18,13 @@ const router = createRouter({
             children:[
                 { path: 'home', component: import('@/pages/seller/Home.vue'), name: 'sellerHome' },
             ]
+        },
+        {
+            path: '/decoration',
+            component: () => import('@/pages/front/decoration/DecorationLayout.vue'),
+            children: [
+                { path: 'app', component: import('@/pages/front/decoration/DecorationApp.vue'), name: 'decorationApp' },
+            ]
         }
     ],
 });
