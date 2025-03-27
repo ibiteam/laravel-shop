@@ -2,8 +2,8 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@/*": ["resources/js/*"]
+            "@/*": ["resources/manage/*"]
         }
     },
-    "include": ["resources/js/**/*"]
+    "include": ["resources/manage/**/*"]
 }

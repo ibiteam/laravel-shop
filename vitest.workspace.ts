@@ -6,13 +6,13 @@ export default defineWorkspace([
     {
         plugins: [vue()],
         test: {
-            include: ['resources/js/test/unit/**/*.test.{ts,js}'],
+            include: ['resources/manage/test/unit/**/*.test.{ts,js}'],
             name: 'unit',
             environment: 'node',
         },
         resolve: {
             alias: {
-                '@': path.resolve(__dirname, './resources/js/'), // Maps @ to the src directory
+                '@': path.resolve(__dirname, './resources/manage/'), // Maps @ to the src directory
             },
         },
     },
@@ -20,7 +20,7 @@ export default defineWorkspace([
         plugins: [vue()],
         test: {
             include: [
-                'resources/js/test/browser/**/*.test.{ts,js}',
+                'resources/manage/test/browser/**/*.test.{ts,js}',
             ],
             name: 'browser',
             browser: {
@@ -32,7 +32,7 @@ export default defineWorkspace([
         },
         resolve: {
             alias: {
-                '@': path.resolve(__dirname, './resources/js/'), // Maps @ to the src directory
+                '@': path.resolve(__dirname, './resources/manage/'), // Maps @ to the src directory
             },
         },
     },
