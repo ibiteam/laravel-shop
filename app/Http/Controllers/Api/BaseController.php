@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Facades\Auth;
 
 class BaseController extends Controller
 {
@@ -12,6 +13,6 @@ class BaseController extends Controller
 
     final public function user(): ?User
     {
-        return request()->user('sanctum');
+        return Auth::guard('api')->user();
     }
 }

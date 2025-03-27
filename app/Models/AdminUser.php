@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -51,7 +52,9 @@ use Spatie\Permission\Traits\HasRoles;
 class AdminUser extends Authenticatable
 {
     use DatetimeTrait;
+    use HasApiTokens;
     use HasRoles;
+
     public const STATUS_ENABLE = 1; // 启用
     public const STATUS_DISABLE = 0; // 禁用
     protected $guarded = [];

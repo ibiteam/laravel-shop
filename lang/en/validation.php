@@ -152,7 +152,9 @@ return [
     'uppercase'              => 'The :attribute field must be uppercase.',
     'url'                    => 'The :attribute field must be a valid URL.',
     'uuid'                   => 'The :attribute field must be a valid UUID.',
-    'is_phone'            => 'The :Attribute must be a valid phone number.',
+    'is_phone'               => 'The :Attribute must be a valid phone number.',
+    'is_md5'                 => 'The :attribute field format is invalid.',
+    'user_name_validated'    => 'The :attribute 6-22 characters, supports letters (case sensitive), numbers, underscores, does not support starting with an underline, cannot be set as a pure number',
     'values' => [
         'action' => [
             'login' => 'Login',

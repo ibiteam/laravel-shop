@@ -15,7 +15,7 @@ class PasswordRule implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         if (! is_md5($value)) {
-            $fail('密码格式不正确');
+            $fail('validation.is_md5')->translate();
         }
     }
 }
