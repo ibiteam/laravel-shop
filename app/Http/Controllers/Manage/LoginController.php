@@ -13,6 +13,7 @@ use App\Utils\RsaUtil;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends BaseController
 {
@@ -24,7 +25,7 @@ class LoginController extends BaseController
         $current_user = $this->adminUser();
 
         if ($current_user instanceof AdminUser) {
-            return redirect()->to($this->redirectToHome());
+            return $this->success(['is_login' => true, 'config' => []]);
         }
 
         $config = $shop_config_dao->multipleConfig(
@@ -40,7 +41,7 @@ class LoginController extends BaseController
             ShopConfig::ICP_NUMBER,
         );
 
-        return $this->success($config);
+        return $this->success(['is_login' => false, 'config' => $config]);
     }
 
     public function login(Request $request, AdminUserService $admin_user_service)
@@ -77,6 +78,8 @@ class LoginController extends BaseController
             }
 
             return $this->success($admin_user_service->loginSuccess($admin_user));
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {

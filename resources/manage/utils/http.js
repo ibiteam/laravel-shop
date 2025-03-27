@@ -30,7 +30,7 @@ axios.defaults.headers['Access-From'] = 'pc'
 // 请求拦截器
 axios.interceptors.request.use(
     config => {
-        let token = cookies.get('pc-token')
+        let token = cookies.get('manage-token')
         let visitorId = ''
         if (localStorage.getItem('visitorId')) {
             visitorId = localStorage.getItem('visitorId')
