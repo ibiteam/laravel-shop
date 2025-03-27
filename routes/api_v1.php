@@ -26,14 +26,14 @@ Route::get('category', [CategoryController::class, 'index']);
 /**
  * 登录可以访问路由.
  */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('api.auth')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']); // 退出登录
         Route::post('edit-password', [AuthController::class, 'editPassword']); // 修改密码
     });
 
-    Route::get('region', [AddressController::class, 'region']); //地区数据
-    Route::get('region_group', [AddressController::class, 'regionGroup']); //地区分组数据
+    Route::get('region', [AddressController::class, 'region']); // 地区数据
+    Route::get('region_group', [AddressController::class, 'regionGroup']); // 地区分组数据
 
     // 用户地址
     Route::prefix('address')->group(function () {

@@ -5,9 +5,9 @@ import router from '@/router'
 import ElementPlus from 'element-plus'
 import VueCookies from 'vue3-cookies'
 import 'element-plus/dist/index.css'
-import '@/css/app.css'
-import '@/css/element-reset.css'
-import '@/css/iconfont.css'
+import '@/assets/css/app.css'
+import '@/assets/css/element-reset.css'
+import '@/assets/css/iconfont.css'
 import dialog from "@/utils/dialog";
 import http from "@/utils/http";
 import $public from "@/utils/public";

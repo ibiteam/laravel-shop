@@ -27,7 +27,23 @@ function alert({title='',message='提示',cancelButtonText='取消',confirmButto
 	})
 }
 
+function prompt({title='', message='提示', cancelButtonText='取消', confirmButtonText='确定', inputPattern, inputErrorMessage}){
+    return new Promise((resolve,reject)=>{
+        ElMessageBox.prompt(message,title,{
+            confirmButtonText: confirmButtonText,
+            center: true,
+            inputPattern,
+            inputErrorMessage
+        }).then(() => {
+            resolve()
+        }).catch(() => {
+            reject()
+        });
+    })
+}
+
 export default {
 	confirm,
-	alert
+	alert,
+    prompt
 }

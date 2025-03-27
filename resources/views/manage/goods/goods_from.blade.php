@@ -5,47 +5,28 @@
         <div class="container">
             <div class="update-box s_flex">
                 <div class="good-form">
-                    <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="120px"
-                             size="small">
-                        <el-form-item label="{{ __('shop/goods.index.category') }}" prop="goods_cate_id">
-                            <el-select v-model="updateForm.goods_cate_id"
-                                       placeholder="{{__('forum_manage/common.please_select')}}">
+                    <el-form ref="updateForm" :model="updateForm" :rules="updateFormRules" label-width="120px" size="small">
+                        <el-form-item label="分类" prop="goods_cate_id">
+                            <el-select v-model="updateForm.goods_cate_id" placeholder="请选择分类">
                                 <el-option :label="its.label" :value="its.value" v-for="its in category"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.goods_type') }}" prop="goods_type">
-                            <el-radio-group v-model="updateForm.goods_type">
-                                <el-radio :label="1">{{ __('shop/goods.index.brand_new') }}</el-radio>
-                                <el-radio :label="2">{{ __('shop/goods.index.second_hand') }}</el-radio>
-                            </el-radio-group>
+                        <el-form-item label="商品名称" prop="goods_name">
+                            <el-input v-model="updateForm.goods_name" placeholder="请输入商品名称" style="width: 95%;"></el-input>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.anonymous_posting') }}" prop="is_anonymous"
-                                      v-if="updateForm.goods_type === 2">
-                            <div class="s_flex ai_ct">
-                                <el-switch v-model="updateForm.is_anonymous" :active-value="1"
-                                           :inactive-value="0"></el-switch>
-                                <div class="tips" style="margin-left: 10px;">
-                                    <span v-if="updateForm.is_anonymous">{{ __('shop/goods.index.buyer_not') }}</span>
-                                    <span v-else>{{ __('shop/goods.index.will_show') }}</span>
-                                </div>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.goods_name') }}" prop="goods_name">
-                            <el-input v-model="updateForm.goods_name" placeholder="{{ __('shop/goods.index.placeholder1') }}" style="width: 95%;"></el-input>
-                        </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.goods_tag') }}" prop="tag">
-                            <el-input v-model="updateForm.tag" :maxlength="5" show-word-limit placeholder="{{ __('shop/goods.index.placeholder2') }}" style="width: 95%;"></el-input>
+                        <el-form-item label="商品标签" prop="tag">
+                            <el-input v-model="updateForm.tag" :maxlength="5" show-word-limit placeholder="可填写热卖，推荐等" style="width: 95%;"></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
                                 width="auto"
                                 trigger="hover"
-                                content="{{ __('shop/goods.index.goods_front_tag') }}">
+                                content="用于在商品名称前加一个标记">
                                 <em class="iconfont" slot="reference" style="cursor: pointer;">&#xe72d;</em>
                             </el-popover>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.goods_subtitle') }}" prop="goods_brief">
-                            <el-input v-model="updateForm.goods_brief" style="width: 95%;" placeholder="{{ __('shop/goods.index.placeholder3') }}"></el-input>
+                        <el-form-item label="商品副标题" prop="goods_brief">
+                            <el-input v-model="updateForm.goods_brief" style="width: 95%;" placeholder="请输入商品副标题"></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
@@ -55,45 +36,38 @@
                                 <em class="iconfont" slot="reference" style="cursor: pointer;">&#xe72d;</em>
                             </el-popover>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.custom_attribute') }}">
+                        <el-form-item label="自定义属性">
                             <template v-if="updateForm.goods_attr.length">
-                                <div class="input-li s_flex ai_ct" v-for="(item,index) in updateForm.goods_attr"
-                                     :key="index" style="margin-bottom: 10px;">
+                                <div class="input-li s_flex ai_ct" v-for="(item,index) in updateForm.goods_attr" :key="index" style="margin-bottom: 10px;">
                                     <div style="width: 95%;" class="s_flex jc_bt ai_ct">
-                                        <el-input v-model="item.attr_name"
-                                                  placeholder="{{ __('shop/goods.index.input_attribute') }}"
-                                                  style="width: 48%;" :maxlength="5" show-word-limit></el-input>
-                                        <el-input v-model="item.attr_value"
-                                                  placeholder="{{ __('shop/goods.index.input_attribute_value') }}"
-                                                  style="width: 48%;" :maxlength="20"></el-input>
+                                        <el-input v-model="item.attr_name" placeholder="请输入属性名" style="width: 48%;" :maxlength="5" show-word-limit></el-input>
+                                        <el-input v-model="item.attr_value" placeholder="请输入属性值" style="width: 48%;" :maxlength="20"></el-input>
                                     </div>
                                     <div class="dels" style="margin-left: 5px;" @click="delGoodsAttr(index)">
-                                        <span>{{ __('shop/goods.index.delete') }}</span>
+                                        <span>删除</span>
                                     </div>
                                 </div>
                             </template>
                             <template>
-                                <el-button class="btn primary" size="small"
-                                           @click="addGoodsAttr">{{__('forum_manage/common.add')}}</el-button>
+                                <el-button class="btn primary" size="small" @click="addGoodsAttr">添加</el-button>
                                 <div class="tips">
-                                    <span>{{ __('shop/goods.index.settle_custom_attribute') }}</span>
+                                    <span>可设置自定义属性，如内存：8G</span>
                                 </div>
                             </template>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.picture') }}" prop="goods_img">
+                        <el-form-item label="图片" prop="goods_img">
                             <div class="s_flex">
                                 <draggable class="good_picture s_flex" v-model="updateForm.goods_img">
                                     <div class="good_picture_list" v-for="(its,ids) in updateForm.goods_img" :key="ids">
                                         <div class="good_picture_li">
                                             <img :src="its" alt="its">
                                             <div class="masking">
-                                                <i class="el-icon-delete"
-                                                   @click="updateForm.goods_img.splice(ids,1)"></i>
+                                                <i class="el-icon-delete" @click="updateForm.goods_img.splice(ids,1)"></i>
                                             </div>
                                         </div>
                                         <div class="main" :class="{'main-img' : !ids}" @click="setMain(ids)">
-                                            <span v-if="!ids">{{ __('shop/goods.index.master_map') }}</span>
-                                            <span v-else>{{ __('shop/goods.index.settle_master_map') }}</span>
+                                            <span v-if="!ids">主图</span>
+                                            <span v-else>设为主图</span>
                                         </div>
                                     </div>
                                 </draggable>
@@ -107,39 +81,35 @@
                                     :on-exceed="handleExceed"
                                     :before-upload="beforeUpload">
                                     <i class="el-icon-plus avatar-uploader-icon"></i>
-
                                 </el-upload>
                             </div>
                             <div class="tips">
-                                <span>{{ __('shop/goods.index.suggested_size') }}</span>
+                                <span>建议尺寸500*500px，最多6张</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.unit') }}" prop="unit">
-                            <el-input v-model="updateForm.unit"
-                                      placeholder="{{ __('shop/goods.index.input_goods_unit') }}"
-                                      style="width: 160px;"></el-input>
+                        <el-form-item label="单位" prop="unit">
+                            <el-input v-model="updateForm.unit" placeholder="请输入商品单位" style="width: 160px;"></el-input>
                             <div class="tips">
-                                <span>{{ __('shop/goods.index.unit_desc') }}</span>
+                                <span>选填，可输入件，公斤等，多单位可在下面商品规格名中标注</span>
                             </div>
                         </el-form-item>
                         <el-form-item>
                             <template slot="label">
-                                {{ __('shop/goods.index.goods_spec') }}
+                                商品规格
                                 <el-popover
                                     placement="right"
                                     title=""
                                     width="auto"
                                     trigger="hover"
-                                    content="{{ __('shop/goods.index.add_multiple_spec') }}">
+                                    content="可添加多个规格属性的商品">
                                     <em class="iconfont" slot="reference" style="cursor: pointer;">&#xe72d;</em>
                                 </el-popover>
                             </template>
                             <div class="specifications" :class="{ 's_flex' : !goods_specs_template.values.length , 'jc_bt' : !goods_specs_template.values.length , 'fd_rs' : !goods_specs_template.values.length }">
                                 <div class="specifications-select s_flex jc_fe">
-                                    <el-select placeholder="{{__('forum_manage/common.please_select')}}"
+                                    <el-select placeholder="please_select"
                                                style="width: 160px;" ref="mySelect">
-                                        <el-option
-                                            v-for="(item,index) in specificationsArr"
+                                        <el-option v-for="(item,index) in specificationsArr"
                                             :key="item.id">
                                             <div class="option-li s_flex jc_bt ai_bs" @click="chooseSpecs(index)">
                                                 <span>@{{ item.name }}</span>
@@ -170,26 +140,26 @@
                                             <div class="specifications-content s_flex jc_bt">
                                                 <div class="left">
                                                     <div class="label">
-                                                        <span>{{ __('shop/goods.index.name') }}</span>
+                                                        <span>名称</span>
                                                     </div>
                                                     <el-form-item :prop="'values.' + index + '.spec_name'">
                                                         <el-input v-model="item.spec_name" size="mini"
-                                                                  placeholder="{{ __('shop/goods.index.please_input_content') }}"></el-input>
+                                                                  placeholder="请输入内容"></el-input>
                                                     </el-form-item>
                                                     <div class="tips">
-                                                        <span>{{ __('shop/goods.index.goods_spec_name') }}</span>
+                                                        <span>请输入规格名称</span>
                                                     </div>
                                                 </div>
                                                 <div class="right">
                                                     <div class="label">
-                                                        <span>{{ __('shop/goods.index.name') }}</span>
+                                                        <span>名称</span>
                                                     </div>
                                                     <div class="specifications-input">
                                                         <template v-for="(its,ids) in item.spec_value">
                                                             <el-form-item
                                                                 :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'">
                                                                 <el-input v-model="its.spec_value_name"
-                                                                          placeholder="{{ __('shop/goods.index.input_spec_item') }}"
+                                                                          placeholder="请输入规格项"
                                                                           size="mini" maxlength="10"
                                                                           style="width: 120px;margin-right: 10px;"
                                                                           :key="ids"><i slot="suffix"
@@ -206,13 +176,13 @@
                                                                 width="auto"
                                                                 trigger="hover"
                                                                 :disabled="computedSpecs(index)"
-                                                                content="{{ __('shop/goods.index.fill_spec_item') }}">
+                                                                content="请填写完当前规格项">
                                                                 <el-link type="primary" slot="reference" :underline="false" icon="el-icon-plus" :disabled="!computedSpecs(index)" @click="addSpecs(index)">{{ __('shop/goods.index.add_spec_item') }}</el-link>
                                                             </el-popover>
                                                         </template>
                                                     </div>
                                                     <div class="tips">
-                                                        <span>{{ __('shop/goods.index.spec_item_max_ten') }}</span>
+                                                        <span>规格项最长为10个字，最多可添加6个规格项。</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -221,43 +191,32 @@
                                 </div>
                                 <div class="specifications-btn">
                                     <el-button class="btn primary" size="small" @click="addGoodsSpecs()"
-                                               v-if="goods_specs_template.values.length < 3">{{__('forum_manage/common.add')}}</el-button>
+                                               v-if="goods_specs_template.values.length < 3">添加</el-button>
                                     <template v-if="goods_specs_template.values.length">
                                         <el-button class="btn" size="small" v-if="!goods_specs_template.id"
-                                                   @click="updaterTemplate()">{{ __('shop/goods.index.save_template') }}</el-button>
+                                                   @click="updaterTemplate()">保存模板</el-button>
                                         <el-button class="btn" size="small" @click="updaterTemplate()"
-                                                   v-else>{{ __('shop/goods.index.update_template') }}</el-button>
+                                                   v-else>更新模板</el-button>
                                     </template>
                                 </div>
                             </div>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.sale_spec') }}"
-                                      v-if="goods_specs_template.values.length">
+                        <el-form-item label="销售规格" v-if="goods_specs_template.values.length">
                             <div class="more-input s_flex jc_fe">
                                 <div class="more-li">
                                     <label>
-                                        <span>{{ __('shop/goods.index.points') }}</span>
+                                        <span>价格</span>
                                     </label>
-                                    <el-input v-model="moreInput.integral_money" size="mini" style="width: 80px;"
-                                              placeholder=""
-                                              @input="moreInput.integral_money = formatInput(moreInput.integral_money)"></el-input>
+                                    <el-input v-model="moreInput.shop_price" size="mini" style="width: 80px;" placeholder="" @input="moreInput.shop_price = formatInput(moreInput.shop_price)"></el-input>
                                 </div>
                                 <div class="more-li">
                                     <label>
-                                        <span>{{ __('shop/goods.index.cash') }}</span>
-                                    </label>
-                                    <el-input v-model="moreInput.shop_price" size="mini" style="width: 80px;"
-                                              placeholder=""
-                                              @input="moreInput.shop_price = formatInput(moreInput.shop_price)"></el-input>
-                                </div>
-                                <div class="more-li">
-                                    <label>
-                                        <span>{{ __('shop/goods.index.inventory') }}</span>
+                                        <span>库存</span>
                                     </label>
                                     <el-input v-model="moreInput.number" size="mini" style="width: 80px;" placeholder=""
                                               @input="moreInput.number = formatInput(moreInput.number)"></el-input>
                                 </div>
-                                <el-button @click="filling()">{{ __('shop/goods.index.bulk_filling') }}</el-button>
+                                <el-button @click="filling()">批量填充</el-button>
                             </div>
                             <el-table
                                 :data="updateForm.goods_skus"
@@ -275,7 +234,7 @@
                                 </el-table-column>
                                 <el-table-column
                                     prop="thumb"
-                                    label="{{ __('shop/goods.index.goods_thumb') }}"
+                                    label="颜色图片"
                                     :width="120">
                                     <template slot-scope="scope">
                                         <el-upload
@@ -296,17 +255,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="{{ __('shop/goods.index.points') }}">
-                                    <template slot-scope="scope">
-                                        <el-form-item :prop="'goods_skus.' + scope.$index + '.integral_money'"
-                                                      :rules="more_integralPrice(scope.$index)">
-                                            <el-input v-model="scope.row.integral_money" size="mini" placeholder=""
-                                                      @input="scope.row.integral_money = formatInput(scope.row.integral_money)"></el-input>
-                                        </el-form-item>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column
-                                    label="{{ __('shop/goods.index.cash') }}">
+                                    label="价格">
                                     <template slot-scope="scope">
                                         <el-form-item :prop="'goods_skus.' + scope.$index + '.shop_price'"
                                                       :rules="more_integralPrice(scope.$index)">
@@ -316,7 +265,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="{{ __('shop/goods.index.inventory') }}">
+                                    label="库存">
                                     <template slot-scope="scope">
                                         <el-form-item :prop="'goods_skus.' + scope.$index + '.number'"
                                                       :rules="updateFormRules.number">
@@ -326,7 +275,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="{{ __('shop/goods.index.is_show') }}"
+                                    label="是否显示"
                                     :width="80">
                                     <template slot-scope="scope">
                                         <el-switch
@@ -340,50 +289,37 @@
                                 </el-table-column>
                             </el-table>
                             <div class="tips" v-if="goods_specs_template.values.length">
-                                <span>{{ __('shop/goods.index.sku_tips') }}</span>
+                                <span>给第一组规格设置图片，用户选择不同规格会看到对应规格图片，建议尺寸：80 x 80 px</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.price') }}" v-else>
+                        <el-form-item label="价格" v-else>
                             <div class="s_flex ai_ct">
-                                <el-form-item prop="integral_money">
-                                    <el-checkbox v-model="integral_money_show"
-                                                 @change="(val) => setCheck(val,'integral_money')">
-                                        {{ __('shop/goods.index.points') }}</el-checkbox>
-                                    <el-input size="mini" style="width: 100px;margin-right: 10px;"
-                                              @input="updateForm.integral_money = formatInput(updateForm.integral_money)"
-                                              v-model="updateForm.integral_money" placeholder=""></el-input>
-                                </el-form-item>
                                 <el-form-item prop="shop_price">
-                                    <el-checkbox v-model="shop_price_show"
-                                                 @change="(val) => setCheck(val,'shop_price')">{{ __('shop/goods.index.cash') }}</el-checkbox>
-                                    <el-input size="mini" style="width: 100px;" v-model="updateForm.shop_price"
-                                              @input="updateForm.shop_price = formatInput(updateForm.shop_price)"
-                                              placeholder=""><span slot="suffix">{{ __('shop/goods.index.yuan') }}</span></el-input>
+                                    <el-input size="mini" style="width: 100px;" v-model="updateForm.shop_price" @input="updateForm.shop_price = formatInput(updateForm.shop_price)" placeholder=""><span slot="suffix">元</span></el-input>
                                 </el-form-item>
                             </div>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.inventory') }}" prop="goods_number">
+                        <el-form-item label="库存" prop="goods_number">
                             <el-input-number v-model="updateForm.goods_number" :disabled="updateForm.goods_skus.length"
                                              :min="1" style="width: 160px;"></el-input-number>
                             <div class="tips" v-if="goods_specs_template.values.length">
-                                <span>{{ __('shop/goods.index.sku_count') }}</span>
+                                <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.nav.goods_detail') }}" prop="goods_desc">
+                        <el-form-item label="商品详情" prop="goods_desc">
                             <quill-editor :content.sync="updateForm.goods_desc" placeholder="" height="500px" min-height="500px" />
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.listing') }}" prop="is_on_sale">
+                        <el-form-item label="上架" prop="is_on_sale">
                             <el-radio-group v-model="updateForm.is_on_sale">
-                                <el-radio :label="1">{{ __('shop/goods.index.put_on_listing') }}</el-radio>
-                                <el-radio :label="0">{{ __('shop/goods.index.put_into_storage') }}</el-radio>
+                                <el-radio :label="1">立即上架</el-radio>
+                                <el-radio :label="0">放入仓库</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="{{ __('shop/goods.index.limited') }}" prop="limit_number"
-                                      class="limit_number">
+                        <el-form-item label="限购" prop="limit_number" class="limit_number">
                             <div>
                                 <el-radio-group v-model="is_limit_number" @change="changeLimitNumber">
-                                    <el-radio :label="false">{{ __('shop/goods.index.not_limited') }}</el-radio>
-                                    <el-radio :label="true">{{ __('shop/goods.index.limited') }}</el-radio>
+                                    <el-radio :label="false">不限购</el-radio>
+                                    <el-radio :label="true">限购</el-radio>
                                 </el-radio-group>
                                 <div v-if="is_limit_number">
                                     <el-input-number v-model="updateForm.limit_number" :min="1"></el-input-number>
@@ -391,16 +327,9 @@
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <el-button class="btn primary sumbit" style="width: 120px;height: 40px;" @click="sumbitGood"
-                                       :loading="loading">{{__('forum_manage/config.submit')}}</el-button>
+                            <el-button class="btn primary sumbit" style="width: 120px;height: 40px;" @click="sumbitGood" :loading="loading">提交</el-button>
                         </el-form-item>
                     </el-form>
-                </div>
-                <div class="good-detail flex_1">
-                    <div class="views">
-                        <span>{{__('shop/goods.index.view')}}</span>
-                    </div>
-                    <good-detail :good-Details="updateForm" ref="goodsDetail" :view="true"></good-detail>
                 </div>
             </div>
         </div>
@@ -428,25 +357,22 @@
             data() {
                 this.validateFile = (rule, value, callback) => {
                     if (!this.updateForm.goods_img.length) {
-                        callback(new Error('{{ __('shop/goods.index.upload_picture') }}'));
+                        callback(new Error('请上传商品图片'));
                     } else {
                         callback();
                     }
                 }
                 this.validatePrice = (rule, value, callback, type) => {
-                    if (!this.updateForm.goods_skus.length && this.updateForm[type === 'shop_price' ? 'integral_money' : 'shop_price'] < 1 && Number(value) < 1) {
-                        callback(new Error('{{ __('shop/goods.index.price_and_points_cannot_less_than_one') }}'));
-                    } else if (this.updateForm.goods_skus.length) {
+                    if (this.updateForm.goods_skus.length) {
                         const checkPrices = (data) => {
                             return data.filter(item => {
                                 const shopPrice = parseFloat(item.shop_price) || 0;
-                                const integralMoney = parseFloat(item.integral_money) || 0;
-                                return shopPrice < 1 && integralMoney < 1;
+                                return shopPrice < 0
                             });
                         };
                         const invalidItems = checkPrices(this.updateForm.goods_skus);
                         if (invalidItems.length) {
-                            callback(new Error('{{ __('shop/goods.index.price_and_points_cannot_less_than_one') }}'));
+                            callback(new Error('价格不能小于0'));
                         } else {
                             callback();
                         }
@@ -456,7 +382,7 @@
                 }
                 this.validateDesc = (rule, value, callback) => {
                     if (this.updateForm.goods_desc == '' || this.updateForm.goods_desc == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
-                        callback(new Error('{{ __('shop/goods.index.goods_detail_cannot_empty') }}'));
+                        callback(new Error('商品详情不能为空'));
                     } else {
                         callback();
                     }
@@ -473,19 +399,17 @@
                         return acc;
                     }, {names: {}, hasDuplicates: false}).hasDuplicates;
                     if (hasDuplicates) {
-                        callback(new Error('{{ __('shop/goods.index.goods_sku_item_repeat') }}'));
+                        callback(new Error('规格项重复'));
                     } else {
                         callback();
                     }
                 }
                 return {
-                    category:@json($goods_cates ?? []),
+                    category:[],
                     updateForm: {
                         id: 0,
                         goods_cate_id: null, //商品分类id
                         member_id: null, //用户id
-                        goods_type: 1, //商品类型
-                        is_anonymous: 0, // 限购设置
                         goods_name: '', //商品名称
                         tag: '', //商品标签
                         goods_brief: '', //商品副标题
@@ -493,7 +417,6 @@
                         goods_img: [], //图片
                         unit: '', //单位
                         shop_price: 0, //价格
-                        integral_money:0,//积分价格
                         goods_number: 10, //库存
                         goods_desc: '', // 商品详情
                         is_on_sale: 1, //是否上架
@@ -505,42 +428,28 @@
                         goods_cate_id: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.choose_goods_category') }}',
-                                trigger: 'change'
-                            },
-                        ],
-                        goods_type: [
-                            {
-                                required: true,
-                                message: '{{ __('shop/goods.index.choose_goods_type') }}',
-                                trigger: 'change'
-                            },
-                        ],
-                        is_anonymous: [
-                            {
-                                required: true,
-                                message: '{{ __('shop/goods.index.choose_is_anonymous') }}',
+                                message: '请选择商品分类',
                                 trigger: 'change'
                             },
                         ],
                         goods_name: [
-                            {required: true, message: '{{ __('shop/goods.index.input_goods_name') }}', trigger: 'blur'},
+                            {required: true, message: '请输入商品名称', trigger: 'blur'},
                         ],
                         goods_img: [
-                            {required: true, message: '{{ __('shop/goods.index.upload_picture') }}', trigger: 'change'},
+                            {required: true, message: '请上传商品图片', trigger: 'change'},
                             {validator: this.validateFile, trigger: 'change'}
                         ],
                         goods_number: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.input_goods_inventory') }}',
+                                message: '请输入商品库存',
                                 trigger: 'blur'
                             },
                         ],
                         goods_desc: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.input_goods_detail') }}',
+                                message: '请输入商品详情',
                                 trigger: 'blur'
                             },
                             {validator: this.validateDesc, trigger: 'blur'}
@@ -548,21 +457,21 @@
                         is_on_sale: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.choose_is_on_sale') }}',
+                                message: '请选择是否上架',
                                 trigger: 'change'
                             },
                         ],
                         limit_number: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.input_goods_limit_number') }}',
+                                message: '请输入限购数量',
                                 trigger: 'blur'
                             },
                         ],
                         shop_price: [
                             {
                                 required: false,
-                                message: '{{ __('shop/goods.index.input_goods_price') }}',
+                                message: '请输入价格',
                                 trigger: 'blur'
                             },
                             {
@@ -570,27 +479,15 @@
                                 trigger: 'blur'
                             }
                         ],
-                        integral_money: [
-                            {
-                                required: false,
-                                message: '{{ __('shop/goods.index.input_goods_points_price') }}',
-                                trigger: 'blur'
-                            },
-                            {
-                                validator: (rule, value, callback) => this.validatePrice(rule, value, callback, 'integral_money'),
-                                trigger: 'blur'
-                            }
-                        ],
                         number: [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.input_goods_inventory') }}',
+                                message: '请输入商品库存',
                                 trigger: 'blur'
                             },
                         ],
                     },
                     shop_price_show: false, //价格显示
-                    integral_money_show:false,//积分显示
                     is_limit_number: false,// 限购选择
                     specificationsArr: [],
                     goods_specs_template: {
@@ -613,7 +510,7 @@
                         rules[`values.${index}.spec_name`] = [
                             {
                                 required: true,
-                                message: '{{ __('shop/goods.index.input_goods_spec_name') }}',
+                                message: '请输入规格名称',
                                 trigger: 'blur'
                             }
                         ];
@@ -621,7 +518,7 @@
                             rules[`values.${index}.spec_value.${id}.spec_value_name`] = [
                                 {
                                     required: true,
-                                    message: '{{ __('shop/goods.index.input_goods_spec_item') }}',
+                                    message: '请输入规格项',
                                     trigger: 'blur'
                                 },
                                 {
@@ -646,15 +543,6 @@
                     }, 500),
                     deep: true,
                     immediate: false
-                },
-                'updateForm.integral_money': {
-                    handler(val) {
-                        if (val && val > 0) {
-                            this.integral_money_show = true
-                        } else {
-                            this.integral_money_show = false
-                        }
-                    }
                 },
                 'updateForm.shop_price': {
                     handler(val) {
@@ -682,15 +570,13 @@
             methods: {
                 more_integralPrice(index) {
                     let skus = this.updateForm.goods_skus[index]
-                    const prop1 = `goods_skus.${index}.integral_money`;
                     const prop2 = `goods_skus.${index}.shop_price`;
                     return [
                         {
                             validator: (rule, value, callback) => {
-                                if (Number(skus.shop_price) < 1 && Number(skus.integral_money) < 1) {
-                                    callback(new Error(`价格和积分必须大于0`));
+                                if (Number(skus.shop_price) < 0) {
+                                    callback(new Error(`价格必须大于0`));
                                 } else {
-                                    this.$refs.updateForm.clearValidate(prop1);
                                     this.$refs.updateForm.clearValidate(prop2);
                                     callback();
                                 }
@@ -700,11 +586,11 @@
                     ]
                 },
                 getTemplate() {
-                    {{--this.doGet('{{route('front.sku_template.index')}}').then(res => {--}}
-                    {{--    if (res.errcode === 0) {--}}
-                    {{--        this.specificationsArr = [...res.data]--}}
-                    {{--    }--}}
-                    {{--})--}}
+                    this.doGet('{{route('front.sku_template.index')}}').then(res => {
+                        if (res.errcode === 0) {
+                            this.specificationsArr = [...res.data]
+                        }
+                    })
                 },
                 changeLimitNumber(val) {
                     if (val) {
@@ -847,21 +733,21 @@
                 },
                 delSelect(index) { // 删除规格
                     vm.$refs.mySelect.visible = true
-                    this.$confirm('{{ __('shop/goods.index.is_delete_template') }}', '{{ __('shop/goods.index.tips') }}', {
-                        confirmButtonText: '{{__('forum_manage/common.sure')}}',
-                        cancelButtonText: '{{__('forum_manage/common.cancel')}}',
+                    this.$confirm('是否删除模板', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
                         type: 'warning'
                     }).then(() => {
-                        {{--this.doPost('{{ route('front.sku_template.destroy') }}', {template_id: this.specificationsArr[index].id}).then(res => {--}}
-                        {{--    if (res.errcode === 0) {--}}
-                        {{--        this.specificationsArr.splice(index, 1)--}}
-                        {{--        this.$message.success(res.errmsg)--}}
-                        {{--    }--}}
-                        {{--})--}}
+                        this.doPost('{{ route('front.sku_template.destroy') }}', {template_id: this.specificationsArr[index].id}).then(res => {
+                            if (res.errcode === 0) {
+                                this.specificationsArr.splice(index, 1)
+                                this.$message.success(res.errmsg)
+                            }
+                        })
                     })
                 },
                 handleExceed(files, fileList) {
-                    this.$message.warning("{{ __('shop/goods.index.max_six_file') }}");
+                    this.$message.warning("最多上传6个文件");
                 },
                 beforeUpload(file) {
                     var type = false;
@@ -872,7 +758,7 @@
                     }
                     const isLt2M = file.size / 1024 / 1024 <= 5;
                     if (type || !isLt2M) {
-                        this.$message.error("{{ __('shop/goods.index.supported_file_format') }}");
+                        this.$message.error("支持 .png .jpg .jpeg格式，单个附件不得超过5M!");
                         return false;
                     }
                 },
@@ -898,21 +784,21 @@
                     this.$refs['templateForm'].validate((valid) => {
                         if (valid) {
                             if (this.goods_specs_template.name) {
-                                {{--this.doPost('{{ route('front.sku_template.update') }}', this.goods_specs_template).then(res => {--}}
-                                {{--    if (res.errcode === 0) {--}}
-                                {{--        this.$message.success('{{ __('shop/goods.template.save_template_success') }}')--}}
-                                {{--    } else {--}}
-                                {{--        this.$message.error(res.message)--}}
-                                {{--    }--}}
-                                {{--    this.goods_specs_template.name = ''--}}
-                                {{--    this.getTemplate()--}}
-                                {{--})--}}
+                                this.doPost('{{ route('front.sku_template.update') }}', this.goods_specs_template).then(res => {
+                                    if (res.errcode === 0) {
+                                        this.$message.success('保存模板成功')
+                                    } else {
+                                        this.$message.error(res.message)
+                                    }
+                                    this.goods_specs_template.name = ''
+                                    this.getTemplate()
+                                })
                             } else {
-                                this.$prompt('{{ __('shop/goods.index.input_template_name') }}', '{{ __('shop/goods.index.tips') }}', {
-                                    confirmButtonText: '{{__('forum_manage/common.sure')}}',
-                                    cancelButtonText: '{{__('forum_manage/common.cancel')}}',
+                                this.$prompt('请输入模板名称', '提示', {
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: '取消',
                                     inputPattern: /\S+/,
-                                    inputErrorMessage: '{{ __('shop/goods.index.input_template_name') }}'
+                                    inputErrorMessage: '请输入模板名称'
                                 }).then(({value}) => {
                                     this.goods_specs_template.name = value
                                     this.updaterTemplate()
@@ -920,7 +806,7 @@
                             }
                         } else {
                             console.log('error submit!!');
-                            this.$message.error("{{ __('shop/goods.index.perfect_sales_spec') }}");
+                            this.$message.error("请完善销售规格");
                             return false
                         }
                     })
@@ -929,22 +815,21 @@
                     this.loading = true
                     this.$refs['updateForm'].validate((valid) => {
                         if (valid) {
-                            {{--this.doPost('{{ route('front.goods.update') }}', this.updateForm).then(res => {--}}
-                            {{--    if (res.errcode === 0) {--}}
-                            {{--        this.$message.success(res.message)--}}
-                            {{--        setTimeout(() => {--}}
-                            {{--            window.location.href = '{{ route('front.goods.my_goods') }}' + '?is_on_sale=' + 1;--}}
-                            {{--        }, 500)--}}
-                            {{--    } else {--}}
-                            {{--        this.$message.error(res.message)--}}
-                            {{--    }--}}
-                            {{--    this.loading = false--}}
-                            {{--}).catch(error => {--}}
-                            {{--    this.loading = false--}}
-                            {{--})--}}
+                            this.doPost('{{ route('front.goods.update') }}', this.updateForm).then(res => {
+                                if (res.errcode === 0) {
+                                    this.$message.success(res.message)
+                                    setTimeout(() => {
+                                        window.location.href = '' // 去列表页
+                                    }, 500)
+                                } else {
+                                    this.$message.error(res.message)
+                                }
+                                this.loading = false
+                            }).catch(error => {
+                                this.loading = false
+                            })
                         } else {
-                            console.log('error submit!!');
-                            this.$message.error("{{ __('shop/goods.index.perfect_goods_info') }}");
+                            this.$message.error("请完善商品信息");
                             this.loading = false
                             return false
                         }
@@ -952,13 +837,13 @@
                 },
             },
             mounted() {
-                {{--let goodsInfo = @json($goods);--}}
-                {{--if (goodsInfo) {--}}
-                {{--    this.$nextTick(() => {--}}
-                {{--        this.$set(this, 'updateForm', {...goodsInfo})--}}
-                {{--        this.is_limit_number = !!goodsInfo.limit_number--}}
-                {{--    });--}}
-                {{--}--}}
+                let goodsInfo = null;
+                if (goodsInfo) {
+                    this.$nextTick(() => {
+                        this.$set(this, 'updateForm', {...goodsInfo})
+                        this.is_limit_number = !!goodsInfo.limit_number
+                    });
+                }
                 this.getTemplate()
             },
         })
@@ -988,7 +873,6 @@
         }
 
         .update-box .good-form {
-            width: 55%;
             height: 100%;
             padding: 0 10px;
         }
@@ -1264,19 +1148,11 @@
 
 
         @media only screen and (max-width: 1920px) {
-            .update-box .good-form {
-                /*width: 560px;*/
-            }
 
             @media screen and (max-width: 1450px) and (min-width: 1024px) and (max-height: 1000px) {
                 .update-box {
                     padding: 20px 10px;
                 }
-
-                .update-box .good-form {
-                    width: 550px;
-                }
-
             }
         }
     </style>

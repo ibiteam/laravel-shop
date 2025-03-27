@@ -2,22 +2,15 @@
 
 use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
-use App\Http\Middleware\HandleAppearance;
-use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
-use App\Http\Middleware\Manage\CustomStartSession;
 use App\Traits\ApiResponse;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
-use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Middleware\HandleCors;
-use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Exceptions\UnauthorizedException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -28,32 +21,18 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php'
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // 重定向到首页
+        $middleware->redirectGuestsTo('/');
         $middleware->group('api', [
             HandleCors::class,
         ]);
 
         $middleware->encryptCookies(except: ['appearance']);
 
-        $middleware->web(append: [
-            HandleAppearance::class,
-            HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
-        ]);
-
         $middleware->alias([
             'manage.auth' => ManageAuthenticate::class,
+            'api.auth' => ApiAuthenticate::class,
         ]);
-        $middleware->group('manage', array_values(array_filter([
-            EncryptCookies::class,
-            AddQueuedCookiesToResponse::class,
-            CustomStartSession::class,
-            ShareErrorsFromSession::class,
-            ValidateCsrfToken::class,
-            SubstituteBindings::class,
-            HandleAppearance::class,
-            HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
-        ])));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // 不记录到日志的异常
@@ -61,7 +40,11 @@ return Application::configure(basePath: dirname(__DIR__))
             BusinessException::class,
         ]);
         // 封装异常返回
-        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $authentication_exception) {
+        $exceptions->render(function (AuthenticationException $authentication_exception, $request) {
+            // 如果不是json请求，则跳转登录
+            if (! ($request->expectsJson() ?? false) && $redirect = $authentication_exception->redirectTo($request)) {
+                return redirect()->to($redirect);
+            }
             $api_response = new class
             {
                 use ApiResponse;
