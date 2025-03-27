@@ -15,8 +15,6 @@ Route::middleware('manage.auth')->group(function () {
 
     // 模板
     require __DIR__.'/manage/template.php';
-    // 商品
-    require __DIR__.'/manage/goods.php';
 });
 
 
