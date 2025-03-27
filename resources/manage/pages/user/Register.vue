@@ -43,7 +43,7 @@
     import { useRouter } from 'vue-router';
     const router = useRouter();
 
-    import { checkPhone, sendCode, registerOrPhoneLogin, checkUsername } from '@/api/user';
+    import { checkPhone, sendCode, registerOrPhoneLogin, checkUsername } from '@/api/user.js';
     import md5 from 'js-md5'
 
     const timerCode = ref(null);

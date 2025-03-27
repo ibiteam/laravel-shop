@@ -40,7 +40,7 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
-import { checkPhone, sendCode, updatePassword } from '@/api/user';
+import { checkPhone, sendCode, updatePassword } from '@/api/user.js';
 import md5 from 'js-md5'
 
 const timerCode = ref(null);
