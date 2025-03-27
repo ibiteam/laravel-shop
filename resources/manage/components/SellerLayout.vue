@@ -8,12 +8,9 @@
                             <img src='https://fastly.jsdelivr.net/npm/@vant/assets/logo.png' alt=''>
                         </div>
                         <el-breadcrumb separator="/">
-                            <el-breadcrumb-item>homepage</el-breadcrumb-item>
-                            <el-breadcrumb-item>
-                                <a href="/">promotion management</a>
-                            </el-breadcrumb-item>
-                            <el-breadcrumb-item>promotion list</el-breadcrumb-item>
-                            <el-breadcrumb-item>promotion detail</el-breadcrumb-item>
+                            <el-breadcrumb-item>首页</el-breadcrumb-item>
+                            <el-breadcrumb-item>订单管理</el-breadcrumb-item>
+                            <el-breadcrumb-item>订单列表</el-breadcrumb-item>
                         </el-breadcrumb>
                     </div>
                     <div class='header-right s-flex ai-ct'>
@@ -93,7 +90,6 @@
                     <div class='router-tabs'>
                         <el-tabs
                             v-model="routerActived"
-                            type="card"
                             closable
                         >
                             <el-tab-pane
@@ -104,7 +100,9 @@
                             />
                         </el-tabs>
                     </div>
-                    <router-view class='flex-1' style='height: 0;background: var(--page-bg-color);'></router-view>
+                    <div class='flex-1' style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
+                        <router-view></router-view>
+                    </div>
                 </el-main>
             </el-container>
         </el-container>
@@ -137,14 +135,12 @@ const data = [
 ]
 const editableTabs = [
     {
-        title: 'Tab 1',
+        title: '基础设置',
         name: '1',
-        content: 'Tab 1 content',
     },
     {
-        title: 'Tab 2',
+        title: '商品管理',
         name: '2',
-        content: 'Tab 2 content',
     },
 ]
 
@@ -174,6 +170,7 @@ const closeSearch = () => {
     &,.el-container{
         width: 100vw;
         height: 100vh;
+        overflow: hidden;
     }
     .el-header{
         padding: 0 10px 0 6px;
@@ -349,12 +346,41 @@ const closeSearch = () => {
         padding: 0;
         .router-tabs{
             :deep(.el-tabs){
-                padding-top: 4px;
+                padding: 4px 77px 0 7px;
                 .el-tabs__header{
                     margin-bottom: 0;
                 }
+                .el-tabs__nav-wrap{
+                    &::after{
+                        content: none;
+                    }
+                }
+                .el-tabs__active-bar{
+                    visibility: hidden;
+                }
                 .el-tabs__item{
+                    width: 122px;
+                    height: 30px;
+                    border-radius: 8px 8px 0px 0px;
+                    border: solid 1px #D8D8D8;
+                    border-bottom: none;
+                    padding: 0;
                     margin-right: 4px;
+
+                    display: flex;
+                    justify-content: space-around;
+
+                    font-size: 12px;
+                    color: #888888;
+                    &:last-child{
+                        margin-right: 0;
+                    }
+
+                    &.is-active{
+                        background: #F6FAFF;
+                        border: none;
+                        color: #077FFF;
+                    }
                 }
             }
         }
