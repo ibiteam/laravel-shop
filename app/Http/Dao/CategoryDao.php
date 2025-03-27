@@ -21,6 +21,14 @@ class CategoryDao
     }
 
     /**
+     * 获取分类信息.
+     */
+    public function getInfoById(int $id): ?Category
+    {
+        return Category::query()->whereId($id)->first();
+    }
+
+    /**
      * 递归处理树状结构数据.
      */
     private function categoryFormat(Category $category): array
