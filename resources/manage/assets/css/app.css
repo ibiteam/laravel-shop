@@ -275,3 +275,7 @@ a{
     text-decoration: none;
     color: var(--main-color);
 }
+
+.cu-p{
+    cursor: pointer;
+}
