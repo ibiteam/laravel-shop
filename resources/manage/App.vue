@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="width: inherit; height: inherit;">
         <router-view></router-view>
     </div>
 </template>
