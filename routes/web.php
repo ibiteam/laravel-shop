@@ -6,6 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 //home
 Route::get(config('app.manage_prefix').'/{any?}', function () {
-    return view('app');
+    return view('manage');
 })->where('any', '^(?!api|storage).*$');
 
