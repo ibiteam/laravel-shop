@@ -35,7 +35,8 @@ it('test check is login api interface', function () {
     $this->assertEquals(200, $response['code']);
 });
 it('test register or login by phone api interface', function () {
-    $response = $this->doPost('api/v1/auth/login-register-by-phone', ['phone' => '13322221111', 'code' => '636604']);
+    $response = $this->doPost('api/v1/auth/login-register-by-phone', ['phone' => '13322221111', 'code' => '000000']);
+    dump($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);

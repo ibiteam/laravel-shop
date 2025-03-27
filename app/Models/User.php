@@ -49,8 +49,6 @@ class User extends Authenticatable
 {
     use DatetimeTrait, HasApiTokens, Notifiable;
 
-    public const HOME_ACCESS_TOKEN_NAME = 'home'; // web端登录token名称
-
     // 修改过用户名
     public const IS_MODIFY_YES = 1;
 

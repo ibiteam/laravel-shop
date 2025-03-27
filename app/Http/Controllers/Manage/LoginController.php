@@ -2,31 +2,29 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Exceptions\BusinessException;
 use App\Http\Dao\AdminUserLoginLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
 use App\Models\AdminUserLoginLog;
 use App\Models\ShopConfig;
+use App\Services\AdminUserService;
 use App\Utils\RsaUtil;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class LoginController extends BaseController
 {
-    use AuthenticatesUsers;
-
-    public function username()
-    {
-        return 'user_name';
-    }
-
-    public function showLoginForm(Request $request, ShopConfigDao $shop_config_dao)
+    /**
+     * 登录初始化页面.
+     */
+    public function showLoginForm(Request $request, ShopConfigDao $shop_config_dao): JsonResponse|RedirectResponse
     {
         $current_user = $this->adminUser();
 
         if ($current_user instanceof AdminUser) {
-            return redirect()->to($this->redirectTo());
+            return redirect()->to($this->redirectToHome());
         }
 
         $config = $shop_config_dao->multipleConfig(
@@ -42,83 +40,47 @@ class LoginController extends BaseController
             ShopConfig::ICP_NUMBER,
         );
 
-        return view('manage.login-password', compact('config'));
+        return $this->success($config);
     }
 
-    public function login(Request $request)
+    public function login(Request $request, AdminUserService $admin_user_service)
     {
-        $this->validateLogin($request);
+        try {
+            $validated = $request->validate([
+                'user_name' => 'required|string',
+                'password' => 'required|string',
+            ], [], [
+                'user_name' => '用户名',
+                'password' => '密码',
+            ]);
+            $admin_user = AdminUser::query()->where('user_name', $validated['user_name'])->first();
 
-        if (method_exists($this, 'hasTooManyLoginAttempts') && $this->hasTooManyLoginAttempts($request)) {
-            $this->fireLockoutEvent($request);
-            $seconds = $this->limiter()->availableIn($this->throttleKey($request));
+            if (! $admin_user instanceof AdminUser) {
+                throw new BusinessException('用户名或密码错误');
+            }
 
-            return $this->error(trans('auth.throttle', ['seconds' => $seconds]));
+            $tmp_password = shop_config(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '') ? RsaUtil::getDecodeData($validated['password']) : $validated['password'];
+
+            if (! password_verify($tmp_password, $admin_user->password)) {
+                app(AdminUserLoginLogDao::class)->addLoginLogByAdminUser(
+                    $admin_user,
+                    AdminUserLoginLog::TYPE_PASSWORD,
+                    AdminUserLoginLog::STATUS_FAILED,
+                    '账号密码登录失败：密码错误。'
+                );
+
+                throw new BusinessException('用户名或密码错误~');
+            }
+
+            if ($admin_user->status !== AdminUser::STATUS_ENABLE) {
+                throw new BusinessException('该用户已被禁用');
+            }
+
+            return $this->success($admin_user_service->loginSuccess($admin_user));
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('登录失败');
         }
-        $validated = $this->credentials($request);
-
-        $admin_user = AdminUser::where('user_name', $validated[$this->username()])->first();
-
-        if (! $admin_user instanceof AdminUser) {
-            return $this->error('用户名或密码错误');
-        }
-        $tmp_password = shop_config(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '') ? RsaUtil::getDecodeData($validated['password']) : $validated['password'];
-
-        if (! password_verify($tmp_password, $admin_user->password)) {
-            $this->incrementLoginAttempts($request);
-            app(AdminUserLoginLogDao::class)->addLoginLogByAdminUser(
-                $admin_user,
-                AdminUserLoginLog::TYPE_PASSWORD,
-                AdminUserLoginLog::STATUS_FAILED,
-                '账号密码登录失败：密码错误。'
-            );
-
-            return $this->error('用户名或密码错误~');
-        }
-
-        if ($admin_user->status !== AdminUser::STATUS_ENABLE) {
-            return $this->error('该用户已被禁用');
-        }
-
-        $this->guard()->login($admin_user);
-
-        app(AdminUserLoginLogDao::class)->addLoginLogByAdminUser(
-            $admin_user,
-            AdminUserLoginLog::TYPE_PASSWORD,
-            AdminUserLoginLog::STATUS_SUCCESS,
-            '账号密码登录成功~'
-        );
-
-        if ($request->hasSession()) {
-            $request->session()->put('auth.password_confirmed_at', time());
-        }
-        $request->session()->regenerate();
-
-        $this->clearLoginAttempts($request);
-
-        return $this->success(['redirect' => $this->redirectTo()]);
-    }
-
-    protected function validateLogin(Request $request)
-    {
-        $request->validate([
-            $this->username() => 'required|string',
-            'password' => 'required|string',
-        ]);
-    }
-
-    protected function guard()
-    {
-        return Auth::guard(config('auth.manage.guard'));
-    }
-
-    /**
-     * 登录成功跳转路由设置.
-     *
-     * @return string
-     */
-    protected function redirectTo()
-    {
-        return route('manage.home');
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -18,7 +17,6 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Manage
@@ -27,7 +25,6 @@ return [
     'manage' => [
         'guard' => env('MANAGE_AUTH_GUARD', 'manage'),
     ],
-
 
     /*
     |--------------------------------------------------------------------------
@@ -52,8 +49,12 @@ return [
             'provider' => 'users',
         ],
         'manage' => [
-            'driver' => 'session',
+            'driver' => 'sanctum',
             'provider' => 'admin_users',
+        ],
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
         ],
     ],
 
@@ -77,7 +78,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => \App\Models\User::class,
         ],
 
         'admin_users' => [
@@ -126,5 +127,4 @@ return [
     */
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
-
 ];

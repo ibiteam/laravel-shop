@@ -73,11 +73,11 @@ class UserService
     /**
      * 登录成功处理token.
      */
-    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5, string $token_name = 'api'): array
+    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5): array
     {
         $now = Carbon::now();
         $future = $now->copy()->addDay();
-        $token = $user->createToken($token_name, expiresAt: $future)->plainTextToken;
+        $token = $user->createToken('api', expiresAt: $future)->plainTextToken;
 
         app(UserLogDao::class)->addLog($user, UserLog::TYPE_LOGIN, $source, '登录成功');
 
