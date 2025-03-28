@@ -70,7 +70,7 @@ export function getPrivacyPhone(phone){
 
 const throttle = (fnc,delay) => {
     let lasttimer:number|null = null
-    return function (args){
+    return function (...args){
         const nowDate:number = Date.now()
         if(nowDate - lasttimer > delay){
             fnc.apply(this,args)
@@ -81,7 +81,7 @@ const throttle = (fnc,delay) => {
 
 const debounce = (fnc,delay) => {
     let timer = null
-    return function (args){
+    return function (...args){
         if(timer) clearTimeout(timer)
         timer = setTimeout(() => {
             fnc.apply(this,args)
