@@ -9,13 +9,14 @@
 }
 
 body, html {
-    --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
 #app, body, html {
     width: 100%;
     height: 100%;
 }
+
 * {
     margin: 0;
     padding: 0;
@@ -79,7 +80,7 @@ a:focus {
     }
 }
 
-.public-inner{
+.public-inner {
     width: 1200px;
     margin: 0 auto;
 }
@@ -151,6 +152,7 @@ a:focus {
 .ai-fs {
     align-items: flex-start;
 }
+
 /*文本省略*/
 .elli-1, .ellipsis-1 {
     overflow: hidden;
@@ -165,6 +167,7 @@ a:focus {
     overflow: hidden;
     word-break: break-all;
 }
+
 .elli-3, .ellipsis-3 {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -272,11 +275,19 @@ a:focus {
     color: #666;
 }
 
-a{
+.mr-10 {
+    margin-right: 10px;
+}
+
+.ml-10 {
+    margin-left: 10px;
+}
+
+a {
     text-decoration: none;
     color: var(--main-color);
 }
 
-.cu-p{
+.cu-p {
     cursor: pointer;
 }
