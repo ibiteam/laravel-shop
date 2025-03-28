@@ -179,8 +179,10 @@ onMounted( () => {
         :tree-props="{ children: 'all_children' }">
         <el-table-column label="分类名称" min-width="200">
             <template #default="scope">
-                <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo"></el-image>
-                {{ scope.row.name }}【{{ scope.row.id }}】
+                <div class="s-flex ai-ct">
+                    <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo" style="margin-right: 10px;width: 40px;height: 40px;" :fit="cover"></el-image>
+                    {{ scope.row.name }}【{{ scope.row.id }}】
+                </div>
             </template>
         </el-table-column>
         <el-table-column label="分类标题" prop="title"></el-table-column>
@@ -269,7 +271,10 @@ onMounted( () => {
         height: 80px;
         display: block;
     }
-
+    :deep(.el-table__row .cell){
+        display: flex;
+        align-items: center;
+    }
 </style>
 
 <style>
