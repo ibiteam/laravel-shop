@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string                          $price           商品价格
  * @property int                             $total           商品库存
  * @property int                             $sales_volume    销量
- * @property int                             $buy_min_number  最小起订量
  * @property int                             $type            库存类型 1下单减库存 2付款减库存
  * @property int                             $status          上下架状态 1上架 0下架
  * @property string|null                     $status_datetime 上下架时间
@@ -42,13 +41,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int|null $parameters_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsSku> $skus
  * @property-read int|null $skus_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsSpecValue> $specValues
+ * @property-read int|null $spec_values_count
  *
  * @method static Builder<static>|Goods newModelQuery()
  * @method static Builder<static>|Goods newQuery()
  * @method static Builder<static>|Goods onlyTrashed()
  * @method static Builder<static>|Goods query()
  * @method static Builder<static>|Goods show()
- * @method static Builder<static>|Goods whereBuyMinNumber($value)
  * @method static Builder<static>|Goods whereCanQuota($value)
  * @method static Builder<static>|Goods whereCategoryId($value)
  * @method static Builder<static>|Goods whereCreatedAt($value)
@@ -109,6 +109,11 @@ class Goods extends Model
     public function skus(): HasMany
     {
         return $this->hasMany(GoodsSku::class, 'goods_id', 'id');
+    }
+
+    public function specValues(): HasMany
+    {
+        return $this->hasMany(GoodsSpecValue::class, 'goods_id', 'id');
     }
 
     public function scopeShow(Builder $query): Builder

@@ -24,7 +24,6 @@ return new class extends Migration
             $table->decimal('price', 13)->comment('商品价格');
             $table->integer('total')->comment('商品库存');
             $table->integer('sales_volume')->comment('销量');
-            $table->integer('buy_min_number')->comment('最小起订量');
             $table->tinyInteger('type')->comment('库存类型 1下单减库存 2付款减库存');
             $table->boolean('status')->default(1)->comment('上下架状态 1上架 0下架');
             $table->timestamp('status_datetime')->nullable()->comment('上下架时间');
