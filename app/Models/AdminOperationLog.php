@@ -33,6 +33,10 @@ class AdminOperationLog extends Model
 {
     use DatetimeTrait;
 
+    public const TYPE_STORE = 1; // 新增
+    public const TYPE_UPDATE = 2; // 更新
+    public const TYPE_DESTROY = 3; // 删除
+
     protected $guarded = [];
 
     public function adminUser(): BelongsTo

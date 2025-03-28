@@ -61,11 +61,4 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id', 'id')->with('allChildren');
     }
-
-    protected function casts(): array
-    {
-        return [
-            'is_show' => 'boolean',
-        ];
-    }
 }
