@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Brand;
 use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,28 +15,27 @@ return new class extends Migration
         Schema::create('goods', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('category_id')->comment('分类ID');
-            $table->unsignedBigInteger('brand_id')->comment('品牌ID');
-            $table->string('goods_sn',80)->comment('商品编号')->unique();
-            $table->string('goods_name')->comment('商品标题');
-            $table->string('goods_sub_name')->comment('商品副标题');
+            $table->string('no', 80)->comment('商品编号')->unique();
+            $table->string('name')->comment('商品标题');
+            $table->string('sub_name')->comment('商品副标题');
+            $table->string('label')->comment('商品副标题');
+            $table->string('image')->comment('商品主图');
             $table->string('keywords')->comment('商品关键词');
             $table->decimal('price', 13)->comment('商品价格');
-            $table->integer('number')->comment('商品库存');
+            $table->integer('total')->comment('商品库存');
             $table->integer('buy_min_number')->comment('最小起订量');
-            $table->boolean('check_status')->default(0)->comment('审核状态 1审核通过 2审核驳回 0未审核');
-            $table->dateTime('check_status_datetime')->nullable()->comment('审核时间');
-            $table->string('reason')->nullable()->comment('驳回原因');
+            $table->tinyInteger('type')->comment('库存类型 1下单减库存 2付款减库存');
             $table->boolean('status')->default(1)->comment('上下架状态 1上架 0下架');
+            $table->timestamp('status_datetime')->nullable()->comment('上下架时间');
+            $table->boolean('can_quota')->default(0)->comment('是否限购 1限购 0不限购');
+            $table->integer('quota_number')->default(0)->comment('限购数量');
             $table->smallInteger('sort')->comment('排序，值越大越靠前');
-            $table->string('goods_original')->comment('商品主图');
-            $table->string('goods_thumb')->comment('商品缩略图');
             $table->string('video')->nullable()->comment('视频地址');
             $table->integer('video_duration')->default(0)->comment('视频时长');
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('category_id')->references('id')->on((new Category())->getTable());
-            $table->foreign('brand_id')->references('id')->on((new Brand())->getTable());
+            $table->foreign('category_id')->references('id')->on((new Category)->getTable());
         });
     }
 
