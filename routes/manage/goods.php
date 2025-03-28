@@ -8,7 +8,8 @@ Route::prefix('goods')->group(function () {
     // 商品管理
     Route::prefix('info')->group(function () {
         Route::get('/', [GoodsController::class, 'index']);
-        Route::get('/edit', [GoodsController::class, 'edit']);
+        Route::post('change-status', [GoodsController::class, 'changeStatus']);
+        Route::get('edit', [GoodsController::class, 'edit']);
     });
     // 商品分类
     Route::prefix('category')->group(function () {
