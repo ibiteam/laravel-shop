@@ -2,7 +2,7 @@
 
 it('add goods api interface', function () {
     $data = [
-        'id' => 15,
+        'id' => 0,
         'category_id' => 1,
         'name' => '测试商品1',
         'label' => '热卖',
@@ -17,13 +17,13 @@ it('add goods api interface', function () {
         'content' => '<p> xxxxxxxxxxxxxxxxxxxxxx </p>',
         'unit' => '个',
         'spec_data' => [
-            ['id' => 1, 'name' => '颜色', 'values' => [['id' => 101, 'name' => '红色']]],
-            ['id' => 18, 'name' => '号码', 'values' => [['id' => 102, 'name' => 'L']]],
-            ['id' => 19, 'name' => '送装服务', 'values' => [['id' => 97, 'name' => '不送装'], ['id' => 98, 'name' => '送装']]],
+            ['id' => 0, 'name' => '颜色', 'values' => [['id' => 0, 'name' => '红色']]],
+            ['id' => 0, 'name' => '号码', 'values' => [['id' => 0, 'name' => 'L']]],
+            ['id' => 0, 'name' => '送装服务', 'values' => [['id' => 0, 'name' => '不送装'], ['id' => 0, 'name' => '送装']]],
         ],
         'sku_data' => [
-            ['id' => 25, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxx.png', 'price' => 10.06, 'number' => 288, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '不送装'],
-            ['id' => 26, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png', 'price' => 12.01, 'number' => 299, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '送装'],
+            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxx.png', 'price' => 10.06, 'number' => 288, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '不送装'],
+            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png', 'price' => 12.01, 'number' => 299, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '送装'],
         ],
         'price' => 10.23,
         'total' => 139,

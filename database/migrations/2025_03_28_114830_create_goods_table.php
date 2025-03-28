@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('no', 80)->comment('商品编号')->unique();
             $table->string('name')->comment('商品标题');
             $table->string('sub_name')->nullable()->comment('商品副标题');
-            $table->string('label')->nullable()->comment('商品副标题');
+            $table->string('label')->nullable()->comment('商品标签');
             $table->string('image')->comment('商品主图');
             $table->string('unit')->comment('商品单位');
             $table->decimal('price', 13)->comment('商品价格');

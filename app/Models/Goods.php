@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int                             $category_id     分类ID
  * @property string                          $no              商品编号
  * @property string                          $name            商品标题
- * @property string                          $sub_name        商品副标题
- * @property string                          $label           商品副标题
+ * @property string|null                     $sub_name        商品副标题
+ * @property string|null                     $label           商品标签
  * @property string                          $image           商品主图
  * @property string                          $unit            商品单位
  * @property string                          $price           商品价格
