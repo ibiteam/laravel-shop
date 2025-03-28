@@ -1,9 +1,15 @@
 <?php
 
 use App\Http\Controllers\Manage\GoodsCategoryController;
+use App\Http\Controllers\Manage\GoodsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('goods')->group(function () {
+    // 商品管理
+    Route::prefix('info')->group(function () {
+        Route::get('/', [GoodsController::class, 'index']);
+        Route::get('/edit', [GoodsController::class, 'edit']);
+    });
     // 商品分类
     Route::prefix('category')->group(function () {
         Route::get('/', [GoodsCategoryController::class, 'index']); // 商品分类列表

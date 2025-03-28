@@ -28,4 +28,11 @@ class GoodsSkuTemplate extends Model
     use DatetimeTrait;
 
     protected $guarded = [];
+
+    protected function casts(): array
+    {
+        return [
+            'values' => 'json',
+        ];
+    }
 }
