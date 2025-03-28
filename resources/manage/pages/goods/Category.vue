@@ -198,11 +198,11 @@ onMounted( () => {
     <el-dialog
         v-model="detailDialogVisible"
         :title="detailDialogTitle"
-        width="500"
+        width="700"
         center
         :before-close="closeDetailDialog">
-        <div v-loading="detailFormLoading">
-            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="max-width: 600px">
+        <div v-loading="detailFormLoading" class="s-flex jc-ct">
+            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="width: 480px" size="default">
                 <el-form-item label="上级分类" prop="parent_id">
                     <el-select v-model="detailForm.parent_id" placeholder="请选择上级分类">
                         <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
