@@ -12,7 +12,8 @@ class SearchDao
      */
     public function searchGoods(array $params, int $user_id)
     {
-        $query = Goods::show(); // 只查询上架且审核通过的商品
+        $query = Goods::query()->show() // 只查询上架且审核通过的商品
+            ->select(['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image']);
 
         $add_keywords = '';
 
