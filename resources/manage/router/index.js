@@ -7,14 +7,13 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
         { path: '/login', component: Login, name: 'login' },
-        { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
-
         {
             path:'/',
             component: () => import('@/components/Layout.vue'),
             children:[
                 { path: 'home', component: import('@/pages/Home.vue'), name: 'sellerHome' },
                 { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
+                { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
             ]
         },
         {
