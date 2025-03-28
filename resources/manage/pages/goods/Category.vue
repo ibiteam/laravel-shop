@@ -82,39 +82,19 @@ const closeDetailDialog = () => {
     detailForm.sort = 0
     detailForm.is_show = 1
 }
+const uploadFile = async (request) => {
+    try {
+        const res = await fileUpload({ file: request.file });
 
-// 文件变更处理函数 - 直接上传文件
-const handleLogoChange = (uploadFile) => {
-    // 如果有文件，直接上传
-    if (uploadFile && uploadFile.raw) {
-        const formData = new FormData();
-        formData.append('file', uploadFile.raw);
-
-        detailFormLoading.value = true;
-        fileUpload(formData).then(res => {
-            detailFormLoading.value = false;
-            if (res.code === 200) {
-                detailForm.logo = res.data.url;
-                cns.$message.success('上传成功');
-            } else {
-                cns.$message.error(res.message || '上传失败');
-            }
-
-            // 清除上传队列，确保下次可以重新选择同一个文件
-            if (uploadRef.value) {
-                uploadRef.value.clearFiles();
-            }
-        }).catch(error => {
-            detailFormLoading.value = false;
-            cns.$message.error('上传失败');
-
-            // 出错时也需要清除文件列表
-            if (uploadRef.value) {
-                uploadRef.value.clearFiles();
-            }
-        });
+        if (res.code === 200) {
+            detailForm.logo = res.data.url;
+        } else {
+            cns.$message.error(res.message)
+        }
+    } catch (error) {
+        console.error('Failed:', error);
     }
-}
+};
 /* 提交信息弹窗 */
 const submitDetailForm = _.throttle(() => {
     detailFormRef.value.validate((valid) => {
@@ -235,15 +215,13 @@ onMounted( () => {
                 </el-form-item>
                 <el-form-item label="分类图标" prop="logo">
                     <el-upload
-                        ref="uploadRef"
-                        v-model="detailForm.logo"
                         class="logo-uploader"
-                        action="#"
-                        :auto-upload="false"
-                        :on-change="handleLogoChange"
-                        accept="image/jpeg,image/png,image/gif"
-                        :limit="1"
-                        :show-file-list="false">
+                        accept="image/jpeg,image/jpg,image/png"
+                        action=""
+                        :show-file-list="false"
+                        :http-request="(request) => uploadFile(request)"
+                        :with-credentials="true"
+                    >
                         <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" />
                         <el-icon v-else class="logo-uploader-icon"><Plus /></el-icon>
                     </el-upload>
