@@ -48,6 +48,7 @@ import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { onBeforeUnmount, ref, shallowRef, onMounted, reactive, getCurrentInstance } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import html2canvas from 'html2canvas-pro';
+import { fileUpload } from '@/api/common'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const editorRef = shallowRef()
@@ -487,7 +488,7 @@ const handleAfterUpload = (file) => {
             reader.onload = () => {
                 const fromdata = new FormData();
                 fromdata.append('file', file);
-                cns.$http.doPost('seller/upload', fromdata).then((res) => {
+                fileUpload(fromdata).then((res) => {
                     if (res.code == 200) {
                         resolve({ status: 'success', url: res.data.url });
                     } else {
@@ -580,6 +581,7 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
     .editor-wrap{
         :deep(.w-e-text-placeholder){
             font-style: normal;
+            top:12px;
         }
         :deep(.w-e-text-container){
             padding: 0;

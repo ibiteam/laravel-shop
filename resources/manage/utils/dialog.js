@@ -14,7 +14,7 @@ function confirm({title='提示',message='',cancelButtonText='取消',confirmBut
 	})
 }
 
-function alert({title='',message='提示',cancelButtonText='取消',confirmButtonText='确定'}){
+function alert({title='提示',message='',cancelButtonText='取消',confirmButtonText='确定'}){
 	return new Promise((resolve,reject)=>{
         ElMessageBox.alert(message,title,{
             confirmButtonText: confirmButtonText,
@@ -27,15 +27,16 @@ function alert({title='',message='提示',cancelButtonText='取消',confirmButto
 	})
 }
 
-function prompt({title='', message='提示', cancelButtonText='取消', confirmButtonText='确定', inputPattern, inputErrorMessage}){
+function prompt({title='', message='', cancelButtonText='取消', confirmButtonText='确定', inputPattern, inputErrorMessage, inputValue}){
     return new Promise((resolve,reject)=>{
         ElMessageBox.prompt(message,title,{
             confirmButtonText: confirmButtonText,
             center: true,
             inputPattern,
-            inputErrorMessage
-        }).then(() => {
-            resolve()
+            inputErrorMessage,
+            inputValue
+        }).then(({ value }) => {
+            resolve({ value })
         }).catch(() => {
             reject()
         });

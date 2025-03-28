@@ -1,5 +1,7 @@
 :root {
     --main-color: #278ff0;
+    --main-color-80: #278ff080;
+    --main-color-20: #278ff020;
     --page-bg-color: #f2f2f2;
     --red-color: #f71111;
     --color-text: #333;
@@ -290,4 +292,8 @@ a {
 
 .cu-p {
     cursor: pointer;
+}
+
+.fw-b{
+    font-weight: bold;
 }

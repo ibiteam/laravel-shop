@@ -1,19 +1,18 @@
 <template>
-    <div class="flex-content flex-1">
-        <div class="container">
-            <div class="update-box s-flex">
-                <div class="good-form">
-                    <el-form ref="updateFormRef" :model="updateForm" :rules="updateFormRules" label-width="120px">
-                        <el-form-item label="分类" prop="goods_cate_id">
-                            <el-select v-model="updateForm.goods_cate_id" placeholder="请选择分类">
-                                <el-option :label="its.label" :value="its.value" v-for="its in category"></el-option>
-                            </el-select>
+    <div class="s-flex jc-bt" ref="wrapRef">
+        <div class="manage-public-wrap update-box flex-1">
+            <el-form ref="updateFormRef" :model="updateForm" :rules="updateFormRules" label-width="150px">
+                <div class="manage-public-cont good-form" ref="baseRef">
+                    <div class="manage-public-title">基础信息</div>
+                    <div>
+                        <el-form-item label="分类" prop="category_id">
+                            <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
                         </el-form-item>
-                        <el-form-item label="商品名称" prop="goods_name">
-                            <el-input v-model="updateForm.goods_name" placeholder="请输入商品名称" style="width: 95%;"></el-input>
+                        <el-form-item label="商品名称" prop="name">
+                            <el-input v-model="updateForm.name" placeholder="请输入商品名称" style="width: 450px;"></el-input>
                         </el-form-item>
-                        <el-form-item label="商品标签" prop="tag">
-                            <el-input v-model="updateForm.tag" :maxlength="5" show-word-limit placeholder="可填写热卖，推荐等" style="width: 95%;"></el-input>
+                        <el-form-item label="商品标签" prop="label">
+                            <el-input v-model="updateForm.label" :maxlength="5" show-word-limit placeholder="可填写热卖，推荐等" style="width: 450px;"></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
@@ -21,74 +20,149 @@
                                 trigger="hover"
                                 content="用于在商品名称前加一个标记">
                                 <template #reference>
-                                    <em class="iconfont" style="cursor: pointer;">&#xe72d;</em>
+                                    <em class="iconfont ml-10" style="cursor: pointer;">&#xe72d;</em>
                                 </template>
                             </el-popover>
                         </el-form-item>
-                        <el-form-item label="商品副标题" prop="goods_brief">
-                            <el-input v-model="updateForm.goods_brief" style="width: 95%;" placeholder="请输入商品副标题"></el-input>
+                        <el-form-item label="商品副标题" prop="sub_name">
+                            <el-input v-model="updateForm.sub_name" style="width: 450px;" placeholder="请输入商品副标题"></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
                                 width="auto"
                                 trigger="hover"
-                                content="商品详情">
+                                content="用于在商品名称下加一行描述">
                                 <template #reference>
-                                    <em class="iconfont" style="cursor: pointer;">&#xe72d;</em>
+                                    <em class="iconfont ml-10" style="cursor: pointer;">&#xe72d;</em>
                                 </template>
                             </el-popover>
                         </el-form-item>
-                        <el-form-item label="自定义属性">
-                            <template v-if="updateForm.goods_attr.length">
-                                <div class="input-li s-flex ai-ct" v-for="(item,index) in updateForm.goods_attr" :key="index" style="margin-bottom: 10px;">
-                                    <div style="width: 95%;" class="s-flex jc-bt ai-ct">
-                                        <el-input v-model="item.attr_name" placeholder="请输入属性名" style="width: 48%;" :maxlength="5" show-word-limit></el-input>
-                                        <el-input v-model="item.attr_value" placeholder="请输入属性值" style="width: 48%;" :maxlength="20"></el-input>
+                        <el-form-item label="产品参数">
+                            <div class="s-flex">
+                                <div style="min-width: 500px;">
+                                    <div class="prop-wrap" v-if="updateForm.parameters.length">
+                                        <div class="input-li s-flex ai-ct" v-for="(item,index) in updateForm.parameters" :key="index" style="margin: 5px 0;">
+                                            <div style="width: 380px;" class="s-flex jc-bt ai-ct">
+                                                <el-input v-model="item.name" placeholder="请输入属性名" style="width: 185px;" :maxlength="6" show-word-limit></el-input>
+                                                <el-input v-model="item.value" placeholder="请输入属性值" style="width: 185px;" :maxlength="20"></el-input>
+                                            </div>
+                                            <div class="dels" style="margin-left: 10px;" @click="delGoodsAttr(index)">
+                                                <span class="cu-p">删除</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="dels" style="margin-left: 5px;" @click="delGoodsAttr(index)">
-                                        <span>删除</span>
+                                    <div style="width: 100%;">
+                                        <div>
+                                            <el-button type="danger" @click="addGoodsAttr">添加</el-button>
+                                            <el-button @click="ctrlAttrTemplate('save')" v-if="updateForm.parameters.length">存为模板</el-button>
+                                            <el-button @click="ctrlAttrTemplate('update')" v-if="currentAttrTemplate&&updateForm.parameters.length">更新模板</el-button>
+                                        </div>
+
+                                        <div class="tips" v-if="!updateForm.parameters.length">
+                                            <span class="co-999 fs14">可设置自定义属性，如内存：8G</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </template>
-                            <div style="width: 100%;">
-                                <el-button type="primary" size="small" @click="addGoodsAttr">添加</el-button>
-                                <div class="tips">
-                                    <span>可设置自定义属性，如内存：8G</span>
+                                <div style="width: 200px;" ref="attrSelectTemplateRef" class="attr-select-template">
+                                    <el-select placeholder="属性模板" v-model="currentAttrTemplate" :append-to="attrSelectTemplateRef" @change="changeAttrTemplate">
+                                        <el-option v-for="(templateItem,i) in attrTemplate" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
+                                            <div class="attr-custom-item">
+                                                <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateAttrTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateAttrTemplate(templateItem,i,'delete')"></i></div>
+                                                <p class="co-999 fs14">更新时间: 2025-01-01 12:12:12</p>
+                                            </div>
+                                        </el-option>
+                                    </el-select>
                                 </div>
                             </div>
                         </el-form-item>
-                        <el-form-item label="图片" prop="goods_img">
+                    </div>
+                </div>
+                <div class="manage-public-cont good-form" ref="imgRef">
+                    <div class="manage-public-title">图文信息</div>
+                    <div>
+                        <el-form-item label="图片" prop="images">
                             <div class="s-flex">
-                                <VueDraggable class="good-picture s-flex" v-model="updateForm.goods_img">
-                                    <div class="good-picture-list" v-for="(its,ids) in updateForm.goods_img" :key="ids">
+                                <VueDraggable class="good-picture s-flex" v-model="updateForm.images" filter=".masking">
+                                    <div class="good-picture-list" v-for="(img,i) in updateForm.images" :key="i">
                                         <div class="good-picture-li">
-                                            <img :src="its" alt="its">
+                                            <el-image
+                                                style="width: 84px; height: 84px"
+                                                :src="img"
+                                                :zoom-rate="1.2"
+                                                :max-scale="7"
+                                                :min-scale="0.2"
+                                                :preview-src-list="updateForm.images"
+                                                show-progress
+                                                :initial-index="4"
+                                                fit="cover"
+                                            />
                                             <div class="masking">
-                                                <i class="el-icon-delete" @click="updateForm.goods_img.splice(ids,1)"></i>
+                                                <i class="iconfont icon-shangchuan" @click="changeImages(i, 'http')" title="从本地上传图片"></i>
+                                                <i class="iconfont icon-shangchuan1" @click="changeImages(i, 'material')" title="从素材库选择"></i>
+                                                <i class="iconfont icon-shanchu" v-if="i" @click="updateForm.images.splice(i,1)" title="删除当前图片"></i>
                                             </div>
                                         </div>
-                                        <div class="main" :class="{'main-img' : !ids}" @click="setMain(ids)">
-                                            <span v-if="!ids">主图</span>
+                                        <div class="main" :class="{'main-img' : !i}" @click="setMain(i)">
+                                            <span v-if="!i">主图</span>
                                             <span v-else>设为主图</span>
                                         </div>
                                     </div>
                                 </VueDraggable>
                                 <el-upload
-                                    v-if="updateForm.goods_img.length < 6"
+                                    v-if="updateForm.images.length < 6"
                                     class="avatar-uploader"
-                                    action="{{ route('manage.common.upload') }}"
+                                    ref="uploadImageRef"
+                                    accept="image/jpeg,image/jpg,image/png"
                                     :show-file-list="false"
-                                    multiple
-                                    :on-success="(res) => handleSuccess(res,'goods_img')"
-                                    :on-exceed="handleExceed"
+                                    :http-request="(file) => uploadImage(file, 'images')"
                                     :before-upload="beforeUpload">
-                                    <i class="el-icon-plus avatar-uploader-icon"></i>
+                                    <i class="iconfont icon-jiahao1"></i>
                                 </el-upload>
                             </div>
-                            <div class="tips">
+                            <div class="tips" style="width: 100%;flex: none;">
                                 <span>建议尺寸500*500px，最多6张</span>
                             </div>
                         </el-form-item>
+                        <el-form-item label="主图视频" prop="video">
+                            <div class="s-flex">
+                                <div class="good-picture s-flex" v-if="updateForm.video">
+                                    <div class="good-picture-list">
+                                        <div class="good-picture-li" style="cursor: default;">
+                                            <video :src="updateForm.video"></video>
+                                            <div class="video-play">
+                                                <i class="iconfont icon-bofang1" @click="playVideo"></i>
+                                            </div>
+                                            <div class="masking">
+                                                <i class="iconfont icon-shangchuan" @click="changeVideo('http')" title="从本地上传图片"></i>
+                                                <i class="iconfont icon-shangchuan1" @click="changeVideo('material')" title="从素材库选择"></i>
+                                                <i class="iconfont icon-shanchu" @click="updateForm.video = ''" title="删除当前主图视频"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <el-upload
+                                    v-if="!updateForm.video"
+                                    class="avatar-uploader"
+                                    ref="uploadVideoRef"
+                                    accept="video/mp4"
+                                    :show-file-list="false"
+                                    :http-request="(file) => uploadImage(file, 'video')"
+                                    :before-upload="beforeUploadVideo">
+                                    <i class="iconfont icon-jiahao1"></i>
+                                </el-upload>
+                            </div>
+                            <div class="tips" style="width: 100%;flex: none;">
+                                <span>仅支持mp4格式上传，大小100M内</span>
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="商品详情" prop="goods_desc">
+                            <Editor v-model="updateForm.goods_desc" @change="handleChangeGoodsDetail" height="500px" min-height="500px" />
+                        </el-form-item>
+                    </div>
+                </div>
+                <div class="manage-public-cont good-form" ref="priceRef">
+                    <div class="manage-public-title">价格库存</div>
+                    <div>
                         <el-form-item label="单位" prop="unit">
                             <el-input v-model="updateForm.unit" placeholder="请输入商品单位" style="width: 160px;"></el-input>
                             <div class="tips">
@@ -240,14 +314,14 @@
                                             class="table-upload"
                                             :show-file-list="false"
                                             v-if="!scope.row.thumb"
-                                            :on-success="(res) => handleSuccess(res,'thumb',scope.row.template_1)"
+                                            :http-request="(file) => uploadImage(file, 'thumb', scope.row.template_1)"
                                             :before-upload="beforeUpload">
-                                            <i slot="default" class="el-icon-plus avatar-uploader-icon"></i>
+                                            <i class="iconfont icon-jiahao1 avatar-uploader-icon"></i>
                                         </el-upload>
                                         <div v-else class="thumb">
                                             <img :src="scope.row.thumb" alt="">
                                             <span class="el-upload-list__item-actions">
-                                                <i class="el-icon-delete" @click="handleTableRemove(scope.$index)"></i>
+                                                <i class="iconfont icon-shanchu" @click="handleTableRemove(scope.$index)"></i>
                                             </span>
                                         </div>
                                     </template>
@@ -304,9 +378,11 @@
                                 <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="商品详情" prop="goods_desc">
-                            <Editor v-model="updateForm.goods_desc" @change="handleChangeGoodsDetail" height="500px" min-height="500px" />
-                        </el-form-item>
+                    </div>
+                </div>
+                <div class="manage-public-cont good-form" ref="serviceRef">
+                    <div class="manage-public-title">服务售后</div>
+                    <div>
                         <el-form-item label="上架" prop="is_on_sale">
                             <el-radio-group v-model="updateForm.is_on_sale">
                                 <el-radio :value="1">立即上架</el-radio>
@@ -324,24 +400,80 @@
                                 </div>
                             </div>
                         </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" style="width: 120px;height: 40px;" @click="sumbitGood" :loading="loading">提交</el-button>
-                        </el-form-item>
-                    </el-form>
+                    </div>
+                </div>
+            </el-form>
+            <div class="goods-footer-btn s-flex jc-ct ai-ct">
+                <el-button type="danger" style="width: 140px;height: 50px;font-size: 20px;" @click="sumbitGood" :loading="loading">发布商品</el-button>
+            </div>
+        </div>
+        <div style="width: 380px;flex: none;">
+            <div class="right-sidebar">
+                <div class="right-header">
+                    <i class="iconfont icon-mulu mr-10 co-fff"></i>
+                    <span class="co-fff fs18 fw-b">商品信息</span>
+                </div>
+                <div class="right-menu">
+                    <div class="right-menu-item" :class="{active: activeContType === 'baseRef'}" @click="scrollToCont('baseRef')">基础信息</div>
+                    <div class="right-menu-item" :class="{active: activeContType === 'imgRef'}" @click="scrollToCont('imgRef')">图文信息</div>
+                    <div class="right-menu-item" :class="{active: activeContType === 'priceRef'}" @click="scrollToCont('priceRef')">价格库存</div>
+                    <div class="right-menu-item" :class="{active: activeContType === 'serviceRef'}" @click="scrollToCont('serviceRef')">服务售后</div>
                 </div>
             </div>
         </div>
+        <el-dialog v-model="videoDialogShow" title="视频预览" width="600px" center>
+            <video :src="updateForm.video" controls ref="videoRef" width="100%"></video>
+        </el-dialog>
     </div>
+
 </template>
 
 <script setup>
 import Editor from '@/components/good/Editor.vue'
-import { ref, getCurrentInstance, onMounted, computed, watch } from 'vue'
+import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import { fileUpload } from '@/api/common'
 import { VueDraggable } from 'vue-draggable-plus'
 import _ from 'lodash'
 const cns = getCurrentInstance().appContext.config.globalProperties
+const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
+
+const wrapRef = ref(null);
+const baseRef = ref(null);
+const imgRef = ref(null);
+const priceRef = ref(null);
+const serviceRef = ref(null);
+
+const scrollToCont = (type) => {
+    const element = {
+        baseRef: baseRef,
+        imgRef: imgRef,
+        priceRef: priceRef,
+        serviceRef: serviceRef
+    }[type];
+    activeContType.value = type;
+    if (element && element.value) {
+        element.value.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+const handleScroll = () => {
+    const baseTop = baseRef.value.getBoundingClientRect().top;
+    const imgTop = imgRef.value.getBoundingClientRect().top;
+    const priceTop = priceRef.value.getBoundingClientRect().top;
+    const serviceTop = serviceRef.value.getBoundingClientRect().top;
+
+    if (baseTop < window.innerHeight && baseTop >= 0) {
+        activeContType.value = 'baseRef';
+    } else if (imgTop < window.innerHeight && imgTop >= 0) {
+        activeContType.value = 'imgRef';
+    } else if (priceTop < window.innerHeight && priceTop >= 0) {
+        activeContType.value = 'priceRef';
+    } else if (serviceTop < window.innerHeight && serviceTop >= 0) {
+        activeContType.value = 'serviceRef';
+    }
+};
+
 const validateFile = (rule, value, callback) => {
-    if (!updateForm.value.goods_img.length) {
+    if (!updateForm.value.images.length) {
         callback(new Error('请上传商品图片'));
     } else {
         callback();
@@ -366,7 +498,85 @@ const validatePrice = (rule, value, callback, type) => {
         callback();
     }
 }
+const attrSelectTemplateRef = ref(null)
+const currentAttrTemplate = ref('')
+const attrTemplate = ref([{
+        name: '模板1',
+        id:1,
+        values: [{
+            name: '颜色',
+            value: '白色'
+        }, {
+            name: '尺寸',
+            value: '均码'
+        }]
+    },
+    {
+        name: '模板2',
+        id:2,
+        values: [{
+            name: '是否有机',
+            value: '是的'
+        }, {
+            name: '发货地',
+            value: '原产地发货'
+        }]
+    }]
+)
 
+const inputValidatorTemplate = (rule, value, callback) => {
+    if (value == '' || value == null) {
+        callback(new Error('模板名称不能为空'));
+    }else if(value.length > 20){
+        callback(new Error('模板名称不能超过10个字符'));
+    }else{
+        callback();
+    }
+}
+const updateAttrTemplate = (item,i,type) => {
+    if(type == 'edit'){
+        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
+            item.name = value
+            let info = item
+        })
+    }else {
+        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
+            attrTemplate.value.splice(i, 1);
+            let info = {
+                id: item.id
+            }
+        }).catch(() => {
+        });
+    }
+}
+
+const changeAttrTemplate = (value) => {
+    if(value){
+        attrTemplate.value.forEach((item,i) => {
+            if(item.id == value){
+                updateForm.value.parameters = item.values
+            }
+        })
+    }
+}
+
+const ctrlAttrTemplate = (type) => {
+    if(type == 'save'){
+        // 存为新模板，需要把currentAttrTemplate.value置为当前返回的id
+        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
+            let info={
+                name: value,
+                values: updateForm.value.parameters
+            }
+        })
+    }else if(type == 'update'){
+        let info={
+            id: currentAttrTemplate.value,
+            values: updateForm.value.parameters
+        }
+        // 更新当前模板，需传currentAttrTemplate.value
+    }
+}
 const validateDesc = (rule, value, callback) => {
     if (updateForm.value.goods_desc == '' || updateForm.value.goods_desc == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
         callback(new Error('商品详情不能为空'));
@@ -391,17 +601,25 @@ const specValue = (rule, value, callback, index, id) => {
         callback();
     }
 }
+// 分类数据
+const category = ref([
+    {
+        "id": 1,
+        "parent_id": 0,
+        "name": "测试分类",
+        "logo": ""
+    }
+]);
 
-const category = ref([]);
 const updateForm = ref({
     id: 0,
-    goods_cate_id: null,
+    category_id: null,
     member_id: null,
-    goods_name: '',
-    tag: '',
-    goods_brief: '',
-    goods_attr: [],
-    goods_img: [],
+    name: '',
+    label: '',
+    sub_name: '',
+    parameters: [],
+    images: [],
     unit: '',
     shop_price: 0,
     goods_number: 10,
@@ -411,21 +629,27 @@ const updateForm = ref({
     goods_skus: [],
     goods_specs: [],
 });
+const uploadImageRef = ref(null);
+const uploadVideoRef = ref(null);
+const videoDialogShow = ref(false);
+const videoRef = ref(null);
+
+const currentChangeImageIndex = ref(-1);
 const updateFormRef = ref(null);
 const templateFormRef = ref(null);
 const mySelectRef = ref(null);
 const updateFormRules = ref({
-    goods_cate_id: [
+    category_id: [
         {
             required: true,
             message: '请选择商品分类',
             trigger: 'change'
         },
     ],
-    goods_name: [
+    name: [
         {required: true, message: '请输入商品名称', trigger: 'blur'},
     ],
-    goods_img: [
+    images: [
         {required: true, message: '请上传商品图片', trigger: 'change'},
         {validator: validateFile, trigger: 'change'}
     ],
@@ -475,7 +699,7 @@ const updateFormRules = ref({
             message: '请输入商品库存',
             trigger: 'blur'
         },
-    ],
+    ]
 });
 const shop_price_show = ref(false);
 const is_limit_number = ref(false);
@@ -569,7 +793,7 @@ const getTemplate = () => {
     })
 }
 const handleChangeGoodsDetail = () => {
-    updateFormRef.value.validateField('goods_desc')
+    // updateFormRef.value.validateField('goods_desc')
 }
 
 const changeLimitNumber = (val) => {
@@ -581,14 +805,14 @@ const changeLimitNumber = (val) => {
 }
 
 const addGoodsAttr = () => {
-    updateForm.value.goods_attr.push({
-        attr_name: '',
-        attr_value: ''
+    updateForm.value.parameters.push({
+        name: '',
+        value: ''
     })
 }
 
 const delGoodsAttr = (index) => {
-    updateForm.value.goods_attr.splice(index, 1)
+    updateForm.value.parameters.splice(index, 1)
 }
 
 const delGoodsSpecs = (index) => {
@@ -712,8 +936,8 @@ const filling = () => {
 
 const setMain = (index) => {
     if (index) {
-        let picture = updateForm.value.goods_img.splice(index, 1)
-        updateForm.value.goods_img.unshift(picture[0])
+        let picture = updateForm.value.images.splice(index, 1)
+        updateForm.value.images.unshift(picture[0])
     }
 }
 
@@ -737,39 +961,79 @@ const delSelect = (index) => {
         })
     })
 }
-
-const handleExceed = (files, fileList) => {
-    cns.$message.warning("最多上传6个文件");
-}
-
 const beforeUpload = (file) => {
-    var type = false;
+    let valiType = false;
     if (file.type != "image/jpg" && file.type != "image/jpeg" && file.type != "image/png") {
-               if (file.type) {
-            type = true
+        if (file.type) {
+            valiType = true
         }
     }
     const isLt2M = file.size / 1024 / 1024 <= 5;
-    if (type || !isLt2M) {
+    if (valiType || !isLt2M) {
         cns.$message.error("支持 .png .jpg .jpeg格式，单个附件不得超过5M!");
         return false;
     }
 }
 
-const handleSuccess = (res, type, name) => {
-    if (type === 'thumb') {
-        let goods_skus = JSON.parse(JSON.stringify(updateForm.value.goods_skus))
-        goods_skus.map(a => {
-            if (a.template_1 === name) {
-                a.thumb = res.data.file
-            }
-        })
-        updateForm.value.goods_skus = [
-            ...goods_skus
-        ]
-    } else {
-        updateForm.value.goods_img.push(res.data.file)
+const beforeUploadVideo = (file) => {
+    let valiType = false;
+
+    if (file.type != "video/mp4") {
+        if (file.type) {
+            valiType = true
+        }
     }
+    const isLt100M = file.size / 1024 / 1024 <= 100;
+    if (valiType || !isLt100M) {
+        cns.$message.error("仅支持mp4格式上传，大小100M内");
+        return false;
+    }
+}
+const changeImages = (i , type) => {
+    currentChangeImageIndex.value = i
+    if(type == 'http'){
+        uploadImageRef.value.handleStart()
+    }else{
+        // 调用素材
+    }
+}
+
+const changeVideo = (type) => {
+    if(type == 'http'){
+        uploadVideoRef.value.handleStart()
+    }else{
+        // 调用素材
+    }
+}
+
+const playVideo = () => {
+    videoDialogShow.value = true
+    nextTick(() => {
+        videoRef.value.play()
+    })
+}
+const uploadImage = (file, type, name) => {
+    fileUpload(file).then((res) => {
+        if (res.code == 200) {
+            if (type === 'thumb') {
+                let goods_skus = JSON.parse(JSON.stringify(updateForm.value.goods_skus))
+                goods_skus.map(a => {
+                    if (a.template_1 === name) {
+                        a.thumb = res.data.url
+                    }
+                })
+                updateForm.value.goods_skus = [
+                    ...goods_skus
+                ]
+            } else if(type === 'video'){
+                updateForm.value.video = res.data.url
+            }else {
+                updateForm.value.images.push(res.data.url)
+            }
+        }
+    }).catch((err)=>{
+        cns.$message.error("上传失败");
+    })
 }
 
 const setCheck = (val, type) => {
@@ -841,90 +1105,159 @@ onMounted(() => {
         });
     }
     getTemplate()
+    wrapRef.value.parentElement.addEventListener('scroll', handleScroll);
 })
 
+onBeforeUnmount(() => {
+    wrapRef.value.parentElement.removeEventListener('scroll', handleScroll);
+});
 </script>
 
 <style scoped lang="scss">
+.right-sidebar{
+    width: 360px;
+    background: #fff;
+    height: fit-content;
+    border-radius: 10px 10px 0 0 ;
+    position: fixed;
+    right: 20px;
+    .right-header{
+        background: linear-gradient(153deg, #1477F0 17%, rgba(90, 23, 176, 0) 131%);
+        border-radius: 10px 10px 0 0 ;
+        height: 90px;
+        line-height: 80px;
+        padding-left: 25px;
+        i{
+            font-size: 18px;
+        }
+    }
+    .right-menu{
+        position: relative;
+        top:-10px;
+        background: #fff;
+        border-radius: 10px 10px 0 0 ;
+        padding: 30px 0 10px;
+        .right-menu-item{
+            padding: 0 30px;
+            height: 44px;
+            line-height: 44px;
+            font-size: 15px;
+            color: var(--color-text);
+            cursor: pointer;
+            font-weight: 600;
+            &:hover, &.active{
+                background: var(--main-color-20);
+                color: var(--main-color);
+            }
+        }
+    }
+}
 
 .update-box {
-    width: 100%;
-    height: 100%;
-    background: #fff;
-    padding: 30px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    -ms-overflow-style: none; /* 不显示滚动条 */
-    scrollbar-width: none; /* 不显示滚动条 */
     position: relative;
+    padding-bottom: 80px;
+    .goods-footer-btn{
+        width: 100%;
+        height: 80px;
+        box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.3);
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        background: #fff;
+        :deep(.el-button span){
+            font-size: 18px;
+            font-weight: 700;
+        }
+    }
     .good-form{
-        height: 100%;
-        padding: 0 10px;
-        .btn {
-            border-radius: 5px;
-        }
-
-        .btn.sumbit {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn.sumbit .el-icon-loading {
-            font-size: 16px;
-        }
-
-        :deep(.el-form){
-            padding-bottom: 20px;
-            .avatar-uploader .el-upload {
-                border: 1px dashed #d9d9d9;
-                border-radius: 6px;
-                cursor: pointer;
-                position: relative;
-                overflow: hidden;
-            }
-
-            .avatar-uploader .el-upload:hover {
-                border-color: #409EFF;
-            }
-
-            .avatar-uploader-icon {
-                font-size: 28px;
-                color: #8c939d;
-                width: 84px;
-                height: 84px;
-                line-height: 84px;
-                text-align: center;
-            }
-
-            .el-upload__tip {
-                line-height: 1;
-                font-size: 14px;
-                font-weight: normal;
-                line-height: 22px;
-                color: #9E9E9E;
-            }
-
-            .tips span {
-                font-size: 12px;
-                font-weight: normal;
-                line-height: 24px;
-                color: #9E9E9E;
-            }
-
-            .limit-number .el-form-item__content {
-                display: flex;
-                align-items: baseline;
-            }
-
+        border-radius: 10px;
+        .prop-wrap{
+            background: #f2f2f2;
+            padding: 5px 10px;
+            margin-bottom: 10px;
+            width: 450px;
             .dels span {
                 font-size: 12px;
                 font-weight: normal;
                 line-height: 22px;
-                color: #3298F6;
+                color: #333;
+                &:hover{
+                    color: var(--red-color);
+                }
                 cursor: pointer;
             }
+        }
+        .attr-select-template{
+            :deep(.el-select-dropdown__item){
+                height: 56px;
+                line-height: 25px;
+                padding: 3px 32px 3px 20px;
+                &:hover{
+                    background: var(--main-color-20);
+                    i{
+                        display: block;
+                    }
+                }
+            }
+            :deep(.el-select-dropdown__item.is-selected) p{
+                color: var(--main-color);
+            }
+            :deep(.attr-custom-item){
+                font-size: 14px;
+                i{
+                    margin-left: 5px;
+                    font-size: 14px;
+                    &:hover{
+                        color: var(--red-color);
+                    }
+                    display: none;
+                }
+            }
+        }
 
+        :deep(.el-form-item__label) {
+            color: #333;
+        }
+
+        padding-bottom: 20px;
+        :deep(.avatar-uploader .el-upload) {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        :deep(.avatar-uploader .el-upload):hover {
+            border-color: #409EFF;
+        }
+
+        :deep(.icon-jiahao1) {
+            font-size: 28px;
+            color: #8c939d;
+            width: 84px;
+            height: 84px;
+            line-height: 84px;
+            text-align: center;
+        }
+
+        .el-upload__tip {
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 22px;
+            color: #9E9E9E;
+        }
+
+        .tips span {
+            font-size: 12px;
+            font-weight: normal;
+            line-height: 24px;
+            color: #9E9E9E;
+        }
+
+        .limit-number .el-form-item__content {
+            display: flex;
+            align-items: baseline;
         }
     }
 }
@@ -1046,36 +1379,57 @@ onMounted(() => {
     width: 84px;
     height: 84px;
     position: relative;
+    cursor: move;
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
 }
 
-.good-picture .good-picture-li img {
+.good-picture .good-picture-li .el-image, .good-picture .good-picture-li video{
     width: 100%;
     height: 100%;
+    border-radius: 6px;
 }
 
 .good-picture .good-picture-li .masking {
     position: absolute;
     width: 100%;
+    height: 24px;
+    left: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: default;
+    display: none;
+    justify-content: space-around;
+    border-radius: 0 0 6px 6px;
+    z-index: 2;
+}
+.good-picture .good-picture-li .video-play{
+    position: absolute;
+    width: 100%;
     height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     left: 0;
     top: 0;
-    background: rgba(0, 0, 0, 0.5);
-    cursor: move;
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    z-index: 1;
+    i{
+        color: #fff;
+        font-size: 24px;
+        cursor: pointer;
+    }
 }
-
 .good-picture .good-picture-li:hover .masking {
-    display: block;
+    display: flex;
 }
 
-.good-picture .good-picture-li .masking .el-icon-delete {
-    font-size: 18px;
+.good-picture .good-picture-li .masking .iconfont {
+    font-size: 14px;
     color: #fff;
+    line-height: 24px;
     cursor: pointer;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
 }
 
 .good-picture .main {
@@ -1084,15 +1438,11 @@ onMounted(() => {
     line-height: 23px;
     text-align: center;
     cursor: pointer;
-    margin: 10px auto 0;
-}
-
-.good-picture .main.main-img {
-    border: solid 1px red;
+    margin: 5px auto 0;
 }
 
 .good-picture .main span {
-    color: red;
+    color: var(--red-color);
     font-size: 12px;
 }
 
