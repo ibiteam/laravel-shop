@@ -174,16 +174,22 @@ class GoodsController extends BaseController
         }
     }
 
-    public function store(GoodsStoreRequest $request, GoodsService $goods_service): JsonResponse
+    public function update(GoodsStoreRequest $request, GoodsService $goods_service): JsonResponse
     {
         $validated = $request->validated();
 
         try {
-            $goods_service->storeOrUpdate($this->adminUser(), $request->validated(), $validated['goods_sn']);
+            if ($validated['can_quota'] && ! $validated['quota_number']) {
+                throw new BusinessException('当开启商品限购时，商品限购数量必须 大于等于 1');
+            }
+
+            $goods_service->storeOrUpdate($this->adminUser(), $request->validated(), $validated['id']);
 
             return $this->success('操作成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('添加失败'.$throwable->getMessage());
         }

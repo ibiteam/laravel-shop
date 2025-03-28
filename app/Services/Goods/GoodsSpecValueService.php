@@ -15,29 +15,29 @@ class GoodsSpecValueService
 
     private array $deleted_spec_value_data = [];
 
-    public function __construct(array $params, Goods $goods)
+    public function __construct(public Goods $goods, array $params)
     {
-        $this->init($params, $goods);
+        $this->init($params);
     }
 
     public function getStoreSpecValueData(): array
     {
-        return $this->store_spec_value_data;
+        return array_values($this->store_spec_value_data);
     }
 
     public function setStoreSpecValueData(array $store_spec_value_data): void
     {
-        $this->store_spec_value_data[] = $store_spec_value_data;
+        $this->store_spec_value_data[$store_spec_value_data['goods_spec_id'].$store_spec_value_data['value']] = $store_spec_value_data;
     }
 
     public function getUpdatedSpecValueData(): array
     {
-        return $this->updated_spec_value_data;
+        return array_values($this->updated_spec_value_data);
     }
 
     public function setUpdatedSpecValueData(array $updated_spec_value_data): void
     {
-        $this->updated_spec_value_data[] = $updated_spec_value_data;
+        $this->updated_spec_value_data[$updated_spec_value_data['id']] = $updated_spec_value_data;
     }
 
     public function getDeletedSpecValueData(): array
@@ -47,24 +47,24 @@ class GoodsSpecValueService
 
     public function setDeletedSpecValueData(array $deleted_spec_value_data): void
     {
-        $this->deleted_spec_value_data[] = $deleted_spec_value_data;
+        $this->deleted_spec_value_data = $deleted_spec_value_data;
     }
 
-    public function exec(Goods $goods): void
+    public function exec(): void
     {
         // 删除
         if ($deleted_ids = $this->getDeletedSpecValueData()) {
-            $goods->specValues()->whereIn('id', $deleted_ids)->delete();
+            $this->goods->specValues()->whereIn('id', $deleted_ids)->delete();
         }
 
         // 新增
         if ($store_data = $this->getStoreSpecValueData()) {
-            $goods->specValues()->createMany($store_data);
+            $this->goods->specValues()->createMany($store_data);
         }
 
         // 更新
         foreach ($this->getUpdatedSpecValueData() as $updated_spec_value_datum) {
-            $spec_value = $goods->specValues()->where('id', $updated_spec_value_datum['id'])->first();
+            $spec_value = $this->goods->specValues()->where('id', $updated_spec_value_datum['id'])->first();
 
             if ($spec_value instanceof GoodsSpecValue) {
                 $spec_value->update($updated_spec_value_datum);
@@ -72,10 +72,10 @@ class GoodsSpecValueService
         }
     }
 
-    private function init(array $params, ?Goods $goods = null): void
+    private function init(array $params): void
     {
         $goods_specs = GoodsSpec::query()->get();
-        $exists_spec_value_ids = $goods instanceof Goods ? $goods->specValues()->pluck('id')->toArray() : [];
+        $exists_spec_value_ids = $this->goods->specValues()->pluck('id')->toArray();
 
         $tmp_spec_values = collect();
 
@@ -85,7 +85,7 @@ class GoodsSpecValueService
                 $goods_spec = $goods_specs->where('name', $param['name'])->first();
 
                 if (! $goods_spec instanceof GoodsSpec) {
-                    $goods_spec = GoodsSpec::query()->create(['name' => $param['name'], 'value' => array_column($params['values'], 'name'), 'is_show' => GoodsSpec::SHOW]);
+                    $goods_spec = GoodsSpec::query()->create(['name' => $param['name'], 'value' => array_column($param['values'], 'name'), 'is_show' => GoodsSpec::SHOW]);
                 }
             } else {
                 $goods_spec = $goods_specs->where('id', $param['id'])->first();
@@ -96,7 +96,7 @@ class GoodsSpecValueService
 
                 // 不同的规格名，需要重新创建
                 if ($goods_spec->name !== $param['name']) {
-                    $goods_spec = GoodsSpec::query()->create(['name' => $param['name'], 'value' => array_column($params['values'], 'name'), 'is_show' => GoodsSpec::SHOW]);
+                    $goods_spec = GoodsSpec::query()->create(['name' => $param['name'], 'value' => array_column($param['values'], 'name'), 'is_show' => GoodsSpec::SHOW]);
                 }
             }
 
@@ -105,7 +105,7 @@ class GoodsSpecValueService
                 $tmp_spec_values->push(['id' => $value['id'] ?? 0, 'goods_spec_id' => $goods_spec->id, 'value' => $value['name'], 'thumb' => '', 'sort' => $key]);
             }
             $tmp_spec_values->each(function ($item) use ($exists_spec_value_ids) {
-                if (in_array($item['id'], $exists_spec_value_ids) === 0) {
+                if (in_array($item['id'], $exists_spec_value_ids)) {
                     $this->setUpdatedSpecValueData($item);
                 } else {
                     unset($item['id']);

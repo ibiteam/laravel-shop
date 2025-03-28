@@ -10,6 +10,7 @@ Route::prefix('goods')->group(function () {
         Route::get('/', [GoodsController::class, 'index']);
         Route::post('change-status', [GoodsController::class, 'changeStatus']);
         Route::get('edit', [GoodsController::class, 'edit']);
+        Route::post('update', [GoodsController::class, 'update']);
     });
     // 商品分类
     Route::prefix('category')->group(function () {
