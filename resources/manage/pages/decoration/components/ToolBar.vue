@@ -7,10 +7,11 @@
                     v-model="active.components[itsKey]"
                     :animation="1000"
                     filter=".disabled"
-                    :group="{name: 'decoration', pull: 'clone', put: false}"
+                    :group="{name: 'decoration', pull: 'clone', put: false, revertClone: true}"
                     :sort="false"
+                    :clone="handleDragClone"
                 >
-                    <div class="module-item s-flex ai-ct jc-ct" :class="{'disabled': item.limit == 0}" v-for="item in its" :key="item.component_name">
+                    <div class="module-item s-flex ai-ct jc-ct" :class="{'disabled': computedTempIsExist({component_name: item.component_name, limit: item.limit})}" v-for="item in its" :key="item.component_name">
                         <em class="iconfont" >{{ item.icon }}</em>
                         <p>{{ item.name }}</p>
                     </div>
@@ -28,35 +29,62 @@ const props = defineProps({
     // 组件拖拽数据
     // advertisement_component: 广告组件
     // data_component: 数据组件
-    components: {
+    component_icon: {
         type: Object,
         default: () => {
             return {}
         }
     },
     // 组件原始数据
-    original: {
+    component_value: {
         type: Array,
         default: () => {
             return []
         }
+    },
+    // 当前装修数据
+    component_data: {
+        type: Array,
+        default: []
     }
 })
+
 const active = reactive({
     name: [],
     title: {
         advertisement_component: '广告组件',
         data_component: '数据组件'
     },
-    value: [],
     components: {}
 })
 
+// 查询组件是否达到添加次数
+const computedTempIsExist = (params = {component_name: '', limit: 0}) => {
+    const { component_name, limit } = params
+    const existList = props.component_data.filter(item => item && item.component_name == component_name)
+    if (limit > 0 && existList.length >= limit) {
+        return true
+    } else {
+        return false
+    }
+}
+
+// 拖拽克隆赋值组件初始数据
+const handleDragClone = (item) => {
+    let {component_name} = item
+    let component = props.component_value.find(item => item.component_name === component_name)
+    component.id = Math.round(new Date() / 1000) + 'add'
+    component.data = {}
+    return component
+}
+
+
 watch(() => props, (newVal) => {
-    if (newVal && newVal.components) {
-        active.name = Object.keys(newVal.components)
-        active.components = newVal.components
-        active.value = Object.values(newVal.components).flat()
+    if (newVal) {
+        if (newVal.component_icon) {
+            active.name = Object.keys(newVal.component_icon)
+            active.components = newVal.component_icon
+        }
     }
 }, {
     immediate: true,
@@ -106,6 +134,10 @@ watch(() => props, (newVal) => {
         }
         &.disabled{
             cursor: no-drop;
+            &:hover {
+                box-shadow: none;
+                transform: scale(1);
+            }
         }
     }
 }

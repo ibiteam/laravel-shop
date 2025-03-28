@@ -1,4 +1,19 @@
 <template>
+    <el-drawer
+        class="setting-drawer"
+        body-class="setting-drawer-body"
+        modal-class="setting-drawer-modal"
+        direction="rtl"
+        :model-value="true"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        :show-close="false"
+        :with-header="false"
+        :modal="false"
+        append-to=".decoration-layout-main"
+        size="400px"
+        :before-close="handleCancle"
+    >
     <aside class="setting-bar-wrapper s-flex">
         <div class="setting-bar-header s-flex ai-ct jc-bt">
             <p class="fs16 fw-b">{{ name }}</p>
@@ -11,15 +26,17 @@
             <slot name="content" :type="formType"></slot>
         </div>
         <div class="setting-bar-footer s-flex ai-ct jc-ct">
-            <el-button>取消</el-button>
+            <el-button @click="handleCancle">取消</el-button>
             <el-button type="primary">保存</el-button>
         </div>
     </aside>
+  </el-drawer>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, getCurrentInstance, defineEmits } from 'vue'
 
+const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
     name: {
         type: String,
@@ -28,6 +45,12 @@ const props = defineProps({
 })
 
 const formType = ref(0)
+
+const emit = defineEmits(['close'])
+const handleCancle = () => {
+    emit('close')
+    // cns.$bus.emit('chooseDragItem', {temp_index: ''})
+}
 
 </script>
 <style lang="scss">
@@ -41,18 +64,39 @@ const formType = ref(0)
 .setting-bar-item {
     border-top: 4px solid var(--page-bg-color);
 }
+.setting-drawer{
+    width: 400px;
+    height: calc(100% - 50px)!important;
+    position: fixed;
+    top: auto!important;
+    right: 0;
+    bottom: 0!important;
+    box-shadow: none;
+}
+.setting-drawer-body {
+    padding: 0!important;
+}
+.setting-drawer-modal {
+    width: 400px;
+    height: calc(100% - 50px);
+    top: auto!important;
+    right: 0!important;
+    bottom: 0!important;
+    inset: auto!important;
+}
 </style>
+
 <style lang='scss' scoped>
 .setting-bar-wrapper{
     width: 400px;
-    height: calc(100% - 50px);
+    height: 100%;
     overflow: hidden;
     background-color: #fff;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     right: 0;
     bottom: 0;
-    z-index: 2;
+    z-index: 3;
     .setting-bar-content{
         flex: 1;
         overflow: hidden auto;
