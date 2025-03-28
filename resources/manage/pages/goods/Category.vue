@@ -186,6 +186,11 @@ onMounted( () => {
         <el-table-column label="分类标题" prop="title"></el-table-column>
         <el-table-column label="关键词" prop="keywords"></el-table-column>
         <el-table-column label="描述" prop="description"></el-table-column>
+        <el-table-column label="是否展示" prop="is_show">
+            <template #default="scope">
+                <el-switch disabled v-model="scope.row.is_show" :active-value="1" :inactive-value="0" />
+            </template>
+        </el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
         <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="操作">

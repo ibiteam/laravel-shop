@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from '@/router'
 import ElementPlus from 'element-plus'
 import VueCookies from 'vue3-cookies'
+import mitt from 'mitt'
 import 'element-plus/dist/index.css'
 import '@/assets/css/common.css'
 import '@/assets/css/public.css'
@@ -18,6 +19,7 @@ const app = createApp(App);
 app.config.globalProperties.$http = http
 app.config.globalProperties.$dialog = dialog
 app.config.globalProperties.$public = $public;
+app.config.globalProperties.$bus = mitt()
 app.use(router);
 app.use(ElementPlus);
 app.use(VueCookies);
