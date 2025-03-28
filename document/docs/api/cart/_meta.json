@@ -1,0 +1,8 @@
+[
+    "list",
+    "get_number",
+    "store",
+    "destroy",
+    "change_number",
+    "change_check"
+]

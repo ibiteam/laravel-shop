@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AccountSetController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
@@ -60,5 +61,15 @@ Route::middleware('api.auth')->group(function () {
         Route::post('nickname', [AccountSetController::class, 'setNickname']); // 修改昵称
         Route::post('avatar', [AccountSetController::class, 'setUserAvatar']); // 修改头像
         Route::post('phone', [AccountSetController::class, 'setUserPhone']); // 修改注册手机号
+    });
+
+    // 购物车
+    Route::prefix('cart')->group(function () {
+        Route::get('list', [CartController::class, 'list']);        // 商品列表
+        Route::get('number', [CartController::class, 'number']);    // 有效购物车数量
+        Route::post('store', [CartController::class, 'store']);     // 添加
+        Route::post('destroy', [CartController::class, 'destroy']); // 删除
+        Route::post('change_number', [CartController::class, 'changeNumber']);  // 变更数量
+        Route::post('change_check', [CartController::class, 'changeCheck']);    // 变更选中结算
     });
 });

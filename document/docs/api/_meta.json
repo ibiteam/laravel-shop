@@ -40,5 +40,11 @@
         "name": "account_set",
         "label": "账户设置",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "cart",
+        "label": "购物车",
+        "collapsed": true
     }
 ]
