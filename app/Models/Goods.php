@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string                          $keywords        商品关键词
  * @property string                          $price           商品价格
  * @property int                             $total           商品库存
+ * @property int                             $sales_volume    销量
  * @property int                             $buy_min_number  最小起订量
  * @property int                             $type            库存类型 1下单减库存 2付款减库存
  * @property int                             $status          上下架状态 1上架 0下架
@@ -60,6 +61,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Goods whereNo($value)
  * @method static Builder<static>|Goods wherePrice($value)
  * @method static Builder<static>|Goods whereQuotaNumber($value)
+ * @method static Builder<static>|Goods whereSalesVolume($value)
  * @method static Builder<static>|Goods whereSort($value)
  * @method static Builder<static>|Goods whereStatus($value)
  * @method static Builder<static>|Goods whereStatusDatetime($value)
