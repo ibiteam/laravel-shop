@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string                          $sub_name        商品副标题
  * @property string                          $label           商品副标题
  * @property string                          $image           商品主图
- * @property string                          $keywords        商品关键词
+ * @property string                          $unit            商品单位
  * @property string                          $price           商品价格
  * @property int                             $total           商品库存
  * @property int                             $sales_volume    销量
@@ -55,7 +55,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Goods whereDeletedAt($value)
  * @method static Builder<static>|Goods whereId($value)
  * @method static Builder<static>|Goods whereImage($value)
- * @method static Builder<static>|Goods whereKeywords($value)
  * @method static Builder<static>|Goods whereLabel($value)
  * @method static Builder<static>|Goods whereName($value)
  * @method static Builder<static>|Goods whereNo($value)
@@ -68,6 +67,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Goods whereSubName($value)
  * @method static Builder<static>|Goods whereTotal($value)
  * @method static Builder<static>|Goods whereType($value)
+ * @method static Builder<static>|Goods whereUnit($value)
  * @method static Builder<static>|Goods whereUpdatedAt($value)
  * @method static Builder<static>|Goods whereVideo($value)
  * @method static Builder<static>|Goods whereVideoDuration($value)
@@ -81,6 +81,8 @@ class Goods extends Model
     use DatetimeTrait, SoftDeletes;
     public const STATUS_ON_SALE = 1; // 上架
     public const STATUS_NOT_SALE = 0; // 下架
+    public const QUOTA = 1; // 限购
+    public const NOT_QUOTA = 0; // 不限购
 
     protected $guarded = [];
 

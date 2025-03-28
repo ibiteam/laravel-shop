@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('sub_name')->comment('商品副标题');
             $table->string('label')->comment('商品副标题');
             $table->string('image')->comment('商品主图');
-            $table->string('keywords')->comment('商品关键词');
+            $table->string('unit')->comment('商品单位');
             $table->decimal('price', 13)->comment('商品价格');
             $table->integer('total')->comment('商品库存');
             $table->integer('sales_volume')->comment('销量');
