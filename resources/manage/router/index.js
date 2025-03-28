@@ -6,15 +6,15 @@ import GoodsForm from '@/pages/goods/GoodsForm.vue';
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
-        { path: '/', component: Home, name: 'home' },
         { path: '/login', component: Login, name: 'login' },
         { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
-        { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
+
         {
-            path:'/seller',
-            component: () => import('@/components/SellerLayout.vue'),
+            path:'/',
+            component: () => import('@/components/Layout.vue'),
             children:[
-                { path: 'home', component: import('@/pages/seller/Home.vue'), name: 'sellerHome' },
+                { path: 'home', component: import('@/pages/Home.vue'), name: 'sellerHome' },
+                { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
             ]
         },
         {
