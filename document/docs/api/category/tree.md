@@ -16,7 +16,6 @@
       "id": 1,
       "parent_id": 0,
       "name": "电子产品",
-      "logo": null,
       "children": [
         {
           "id": 6,
@@ -42,7 +41,6 @@
           "id": 7,
           "parent_id": 1,
           "name": "电脑",
-          "logo": null,
           "children": [
             {
               "id": 18,
@@ -62,7 +60,6 @@
           "id": 8,
           "parent_id": 1,
           "name": "电视",
-          "logo": null,
           "children": [
             {
               "id": 20,
@@ -78,7 +75,6 @@
       "id": 2,
       "parent_id": 0,
       "name": "家居用品",
-      "logo": null,
       "children": [
         {
           "id": 9,
@@ -98,7 +94,6 @@
       "id": 3,
       "parent_id": 0,
       "name": "图书",
-      "logo": null,
       "children": [
         {
           "id": 11,
@@ -118,7 +113,6 @@
       "id": 4,
       "parent_id": 0,
       "name": "服装",
-      "logo": null,
       "children": [
         {
           "id": 13,
@@ -132,7 +126,6 @@
       "id": 5,
       "parent_id": 0,
       "name": "运动户外",
-      "logo": null,
       "children": [
         {
           "id": 14,
