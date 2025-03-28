@@ -14,7 +14,3 @@ export function categoryEdit(data) {
 export function categoryDestroy(data) {
     return $http.doPost('manage/goods/category/destroy', data)
 }
-
-export function brandIndex(data) {
-    return $http.doGet('manage/goods/brand', data)
-}

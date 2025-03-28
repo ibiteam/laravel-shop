@@ -99,7 +99,40 @@ function doPost(url, param) {
     })
 }
 
+/**
+ * 文件上传
+ * @param url 请求地址
+ * @param param 请求参数
+ * @param method 请求方式
+ * @returns {Promise<never>|Promise<unknown>}
+ */
+function doUpload(url, param, method = 'post') {
+    let params = param || {};
+    let formData = new FormData();
+
+    if (!params.file) {
+        return Promise.reject('File is required');
+    }
+
+    formData.append('file', params.file);
+    formData.append('timeStamp', Math.floor(Date.now() / 1000));
+
+    return axios({
+        method,
+        url,
+        data: formData,
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+        .then(res => res.data)
+        .catch(err => {
+            return Promise.reject(err);
+        });
+}
+
 export default {
+    doUpload,
     doPost,
     doGet
 }

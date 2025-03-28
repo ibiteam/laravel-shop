@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 4872836 */
-  src: url('iconfont.woff2?t=1743068842079') format('woff2'),
-       url('iconfont.woff?t=1743068842079') format('woff'),
-       url('iconfont.ttf?t=1743068842079') format('truetype');
+  src: url('iconfont.woff2?t=1743154859282') format('woff2'),
+       url('iconfont.woff?t=1743154859282') format('woff'),
+       url('iconfont.ttf?t=1743154859282') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,50 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-bofang1:before {
+  content: "\e602";
+}
+
+.icon-shangchuan:before {
+  content: "\e606";
+}
+
+.icon-shangchuan1:before {
+  content: "\e661";
+}
+
+.icon-jiahao1:before {
+  content: "\e727";
+}
+
+.icon-bofang:before {
+  content: "\e798";
+}
+
+.icon-fenlei:before {
+  content: "\e799";
+}
+
+.icon-bianji:before {
+  content: "\e79a";
+}
+
+.icon-shanchu:before {
+  content: "\e79b";
+}
+
+.icon-shijian:before {
+  content: "\e79c";
+}
+
+.icon-baocun:before {
+  content: "\e79e";
+}
+
+.icon-mulu:before {
+  content: "\e605";
 }
 
 .icon-wenhao:before {

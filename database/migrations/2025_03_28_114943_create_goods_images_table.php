@@ -15,8 +15,7 @@ return new class extends Migration
         Schema::create('goods_images', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('goods_id')->comment('商品ID');
-            $table->string('goods_original')->comment('商品图片');
-            $table->string('goods_thumb')->comment('商品缩略图');
+            $table->string('image')->comment('商品图片');
             $table->timestamps();
 
             $table->foreign('goods_id')->references('id')->on((new Goods)->getTable());

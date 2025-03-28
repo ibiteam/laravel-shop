@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brands', function (Blueprint $table) {
+        Schema::create('search_keywords', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->comment('品牌名称');
-            $table->string('logo')->comment('品牌LOGO');
-            $table->smallInteger('sort')->comment('排序，值越大越靠前');
-            $table->boolean('is_show')->comment('是否显示 1显示 0不显示');
+            $table->string('keywords')->comment('关键字');
+            $table->integer('count')->default(1)->comment('搜索数量');
+            $table->tinyInteger('is_can_search')->default(0)->comment('是否可查询');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brands');
+        Schema::dropIfExists('search_keywords');
     }
 };

@@ -400,3 +400,46 @@ if (! function_exists('get_sensitive_words')) {
         }
     }
 }
+
+
+if (! function_exists('is_spider')) {
+    /**
+     * 是否是搜索引擎抓取.
+     */
+    function is_spider(): bool
+    {
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+        //搜索引擎
+        $spiders = [
+            '/sogou/i',
+            '/bing/i',
+            '/baidu/i',
+            '/google/i',
+            '/360/i',
+            '/soso/i',
+            '/msn/i',
+            '/ask/i',
+            '/Bot/i',
+            '/yahoo/i',
+            '/youdao/i',
+            '/AhrefsBot/i',
+            '/YisouSpider/i',
+            '/SemrushBot/i',
+            '/DotBot/i',
+            '/Bytespider/i',
+            '/YexBot/i',
+            '/zoominfobot/i',
+            '/Applebot/i',
+            '/MJ12bot/i',
+            '/YexBot/i',
+            '/Daum/i',
+            '/Trident\/4.0/i',
+            '/Gecko\/20100101/i',
+            '/Barkrowler/i',
+        ];
+
+        return ! is_null(Arr::first($spiders, function ($spider) use ($agent) {
+            return (bool) preg_match($spider, $agent);
+        }));
+    }
+}

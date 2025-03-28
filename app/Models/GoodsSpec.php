@@ -32,4 +32,11 @@ class GoodsSpec extends Model
     public const NOT_SHOW = 0; // 不展示
 
     protected $guarded = [];
+
+    protected function casts(): array
+    {
+        return [
+            'value' => 'json',
+        ];
+    }
 }

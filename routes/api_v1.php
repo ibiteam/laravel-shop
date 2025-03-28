@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AccountSetController;
 use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,8 +21,14 @@ Route::prefix('auth')->group(function () {
     Route::post('forget-password', [AuthController::class, 'forgetPassword']); // 忘记密码
 });
 
+// 搜索
+Route::prefix('search')->group(function () {
+    Route::post('goods', [SearchController::class, 'searchGoods']); // 搜索商品
+    Route::get('keywords', [SearchController::class, 'getKeywords']); // 获取搜索推荐关键字
+});
+
 // 分类
-Route::get('category', [CategoryController::class, 'index']);
+Route::get('category', [CategoryController::class, 'index']); // 树状结构
 
 /**
  * 登录可以访问路由.

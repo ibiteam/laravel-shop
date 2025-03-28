@@ -31,6 +31,12 @@
     },
     {
         "type": "dir",
+        "name": "search",
+        "label": "搜索",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
         "name": "account_set",
         "label": "账户设置",
         "collapsed": true

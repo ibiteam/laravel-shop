@@ -61,7 +61,6 @@ class CategoryDao
             'id' => $category->id,
             'parent_id' => $category->parent_id,
             'name' => $category->name,
-            'logo' => $category->logo,
             'children' => $category->allChildren->map(fn (Category $category) => $this->categoryFormat($category))->toArray(),
         ];
     }

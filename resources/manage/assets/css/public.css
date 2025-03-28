@@ -1,0 +1,4 @@
+.manage-public-wrap{max-height: 100%;overflow-y: auto;}
+.manage-public-wrap .manage-public-cont{background: #fff;margin-bottom: 20px;padding: 20px;}
+.manage-public-wrap .manage-public-cont:last-of-type{margin-bottom: 0;}
+.manage-public-wrap .manage-public-cont .manage-public-title{font-size: 18px;font-weight: bold;line-height: 30px;margin-bottom: 10px;}
