@@ -5,8 +5,8 @@
         :page-size="pageInfo.number"
         :layout="pageInfo.layout ? pageInfo.layout : 'total, sizes, prev, pager, next, jumper'"
         :total="pageInfo.total" 
-        @size-change="(value) => emit('sizeChange', value)"
-        @current-change="(value) => emit('currentChange', value)" 
+        @size-change="(value) => $emit('sizeChange', value)"
+        @current-change="(value) => $emit('currentChange', value)" 
         />
 </template>
 
@@ -22,8 +22,6 @@ defineProps({
                 total: 0,
                 pageSizes: [10, 20, 50, 100],
                 layout: "total, sizes, prev, pager, next, jumper",
-                handleSizeChange: (val) => { },
-                handleCurrentChange: (val) => { }
             }
         }
     }
