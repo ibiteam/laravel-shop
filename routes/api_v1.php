@@ -31,6 +31,12 @@ Route::prefix('search')->group(function () {
 // 分类
 Route::get('category', [CategoryController::class, 'index']); // 树状结构
 
+// 地区数据
+Route::prefix('region')->group(function () {
+    Route::post('/', [AddressController::class, 'region']); // 地区数据
+    Route::post('/group', [AddressController::class, 'regionGroup']); // 地区分组数据
+});
+
 /**
  * 登录可以访问路由.
  */
@@ -40,18 +46,15 @@ Route::middleware('api.auth')->group(function () {
         Route::post('edit-password', [AuthController::class, 'editPassword']); // 修改密码
     });
 
-    Route::get('region', [AddressController::class, 'region']); // 地区数据
-    Route::get('region_group', [AddressController::class, 'regionGroup']); // 地区分组数据
-
     // 用户地址
     Route::prefix('address')->group(function () {
         Route::post('list', [AddressController::class, 'index']); // 收货地址
-        Route::post('search_address', [AddressController::class, 'search_address']); // 搜索地址
+        Route::post('search', [AddressController::class, 'search']); // 搜索地址
         Route::post('show', [AddressController::class, 'show']); // 获取一条收货地址
         Route::post('default', [AddressController::class, 'setDefault']); // 设置默认地址
         Route::post('update', [AddressController::class, 'update']); // 添加|编辑 收货地址
         Route::post('destroy', [AddressController::class, 'destroy']); // 删除一条收货地址
-        Route::post('batch_destroy', [AddressController::class, 'batch_destroy']); // 批量删除
+        Route::post('batch_destroy', [AddressController::class, 'batchDestroy']); // 批量删除
     });
 
     // 个人信息设置

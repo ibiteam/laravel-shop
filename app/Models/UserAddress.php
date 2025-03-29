@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Http\Dao\RegionDao;
+use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -42,7 +43,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class UserAddress extends Model
 {
-
+    use DatetimeTrait;
     // 默认地址
     public const DEFAULT = 1;
     // 非默认地址
@@ -69,7 +70,7 @@ class UserAddress extends Model
      */
     public function regionProvince()
     {
-        return $this->belongsTo(Region::class, 'province', 'region_id');
+        return $this->belongsTo(Region::class, 'province', 'id');
     }
 
     /**
@@ -79,7 +80,7 @@ class UserAddress extends Model
      */
     public function regionCity()
     {
-        return $this->belongsTo(Region::class, 'city', 'region_id');
+        return $this->belongsTo(Region::class, 'city', 'id');
     }
 
     /**
@@ -89,7 +90,7 @@ class UserAddress extends Model
      */
     public function regionDistrict()
     {
-        return $this->belongsTo(Region::class, 'district', 'region_id');
+        return $this->belongsTo(Region::class, 'district', 'id');
     }
 
     /**
@@ -97,6 +98,6 @@ class UserAddress extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class);
     }
 }

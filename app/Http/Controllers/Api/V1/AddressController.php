@@ -32,7 +32,7 @@ class AddressController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search_address(Request $request)
+    public function search(Request $request)
     {
         $data = app(UserAddressDao::class)
             ->getAddrListsForUser($request->user()?->id ?: 0, $request->get('keywords'))
@@ -79,7 +79,7 @@ class AddressController extends BaseController
     /**
      * 批量删除收货地址
      */
-    public function batch_destroy(BatchDestroyAddressRequest $request)
+    public function batchDestroy(BatchDestroyAddressRequest $request)
     {
         $validate = $request->validated();
         $user = $request->user();

@@ -36,7 +36,6 @@ class RegionDao
         return Cache::rememberForever('getRegionTree', function () use ($specialRegion) {
             $rows = Region::query()
                 ->select('id', 'parent_id', 'name', 'code', 'pinyin')
-                ->where('is_enable', Region::ENABLE)
                 ->where('parent_id', '<>', 0)
                 ->whereNotIn('name', $specialRegion)
                 ->get()->toArray();
