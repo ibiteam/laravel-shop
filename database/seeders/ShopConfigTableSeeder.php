@@ -34,7 +34,10 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_ADDRESS, '');
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SERVICE_MOBILE, '');
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::ICP_NUMBER, '');
-        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::MANAGE_SHOP_COLOR, '#E48F34');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SHOP_COLOR, '#E48F34');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::IS_GRAY, 0);
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::PRICE_FORMAT, 2);
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void

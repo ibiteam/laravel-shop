@@ -39,11 +39,15 @@ class ShopConfig extends Model
     public const SHOP_ADDRESS = 'shop_address'; // 商城线下地址
     public const SERVICE_MOBILE = 'service_mobile'; // 服务热线
     public const ICP_NUMBER = 'icp_number'; // ICP 备案号
+    public const SHOP_COLOR = 'shop_color'; // 主题色
+    public const IS_GRAY = 'is_gray'; // 网站首页是否置灰
+
+    public const CURRENCY_FORMAT = 'currency_format'; // 对价格进行格式化
+    public const PRICE_FORMAT = 'price_format'; // 保留几位小数
 
     public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置组名
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
-    public const MANAGE_SHOP_COLOR = 'shop_color'; // 主题色
 
     protected $guarded = [];
 

@@ -25,6 +25,11 @@ class CartDao
 
             $validCarts = [];   // 有效的购物车记录
             $invalidCarts = []; // 无效的购物车记录
+            $total = [
+                'check_count' => 0,
+                'total_price_format' => 0, // 有格式
+                'total_price' => 0, // 无格式
+            ];
 
             foreach ($carts as $cart) {
                 if (! $cart->goods) {// 商品不存在
@@ -78,6 +83,11 @@ class CartDao
                         }
                     }
 
+                    if($cart->is_check == Cart::IS_CHECK_YES){
+                        $total['check_count'] ++;
+                        $total['total_price'] += $goods_price;
+                    }
+
                     $validCarts[] = [
                         'id' => $cart->id,
                         'buy_number' => $cart->buy_number,
@@ -98,9 +108,13 @@ class CartDao
                 }
             }
 
+            $total['total_price_format'] = price_number_format(max($total['total_price'], 0));
+            $total['total_price'] = to_number_format(max($total['total_price'], 0));
+
             return [
                 'valid_carts' => $validCarts,
                 'invalid_carts' => $invalidCarts,
+                'total' => $total,
             ];
         } catch (\Exception $e) {
             throw new BusinessException('购物车商品列表查询异常');

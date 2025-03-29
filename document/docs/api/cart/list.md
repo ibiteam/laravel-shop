@@ -15,16 +15,16 @@
     "valid_carts": [// 有效商品
       {
         "id": 3,
-        "buy_number": 3,
-        "is_check": 0,
-        "goods_sku_id": 0,
-        "goods": {
+        "buy_number": 3, // 购买数量
+        "is_check": 1,   // 是否选中 0-未选中 1-选中
+        "goods_sku_id": 0, // 商品sku id
+        "goods": {// 商品信息
           "id": 3,
           "name": "商品B",
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "299.99",
           "unit": "个",
-          "skus": [ ]
+          "skus": [ ]  // 商品sku信息
         }
       },
       {
@@ -78,7 +78,12 @@
           "invalid_type": "status_not_sale"
         }
       }
-    ]
+    ],
+    "total": {// 选中结算数据
+      "check_count": 1,  // 结算数量
+      "total_price_format": "￥299.99",  // 有格式 ￥0.00
+      "total_price": "299.99" // 无格式 0.00
+    }
   }
 }
 ```

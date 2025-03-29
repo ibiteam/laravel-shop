@@ -5,6 +5,7 @@ use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
 use App\Models\SensitiveWord;
+use App\Models\ShopConfig;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
@@ -441,5 +442,47 @@ if (! function_exists('is_spider')) {
         return ! is_null(Arr::first($spiders, function ($spider) use ($agent) {
             return (bool) preg_match($spider, $agent);
         }));
+    }
+}
+
+if (! function_exists('price_format')) {
+    /**
+     * 对价格进行格式化.
+     */
+    function price_format($price, $currency_format = ''): int|string
+    {
+        if ($price === '') {
+            return 0;
+        }
+
+        if ($currency_format === '') {
+            $currency_format = shop_config(ShopConfig::CURRENCY_FORMAT);
+        }
+
+        return sprintf($currency_format, $price);
+    }
+}
+
+if (! function_exists('price_number_format')) {
+    /**
+     * 对价格进行格式化并添加货币符号 保留2位或者后台配置的小数.
+     */
+    function price_number_format($price): int|string
+    {
+        return price_format(to_number_format($price));
+    }
+}
+
+if (! function_exists('to_number_format')) {
+    /**
+     * 对价格进行格式化 保留2位或者后台配置的小数.
+     */
+    function to_number_format($price, $config_price_format = '', $thousands_separator = ''): string
+    {
+        if (! $config_price_format) {
+            $config_price_format = shop_config(ShopConfig::PRICE_FORMAT);
+        }
+
+        return number_format($price, $config_price_format ?: 2, '.', $thousands_separator);
     }
 }
