@@ -4,16 +4,22 @@ namespace App\Http\Dao;
 
 use App\Models\Category;
 use App\Models\Goods;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchDao
 {
+
+    public const PRICE_DESC = 'price_desc';
+    public const PRICE_ASC = 'price_asc';
+    public const SALE_DESC = 'sale_desc';
+
     /**
      * 执行搜索并返回分页结果.
      */
-    public function searchGoods(array $params, int $user_id)
+    public function searchGoods(array $params, int $user_id): LengthAwarePaginator
     {
         $query = Goods::query()->show() // 只查询上架且审核通过的商品
-            ->select(['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image']);
+            ->select(['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume']);
 
         $add_keywords = '';
 
@@ -40,12 +46,16 @@ class SearchDao
 
         if (! empty($params['sort_type'])) {
             switch ($params['sort_type']) {
-                case 'price_asc':
+                case static::PRICE_ASC:
                     $query->orderBy('price', 'asc');
                     break;
 
-                case 'price_desc':
+                case static::PRICE_DESC:
                     $query->orderBy('price', 'desc');
+                    break;
+
+                case static::SALE_DESC:
+                    $query->orderBy('sales_volume', 'desc');
                     break;
 
                 default:

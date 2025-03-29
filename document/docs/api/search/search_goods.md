@@ -10,15 +10,15 @@
 
 ### 请求参数
 
-| 字段          | 是否必填 | 字段类型    | 说明                                             |
-|:------------|:-----|:--------|:-----------------------------------------------|
-| keywords    | Y    | string  | 搜索关键字                                          |
-| category_id | N    | integer | 分类ID                                           |
-| min_price   | N    | integer | 最小价格                                           |
-| max_price   | N    | integer | 最大价格                                           |
-| sort_type   | N    | string  | 排序类型(不传默认：sort；价格升序：price_asc；价格降序：price_desc) |
-| page        | Y    | integer | 页码                                             |
-| number      | Y    | integer | 每页数量                                           |
+| 字段          | 是否必填 | 字段类型    | 说明                                                            |
+|:------------|:-----|:--------|:--------------------------------------------------------------|
+| keywords    | Y    | string  | 搜索关键字                                                         |
+| category_id | N    | integer | 分类ID                                                          |
+| min_price   | N    | integer | 最小价格                                                          |
+| max_price   | N    | integer | 最大价格                                                          |
+| sort_type   | N    | string  | 排序类型(不传默认：sort；价格升序：price_asc；价格降序：price_desc；销量降序：sale_desc) |
+| page        | Y    | integer | 页码                                                            |
+| number      | Y    | integer | 每页数量                                                          |
 
 ### 返回示例
 
@@ -35,7 +35,8 @@
         "label": "标签C",
         "price": "399.99",
         "unit": "盒",
-        "image": "imageC.jpg"
+        "image": "imageC.jpg",
+        "sales_volume": 100
       },
       {
         "id": 2,
@@ -44,7 +45,8 @@
         "label": "标签B",
         "price": "299.99",
         "unit": "个",
-        "image": "imageB.jpg"
+        "image": "imageB.jpg",
+        "sales_volume": 10
       }
     ],
     "meta": {

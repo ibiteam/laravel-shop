@@ -89,6 +89,9 @@ class CartDao
                             'image' => $cart->goods->image,
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
+                            'total' => $cart->goods->total,
+                            'can_quota' => $cart->goods->can_quota,
+                            'quota_number' => $cart->goods->quota_number,
                             'skus' => $cart->goods->skus ?? [],
                         ],
                     ];
