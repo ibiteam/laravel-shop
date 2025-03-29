@@ -152,6 +152,16 @@ if (! function_exists('cache_forever')) {
     }
 }
 
+if (! function_exists('cache_remove')) {
+    /**
+     * 移除缓存.
+     */
+    function cache_remove($key)
+    {
+        return Cache::forget(config('cache.prefix').$key);
+    }
+}
+
 if (! function_exists('is_m_request')) {
     /**
      * 判断来源是否为H5.

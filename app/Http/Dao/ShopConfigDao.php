@@ -47,4 +47,12 @@ class ShopConfigDao
 
         return $collection;
     }
+
+    /**
+     * 获取指定配置 返回code=>value.
+     */
+    public function getConfigByCodes(array $codes): array
+    {
+        return ShopConfig::whereIn('code', $codes)->pluck('value', 'code')->toArray();
+    }
 }
