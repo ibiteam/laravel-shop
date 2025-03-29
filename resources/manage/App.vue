@@ -1,11 +1,14 @@
 <template>
     <div style="width: inherit; height: inherit;">
-        <router-view></router-view>
+        <el-config-provider :locale="zhCn">
+            <router-view></router-view>
+        </el-config-provider>
     </div>
 </template>
 
 <script lang="ts" setup>
 import {onMounted} from "vue";
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 onMounted(() => {
     function getCssVariableValue(variableName) {
         return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
