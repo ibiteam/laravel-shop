@@ -14,23 +14,23 @@
         size="400px"
         :before-close="handleCancle"
     >
-    <aside class="setting-bar-wrapper s-flex">
-        <div class="setting-bar-header s-flex ai-ct jc-bt">
-            <p class="fs16 fw-b">{{ name }}</p>
-            <el-radio-group v-model="formType">
-                <el-radio-button label="内容" :value="0" />
-                <el-radio-button label="样式" :value="1" />
-            </el-radio-group>
-        </div>
-        <div class="setting-bar-content">
-            <slot name="content" :type="formType"></slot>
-        </div>
-        <div class="setting-bar-footer s-flex ai-ct jc-ct">
-            <el-button @click="handleCancle">取消</el-button>
-            <el-button type="primary">保存</el-button>
-        </div>
-    </aside>
-  </el-drawer>
+        <aside class="setting-bar-wrapper s-flex">
+            <div class="setting-bar-header s-flex ai-ct jc-bt">
+                <p class="fs16 fw-b">{{ name }}</p>
+                <el-radio-group v-model="formType">
+                    <el-radio-button label="内容" :value="0" />
+                    <el-radio-button label="样式" :value="1" />
+                </el-radio-group>
+            </div>
+            <div class="setting-bar-content">
+                <slot name="content" :type="formType"></slot>
+            </div>
+            <div class="setting-bar-footer s-flex ai-ct jc-ct">
+                <el-button @click="handleCancle">取消</el-button>
+                <el-button type="primary">保存</el-button>
+            </div>
+        </aside>
+    </el-drawer>
 </template>
 
 <script setup>
@@ -63,6 +63,19 @@ const handleCancle = () => {
 }
 .setting-bar-item {
     border-top: 4px solid var(--page-bg-color);
+    font-size: 14px;
+    color: #333;
+    .item-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: bold;
+    }
+    .item-title-info {
+        color: #999;
+        line-height: 30px;
+        font-size: 12px;
+    }
 }
 .setting-drawer{
     width: 400px;

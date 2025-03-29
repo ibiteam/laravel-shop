@@ -22,18 +22,34 @@
         </drag-wrapper>
         <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.id">
             <template #content="slotProps">
-                {{slotProps.type}}
-                <div class="setting-bar-item"></div>
+                <div class="setting-bar-item" v-if="slotProps.type == 0">
+                    <div class="item-title">内容设置
+                        <el-button size="small">添加({{form.content.data.length}}/20)</el-button>
+                    </div>
+                    <p class="item-title-info">支持jpg、jpeg、png、gif格式；建议大小：2M内。</p>
+                    <VueDraggable
+                        class="group-dragable"
+                        v-model="form.content.data"
+                        :animation="1000"
+                        :group="{name: form.component_name, pull: true, put: true}"
+                        handle=".icon-drag"
+                        >
+                        <div class="group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
+                            <icon name="bars" class="icon-drag" size="20px"/>
+                        </div>
+                    </VueDraggable>
+                </div>
             </template>
         </setting-bar>
     </section>
 </template>
-
 <script setup>
 import DragWrapper from '@/pages/decoration/components/app/DragWrapper.vue'
 import ImageWrapper from '@/pages/decoration/components/app/ImageWrapper.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import { ref, reactive, watch, getCurrentInstance } from 'vue'
+import { VueDraggable } from 'vue-draggable-plus'
+import { Icon } from 'vant';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -102,6 +118,19 @@ watch([() => props.component], (newValue) => {
             border-radius: 20px;
             background-color: var(--main-color);
         }
+    }
+}
+.group-item {
+    width: 100%;
+    padding: 16px 20px 16px 0;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    position: relative;
+    .icon-drag {
+        padding: 10px;
+        cursor: move;
     }
 }
 </style>
