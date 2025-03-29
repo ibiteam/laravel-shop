@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/v1/address/search_address
+* /api/v1/address/search
 
 ### 请求方式
 * POST

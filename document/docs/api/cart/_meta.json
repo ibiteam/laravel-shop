@@ -4,5 +4,8 @@
     "store",
     "destroy",
     "change_number",
-    "change_check"
+    "change_check",
+    "empty_invalid",
+    "move_collect",
+    "place_order"
 ]

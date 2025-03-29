@@ -47,7 +47,7 @@ class Region extends Model
      */
     public function allChildren()
     {
-        return $this->hasMany(Region::class, 'parent_id', 'id')->whereIsEnable(self::ENABLE)->select(['id', 'name', 'parent_id', 'type', 'code'])->with('allChildren');
+        return $this->hasMany(Region::class, 'parent_id', 'id')->select(['id', 'name', 'parent_id', 'type', 'code'])->with('allChildren');
     }
 
     /**
@@ -55,6 +55,6 @@ class Region extends Model
      */
     public function children()
     {
-        return $this->hasMany(Region::class, 'parent_id', 'id')->whereIsEnable(Region::ENABLE)->select(['id', 'parent_id', 'id as value', 'name as text', 'name as label', 'code']);
+        return $this->hasMany(Region::class, 'parent_id', 'id')->select(['id', 'parent_id', 'id as value', 'name as text', 'name as label', 'code']);
     }
 }

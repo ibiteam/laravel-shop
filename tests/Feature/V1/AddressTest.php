@@ -12,11 +12,11 @@ it('test address list', function () {
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
 });
 
-it('test address search_address', function () {
+it('test address search', function () {
     $data = [
         'keywords' => 'jeck',
     ];
-    $response = $this->doPost('api/v1/address/search_address', $data);
+    $response = $this->doPost('api/v1/address/search', $data);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
