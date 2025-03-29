@@ -71,5 +71,8 @@ Route::middleware('api.auth')->group(function () {
         Route::post('destroy', [CartController::class, 'destroy']); // 删除
         Route::post('change_number', [CartController::class, 'changeNumber']);  // 变更数量
         Route::post('change_check', [CartController::class, 'changeCheck']);    // 变更选中结算
+        Route::post('empty_invalid', [CartController::class, 'emptyInvalid']);  // 清空失效
+        Route::post('move_collect', [CartController::class, 'moveCollect']);    // 移入收藏
+        Route::post('place_order', [CartController::class, 'placeOrder']);      // 去结算
     });
 });
