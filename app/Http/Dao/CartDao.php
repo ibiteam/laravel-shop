@@ -26,6 +26,7 @@ class CartDao
             $validCarts = [];   // 有效的购物车记录
             $invalidCarts = []; // 无效的购物车记录
             $total = [
+                'check_count' => 0,
                 'total_price_format' => 0, // 有格式
                 'total_price' => 0, // 无格式
             ];
@@ -83,6 +84,7 @@ class CartDao
                     }
 
                     if($cart->is_check == Cart::IS_CHECK_YES){
+                        $total['check_count'] ++;
                         $total['total_price'] += $goods_price;
                     }
 
