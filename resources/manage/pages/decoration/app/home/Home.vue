@@ -1,6 +1,13 @@
 <template>
     <div class="decoration-app-container">
-        <tool-bar v-bind="{component_icon: decoration.component_icon, component_value: decoration.component_value, component_data: decoration.data, }" ></tool-bar>
+        <tool-bar
+            v-bind="{
+                component_icon: decoration.component_icon,
+                component_value: decoration.component_value,
+                component_data: decoration.data,
+            }"
+            @updateDragPlaceholder="updateDragPlaceholder"
+        ></tool-bar>
         <main class="decoration-app-main">
             <div class="app-wrapper">
                 <search v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}"></search>
@@ -14,12 +21,13 @@
                     :group="{name: 'decoration', pull: true, put: true}"
                     :forceFallback="false"
                     @add="handleDragAdd">
-                    <block v-for="(temp, index) in decoration.data" :key="temp.id">
+                    <div v-for="(temp, index) in decoration.data" :key="temp.id">
+                        <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
                         <advertising-one v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-one>
                         <advertising-two v-else-if="temp.component_name == 'advertising_two'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-two>
                         <advertising-three v-else-if="temp.component_name == 'advertising_three'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-three>
                         <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else>{{ temp.component_name }}{{ temp.name }}</div>
-                    </block>
+                    </div>
                 </VueDraggable>
                 <bottom-nav-bar v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}"></bottom-nav-bar>
             </div>
@@ -37,7 +45,7 @@ import AdvertisingOne from './components/AdvertisingOne.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
 import DataExample from './DataExample'
-import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -54,24 +62,25 @@ const decoration = reactive({
     // 当前选中拖拽的索引
     temp_index: ''
 })
+// 拖拽占位 下标显示位置
+const dragPlaceholderIndex = ref(null)
 
 // 查找不可拖拽的数据
 const findNotForData = (component_name) => {
     return decoration.not_for_data.find(item => item.component_name === component_name)
 }
 console.log(DataExample)
-
+// 拖拽克隆完成
 const handleDragAdd = (e) => {
     console.log('handleDragAdd:')
     console.log(e)
     const { clonedData } = e
     decoration.temp_index = clonedData.id
-    // let {component_name, newIndex} = e.data
-    // let component = decoration.component_value.find(item => item.component_name === component_name)
-    // component.id = Math.round(new Date() / 1000) + 'add'
-    // decoration.data[newIndex] = component
 }
-
+// 拖拽过程中获取占位下标
+const updateDragPlaceholder = (index) => {
+    dragPlaceholderIndex.value = index
+}
 const handleDragChoose = (e) => {
     console.log(e)   
 }
@@ -199,6 +208,18 @@ onUnmounted(() => {
                     &::-webkit-scrollbar-thumb:vertical {
                         display: block;
                     }
+                }
+                .drag-placeholder {
+                    width: 375px;
+                    height: 44px;
+                    line-height: 44px;
+                    margin: 0 auto;
+                    border: 2px dotted var(--main-color);
+                    color: var(--main-color);
+                    text-align: center;
+                    box-sizing: border-box;
+                    background-color: var(--main-color-20);
+                    user-select: none;
                 }
             }
         }

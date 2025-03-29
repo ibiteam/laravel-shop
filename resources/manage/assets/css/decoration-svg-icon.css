@@ -1,0 +1,66 @@
+.decoration-svg {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    overflow: hidden;
+    position: relative;
+}
+/* 广告图1\2\3 */
+.advertising {
+    background: url('./../images/decoration/svg/ad.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 主题广告 */
+.theme-advertising {
+    background: url('./../images/decoration/svg/theme-ad.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 金刚区 */
+.quick-link {
+    background: url('./../images/decoration/svg/quick-link.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 品牌精选 */
+.brand-choice {
+    background: url('./../images/decoration/svg/brand-choice.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 频道广场 */
+.channel-square {
+    background: url('./../images/decoration/svg/channel-square.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 新闻 */
+.news {
+    background: url('./../images/decoration/svg/news.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 热力榜 */
+.hot-list {
+    background: url('./../images/decoration/svg/hot-list.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 限时抢购 */
+.flash-sale {
+    background: url('./../images/decoration/svg/flash-sale.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 推荐商家 */
+.recommend-seller {
+    background: url('./../images/decoration/svg/recommend-seller.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 为您推荐 */
+.recommend-theme {
+    background: url('./../images/decoration/svg/recommend-theme.svg') center no-repeat;
+    background-size: 100% auto;
+}
+/* 热销商品 */
+.hot-sale-good {
+    background: url('./../images/decoration/svg/hot-sale-good.svg') center no-repeat;
+    background-size: 100% auto;
+}
+
+
+
+
