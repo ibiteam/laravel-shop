@@ -165,31 +165,91 @@
                     <div>
                         <el-form-item label="单位" prop="unit">
                             <el-input v-model="updateForm.unit" placeholder="请输入商品单位" style="width: 160px;"></el-input>
-                            <div class="tips">
+                            <div class="tips" style="width: 100%;flex: none;">
                                 <span>选填，可输入件，公斤等，多单位可在下面商品规格名中标注</span>
                             </div>
                         </el-form-item>
                         <el-form-item>
                             <template #label>
                                 商品规格
-                                <el-popover
-                                    placement="right"
-                                    title=""
-                                    width="auto"
-                                    trigger="hover"
-                                    content="可添加多个规格属性的商品">
-                                    <template #reference>
-                                        <em class="iconfont" style="cursor: pointer;">&#xe72d;</em>
-                                    </template>
-                                </el-popover>
                             </template>
-                            <div class="specifications" :class="{ 's-flex' : !goods_specs_template.values.length , 'jc-bt' : !goods_specs_template.values.length , 'fd-rs' : !goods_specs_template.values.length }">
+                            <div class="specifications s-flex">
+                                <div style="min-width: 500px;">
+                                    <div class="specifications-box" v-if="goods_specs_template.values.length">
+                                        <el-form ref="templateFormRef" :model="goods_specs_template" :rules="templateRules">
+                                            <el-card class="specifications-list" style="padding-top: 0;width: 600px;" v-for="(item,index) in goods_specs_template.values" :key="index">
+                                                <div class="s-flex jc-fe" style="height: 20px;">
+                                                    <div style="cursor: pointer;" @click="delGoodsSpecs(index)">
+                                                        <em class="iconfont" style="font-size: 14px;">&#xe79b;</em>
+                                                    </div>
+                                                </div>
+                                                <div class="specifications-content s-flex jc-bt">
+                                                    <div class="left">
+                                                        <div class="label">
+                                                            <span>名称</span>
+                                                        </div>
+                                                        <el-form-item :prop="'values.' + index + '.spec_name'" style="margin: 3px 0;">
+                                                            <el-input v-model="item.spec_name" placeholder="请输入内容" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
+                                                        </el-form-item>
+                                                        <div class="tips" style="padding-top: 8px;">
+                                                            <span class="fs12" style="line-height: 16px;">名称如颜色、尺码等，最长4个字</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="right">
+                                                        <div class="label">
+                                                            <span>名称</span>
+                                                        </div>
+                                                        <div class="specifications-input">
+                                                            <template v-for="(its,ids) in item.spec_value">
+                                                                <el-form-item :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'" style="margin: 3px 0;">
+                                                                    <el-input v-model="its.spec_value_name"
+                                                                              placeholder="请输入规格项"
+                                                                              maxlength="10"
+                                                                              style="width: 150px;margin-right: 10px;"
+                                                                              :key="ids">
+                                                                        <template #suffix>
+                                                                            <i style="font-size: 12px;cursor: pointer;" class="iconfont" @click="delSpecs(index,ids)">&#xe79b;</i>
+                                                                        </template>
+                                                                    </el-input>
+                                                                </el-form-item>
+                                                            </template>
+                                                            <template v-if="goods_specs_template.values[index].spec_value.length < 6">
+                                                                <el-popover
+                                                                    placement="right"
+                                                                    title=""
+                                                                    width="auto"
+                                                                    trigger="hover"
+                                                                    :disabled="computedSpecs(index)"
+                                                                    content="请填写完当前规格项">
+                                                                    <template #reference>
+                                                                        <el-link type="primary" :underline="false" style="margin: 3px 0;" :disabled="!computedSpecs(index)" @click="addSpecs(index)"><i class="iconfont">&#xe727;</i>新增规格项</el-link>
+                                                                    </template>
+                                                                </el-popover>
+                                                            </template>
+                                                        </div>
+                                                        <div class="tips" style="padding-top: 8px;">
+                                                            <span class="fs12" style="line-height: 16px;">规格项最长为10个字，最多可添加6个规格项。</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </el-card>
+                                        </el-form>
+                                    </div>
+                                    <div class="specifications-btn">
+                                        <el-button type="danger" @click="addGoodsSpecs()" v-if="goods_specs_template.values.length < 3">添加</el-button>
+                                        <template v-if="goods_specs_template.values.length">
+                                            <el-button type="primary" v-if="!goods_specs_template.id"
+                                                       @click="updaterTemplate()">保存模板</el-button>
+                                            <el-button type="primary" @click="updaterTemplate()" v-else>更新模板</el-button>
+                                        </template>
+                                    </div>
+                                </div>
                                 <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择" style="width: 160px;" ref="mySelectRef">
+                                    <el-select placeholder="请选择" style="width: 160px;position: relative;" ref="mySelectRef" :style="{'left':goods_specs_template.values.length?'-160px':0}">
                                         <el-option v-for="(item,index) in specificationsArr" :key="item.id">
                                             <template #default>
                                                 <div class="option-li s-flex jc-bt ai-bs" @click="chooseSpecs(index)">
-                                                    <span>@{{ item.name }}</span>
+                                                    <span>{{ item.name }}</span>
                                                     <el-tag effect="dark" @click.native.stop="delSelect(index)" style="float: right; margin-top: 8px; margin-left: 3px">
                                                         <em class="iconfont">&#xe8b6;</em>
                                                     </el-tag>
@@ -198,95 +258,24 @@
                                         </el-option>
                                     </el-select>
                                 </div>
-                                <div class="specifications-box" v-if="goods_specs_template.values.length">
-                                    <el-form ref="templateFormRef" :model="goods_specs_template" :rules="templateRules">
-                                        <el-card class="specifications-list"
-                                                 v-for="(item,index) in goods_specs_template.values" :key="index">
-                                            <div class="s-flex jc-fe">
-                                                <div style="cursor: pointer;" @click="delGoodsSpecs(index)">
-                                                    <em class="iconfont" style="font-size: 14px;">&#xe686;</em>
-                                                </div>
-                                            </div>
-                                            <div class="specifications-content s-flex jc-bt">
-                                                <div class="left">
-                                                    <div class="label">
-                                                        <span>名称</span>
-                                                    </div>
-                                                    <el-form-item :prop="'values.' + index + '.spec_name'">
-                                                        <el-input v-model="item.spec_name"
-                                                                  placeholder="请输入内容"></el-input>
-                                                    </el-form-item>
-                                                    <div class="tips">
-                                                        <span>请输入规格名称</span>
-                                                    </div>
-                                                </div>
-                                                <div class="right">
-                                                    <div class="label">
-                                                        <span>名称</span>
-                                                    </div>
-                                                    <div class="specifications-input">
-                                                        <template v-for="(its,ids) in item.spec_value">
-                                                            <el-form-item
-                                                                :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'">
-                                                                <el-input v-model="its.spec_value_name"
-                                                                          placeholder="请输入规格项"
-                                                                          maxlength="10"
-                                                                          style="width: 120px;margin-right: 10px;"
-                                                                          :key="ids"><i slot="suffix"
-                                                                                        style="font-size: 12px;cursor: pointer;"
-                                                                                        class="iconfont"
-                                                                                        @click="delSpecs(index,ids)">&#xe686;</i>
-                                                                </el-input>
-                                                            </el-form-item>
-                                                        </template>
-                                                        <template v-if="goods_specs_template.values[index].spec_value.length < 6">
-                                                            <el-popover
-                                                                placement="right"
-                                                                title=""
-                                                                width="auto"
-                                                                trigger="hover"
-                                                                :disabled="computedSpecs(index)"
-                                                                content="请填写完当前规格项">
-                                                                <template #reference>
-                                                                    <el-link type="primary" :underline="false" icon="el-icon-plus" :disabled="!computedSpecs(index)" @click="addSpecs(index)">新增规格项</el-link>
-                                                                </template>
-
-                                                            </el-popover>
-                                                        </template>
-                                                    </div>
-                                                    <div class="tips">
-                                                        <span>规格项最长为10个字，最多可添加6个规格项。</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </el-card>
-                                    </el-form>
-                                </div>
-                                <div class="specifications-btn">
-                                    <el-button type="primary" size="small" @click="addGoodsSpecs()"
-                                               v-if="goods_specs_template.values.length < 3">添加</el-button>
-                                    <template v-if="goods_specs_template.values.length">
-                                        <el-button type="primary" size="small" v-if="!goods_specs_template.id"
-                                                   @click="updaterTemplate()">保存模板</el-button>
-                                        <el-button type="primary" size="small" @click="updaterTemplate()"
-                                                   v-else>更新模板</el-button>
-                                    </template>
-                                </div>
+                            </div>
+                            <div class="tips" style="width: 100%;">
+                                <span>可添加多个规格属性的商品</span>
                             </div>
                         </el-form-item>
                         <el-form-item label="销售规格" v-if="goods_specs_template.values.length">
-                            <div class="more-input s-flex jc-fe">
+                            <div class="more-input s-flex jc-fe" style="width: 100%;">
                                 <div class="more-li">
                                     <label>
                                         <span>价格</span>
                                     </label>
-                                    <el-input v-model="moreInput.shop_price" style="width: 80px;" placeholder="" @input="moreInput.shop_price = formatInput(moreInput.shop_price)"></el-input>
+                                    <el-input v-model="moreInput.shop_price" style="width: 80px;" size="small" placeholder="" @input="moreInput.shop_price = formatInput(moreInput.shop_price)"></el-input>
                                 </div>
                                 <div class="more-li">
                                     <label>
                                         <span>库存</span>
                                     </label>
-                                    <el-input v-model="moreInput.number" style="width: 80px;" placeholder="" @input="moreInput.number = formatInput(moreInput.number)"></el-input>
+                                    <el-input v-model="moreInput.number" style="width: 80px;" placeholder="" size="small"  @input="moreInput.number = formatInput(moreInput.number)"></el-input>
                                 </div>
                                 <el-button @click="filling()">批量填充</el-button>
                             </div>
@@ -300,17 +289,17 @@
                                     :prop="`template_${ids + 1}`"
                                     :label="its.spec_name?its.spec_name:'--'"
                                     :width="80">
-                                    <template slot-scope="scope">
-                                        <span>@{{ scope.row[`template_${ids + 1}`]?scope.row[`template_${ids + 1}`]:'--' }}</span>
+                                    <template #default="scope">
+                                        <span>{{ scope.row[`template_${ids + 1}`]?scope.row[`template_${ids + 1}`]:'--' }}</span>
                                     </template>
                                 </el-table-column>
                                 <el-table-column
                                     prop="thumb"
                                     label="颜色图片"
-                                    :width="120">
-                                    <template slot-scope="scope">
+                                    :width="90">
+                                    <template #default="scope">
                                         <el-upload
-                                            action="{{ route('manage.common.upload') }}"
+                                            action=""
                                             class="table-upload"
                                             :show-file-list="false"
                                             v-if="!scope.row.thumb"
@@ -328,7 +317,7 @@
                                 </el-table-column>
                                 <el-table-column
                                     label="价格">
-                                    <template slot-scope="scope">
+                                    <template #default="scope">
                                         <el-form-item :prop="'goods_skus.' + scope.$index + '.shop_price'"
                                                       :rules="more_integralPrice(scope.$index)">
                                             <el-input v-model="scope.row.shop_price" placeholder=""
@@ -338,7 +327,7 @@
                                 </el-table-column>
                                 <el-table-column
                                     label="库存">
-                                    <template slot-scope="scope">
+                                    <template #default="scope">
                                         <el-form-item :prop="'goods_skus.' + scope.$index + '.number'"
                                                       :rules="updateFormRules.number">
                                             <el-input v-model="scope.row.number" placeholder=""
@@ -348,8 +337,8 @@
                                 </el-table-column>
                                 <el-table-column
                                     label="是否显示"
-                                    :width="80">
-                                    <template slot-scope="scope">
+                                    :width="100">
+                                    <template #default="scope">
                                         <el-switch
                                             v-model="scope.row.is_show"
                                             :active-value="1"
@@ -372,11 +361,16 @@
                             </div>
                         </el-form-item>
                         <el-form-item label="库存" prop="goods_number">
-                            <el-input-number v-model="updateForm.goods_number" :disabled="!!updateForm.goods_skus.length"
-                                             :min="1" style="width: 160px;"></el-input-number>
-                            <div class="tips" v-if="goods_specs_template.values.length">
+                            <el-input-number v-model="updateForm.goods_number" :disabled="!!updateForm.goods_skus.length" :min="1" style="width: 160px;"></el-input-number>
+                            <div class="tips" v-if="goods_specs_template.values.length" style="width: 100%;flex: none;">
                                 <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
+                        </el-form-item>
+                        <el-form-item label="订单库存" prop="goods_number">
+                            <el-radio-group v-model="updateForm.is_order_goods_number">
+                                <el-radio :value="1">下单减库存</el-radio>
+                                <el-radio :value="2">付款减库存</el-radio>
+                            </el-radio-group>
                         </el-form-item>
                     </div>
                 </div>
@@ -397,6 +391,9 @@
                                 </el-radio-group>
                                 <div v-if="is_limit_number">
                                     <el-input-number v-model="updateForm.limit_number" :min="1"></el-input-number>
+                                    <div class="tips" style="width: 100%;flex: none;">
+                                        <span>用户总购买数量不超过{{ updateForm.limit_number }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </el-form-item>
@@ -424,6 +421,23 @@
         <el-dialog v-model="videoDialogShow" title="视频预览" width="600px" center>
             <video :src="updateForm.video" controls ref="videoRef" width="100%"></video>
         </el-dialog>
+        <el-dialog title="图片裁剪" v-model="cropperDialogShow" width="600px" center :show-close="false">
+            <div class="cropper-wrap bg-fff" style="width: 560px;height: 560px;">
+                <vue-cropper
+                    ref="cropperRef"
+                    :autoCrop="true"
+                    mode="cover"
+                    :autoCropWidth="480"
+                    :autoCropHeight="480"
+                    :fixedBox="true"
+                    :img="curentFileCropBlob">
+                </vue-cropper>
+            </div>
+            <div class="s-flex ai-ct jc-ct" style="padding-top: 15px;">
+                <el-button type="primary" @click="cropImageConfirm">确定裁剪</el-button>
+                <el-button type="default" @click="cropperDialogShow = false, curentFileCropBlob = null">取消</el-button>
+            </div>
+        </el-dialog>
     </div>
 
 </template>
@@ -432,8 +446,10 @@
 import Editor from '@/components/good/Editor.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 import { fileUpload } from '@/api/common'
-import { VueDraggable } from 'vue-draggable-plus'
 import _ from 'lodash'
+import { VueCropper }  from "vue-cropper";
+import 'vue-cropper/dist/index.css'
+import { VueDraggable } from 'vue-draggable-plus'
 const cns = getCurrentInstance().appContext.config.globalProperties
 const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
 
@@ -442,6 +458,10 @@ const baseRef = ref(null);
 const imgRef = ref(null);
 const priceRef = ref(null);
 const serviceRef = ref(null);
+// 图片裁剪
+const curentFileCropBlob = ref(null);
+const cropperRef = ref(null);
+const cropperDialogShow = ref(false);
 
 const scrollToCont = (type) => {
     const element = {
@@ -511,17 +531,17 @@ const attrTemplate = ref([{
             value: '均码'
         }]
     },
-    {
-        name: '模板2',
-        id:2,
-        values: [{
-            name: '是否有机',
-            value: '是的'
-        }, {
-            name: '发货地',
-            value: '原产地发货'
+        {
+            name: '模板2',
+            id:2,
+            values: [{
+                name: '是否有机',
+                value: '是的'
+            }, {
+                name: '发货地',
+                value: '原产地发货'
+            }]
         }]
-    }]
 )
 
 const inputValidatorTemplate = (rule, value, callback) => {
@@ -1012,28 +1032,67 @@ const playVideo = () => {
         videoRef.value.play()
     })
 }
-const uploadImage = (file, type, name) => {
-    fileUpload(file).then((res) => {
-        if (res.code == 200) {
-            if (type === 'thumb') {
-                let goods_skus = JSON.parse(JSON.stringify(updateForm.value.goods_skus))
-                goods_skus.map(a => {
-                    if (a.template_1 === name) {
-                        a.thumb = res.data.url
-                    }
-                })
-                updateForm.value.goods_skus = [
-                    ...goods_skus
-                ]
-            } else if(type === 'video'){
-                updateForm.value.video = res.data.url
-            }else {
-                updateForm.value.images.push(res.data.url)
+const loadFile = (file) => {
+    return new Promise((resolve, reject) => {
+        // 创建一个 FileReader 对象
+        const reader = new FileReader();
+        // 当文件读取成功时触发
+        reader.onload = (event) => {
+            if (event.target && event.target.result) {
+                // 解析为 DataURL 字符串
+                resolve(event.target.result);
+            } else {
+                reject(new Error('文件读取失败'));
             }
-        }
-    }).catch((err)=>{
-        cns.$message.error("上传失败");
+        };
+        // 当文件读取失败时触发
+        reader.onerror = () => {
+            reject(new Error('文件读取出错'));
+        };
+        // 以 DataURL 格式读取文件
+        reader.readAsDataURL(file);
+    });
+};
+
+const blobToFile = (blob)=> {
+    // 合并默认的文件类型选项
+    const defaultOptions = { type: blob.type };
+    // 创建 File 对象
+    return new File([blob],'裁剪图片.jpg');
+}
+const cropImageConfirm = () => {
+    cropperRef.value.getCropBlob((data)=>{
+        uploadImage({file:blobToFile(data)}, 'images-cropper')
     })
+}
+const uploadImage = async (file, type, name) => {
+    if(type === 'images'){
+        const dataUrl = await loadFile(file.file);
+        curentFileCropBlob.value = dataUrl
+        cropperDialogShow.value  = true
+    }else {
+        fileUpload(file).then((res) => {
+            if (res.code == 200) {
+                if (type === 'thumb') {
+                    let goods_skus = JSON.parse(JSON.stringify(updateForm.value.goods_skus))
+                    goods_skus.map(a => {
+                        if (a.template_1 === name) {
+                            a.thumb = res.data.url
+                        }
+                    })
+                    updateForm.value.goods_skus = [
+                        ...goods_skus
+                    ]
+                } else if(type === 'video'){
+                    updateForm.value.video = res.data.url
+                }else {
+                    updateForm.value.images.push(res.data.url)
+                }
+            }
+        }).catch((err)=>{
+            cns.$message.error("上传失败");
+        })
+    }
 }
 
 const setCheck = (val, type) => {
@@ -1114,6 +1173,12 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.cropper-box){
+    width: 560px;
+    height: 560px;
+    box-sizing: border-box; overflow: hidden;
+}
+
 .right-sidebar{
     width: 360px;
     background: #fff;
@@ -1259,6 +1324,24 @@ onBeforeUnmount(() => {
             display: flex;
             align-items: baseline;
         }
+
+        .table-upload :deep(.el-upload) {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-upload .avatar-uploader-icon {
+            font-size: 28px;
+            color: #8c939d;
+            width: 48px;
+            height: 48px;
+            line-height: 48px;
+            border-radius: 6px;
+            text-align: center;
+        }
     }
 }
 .update-box::-webkit-scrollbar {
@@ -1267,14 +1350,17 @@ onBeforeUnmount(() => {
 
 
 .specifications .specifications-box {
-    margin-top: 30px;
+    margin-top: 40px;
     margin-bottom: 30px;
 }
 
 .specifications-box .specifications-list {
     width: 100%;
     background: #FFFFFF;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    :deep(.el-card__body){
+        padding-top: 5px;
+    }
 }
 
 .specifications-box .specifications-list .specifications-content .left {
@@ -1308,23 +1394,6 @@ onBeforeUnmount(() => {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-}
-
-.table-upload .el-upload {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.table-upload .avatar-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 48px;
-    height: 48px;
-    line-height: 48px;
-    text-align: center;
 }
 
 .thumb {
@@ -1446,13 +1515,4 @@ onBeforeUnmount(() => {
     font-size: 12px;
 }
 
-
-@media only screen and (max-width: 1920px) {
-
-    @media screen and (max-width: 1450px) and (min-width: 1024px) and (max-height: 1000px) {
-        .update-box {
-            padding: 20px 10px;
-        }
-    }
-}
 </style>
