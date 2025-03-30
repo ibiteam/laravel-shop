@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/pages/user/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
+import MaterialIndex from '@/pages/material/Index.vue';
 import GoodsForm from '@/pages/goods/GoodsForm.vue';
 import ShopConfig from '@/pages/set/ShopConfig.vue';
 
@@ -18,6 +19,7 @@ const router = createRouter({
                 { path: 'home', component: import('@/pages/Home.vue'), name: 'sellerHome' },
                 { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
+                { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
                 { path: '/set/ShopConfig', component: ShopConfig, name: 'ShopConfig' },
                 { path: '/user/index', component: UserIndex , name: 'UserIndex' },
                 { path: '/user/address', component: UserAddress , name: 'UserAddress' },

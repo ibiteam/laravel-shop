@@ -1380,7 +1380,7 @@ onBeforeUnmount(() => {
     height: 100%;
     width: 1px;
     left: 0;
-    border-left: solid 1px #ccc;
+    border-left: solid 1px #eee;
 }
 
 .specifications-box .specifications-list .specifications-content .label span {

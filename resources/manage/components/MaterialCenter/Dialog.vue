@@ -303,8 +303,6 @@ const handleClose = () => {
         }
     }
 }
-</style>
-<style>
 .custom-dialog {
     padding: 0!important;
 }
