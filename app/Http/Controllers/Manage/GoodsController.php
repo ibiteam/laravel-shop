@@ -134,8 +134,7 @@ class GoodsController extends BaseController
                 if (! $goods instanceof Goods) {
                     throw new BusinessException('商品不存在');
                 }
-                $tmp_images = $goods->images->map(fn (GoodsImage $goodsImage) => ['image' => $goodsImage->image, 'type' => 'detail']);
-                $tmp_images->unshift(['image' => $goods->image, 'type' => 'main']);
+                $tmp_images = $goods->images->map(fn (GoodsImage $goodsImage) => $goodsImage->image)->unshift($goods->image);
                 // 商品SKU处理
                 $info = array_merge($info, [
                     'category_id' => $goods->category_id,
