@@ -240,8 +240,8 @@
                                         </template>
                                     </div>
                                 </div>
-                                <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择SKU模板" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
+                                <div class="specifications-select s-flex jc-fe attr-select-template" ref="skuSelectTemplateRef">
+                                    <el-select placeholder="请选择模板" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}" :append-to="skuSelectTemplateRef">
                                         <el-option v-for="(item,index) in specificationsArr" :key="item.id" :value="item.id" :label="item.name">
                                             <div class="attr-custom-item">
                                                 <div class="s-flex ai-ct">{{ item.name }} <i class="iconfont icon-bianji" @click.prevent.stop="chooseSpecs(index)"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="delSelect(index)"></i></div>
@@ -696,6 +696,7 @@ const currentChangeImageIndex = ref(-1);
 const updateFormRef = ref(null);
 const templateFormRef = ref(null);
 const mySelectRef = ref(null);
+const skuSelectTemplateRef = ref(null);
 const updateFormRules = ref({
     category_id: [
         { required: true, message: '请选择商品分类', trigger: 'change' },
@@ -1151,7 +1152,9 @@ const ctrlSkuTemplate = (type) => {
     templateFormRef.value.validate((valid) => {
         if (valid) {
             if (!specDataTemplate.value.name) {
-                cns.$dialog.prompt('请输入模板名称', '提示', {
+                cns.$dialog.prompt({
+                    message: '',
+                    title: '请输入模板名称',
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     inputPattern: /\S+/,
