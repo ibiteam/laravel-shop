@@ -83,14 +83,22 @@ class CartDao
                         }
                     }
 
+                    // 限购数量校验
+                    $buy_number = $cart->buy_number;
+                    if ($cart->goods->can_quota && $cart->goods->quota_number > 0) {
+                        if ($buy_number > $cart->goods->quota_number) {
+                            $buy_number = $cart->goods->quota_number;
+                        }
+                    }
+
                     if($cart->is_check == Cart::IS_CHECK_YES){
                         $total['check_count'] ++;
-                        $total['total_price'] += $goods_price;
+                        $total['total_price'] += $goods_price * $buy_number;
                     }
 
                     $validCarts[] = [
                         'id' => $cart->id,
-                        'buy_number' => $cart->buy_number,
+                        'buy_number' => $buy_number,
                         'is_check' => $cart->is_check,
                         'goods_sku_id' => $cart->goods_sku_id,
                         'goods' => [
