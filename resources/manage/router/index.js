@@ -16,7 +16,7 @@ const router = createRouter({
             path:'/',
             component: () => import('@/components/Layout.vue'),
             children:[
-                { path: 'home', component: import('@/pages/Home.vue'), name: 'sellerHome' },
+                { path: 'home', component: import('@/pages/Home.vue'), name: 'home' },
                 { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
                 { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
