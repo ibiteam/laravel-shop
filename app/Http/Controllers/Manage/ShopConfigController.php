@@ -6,6 +6,7 @@ use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminOperationLog;
 use App\Models\ShopConfig;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ShopConfigController extends BaseController
 {
@@ -14,32 +15,22 @@ class ShopConfigController extends BaseController
      */
     public function index(Request $request, ShopConfigDao $shop_config_dao)
     {
-        $active_name = $request->get('active_name', 'site_info');
+        try {
+            $validated = $request->validate([
+                'group_name' => 'required|string',
+            ], [], [
+                'group_name' => '组名',
+            ]);
 
-        $configCodes = match ($active_name) {
-            'site_info' => [// 站点信息
-                ShopConfig::SHOP_NAME,
-                ShopConfig::BANK_ACCOUNT,
-                ShopConfig::SHOP_ADDRESS,
-                ShopConfig::SERVICE_MOBILE,
-                ShopConfig::SHOP_COLOR,
-                ShopConfig::IS_GRAY,
-                ShopConfig::ICP_NUMBER,
-            ],
-            'site_logo' => [// 站点Logo
-                ShopConfig::SHOP_LOGO,
-                ShopConfig::SHOP_ICON,
-                ShopConfig::SHOP_MANAGE_LOGIN_IMAGE,
-            ],
-            'smtp_service' => [// 邮件服务
-                ShopConfig::SMTP_HOST,
-                ShopConfig::SMTP_PORT,
-                ShopConfig::SMTP_USER,
-                ShopConfig::SMTP_PASS,
-            ],
-        };
+            $group_name = $validated['group_name'] ?? 'site_info';
 
-        return $this->success($shop_config_dao->getConfigByCodes($configCodes));
+            return $this->success($shop_config_dao->getConfigByGroupName($group_name));
+
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (\Throwable $throwable) {
+            return $this->error('获取配置信息异常~');
+        }
     }
 
     /**
@@ -66,7 +57,7 @@ class ShopConfigController extends BaseController
         // 重新更新缓存
         $shop_config_dao->getAll();
 
-        admin_operation_log($this->adminUser(), "更新了商店设置的【'.$tab_label.'】", AdminOperationLog::TYPE_UPDATE);
+        admin_operation_log($this->adminUser(), "更新了商店设置的【".$tab_label."】", AdminOperationLog::TYPE_UPDATE);
 
         return $this->success('更新成功');
     }

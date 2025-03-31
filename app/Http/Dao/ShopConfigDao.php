@@ -55,4 +55,12 @@ class ShopConfigDao
     {
         return ShopConfig::whereIn('code', $codes)->pluck('value', 'code')->toArray();
     }
+
+    /**
+     * 获取指定配置 返回code=>value.
+     */
+    public function getConfigByGroupName(String $group_name): array
+    {
+        return ShopConfig::whereGroupName($group_name)->pluck('value', 'code')->toArray();
+    }
 }
