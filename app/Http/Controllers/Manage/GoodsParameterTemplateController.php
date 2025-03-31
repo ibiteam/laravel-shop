@@ -43,7 +43,7 @@ class GoodsParameterTemplateController extends BaseController
             ]);
             admin_operation_log($this->adminUser(), "添加了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_STORE);
 
-            return $this->success('添加成功');
+            return $this->success(['id' => $goods_parameter_template->id]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
