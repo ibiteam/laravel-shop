@@ -486,9 +486,7 @@ const handleAfterUpload = (file) => {
             let reader = new FileReader();
             reader.readAsArrayBuffer(file);
             reader.onload = () => {
-                const fromdata = new FormData();
-                fromdata.append('file', file);
-                fileUpload(fromdata).then((res) => {
+                fileUpload({ file }).then((res) => {
                     if (res.code == 200) {
                         resolve({ status: 'success', url: res.data.url });
                     } else {

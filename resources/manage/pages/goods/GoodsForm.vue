@@ -9,10 +9,10 @@
                             <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
                         </el-form-item>
                         <el-form-item label="商品名称" prop="name">
-                            <el-input v-model="updateForm.name" placeholder="请输入商品名称" style="width: 450px;"></el-input>
+                            <el-input v-model="updateForm.name" placeholder="请输入商品名称" style="width: 450px;" maxlength="60" show-word-limit></el-input>
                         </el-form-item>
                         <el-form-item label="商品标签" prop="label">
-                            <el-input v-model="updateForm.label" :maxlength="5" show-word-limit placeholder="可填写热卖，推荐等" style="width: 450px;"></el-input>
+                            <el-input v-model="updateForm.label" :maxlength="6" show-word-limit placeholder="可填写热卖，推荐等" style="width: 450px;"></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
@@ -25,7 +25,7 @@
                             </el-popover>
                         </el-form-item>
                         <el-form-item label="商品副标题" prop="sub_name">
-                            <el-input v-model="updateForm.sub_name" style="width: 450px;" placeholder="请输入商品副标题"></el-input>
+                            <el-input v-model="updateForm.sub_name" style="width: 450px;" placeholder="请输入商品副标题" maxlength="60" show-word-limit></el-input>
                             <el-popover
                                 placement="right"
                                 title=""
@@ -169,10 +169,7 @@
                                 <span>选填，可输入件，公斤等，多单位可在下面商品规格名中标注</span>
                             </div>
                         </el-form-item>
-                        <el-form-item>
-                            <template #label>
-                                商品规格
-                            </template>
+                        <el-form-item label="商品规格">
                             <div class="specifications s-flex">
                                 <div style="min-width: 500px;">
                                     <div class="specifications-box" v-if="specDataTemplate.values.length">
@@ -189,7 +186,7 @@
                                                             <span>名称</span>
                                                         </div>
                                                         <el-form-item :prop="'values.' + index + '.spec_name'" style="margin: 3px 0;">
-                                                            <el-input v-model="item.spec_name" placeholder="请输入内容" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
+                                                            <el-input v-model="item.spec_name" placeholder="请输入规格名" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
                                                         </el-form-item>
                                                         <div class="tips" style="padding-top: 8px;">
                                                             <span class="fs12" style="line-height: 16px;">名称如颜色、尺码等，最长4个字</span>
@@ -203,8 +200,8 @@
                                                             <template v-for="(its,ids) in item.spec_value">
                                                                 <el-form-item :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'" style="margin: 3px 0;">
                                                                     <el-input v-model="its.spec_value_name"
-                                                                              placeholder="请输入规格项"
-                                                                              maxlength="10"
+                                                                              placeholder="请输入规格值"
+                                                                              maxlength="6"
                                                                               style="width: 150px;margin-right: 10px;"
                                                                               :key="ids">
                                                                         <template #suffix>
@@ -228,7 +225,7 @@
                                                             </template>
                                                         </div>
                                                         <div class="tips" style="padding-top: 8px;">
-                                                            <span class="fs12" style="line-height: 16px;">规格项最长为10个字，最多可添加6个规格项。</span>
+                                                            <span class="fs12" style="line-height: 16px;">规格项最长为6个字，最多可添加6个规格项。</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -238,8 +235,7 @@
                                     <div class="specifications-btn">
                                         <el-button type="danger" @click="addGoodsSpecs()" v-if="specDataTemplate.values.length < 3">添加</el-button>
                                         <template v-if="specDataTemplate.values.length">
-                                            <el-button type="primary" v-if="!specDataTemplate.id"
-                                                       @click="updaterTemplate()">保存模板</el-button>
+                                            <el-button type="primary" v-if="!specDataTemplate.id" @click="updaterTemplate()">保存模板</el-button>
                                             <el-button type="primary" @click="updaterTemplate()" v-else>更新模板</el-button>
                                         </template>
                                     </div>
@@ -263,7 +259,10 @@
                                 <span>可添加多个规格属性的商品</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="销售规格" v-if="specDataTemplate.values.length">
+                        <el-form-item label="价格与库存" v-if="specDataTemplate.values.length" class="is-required">
+                            <template #label>
+                                <label class="el-form-item__label">价格与库存</label>
+                            </template>
                             <div class="more-input s-flex jc-fe" style="width: 100%;">
                                 <div class="more-li">
                                     <label>
@@ -294,7 +293,8 @@
                                     v-for="(its,ids) in specDataTemplate.values"
                                     :prop="`template_${ids + 1}`"
                                     :label="its.spec_name?its.spec_name:'--'"
-                                    :width="80">
+                                    align="center"
+                                    :width="100">
                                     <template #default="scope">
                                         <span>{{ scope.row[`template_${ids + 1}`]?scope.row[`template_${ids + 1}`]:'--' }}</span>
                                     </template>
@@ -302,7 +302,8 @@
                                 <el-table-column
                                     prop="thumb"
                                     label="颜色图片"
-                                    :width="90">
+                                    align="center"
+                                    :width="120">
                                     <template #default="scope">
                                         <el-upload
                                             action=""
@@ -323,7 +324,9 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="积分">
+                                    label="积分"
+                                    align="center"
+                                    min-width="120">
                                     <template #default="scope">
                                         <el-form-item :prop="'sku_data.' + scope.$index + '.integral_money'"
                                                       :rules="moreIntegralPrice(scope.$index)">
@@ -333,7 +336,9 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="价格">
+                                    label="价格"
+                                    align="center"
+                                    min-width="120">
                                     <template #default="scope">
                                         <el-form-item :prop="'sku_data.' + scope.$index + '.shop_price'"
                                                       :rules="moreIntegralPrice(scope.$index)">
@@ -343,7 +348,9 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
-                                    label="库存">
+                                    label="库存"
+                                    align="center"
+                                    min-width="120">
                                     <template #default="scope">
                                         <el-form-item :prop="'sku_data.' + scope.$index + '.number'"
                                                       :rules="updateFormRules.number">
@@ -354,7 +361,8 @@
                                 </el-table-column>
                                 <el-table-column
                                     label="是否显示"
-                                    :width="100">
+                                    :width="100"
+                                    align="center">
                                     <template #default="scope">
                                         <el-switch
                                             v-model="scope.row.is_show"
@@ -443,14 +451,14 @@
         <el-dialog v-model="videoDialogShow" title="视频预览" width="600px" center>
             <video :src="updateForm.video" controls ref="videoRef" width="100%"></video>
         </el-dialog>
-        <el-dialog title="图片裁剪" v-model="cropperDialogShow" width="600px" center :show-close="false">
-            <div class="cropper-wrap bg-fff" style="width: 560px;height: 560px;">
+        <el-dialog title="图片裁剪" v-model="cropperDialogShow" width="700px" center :show-close="false">
+            <div class="cropper-wrap bg-fff" style="width: 660px;height: 660px;">
                 <vue-cropper
                     ref="cropperRef"
                     :autoCrop="true"
                     mode="cover"
-                    :autoCropWidth="480"
-                    :autoCropHeight="480"
+                    :autoCropWidth="500"
+                    :autoCropHeight="500"
                     :fixedBox="true"
                     :img="curentFileCropBlob">
                 </vue-cropper>
@@ -1213,8 +1221,8 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 :deep(.cropper-box){
-    width: 560px;
-    height: 560px;
+    width: 660px;
+    height: 660px;
     box-sizing: border-box; overflow: hidden;
 }
 
