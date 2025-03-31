@@ -6,7 +6,7 @@
                     <div class="manage-public-title">基础信息</div>
                     <div>
                         <el-form-item label="分类" prop="category_id">
-                            <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" @change="selectUpdateFormCategory" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
+                            <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" @change="selectedCategory" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
                         </el-form-item>
                         <el-form-item label="商品名称" prop="name">
                             <el-input v-model="updateForm.name" placeholder="请输入商品名称" style="width: 450px;" maxlength="60" show-word-limit></el-input>
@@ -54,8 +54,8 @@
                                     <div style="width: 100%;">
                                         <div>
                                             <el-button type="danger" @click="addGoodsAttr">添加</el-button>
-                                            <el-button @click="ctrlAttrTemplate('save')" v-if="updateForm.parameters.length">存为模板</el-button>
-                                            <el-button @click="ctrlAttrTemplate('update')" v-if="currentAttrTemplate&&updateForm.parameters.length">更新模板</el-button>
+                                            <el-button @click="ctrlParameterTemplate('save')" v-if="updateForm.parameters.length">存为模板</el-button>
+                                            <el-button @click="ctrlParameterTemplate('update')" v-if="currentParameterTemplate&&updateForm.parameters.length">更新模板</el-button>
                                         </div>
 
                                         <div class="tips" v-if="!updateForm.parameters.length">
@@ -63,11 +63,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="width: 200px;" ref="attrSelectTemplateRef" class="attr-select-template">
-                                    <el-select placeholder="属性模板" v-model="currentAttrTemplate" :append-to="attrSelectTemplateRef" @change="changeAttrTemplate">
-                                        <el-option v-for="(templateItem,i) in attrTemplate" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
+                                <div style="width: 200px;" ref="selectParameterTemplateRef" class="attr-select-template">
+                                    <el-select placeholder="属性模板" v-model="currentParameterTemplate" :append-to="selectParameterTemplateRef" @change="selectedParameterTemplate">
+                                        <el-option v-for="(templateItem,i) in parameterTemplateArr" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
                                             <div class="attr-custom-item">
-                                                <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateAttrTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateAttrTemplate(templateItem,i,'delete')"></i></div>
+                                                <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateParameterTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateParameterTemplate(templateItem,i,'delete')"></i></div>
                                                 <p class="co-999 fs14">更新时间: {{ templateItem.updated_at }}</p>
                                             </div>
                                         </el-option>
@@ -240,8 +240,8 @@
                                         </template>
                                     </div>
                                 </div>
-                                <div class="specifications-select s-flex jc-fe attr-select-template" ref="skuSelectTemplateRef">
-                                    <el-select placeholder="请选择模板" v-model="currentSkuTemplate" style="width: 160px;position: relative;height: 40px;left: -160px;" :append-to="skuSelectTemplateRef" @change="changeSkuTemplate">
+                                <div class="specifications-select s-flex jc-fe attr-select-template" ref="selectedSkuTemplateRef">
+                                    <el-select placeholder="请选择模板" v-model="currentSkuTemplate" style="width: 160px;position: relative;height: 40px;left: -160px;" :append-to="selectedSkuTemplateRef" @change="changeSkuTemplate">
                                         <el-option v-for="(item,index) in specificationsArr" :key="item.id" :value="item.id" :label="item.name">
                                             <div class="attr-custom-item">
                                                 <div class="s-flex ai-ct">{{ item.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateSkuTemplate(item,index,'update')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateSkuTemplate(item,index,'destroy')"></i></div>
@@ -435,12 +435,12 @@
                     :autoCropWidth="500"
                     :autoCropHeight="500"
                     :fixedBox="true"
-                    :img="curentFileCropBlob">
+                    :img="currentFileCropBlob">
                 </vue-cropper>
             </div>
             <div class="s-flex ai-ct jc-ct" style="padding-top: 15px;">
                 <el-button type="primary" @click="cropImageConfirm">确定裁剪</el-button>
-                <el-button type="default" @click="cropperDialogShow = false, curentFileCropBlob = null">取消</el-button>
+                <el-button type="default" @click="cropperDialogShow = false, currentFileCropBlob = null">取消</el-button>
             </div>
         </el-dialog>
         <input type="file" ref="fileImgRef" style="display: none" @change="(event) => {handleFileChange(event, 'image')}" accept="image/*">
@@ -471,20 +471,117 @@ import 'vue-cropper/dist/index.css'
 import { VueDraggable } from 'vue-draggable-plus'
 import { useRoute,useRouter } from 'vue-router';
 const router = useRouter()
+const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties
-const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
 
+/* 校验模板名称 */
+const validatorTemplateName = (rule, value, callback) => {
+    if (value == '' || value == null) {
+        callback(new Error('模板名称不能为空'));
+    }else if(value.length > 20){
+        callback(new Error('模板名称不能超过10个字符'));
+    }else{
+        callback();
+    }
+}
+
+/* 商品分类 */
+const category = ref([]);
+/* 商品分类选择触发函数 */
+const selectedCategory = (item) => {
+    if (item == undefined) {
+        updateForm.value.category_id = '';
+    } else {
+        updateForm.value.category_id = item[parseInt(item.length) - 1]
+    }
+}
+
+/* 产品参数模板 */
+const selectParameterTemplateRef = ref(null)
+const currentParameterTemplate = ref('')
+const parameterTemplateArr = ref([])
+const updateParameterTemplate = (item,i,type) => {
+    if(type == 'edit'){
+        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('修改产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        })
+    }else {
+        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
+            parameterTemplateArr.value.splice(i, 1);
+            goodsParameterTemplateDestroy({id: item.id}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('删除产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        }).catch(() => {
+        });
+    }
+}
+const selectedParameterTemplate = (value) => {
+    if(value){
+        parameterTemplateArr.value.forEach((item,i) => {
+            if(item.id == value){
+                updateForm.value.parameters = item.values
+            }
+        })
+    }
+}
+const ctrlParameterTemplate = (type) => {
+    if(type == 'save'){
+        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
+                if (res.code === 200) {
+                    getParameterTemplate(res.data.id)
+                    cns.$message.success('保存产品参数模板成功')
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        })
+    }else if(type == 'update'){
+        goodsParameterTemplateUpdate({ id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
+            if (res.code === 200) {
+                cns.$message.success('更新产品参数模板成功')
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
+    }
+}
+const getParameterTemplate = (id) => {
+    getGoodsParameterTemplate().then(res => {
+        if (res.code === 200) {
+            parameterTemplateArr.value = [...res.data]
+            currentParameterTemplate.value = id
+        }
+    })
+}
+
+/* 商品规格模板 */
+
+
+// 图片裁剪
+const currentFileCropBlob = ref(null);
+const cropperRef = ref(null);
+const cropperDialogShow = ref(false);
+
+const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
 const wrapRef = ref(null);
 const baseRef = ref(null);
 const imgRef = ref(null);
 const priceRef = ref(null);
 const serviceRef = ref(null);
-// 图片裁剪
-const curentFileCropBlob = ref(null);
-const cropperRef = ref(null);
-const cropperDialogShow = ref(false);
-
 const scrollToCont = (type) => {
     const element = {
         baseRef: baseRef,
@@ -543,81 +640,6 @@ const validatePrice = (rule, value, callback, type) => {
         callback();
     }
 }
-const attrSelectTemplateRef = ref(null)
-const currentAttrTemplate = ref('')
-const attrTemplate = ref([])
-
-const inputValidatorTemplate = (rule, value, callback) => {
-    if (value == '' || value == null) {
-        callback(new Error('模板名称不能为空'));
-    }else if(value.length > 20){
-        callback(new Error('模板名称不能超过10个字符'));
-    }else{
-        callback();
-    }
-}
-const updateAttrTemplate = (item,i,type) => {
-    if(type == 'edit'){
-        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
-                if (res.code === 200) {
-                    cns.$message.success('修改产品参数模板成功')
-                    getParameterTemplate()
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        })
-    }else {
-        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
-            attrTemplate.value.splice(i, 1);
-            goodsParameterTemplateDestroy({id: item.id}).then(res => {
-                if (res.code === 200) {
-                    cns.$message.success('删除产品参数模板成功')
-                    getParameterTemplate()
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        }).catch(() => {
-        });
-    }
-}
-
-const changeAttrTemplate = (value) => {
-    if(value){
-        attrTemplate.value.forEach((item,i) => {
-            if(item.id == value){
-                updateForm.value.parameters = item.values
-            }
-        })
-    }
-}
-
-const ctrlAttrTemplate = (type) => {
-    if(type == 'save'){
-        // 存为新模板，需要把currentAttrTemplate.value置为当前返回的id
-        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
-                if (res.code === 200) {
-                    getParameterTemplate(res.data.id)
-                    cns.$message.success('保存产品参数模板成功')
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        })
-    }else if(type == 'update'){
-        // 更新当前模板，需传currentAttrTemplate.value
-        goodsParameterTemplateUpdate({ id: currentAttrTemplate.value, values: updateForm.value.parameters }).then(res => {
-            if (res.code === 200) {
-                cns.$message.success('更新产品参数模板成功')
-            } else {
-                cns.$message.error(res.message)
-            }
-        })
-    }
-}
 
 const validateContent = (rule, value, callback) => {
     if (updateForm.value.content == '' || updateForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
@@ -643,8 +665,6 @@ const specValue = (rule, value, callback, index, id) => {
         callback();
     }
 }
-// 分类数据
-const category = ref([]);
 
 const updateForm = ref({
     id: 0,
@@ -661,7 +681,7 @@ const updateForm = ref({
     integral:0, //积分价格
     total: 0,
     type: 1,
-    content: '系信息信息寻寻寻',
+    content: '',
     status: 1,
     can_quota: 0,
     quota_number: 0,
@@ -680,7 +700,7 @@ const currentChangeImageIndex = ref(-1);
 
 const updateFormRef = ref(null);
 const templateFormRef = ref(null);
-const skuSelectTemplateRef = ref(null);
+const selectedSkuTemplateRef = ref(null);
 const updateFormRules = ref({
     category_id: [
         { required: true, message: '请选择商品分类', trigger: 'change' },
@@ -720,7 +740,6 @@ const updateFormRules = ref({
         { required: true, message: '请输入商品库存', trigger: 'blur' },
     ]
 });
-const route = useRoute();
 /* 设置信息 */
 const settings = ref({
     is_open_integral: false
@@ -812,15 +831,6 @@ const getSkuTemplate = () => {
     getGoodsSkuTemplate().then(res => {
         if (res.code === 200) {
             specificationsArr.value = [...res.data]
-        }
-    })
-}
-/* 获取商品参数模板 */
-const getParameterTemplate = (id) => {
-    getGoodsParameterTemplate().then(res => {
-        if (res.code === 200) {
-            attrTemplate.value = [...res.data]
-            currentAttrTemplate.value = id
         }
     })
 }
@@ -1047,7 +1057,7 @@ const cropImageConfirm = () => {
 const uploadImage = async (file, type, name) => {
     if(type === 'images'){
         const dataUrl = await loadFile(file.file);
-        curentFileCropBlob.value = dataUrl
+        currentFileCropBlob.value = dataUrl
         cropperDialogShow.value  = true
     }else {
         fileUpload(file).then((res) => {
@@ -1131,7 +1141,7 @@ const ctrlSkuTemplate = (type) => {
 /* 修改模板名称或删除模板 */
 const updateSkuTemplate = (item,i,type) => {
     if(type == 'update'){
-        cns.$dialog.prompt({message: '修改商品规格模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
+        cns.$dialog.prompt({message: '修改商品规格模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsSkuTemplateUpdate({id: item.id, name: value}).then(res => {
                 if (res.code === 200) {
                     cns.$message.success('修改商品规格模板成功')
@@ -1143,7 +1153,7 @@ const updateSkuTemplate = (item,i,type) => {
         })
     }else {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
-            attrTemplate.value.splice(i, 1);
+            parameterTemplateArr.value.splice(i, 1);
             goodsSkuTemplateDestroy({id: item.id}).then(res => {
                 if (res.code === 200) {
                     cns.$message.success('删除商品规格模板成功')
@@ -1154,15 +1164,6 @@ const updateSkuTemplate = (item,i,type) => {
             })
         }).catch(() => {
         });
-    }
-}
-
-/* 商品分类选择触发函数 */
-const selectUpdateFormCategory = (item) => {
-    if (item == undefined) {
-        updateForm.value.category_id = '';
-    } else {
-        updateForm.value.category_id = item[parseInt(item.length) - 1]
     }
 }
 
