@@ -39,8 +39,8 @@ const secondHandleClick = (tab, event) => {
     setInfo(secondActiveName.value);
 };
 
-const setInfo = (active_name) => {
-    shopConfigIndex({active_name:active_name}).then(res => {
+const setInfo = (group_name) => {
+    shopConfigIndex({group_name:group_name}).then(res => {
         if (res.code === 200) {
             Object.assign(inputFrom, res.data);
         } else {

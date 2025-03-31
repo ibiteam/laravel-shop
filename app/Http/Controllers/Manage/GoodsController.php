@@ -39,7 +39,7 @@ class GoodsController extends BaseController
         $update_end_time = $request->get('update_end_time');
         $number = (int) $request->get('limit', 10);
 
-        $list = Goods::query()->latest()->with('category:id,name')
+        $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
             ->when($goods_id, fn (Builder $query) => $query->where('id', $goods_id))
             ->when($category_id, fn (Builder $query) => $query->where('category_id', $category_id))
             ->when($no, fn (Builder $query) => $query->where('no', $no))
@@ -49,7 +49,7 @@ class GoodsController extends BaseController
             ->when($create_end_time, fn (Builder $query) => $query->where('created_at', '<=', $create_end_time))
             ->when($update_start_time, fn (Builder $query) => $query->where('updated_at', '>=', $update_start_time))
             ->when($update_end_time, fn (Builder $query) => $query->where('updated_at', '<=', $update_end_time))
-            ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
+            ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
             ->paginate($number);
 
         return $this->success(new CommonResourceCollection($list));
@@ -134,8 +134,7 @@ class GoodsController extends BaseController
                 if (! $goods instanceof Goods) {
                     throw new BusinessException('商品不存在');
                 }
-                $tmp_images = $goods->images->map(fn (GoodsImage $goodsImage) => ['image' => $goodsImage->image, 'type' => 'detail']);
-                $tmp_images->unshift(['image' => $goods->image, 'type' => 'main']);
+                $tmp_images = $goods->images->map(fn (GoodsImage $goodsImage) => $goodsImage->image)->unshift($goods->image);
                 // 商品SKU处理
                 $info = array_merge($info, [
                     'category_id' => $goods->category_id,
@@ -162,8 +161,6 @@ class GoodsController extends BaseController
             return $this->success([
                 'category' => $category_dao->getTreeList(),
                 'info' => $info,
-                'parameter_template' => $goods_parameter_dao->list(),
-                'sku_template' => $goods_sku_template_dao->list(),
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());

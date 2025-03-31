@@ -38,7 +38,73 @@ it('add goods api interface', function () {
     ];
     $response = $this->doPost('api/manage/goods/info/update', $data);
 
-    dump($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test store goods parameter template api interface', function () {
+    $response = $this->doPost('api/manage/goods/parameter/template/store', [
+        'name' => '测试参数模板',
+        'values' => [
+            ['name' => '颜色', 'value' => '红色'],
+            ['name' => '颜色', 'value' => '蓝色'],
+            ['name' => '颜色', 'value' => '绿色'],
+        ],
+    ]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test update goods parameter template api interface', function () {
+    $response = $this->doPost('api/manage/goods/parameter/template/update', [
+        'id' => 1,
+        'name' => '测试参数模板1',
+        'values' => [
+            ['name' => '颜色', 'value' => '红色'],
+            ['name' => '产地', 'value' => '中国'],
+            ['name' => '包装', 'value' => '袋装'],
+        ],
+    ]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test destroy goods parameter template api interface', function () {
+    $response = $this->doPost('api/manage/goods/parameter/template/destroy', ['id' => 1]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+
+it('test store goods sku template api interface', function () {
+    $response = $this->doPost('api/manage/goods/sku/template/store', [
+        'name' => '测试SKU模板',
+        'values' => [
+            ['name' => '颜色', 'values' => [['name' => '红色']]],
+            ['name' => '号码', 'values' => [['name' => 'L']]],
+            ['name' => '送装服务', 'values' => [['name' => '不送装'], ['name' => '送装']]],
+        ],
+    ]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test update goods sku template api interface', function () {
+    $response = $this->doPost('api/manage/goods/sku/template/update', [
+        'id' => 1,
+        'name' => '测试SKU模板',
+        'values' => [
+            ['name' => '颜色', 'values' => [['name' => '红色']]],
+            ['name' => '号码', 'values' => [['name' => 'XL']]],
+            ['name' => '送装服务', 'values' => [['name' => '不送装'], ['name' => '送装']]],
+        ],
+    ]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+it('test destroy goods sku template api interface', function () {
+    $response = $this->doPost('api/manage/goods/sku/template/destroy', ['id' => 1]);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);

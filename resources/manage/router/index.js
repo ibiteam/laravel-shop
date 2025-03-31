@@ -3,6 +3,7 @@ import Login from '@/pages/user/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
 import MaterialIndex from '@/pages/material/Index.vue';
+import Goods from '@/pages/goods/Goods.vue';
 import GoodsForm from '@/pages/goods/GoodsForm.vue';
 import SetShopConfig from '@/pages/set/ShopConfig.vue';
 
@@ -17,7 +18,8 @@ const router = createRouter({
             component: () => import('@/components/Layout.vue'),
             children:[
                 { path: 'home', component: import('@/pages/Home.vue'), name: 'home' },
-                { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
+                { path: '/goods/index', component: Goods , name: 'goods' },
+                { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
                 { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
                 { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },

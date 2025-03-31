@@ -13,6 +13,6 @@ class GoodsSkuTemplateDao
      */
     public function list(): EloquentCollection|Collection
     {
-        return GoodsSkuTemplate::query()->select(['id', 'name', 'values'])->orderByDesc('id')->get();
+        return GoodsSkuTemplate::query()->select(['id', 'name', 'values', 'updated_at'])->orderByDesc('id')->get();
     }
 }
