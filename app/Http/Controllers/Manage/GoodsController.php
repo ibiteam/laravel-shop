@@ -14,6 +14,7 @@ use App\Models\AdminOperationLog;
 use App\Models\Goods;
 use App\Models\GoodsImage;
 use App\Models\GoodsParameter;
+use App\Models\ShopConfig;
 use App\Services\Goods\GoodsService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -161,6 +162,9 @@ class GoodsController extends BaseController
             return $this->success([
                 'category' => $category_dao->getTreeList(),
                 'info' => $info,
+                'settings' => [
+                    'is_open_integral' => shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                ],
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());

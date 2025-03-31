@@ -185,8 +185,8 @@
                                                         <div class="label">
                                                             <span>名称</span>
                                                         </div>
-                                                        <el-form-item :prop="'values.' + index + '.spec_name'" style="margin: 3px 0;">
-                                                            <el-input v-model="item.spec_name" placeholder="请输入规格名" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
+                                                        <el-form-item :prop="'values.' + index + '.name'" style="margin: 3px 0;">
+                                                            <el-input v-model="item.name" placeholder="请输入规格名" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
                                                         </el-form-item>
                                                         <div class="tips" style="padding-top: 8px;">
                                                             <span class="fs12" style="line-height: 16px;">名称如颜色、尺码等，最长4个字</span>
@@ -197,9 +197,9 @@
                                                             <span>名称</span>
                                                         </div>
                                                         <div class="specifications-input">
-                                                            <template v-for="(its,ids) in item.spec_value">
-                                                                <el-form-item :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'" style="margin: 3px 0;">
-                                                                    <el-input v-model="its.spec_value_name"
+                                                            <template v-for="(its,ids) in item.values">
+                                                                <el-form-item :prop="'values.' + index + '.values.' + ids + '.name'" style="margin: 3px 0;">
+                                                                    <el-input v-model="its.name"
                                                                               placeholder="请输入规格值"
                                                                               maxlength="6"
                                                                               style="width: 150px;margin-right: 10px;"
@@ -210,7 +210,7 @@
                                                                     </el-input>
                                                                 </el-form-item>
                                                             </template>
-                                                            <template v-if="specDataTemplate.values[index].spec_value.length < 6">
+                                                            <template v-if="specDataTemplate.values[index].values.length < 6">
                                                                 <el-popover
                                                                     placement="right"
                                                                     title=""
@@ -235,22 +235,18 @@
                                     <div class="specifications-btn">
                                         <el-button type="danger" @click="addGoodsSpecs()" v-if="specDataTemplate.values.length < 3">添加</el-button>
                                         <template v-if="specDataTemplate.values.length">
-                                            <el-button type="primary" v-if="!specDataTemplate.id" @click="updaterTemplate()">保存模板</el-button>
-                                            <el-button type="primary" @click="updaterTemplate()" v-else>更新模板</el-button>
+                                            <el-button type="primary" v-if="!specDataTemplate.id" @click="ctrlSkuTemplate('save')">保存模板</el-button>
+                                            <el-button type="primary" @click="ctrlSkuTemplate('update')" v-else>更新模板</el-button>
                                         </template>
                                     </div>
                                 </div>
                                 <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
-                                        <el-option v-for="(item,index) in specificationsArr" :key="item.id">
-                                            <template #default>
-                                                <div class="option-li s-flex jc-bt ai-bs" @click="chooseSpecs(index)">
-                                                    <span>{{ item.name }}</span>
-                                                    <el-tag effect="dark" @click.native.stop="delSelect(index)" style="float: right; margin-top: 8px; margin-left: 3px">
-                                                        <em class="iconfont">&#xe8b6;</em>
-                                                    </el-tag>
-                                                </div>
-                                            </template>
+                                    <el-select placeholder="请选择SKU模板" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
+                                        <el-option v-for="(item,index) in specificationsArr" :key="item.id" :value="item.id" :label="item.name">
+                                            <div class="attr-custom-item">
+                                                <div class="s-flex ai-ct">{{ item.name }} <i class="iconfont icon-bianji" @click.prevent.stop="chooseSpecs(index)"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="delSelect(index)"></i></div>
+                                                <p class="co-999 fs14">更新时间: {{ item.updated_at }}</p>
+                                            </div>
                                         </el-option>
                                     </el-select>
                                 </div>
@@ -264,7 +260,7 @@
                                 <label class="el-form-item__label">价格与库存</label>
                             </template>
                             <div class="more-input s-flex jc-fe" style="width: 100%;">
-                                <div class="more-li">
+                                <div class="more-li" v-if="settings.is_open_integral">
                                     <label>
                                         <span>积分</span>
                                     </label>
@@ -292,7 +288,7 @@
                                 <el-table-column
                                     v-for="(its,ids) in specDataTemplate.values"
                                     :prop="`template_${ids + 1}`"
-                                    :label="its.spec_name?its.spec_name:'--'"
+                                    :label="its.name?its.name:'--'"
                                     align="center"
                                     :width="100">
                                     <template #default="scope">
@@ -324,6 +320,7 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
+                                    v-if="settings.is_open_integral"
                                     label="积分"
                                     align="center"
                                     min-width="120">
@@ -380,12 +377,12 @@
                         </el-form-item>
                         <el-form-item label="价格" v-else>
                             <div class="s-flex ai-ct">
-                                <el-form-item prop="integral_money">
+                                <el-form-item prop="integral_money" v-if="settings.is_open_integral">
                                     <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral_money')">积分</el-checkbox>
                                     <el-input style="width: 100px;margin:0 10px;" @input="updateForm.integral_money = formatInput(updateForm.integral_money)" v-model="updateForm.integral_money" placeholder=""></el-input>
                                 </el-form-item>
                                 <el-form-item prop="shop_price">
-                                    <el-checkbox v-model="shopPriceShow" @change="(val) => setCheck(val,'shop_price')">现金</el-checkbox>
+                                    <el-checkbox v-if="settings.is_open_integral" v-model="shopPriceShow" @change="(val) => setCheck(val,'shop_price')">现金</el-checkbox>
                                     <el-input style="width: 100px;" v-model="updateForm.shop_price" @input="updateForm.shop_price = formatInput(updateForm.shop_price)" placeholder=""><template #suffix>元</template></el-input>
                                 </el-form-item>
                             </div>
@@ -431,7 +428,7 @@
                 </div>
             </el-form>
             <div class="goods-footer-btn s-flex jc-ct ai-ct">
-                <el-button type="danger" style="width: 140px;height: 50px;font-size: 20px;" @click="sumbitGood" :loading="loading">发布商品</el-button>
+                <el-button type="danger" style="width: 140px;height: 50px;font-size: 20px;" @click="submitGoods" :loading="loading">发布商品</el-button>
             </div>
         </div>
         <div style="width: 380px;flex: none;">
@@ -477,7 +474,15 @@
 <script setup>
 import Editor from '@/components/good/Editor.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
-import { goodsDetailInit, getGoodsSkuTemplate, getGoodsParameterTemplate, goodsParameterTemplateStore, goodsParameterTemplateUpdate, goodsParameterTemplateDestroy } from '@/api/goods';
+import {
+    goodsDetailInit,
+    getGoodsSkuTemplate,
+    getGoodsParameterTemplate,
+    goodsParameterTemplateStore,
+    goodsParameterTemplateUpdate,
+    goodsParameterTemplateDestroy,
+    goodsSkuTemplateStore, goodsSkuTemplateUpdate
+} from '@/api/goods';
 import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
@@ -631,6 +636,7 @@ const ctrlAttrTemplate = (type) => {
         })
     }
 }
+
 const validateDesc = (rule, value, callback) => {
     if (updateForm.value.goods_desc == '' || updateForm.value.goods_desc == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
         callback(new Error('商品详情不能为空'));
@@ -640,12 +646,12 @@ const validateDesc = (rule, value, callback) => {
 }
 
 const specValue = (rule, value, callback, index, id) => {
-    let arr = specDataTemplate.value.values[index].spec_value
+    let arr = specDataTemplate.value.values[index].values
     const hasDuplicates = arr.reduce((acc, current) => {
-        if (acc.names[current.spec_value_name]) {
+        if (acc.names[current.name]) {
             acc.hasDuplicates = true;
         } else {
-            acc.names[current.spec_value_name] = true;
+            acc.names[current.name] = true;
         }
         return acc;
     }, {names: {}, hasDuplicates: false}).hasDuplicates;
@@ -726,6 +732,11 @@ const updateFormRules = ref({
         { required: true, message: '请输入商品库存', trigger: 'blur' },
     ]
 });
+const route = useRoute();
+/* 设置信息 */
+const settings = ref({
+    is_open_integral: false
+})
 // 价格/规格 相关
 const shopPriceShow = ref(false);
 const integralMoneyShow = ref(false);
@@ -746,11 +757,11 @@ const loading = ref(false);
 const templateRules = computed(() => {
     const rules = {};
     specDataTemplate.value.values.forEach((field, index) => {
-        rules[`values.${index}.spec_name`] = [
+        rules[`values.${index}.name`] = [
             { required: true, message: '请输入规格名称', trigger: 'blur' }
         ];
-        field.spec_value.forEach((fd, id) => {
-            rules[`values.${index}.spec_value.${id}.spec_value_name`] = [
+        field.values.forEach((fd, id) => {
+            rules[`values.${index}.values.${id}.name`] = [
                 { required: true, message: '请输入规格项', trigger: 'blur' },
                 { validator: (rule, value, callback) => specValue(rule, value, callback, index, id), trigger: 'blur' }
             ];
@@ -858,35 +869,27 @@ const delGoodsSpecs = (index) => {
 
 const addGoodsSpecs = () => {
     specDataTemplate.value.values.push({
-        spec_name: '',
-        spec_id: '',
-        spec_value: [
-            {
-                spec_value_name: '',
-                spec_value_id: ''
-            }
-        ]
+        name: '',
+        id: '',
+        values: [{ name: '', id: '' }]
     })
 }
 
 const computedSpecs = (index) => {
-    return specDataTemplate.value.values[index].spec_value.every(a => a.spec_value_name)
+    return specDataTemplate.value.values[index].values.every(a => a.name)
 }
 
 const addSpecs = (index) => {
-    if (computedSpecs(index) && specDataTemplate.value.values[index].spec_value.length < 6) {
-        specDataTemplate.value.values[index].spec_value.push({
-            spec_value_name: '',
-            spec_value_id: ''
-        })
+    if (computedSpecs(index) && specDataTemplate.value.values[index].values.length < 6) {
+        specDataTemplate.value.values[index].values.push({ name: '', id: '' })
     }
 }
 
 const delSpecs = (index, index2) => {
-    if (specDataTemplate.value.values[index].spec_value.length === 1) {
-        specDataTemplate.value.values[index].spec_value[index2].spec_value_name = ''
+    if (specDataTemplate.value.values[index].values.length === 1) {
+        specDataTemplate.value.values[index].values[index2].name = ''
     } else {
-        specDataTemplate.value.values[index].spec_value.splice(index2, 1)
+        specDataTemplate.value.values[index].values.splice(index2, 1)
     }
 }
 
@@ -921,9 +924,9 @@ const toTableArray = (specs) => {
 
         const spec = specs[index];
         const templateName = `template_${index + 1}`;
-        spec.spec_value.forEach(value => {
+        spec.values.forEach(value => {
             const next = {...current};
-            next[templateName] = value.spec_value_name;
+            next[templateName] = value.name;
             helper(next, index + 1);
         });
     }
@@ -1144,20 +1147,10 @@ const setCheck = (val, type) => {
     updateForm.value[type] = val ? 1 : 0
 }
 
-const updaterTemplate = () => {
+const ctrlSkuTemplate = (type) => {
     templateFormRef.value.validate((valid) => {
         if (valid) {
-            if (specDataTemplate.value.name) {
-                cns.$http.doPost('front.sku_template.update', specDataTemplate.value).then(res => {
-                    if (res.code === 200) {
-                        cns.$message.success('保存模板成功')
-                    } else {
-                        cns.$message.error(res.message)
-                    }
-                    specDataTemplate.value.name = ''
-                    getSkuTemplate()
-                })
-            } else {
+            if (!specDataTemplate.value.name) {
                 cns.$dialog.prompt('请输入模板名称', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -1165,8 +1158,32 @@ const updaterTemplate = () => {
                     inputErrorMessage: '请输入模板名称'
                 }).then(({value}) => {
                     specDataTemplate.value.name = value
-                    updaterTemplate()
+                    ctrlSkuTemplate(type)
                 })
+            } else {
+                if (type === 'save') {
+                    // 保存SKU模板
+                    goodsSkuTemplateStore(specDataTemplate.value).then(res => {
+                        if (res.code === 200) {
+                            cns.$message.success('保存模板成功')
+                        } else {
+                            cns.$message.error(res.message)
+                        }
+                        specDataTemplate.value.name = ''
+                        getSkuTemplate()
+                    });
+                } else if (type === 'update') {
+                    // 更新SKU模板
+                    goodsSkuTemplateUpdate(specDataTemplate.value).then(res => {
+                        if (res.code === 200) {
+                            cns.$message.success('更新模板成功')
+                        } else {
+                            cns.$message.error(res.message)
+                        }
+                        specDataTemplate.value.name = ''
+                        getSkuTemplate()
+                    });
+                }
             }
         } else {
             cns.$message.error("请完善销售规格");
@@ -1175,7 +1192,7 @@ const updaterTemplate = () => {
     })
 }
 
-const sumbitGood = () => {
+const submitGoods = () => {
     loading.value = true
     updateFormRef.value.validate((valid) => {
         if (valid) {
@@ -1199,16 +1216,18 @@ const sumbitGood = () => {
         }
     })
 }
-const route = useRoute();
 
 onMounted(() => {
     goodsDetailInit({id:route.params.id}).then(res => {
         if (res.code === 200) {
             updateForm.value = {...res.data.info}
+            specDataTemplate.value.values = res.data.info.spec_data
             isLimitNumber.value = !!res.data.info.quota_number
             category.value = res.data.category
+            settings.value = res.data.settings
         }
     })
+    console.log('settings',settings.value.is_open_integral);
     getSkuTemplate()
     getParameterTemplate()
     wrapRef.value.parentElement.addEventListener('scroll', handleScroll);
