@@ -110,7 +110,7 @@ const handleStatusChange = (goodsId) => {
     })
 }
 const openDetailView = (goodsId) => {
-    router.push({name:'goodsForm',query:{id:goodsId}})
+    router.push({name:'goodsForm',params:{id:goodsId}})
 }
 
 onMounted( () => {
