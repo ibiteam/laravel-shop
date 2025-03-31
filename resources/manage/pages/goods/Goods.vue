@@ -100,9 +100,8 @@ const handleStatusChange = (goodsId) => {
       }
     })
 }
-const openDetailDialog = (goodsId) => {
-    router.push({name:'goodsForm',params:{goods_id:goodsId}})
-
+const openDetailView = (goodsId) => {
+    router.push({name:'goodsForm',query:{id:goodsId}})
 }
 
 onMounted( () => {
@@ -196,7 +195,7 @@ onMounted( () => {
             <el-form-item>
                 <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
                 <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                <el-button :icon="Plus" type="warning" @click="openDetailDialog()">添加</el-button>
+                <el-button :icon="Plus" type="warning" @click="openDetailView()">添加</el-button>
             </el-form-item>
         </el-form>
     </el-header>
@@ -240,7 +239,7 @@ onMounted( () => {
         <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="操作">
             <template #default="scope">
-                <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
+                <el-button link type="primary" size="large" @click="openDetailView(scope.row.id)">编辑</el-button>
             </template>
         </el-table-column>
     </el-table>

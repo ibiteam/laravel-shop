@@ -162,8 +162,6 @@ class GoodsController extends BaseController
             return $this->success([
                 'category' => $category_dao->getTreeList(),
                 'info' => $info,
-                'parameter_template' => $goods_parameter_dao->list(),
-                'sku_template' => $goods_sku_template_dao->list(),
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());

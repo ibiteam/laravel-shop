@@ -68,7 +68,7 @@
                                         <el-option v-for="(templateItem,i) in attrTemplate" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
                                             <div class="attr-custom-item">
                                                 <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateAttrTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateAttrTemplate(templateItem,i,'delete')"></i></div>
-                                                <p class="co-999 fs14">更新时间: 2025-01-01 12:12:12</p>
+                                                <p class="co-999 fs14">更新时间: {{ templateItem.updated_at }}</p>
                                             </div>
                                         </el-option>
                                     </el-select>
@@ -175,9 +175,9 @@
                             </template>
                             <div class="specifications s-flex">
                                 <div style="min-width: 500px;">
-                                    <div class="specifications-box" v-if="goods_specs_template.values.length">
-                                        <el-form ref="templateFormRef" :model="goods_specs_template" :rules="templateRules">
-                                            <el-card class="specifications-list" style="padding-top: 0;width: 600px;" v-for="(item,index) in goods_specs_template.values" :key="index">
+                                    <div class="specifications-box" v-if="spec_data_template.values.length">
+                                        <el-form ref="templateFormRef" :model="spec_data_template" :rules="templateRules">
+                                            <el-card class="specifications-list" style="padding-top: 0;width: 600px;" v-for="(item,index) in spec_data_template.values" :key="index">
                                                 <div class="s-flex jc-fe" style="height: 20px;">
                                                     <div style="cursor: pointer;" @click="delGoodsSpecs(index)">
                                                         <em class="iconfont" style="font-size: 14px;">&#xe79b;</em>
@@ -213,7 +213,7 @@
                                                                     </el-input>
                                                                 </el-form-item>
                                                             </template>
-                                                            <template v-if="goods_specs_template.values[index].spec_value.length < 6">
+                                                            <template v-if="spec_data_template.values[index].spec_value.length < 6">
                                                                 <el-popover
                                                                     placement="right"
                                                                     title=""
@@ -236,16 +236,16 @@
                                         </el-form>
                                     </div>
                                     <div class="specifications-btn">
-                                        <el-button type="danger" @click="addGoodsSpecs()" v-if="goods_specs_template.values.length < 3">添加</el-button>
-                                        <template v-if="goods_specs_template.values.length">
-                                            <el-button type="primary" v-if="!goods_specs_template.id"
+                                        <el-button type="danger" @click="addGoodsSpecs()" v-if="spec_data_template.values.length < 3">添加</el-button>
+                                        <template v-if="spec_data_template.values.length">
+                                            <el-button type="primary" v-if="!spec_data_template.id"
                                                        @click="updaterTemplate()">保存模板</el-button>
                                             <el-button type="primary" @click="updaterTemplate()" v-else>更新模板</el-button>
                                         </template>
                                     </div>
                                 </div>
                                 <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择" style="width: 160px;position: relative;" ref="mySelectRef" :style="{'left':goods_specs_template.values.length?'-160px':0}">
+                                    <el-select placeholder="请选择" style="width: 160px;position: relative;" ref="mySelectRef" :style="{'left':spec_data_template.values.length?'-160px':0}">
                                         <el-option v-for="(item,index) in specificationsArr" :key="item.id">
                                             <template #default>
                                                 <div class="option-li s-flex jc-bt ai-bs" @click="chooseSpecs(index)">
@@ -263,7 +263,7 @@
                                 <span>可添加多个规格属性的商品</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="销售规格" v-if="goods_specs_template.values.length">
+                        <el-form-item label="销售规格" v-if="spec_data_template.values.length">
                             <div class="more-input s-flex jc-fe" style="width: 100%;">
                                 <div class="more-li">
                                     <label>
@@ -280,12 +280,12 @@
                                 <el-button @click="filling()">批量填充</el-button>
                             </div>
                             <el-table
-                                :data="updateForm.goods_skus"
+                                :data="updateForm.sku_data"
                                 :span-method="objectSpanMethod"
                                 border
                                 style="width: 100%; margin-top: 20px">
                                 <el-table-column
-                                    v-for="(its,ids) in goods_specs_template.values"
+                                    v-for="(its,ids) in spec_data_template.values"
                                     :prop="`template_${ids + 1}`"
                                     :label="its.spec_name?its.spec_name:'--'"
                                     :width="80">
@@ -318,7 +318,7 @@
                                 <el-table-column
                                     label="价格">
                                     <template #default="scope">
-                                        <el-form-item :prop="'goods_skus.' + scope.$index + '.shop_price'"
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.shop_price'"
                                                       :rules="more_integralPrice(scope.$index)">
                                             <el-input v-model="scope.row.shop_price" placeholder=""
                                                       @input="scope.row.shop_price = formatInput(scope.row.shop_price)"></el-input>
@@ -328,7 +328,7 @@
                                 <el-table-column
                                     label="库存">
                                     <template #default="scope">
-                                        <el-form-item :prop="'goods_skus.' + scope.$index + '.number'"
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.number'"
                                                       :rules="updateFormRules.number">
                                             <el-input v-model="scope.row.number" placeholder=""
                                                       @input="scope.row.number = formatInput(scope.row.number)"></el-input>
@@ -349,7 +349,7 @@
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <div class="tips" v-if="goods_specs_template.values.length">
+                            <div class="tips" v-if="spec_data_template.values.length">
                                 <span>给第一组规格设置图片，用户选择不同规格会看到对应规格图片，建议尺寸：80 x 80 px</span>
                             </div>
                         </el-form-item>
@@ -361,8 +361,8 @@
                             </div>
                         </el-form-item>
                         <el-form-item label="库存" prop="goods_number">
-                            <el-input-number v-model="updateForm.goods_number" :disabled="!!updateForm.goods_skus.length" :min="1" style="width: 160px;"></el-input-number>
-                            <div class="tips" v-if="goods_specs_template.values.length" style="width: 100%;flex: none;">
+                            <el-input-number v-model="updateForm.goods_number" :disabled="!!updateForm.sku_data.length" :min="1" style="width: 160px;"></el-input-number>
+                            <div class="tips" v-if="spec_data_template.values.length" style="width: 100%;flex: none;">
                                 <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
                         </el-form-item>
@@ -445,11 +445,20 @@
 <script setup>
 import Editor from '@/components/good/Editor.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import {
+    goodsDetailInit,
+    getGoodsSkuTemplate,
+    getGoodsParameterTemplate,
+    goodsParameterTemplateStore,
+    goodsParameterTemplateUpdate, goodsParameterTemplateDestroy
+} from '@/api/goods';
 import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
 import 'vue-cropper/dist/index.css'
 import { VueDraggable } from 'vue-draggable-plus'
+import { useRoute } from 'vue-router';
+
 const cns = getCurrentInstance().appContext.config.globalProperties
 const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
 
@@ -501,14 +510,14 @@ const validateFile = (rule, value, callback) => {
 }
 
 const validatePrice = (rule, value, callback, type) => {
-    if (updateForm.value.goods_skus.length) {
+    if (updateForm.value.sku_data.length) {
         const checkPrices = (data) => {
             return data.filter(item => {
                 const shopPrice = parseFloat(item.shop_price) || 0;
                 return shopPrice < 0
             });
         };
-        const invalidItems = checkPrices(updateForm.value.goods_skus);
+        const invalidItems = checkPrices(updateForm.value.sku_data);
         if (invalidItems.length) {
             callback(new Error('价格不能小于0'));
         } else {
@@ -520,29 +529,7 @@ const validatePrice = (rule, value, callback, type) => {
 }
 const attrSelectTemplateRef = ref(null)
 const currentAttrTemplate = ref('')
-const attrTemplate = ref([{
-        name: '模板1',
-        id:1,
-        values: [{
-            name: '颜色',
-            value: '白色'
-        }, {
-            name: '尺寸',
-            value: '均码'
-        }]
-    },
-        {
-            name: '模板2',
-            id:2,
-            values: [{
-                name: '是否有机',
-                value: '是的'
-            }, {
-                name: '发货地',
-                value: '原产地发货'
-            }]
-        }]
-)
+const attrTemplate = ref([])
 
 const inputValidatorTemplate = (rule, value, callback) => {
     if (value == '' || value == null) {
@@ -556,15 +543,26 @@ const inputValidatorTemplate = (rule, value, callback) => {
 const updateAttrTemplate = (item,i,type) => {
     if(type == 'edit'){
         cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            item.name = value
-            let info = item
+            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('修改产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
         })
     }else {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
             attrTemplate.value.splice(i, 1);
-            let info = {
-                id: item.id
-            }
+            goodsParameterTemplateDestroy({id: item.id}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('删除产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
         }).catch(() => {
         });
     }
@@ -584,17 +582,25 @@ const ctrlAttrTemplate = (type) => {
     if(type == 'save'){
         // 存为新模板，需要把currentAttrTemplate.value置为当前返回的id
         cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            let info={
-                name: value,
-                values: updateForm.value.parameters
-            }
+            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
+                if (res.code === 200) {
+                    getParameterTemplate()
+                    currentAttrTemplate.value = res.data.id
+                    cns.$message.success('保存产品参数模板成功')
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
         })
     }else if(type == 'update'){
-        let info={
-            id: currentAttrTemplate.value,
-            values: updateForm.value.parameters
-        }
         // 更新当前模板，需传currentAttrTemplate.value
+        goodsParameterTemplateUpdate({ id: currentAttrTemplate.value, values: updateForm.value.parameters }).then(res => {
+            if (res.code === 200) {
+                cns.$message.success('更新产品参数模板成功')
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
     }
 }
 const validateDesc = (rule, value, callback) => {
@@ -606,7 +612,7 @@ const validateDesc = (rule, value, callback) => {
 }
 
 const specValue = (rule, value, callback, index, id) => {
-    let arr = goods_specs_template.value.values[index].spec_value
+    let arr = spec_data_template.value.values[index].spec_value
     const hasDuplicates = arr.reduce((acc, current) => {
         if (acc.names[current.spec_value_name]) {
             acc.hasDuplicates = true;
@@ -622,14 +628,7 @@ const specValue = (rule, value, callback, index, id) => {
     }
 }
 // 分类数据
-const category = ref([
-    {
-        "id": 1,
-        "parent_id": 0,
-        "name": "测试分类",
-        "logo": ""
-    }
-]);
+const category = ref([]);
 
 const updateForm = ref({
     id: 0,
@@ -646,8 +645,8 @@ const updateForm = ref({
     goods_desc: '',
     is_on_sale: 1,
     limit_number: 0,
-    goods_skus: [],
-    goods_specs: [],
+    sku_data: [],
+    spec_data: [],
 });
 const uploadImageRef = ref(null);
 const uploadVideoRef = ref(null);
@@ -660,11 +659,7 @@ const templateFormRef = ref(null);
 const mySelectRef = ref(null);
 const updateFormRules = ref({
     category_id: [
-        {
-            required: true,
-            message: '请选择商品分类',
-            trigger: 'change'
-        },
+        { required: true, message: '请选择商品分类', trigger: 'change' },
     ],
     name: [
         {required: true, message: '请输入商品名称', trigger: 'blur'},
@@ -674,57 +669,30 @@ const updateFormRules = ref({
         {validator: validateFile, trigger: 'change'}
     ],
     goods_number: [
-        {
-            required: true,
-            message: '请输入商品库存',
-            trigger: 'blur'
-        },
+        { required: true, message: '请输入商品库存', trigger: 'blur' },
     ],
     goods_desc: [
-        {
-            required: true,
-            message: '请输入商品详情',
-            trigger: 'blur'
-        },
+        { required: true, message: '请输入商品详情', trigger: 'blur' },
         {validator: validateDesc, trigger: 'blur'}
     ],
     is_on_sale: [
-        {
-            required: true,
-            message: '请选择是否上架',
-            trigger: 'change'
-        },
+        { required: true, message: '请选择是否上架', trigger: 'change' },
     ],
     limit_number: [
-        {
-            required: true,
-            message: '请输入限购数量',
-            trigger: 'blur'
-        },
+        { required: true, message: '请输入限购数量', trigger: 'blur' },
     ],
     shop_price: [
-        {
-            required: false,
-            message: '请输入价格',
-            trigger: 'blur'
-        },
-        {
-            validator: (rule, value, callback) => validatePrice(rule, value, callback, 'shop_price'),
-            trigger: 'blur'
-        }
+        { required: false, message: '请输入价格', trigger: 'blur' },
+        { validator: (rule, value, callback) => validatePrice(rule, value, callback, 'shop_price'), trigger: 'blur' }
     ],
     number: [
-        {
-            required: true,
-            message: '请输入商品库存',
-            trigger: 'blur'
-        },
+        { required: true, message: '请输入商品库存', trigger: 'blur' },
     ]
 });
 const shop_price_show = ref(false);
 const is_limit_number = ref(false);
 const specificationsArr = ref([]);
-const goods_specs_template = ref({
+const spec_data_template = ref({
     name: '',
     template_id: null,
     values: [],
@@ -737,37 +705,26 @@ const loading = ref(false);
 
 const templateRules = computed(() => {
     const rules = {};
-    goods_specs_template.value.values.forEach((field, index) => {
+    spec_data_template.value.values.forEach((field, index) => {
         rules[`values.${index}.spec_name`] = [
-            {
-                required: true,
-                message: '请输入规格名称',
-                trigger: 'blur'
-            }
+            { required: true, message: '请输入规格名称', trigger: 'blur' }
         ];
         field.spec_value.forEach((fd, id) => {
             rules[`values.${index}.spec_value.${id}.spec_value_name`] = [
-                {
-                    required: true,
-                    message: '请输入规格项',
-                    trigger: 'blur'
-                },
-                {
-                    validator: (rule, value, callback) => specValue(rule, value, callback, index, id),
-                    trigger: 'blur'
-                }
+                { required: true, message: '请输入规格项', trigger: 'blur' },
+                { validator: (rule, value, callback) => specValue(rule, value, callback, index, id), trigger: 'blur' }
             ];
         })
     });
     return rules;
 });
 
-watch(() => goods_specs_template.value.values, _.debounce((newVal, oldVal) => {
+watch(() => spec_data_template.value.values, _.debounce((newVal, oldVal) => {
     if (newVal.length) {
         toTableArray(newVal)
     } else {
-        updateForm.value.goods_skus = []
-        updateForm.value.goods_specs = []
+        updateForm.value.sku_data = []
+        updateForm.value.spec_data = []
     }
 }, 500), { deep: true, immediate: false });
 
@@ -779,7 +736,7 @@ watch(() => updateForm.value.shop_price, (val) => {
     }
 });
 
-watch(() => updateForm.value.goods_skus, (val) => {
+watch(() => updateForm.value.sku_data, (val) => {
     if (val.length) {
         let numberArr = Array.from(val, a => a.number)
         let sum = numberArr.reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue), 0);
@@ -788,8 +745,8 @@ watch(() => updateForm.value.goods_skus, (val) => {
 }, { deep: true, immediate: false });
 
 const more_integralPrice = (index) => {
-    let skus = updateForm.value.goods_skus[index]
-    const prop2 = `goods_skus.${index}.shop_price`;
+    let skus = updateForm.value.sku_data[index]
+    const prop2 = `sku_data.${index}.shop_price`;
     return [
         {
             validator: (rule, value, callback) => {
@@ -804,14 +761,23 @@ const more_integralPrice = (index) => {
         },
     ]
 }
-
-const getTemplate = () => {
-    cns.$http.doGet('front.sku_template.index').then(res => {
+/* 获取规格模板 */
+const getSkuTemplate = () => {
+    getGoodsSkuTemplate().then(res => {
         if (res.code === 200) {
             specificationsArr.value = [...res.data]
         }
     })
 }
+/* 获取商品参数模板 */
+const getParameterTemplate = () => {
+    getGoodsParameterTemplate().then(res => {
+    if (res.code === 200) {
+        attrTemplate.value = [...res.data]
+    }
+  })
+}
+
 const handleChangeGoodsDetail = () => {
     // updateFormRef.value.validateField('goods_desc')
 }
@@ -836,11 +802,11 @@ const delGoodsAttr = (index) => {
 }
 
 const delGoodsSpecs = (index) => {
-    goods_specs_template.value.values.splice(index, 1)
+    spec_data_template.value.values.splice(index, 1)
 }
 
 const addGoodsSpecs = () => {
-    goods_specs_template.value.values.push({
+    spec_data_template.value.values.push({
         spec_name: '',
         spec_id: '',
         spec_value: [
@@ -853,12 +819,12 @@ const addGoodsSpecs = () => {
 }
 
 const computedSpecs = (index) => {
-    return goods_specs_template.value.values[index].spec_value.every(a => a.spec_value_name)
+    return spec_data_template.value.values[index].spec_value.every(a => a.spec_value_name)
 }
 
 const addSpecs = (index) => {
-    if (computedSpecs(index) && goods_specs_template.value.values[index].spec_value.length < 6) {
-        goods_specs_template.value.values[index].spec_value.push({
+    if (computedSpecs(index) && spec_data_template.value.values[index].spec_value.length < 6) {
+        spec_data_template.value.values[index].spec_value.push({
             spec_value_name: '',
             spec_value_id: ''
         })
@@ -866,10 +832,10 @@ const addSpecs = (index) => {
 }
 
 const delSpecs = (index, index2) => {
-    if (goods_specs_template.value.values[index].spec_value.length === 1) {
-        goods_specs_template.value.values[index].spec_value[index2].spec_value_name = ''
+    if (spec_data_template.value.values[index].spec_value.length === 1) {
+        spec_data_template.value.values[index].spec_value[index2].spec_value_name = ''
     } else {
-        goods_specs_template.value.values[index].spec_value.splice(index2, 1)
+        spec_data_template.value.values[index].spec_value.splice(index2, 1)
     }
 }
 
@@ -877,14 +843,14 @@ const objectSpanMethod = ({row, column, rowIndex, columnIndex}) => {
     const field = column.property;
     if (field && field.startsWith('template')) {
         let spanCount = 1;
-        for (let i = rowIndex + 1; i < updateForm.value.goods_skus.length; i++) {
-            if (updateForm.value.goods_skus[i][field] === row[field]) {
+        for (let i = rowIndex + 1; i < updateForm.value.sku_data.length; i++) {
+            if (updateForm.value.sku_data[i][field] === row[field]) {
                 spanCount++;
             } else {
                 break;
             }
         }
-        if (rowIndex === 0 || updateForm.value.goods_skus[rowIndex - 1][field] !== row[field]) {
+        if (rowIndex === 0 || updateForm.value.sku_data[rowIndex - 1][field] !== row[field]) {
             return {rowspan: spanCount, colspan: 1};
         } else {
             return {rowspan: 0, colspan: 0};
@@ -919,8 +885,8 @@ const toTableArray = (specs) => {
         number: '',
         is_show: 1,
     }, 0);
-    updateForm.value.goods_skus = [...result]
-    updateForm.value.goods_specs = [...specs]
+    updateForm.value.sku_data = [...result]
+    updateForm.value.spec_data = [...specs]
 }
 
 const formatInput = (value) => {
@@ -929,22 +895,22 @@ const formatInput = (value) => {
 }
 
 const handleTableRemove = (index) => {
-    updateForm.value.goods_skus[index].thumb = ''
+    updateForm.value.sku_data[index].thumb = ''
 }
 
 const filling = () => {
-    let newArray = updateForm.value.goods_skus.map(item => {
+    let newArray = updateForm.value.sku_data.map(item => {
         return {
             ...item,
             shop_price: moreInput.value.shop_price === '' ? item.shop_price : moreInput.value.shop_price,
             number: moreInput.value.number === '' ? item.number : moreInput.value.number
         }
     })
-    updateForm.value.goods_skus = [...newArray]
+    updateForm.value.sku_data = [...newArray]
     Object.keys(moreInput.value).map(its => {
         if(moreInput.value[its]){
-            for(let i = 0; i < updateForm.value.goods_skus.length; i++){
-                updateFormRef.value.clearValidate('goods_skus.' + i + '.' + its);
+            for(let i = 0; i < updateForm.value.sku_data.length; i++){
+                updateFormRef.value.clearValidate('sku_data.' + i + '.' + its);
             }
         }
     })
@@ -963,7 +929,7 @@ const setMain = (index) => {
 
 const chooseSpecs = (index) => {
     let obj = specificationsArr.value.find((_a, b) => b === index)
-    goods_specs_template.value = obj
+    spec_data_template.value = obj
 }
 
 const delSelect = (index) => {
@@ -1074,14 +1040,14 @@ const uploadImage = async (file, type, name) => {
         fileUpload(file).then((res) => {
             if (res.code == 200) {
                 if (type === 'thumb') {
-                    let goods_skus = JSON.parse(JSON.stringify(updateForm.value.goods_skus))
-                    goods_skus.map(a => {
+                    let sku_data = JSON.parse(JSON.stringify(updateForm.value.sku_data))
+                    sku_data.map(a => {
                         if (a.template_1 === name) {
                             a.thumb = res.data.url
                         }
                     })
-                    updateForm.value.goods_skus = [
-                        ...goods_skus
+                    updateForm.value.sku_data = [
+                        ...sku_data
                     ]
                 } else if(type === 'video'){
                     updateForm.value.video = res.data.url
@@ -1102,15 +1068,15 @@ const setCheck = (val, type) => {
 const updaterTemplate = () => {
     templateFormRef.value.validate((valid) => {
         if (valid) {
-            if (goods_specs_template.value.name) {
-                cns.$http.doPost('front.sku_template.update', goods_specs_template.value).then(res => {
+            if (spec_data_template.value.name) {
+                cns.$http.doPost('front.sku_template.update', spec_data_template.value).then(res => {
                     if (res.code === 200) {
                         cns.$message.success('保存模板成功')
                     } else {
                         cns.$message.error(res.message)
                     }
-                    goods_specs_template.value.name = ''
-                    getTemplate()
+                    spec_data_template.value.name = ''
+                    getSkuTemplate()
                 })
             } else {
                 cns.$dialog.prompt('请输入模板名称', '提示', {
@@ -1119,7 +1085,7 @@ const updaterTemplate = () => {
                     inputPattern: /\S+/,
                     inputErrorMessage: '请输入模板名称'
                 }).then(({value}) => {
-                    goods_specs_template.value.name = value
+                    spec_data_template.value.name = value
                     updaterTemplate()
                 })
             }
@@ -1154,16 +1120,18 @@ const sumbitGood = () => {
         }
     })
 }
+const route = useRoute();
 
 onMounted(() => {
-    let goodsInfo = null;
-    if (goodsInfo) {
-        nextTick(() => {
-            updateForm.value = {...goodsInfo}
-            is_limit_number.value = !!goodsInfo.limit_number
-        });
-    }
-    getTemplate()
+    goodsDetailInit({id:route.params.id}).then(res => {
+        if (res.code === 200) {
+            updateForm.value = {...res.data.info}
+            is_limit_number.value = !!res.data.info.quota_number
+            category.value = res.data.category
+        }
+    })
+    getSkuTemplate()
+    getParameterTemplate()
     wrapRef.value.parentElement.addEventListener('scroll', handleScroll);
 })
 

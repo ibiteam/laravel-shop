@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Dao\GoodsSkuTemplateDao;
 use App\Models\AdminOperationLog;
 use App\Models\GoodsSkuTemplate;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class GoodsSkuTemplateController extends BaseController
 {
+    /**
+     * 下拉商品规格模板列表.
+     */
+    public function smallIndex(Request $request, GoodsSkuTemplateDao $goods_sku_template_dao): JsonResponse
+    {
+        return $this->success($goods_sku_template_dao->list());
+    }
+
     /**
      * 添加商品规格模板
      */

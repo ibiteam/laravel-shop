@@ -19,7 +19,30 @@ export function goodsIndex(data) {
     return $http.doGet('manage/goods/info', data)
 }
 
-
 export function goodsChangeStatus(data) {
     return $http.doPost('manage/goods/info/change/status', data)
+}
+
+export function goodsDetailInit(data) {
+    return $http.doGet('manage/goods/info/edit', data)
+}
+
+export function getGoodsSkuTemplate() {
+    return $http.doGet('manage/goods/sku/template/small/index')
+}
+
+export function getGoodsParameterTemplate() {
+    return $http.doGet('manage/goods/parameter/template/small/index')
+}
+
+export function goodsParameterTemplateStore(data) {
+    return $http.doPost('manage/goods/parameter/template/store',data)
+}
+
+export function goodsParameterTemplateUpdate(data) {
+    return $http.doPost('manage/goods/parameter/template/update',data)
+}
+
+export function goodsParameterTemplateDestroy(data) {
+    return $http.doPost('manage/goods/parameter/template/destroy',data)
 }

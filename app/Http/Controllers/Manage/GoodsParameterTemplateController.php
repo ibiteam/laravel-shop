@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Dao\GoodsParameterTemplateDao;
 use App\Models\AdminOperationLog;
 use App\Models\GoodsParameterTemplate;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class GoodsParameterTemplateController extends BaseController
 {
+    /**
+     * 下拉获取商品参数模板列表.
+     */
+    public function smallIndex(Request $request, GoodsParameterTemplateDao $goods_parameter_template_dao): JsonResponse
+    {
+        return $this->success($goods_parameter_template_dao->list());
+    }
+
     /**
      * 添加商品参数模板
      */

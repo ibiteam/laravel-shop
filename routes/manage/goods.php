@@ -23,12 +23,14 @@ Route::prefix('goods')->group(function () {
     });
     // 商品参数模板
     Route::prefix('parameter/template')->group(function () {
+        Route::get('small/index', [GoodsParameterTemplateController::class, 'smallIndex']);
         Route::post('store', [GoodsParameterTemplateController::class, 'store']);
         Route::post('update', [GoodsParameterTemplateController::class, 'update']);
         Route::post('destroy', [GoodsParameterTemplateController::class, 'destroy']);
     });
     // 商品规格模板
     Route::prefix('sku/template')->group(function () {
+        Route::get('small/index', [GoodsSkuTemplateController::class, 'smallIndex']);
         Route::post('store', [GoodsSkuTemplateController::class, 'store']);
         Route::post('update', [GoodsSkuTemplateController::class, 'update']);
         Route::post('destroy', [GoodsSkuTemplateController::class, 'destroy']);

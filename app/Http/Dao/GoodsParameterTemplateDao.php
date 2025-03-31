@@ -13,6 +13,6 @@ class GoodsParameterTemplateDao
      */
     public function list(): EloquentCollection|Collection
     {
-        return GoodsParameterTemplate::query()->select(['id', 'name', 'values'])->orderByDesc('id')->get();
+        return GoodsParameterTemplate::query()->select(['id', 'name', 'values', 'updated_at'])->orderByDesc('id')->get();
     }
 }

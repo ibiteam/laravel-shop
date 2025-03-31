@@ -19,7 +19,7 @@ const router = createRouter({
             children:[
                 { path: 'home', component: import('@/pages/Home.vue'), name: 'home' },
                 { path: '/goods/index', component: Goods , name: 'goods' },
-                { path: '/goods/form', component: GoodsForm , name: 'goodsForm' },
+                { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
                 { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
                 { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
