@@ -63,6 +63,15 @@ const handleSizeChange = (val) => {
     getData(1);
 }
 
+/* 商品分类选择触发函数 */
+const selectQueryParamsCategory = (item) => {
+    if (item == undefined) {
+        queryParams.category_id = '';
+    } else {
+        queryParams.category_id = item[parseInt(item.length) - 1]
+    }
+}
+
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
