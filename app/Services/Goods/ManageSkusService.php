@@ -7,7 +7,7 @@ use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\GoodsSpecValue;
 
-class GoodsSkusService
+class ManageSkusService
 {
     /**
      * @var array 待删除 Goods Sku Ids
@@ -29,6 +29,9 @@ class GoodsSkusService
      */
     private $spec_value_thumb = [];
 
+    /**
+     * @throws BusinessException
+     */
     public function __construct(public Goods $goods, array $request_goods_skus_data)
     {
         $this->init($request_goods_skus_data);

@@ -88,10 +88,10 @@ class GoodsService
                     throw new BusinessException('商品参数更新失败');
                 }
                 /* 商品 SPEC 处理 */
-                (new GoodsSpecValueService($goods, $params['spec_data']))->exec();
+                (new ManageSpecValueService($goods, $params['spec_data']))->exec();
 
                 /* 商品 SKU 处理 */
-                (new GoodsSkusService($goods, $params['sku_data']))->exec();
+                (new ManageSkusService($goods, $params['sku_data']))->exec();
 
                 admin_operation_log($admin_user, "修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
                 DB::commit();
@@ -139,9 +139,9 @@ class GoodsService
                 throw new BusinessException('商品参数新增失败');
             }
             /* 商品 SPEC 处理 */
-            (new GoodsSpecValueService($goods, $params['spec_data']))->exec();
+            (new ManageSpecValueService($goods, $params['spec_data']))->exec();
             /* 商品 SKU 处理 */
-            (new GoodsSkusService($goods, $params['sku_data']))->exec();
+            (new ManageSkusService($goods, $params['sku_data']))->exec();
 
             admin_operation_log($admin_user, "新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
             DB::commit();
