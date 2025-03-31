@@ -99,7 +99,7 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
 })
 
-const dialogVisible = ref(true)
+const dialogVisible = ref(false)
 const treeMenuData = reactive({
     active: '',
     menu: [],

@@ -33,6 +33,7 @@
             </div>
         </main>
         <MaterialCenterImageDialog />
+        <HotZoneDialog v-bind="{show: true, title: '编辑热区'}"/>
     </div>
 </template>
 
@@ -46,6 +47,7 @@ import AdvertisingOne from './components/AdvertisingOne.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
 import MaterialCenterImageDialog from '@/components/MaterialCenter/ImageDialog.vue'
+import HotZoneDialog from './components/HotZoneDialog.vue'
 import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 
