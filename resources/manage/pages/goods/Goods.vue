@@ -157,15 +157,15 @@ onMounted( () => {
                 </el-select>
             </el-form-item>
             <el-form-item label="商品分类" prop="category_id">
-                <el-tree-select
+                <el-cascader
                     v-model="queryParams.category_id"
-                    :data="categoryOptions"
-                    :props="{label: 'name',value: 'id',children:'all_children'}"
-                    :check-strictly="true"
                     filterable
-                    style="width: 240px"
-                >
-                </el-tree-select>
+                    clearable
+                    :options="categoryOptions"
+                    :props="{label: 'name',value: 'id',children:'all_children',checkStrictly: true}"
+                    placeholder="请选择"
+                    @change="selectQueryParamsCategory"
+                ></el-cascader>
             </el-form-item>
             <el-form-item label="创建时间">
                     <el-date-picker
