@@ -38,6 +38,10 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::IS_GRAY, 0);
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
         $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::PRICE_FORMAT, 2);
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SMTP_HOST, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SMTP_PORT, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SMTP_USER, '');
+        $this->addItem(ShopConfig::GROUP_BASE_SETTINGS, ShopConfig::SMTP_PASS, '');
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void

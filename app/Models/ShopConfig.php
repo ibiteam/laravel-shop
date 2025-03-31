@@ -44,6 +44,10 @@ class ShopConfig extends Model
 
     public const CURRENCY_FORMAT = 'currency_format'; // 对价格进行格式化
     public const PRICE_FORMAT = 'price_format'; // 保留几位小数
+    public const SMTP_HOST = 'smtp_host'; // 发送邮件服务器地址(SMTP)
+    public const SMTP_PORT = 'smtp_port'; // 服务器端口
+    public const SMTP_USER = 'smtp_user'; // 邮件发送账号
+    public const SMTP_PASS = 'smtp_pass'; // 账号密码
 
     public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置组名
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
