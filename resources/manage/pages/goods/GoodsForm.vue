@@ -245,7 +245,7 @@
                                     </div>
                                 </div>
                                 <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择" style="width: 160px;position: relative;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
+                                    <el-select placeholder="请选择" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
                                         <el-option v-for="(item,index) in specificationsArr" :key="item.id">
                                             <template #default>
                                                 <div class="option-li s-flex jc-bt ai-bs" @click="chooseSpecs(index)">
@@ -308,6 +308,7 @@
                                             action=""
                                             class="table-upload"
                                             :show-file-list="false"
+                                            accept="image/jpeg,image/jpg,image/png"
                                             v-if="!scope.row.thumb"
                                             :http-request="(file) => uploadImage(file, 'thumb', scope.row.template_1)"
                                             :before-upload="beforeUpload">
@@ -324,7 +325,7 @@
                                 <el-table-column
                                     label="积分">
                                     <template #default="scope">
-                                        <el-form-item :prop="'goods_skus.' + scope.$index + '.integral_money'"
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.integral_money'"
                                                       :rules="moreIntegralPrice(scope.$index)">
                                             <el-input v-model="scope.row.integral_money" placeholder=""
                                                       @input="scope.row.integral_money = formatInput(scope.row.integral_money)"></el-input>
@@ -335,7 +336,7 @@
                                     label="价格">
                                     <template #default="scope">
                                         <el-form-item :prop="'sku_data.' + scope.$index + '.shop_price'"
-                                                      :rules="more_integralPrice(scope.$index)">
+                                                      :rules="moreIntegralPrice(scope.$index)">
                                             <el-input v-model="scope.row.shop_price" placeholder=""
                                                       @input="scope.row.shop_price = formatInput(scope.row.shop_price)"></el-input>
                                         </el-form-item>
@@ -373,10 +374,11 @@
                             <div class="s-flex ai-ct">
                                 <el-form-item prop="integral_money">
                                     <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral_money')">积分</el-checkbox>
-                                    <el-input size="small" style="width: 100px;margin-right: 10px;" @input="updateForm.integral_money = formatInput(updateForm.integral_money)" v-model="updateForm.integral_money" placeholder=""></el-input>
+                                    <el-input style="width: 100px;margin:0 10px;" @input="updateForm.integral_money = formatInput(updateForm.integral_money)" v-model="updateForm.integral_money" placeholder=""></el-input>
                                 </el-form-item>
                                 <el-form-item prop="shop_price">
-                                    <el-input style="width: 100px;" v-model="updateForm.shop_price" @input="updateForm.shop_price = formatInput(updateForm.shop_price)" placeholder=""><span slot="suffix">元</span></el-input>
+                                    <el-checkbox v-model="shopPriceShow" @change="(val) => setCheck(val,'shop_price')">现金</el-checkbox>
+                                    <el-input style="width: 100px;" v-model="updateForm.shop_price" @input="updateForm.shop_price = formatInput(updateForm.shop_price)" placeholder=""><template #suffix>元</template></el-input>
                                 </el-form-item>
                             </div>
                         </el-form-item>
@@ -528,7 +530,7 @@ const validateFile = (rule, value, callback) => {
 const validatePrice = (rule, value, callback, type) => {
     if (!updateForm.value.sku_data.length && updateForm.value[type === 'shop_price' ? 'integral_money' : 'shop_price'] < 0 && Number(value) < 0) {
         callback(new Error('积分和价格不能同时小于0'));
-    } else if (updateForm.value.goods_skus.length) {
+    } else if (updateForm.value.sku_data.length) {
         const checkPrices = (data) => {
             return data.filter(item => {
                 const shopPrice = parseFloat(item.shop_price) || 0;
@@ -603,8 +605,7 @@ const ctrlAttrTemplate = (type) => {
         cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
             goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
                 if (res.code === 200) {
-                    getParameterTemplate()
-                    currentAttrTemplate.value = res.data.id
+                    getParameterTemplate(res.data.id)
                     cns.$message.success('保存产品参数模板成功')
                 } else {
                     cns.$message.error(res.message)
@@ -811,10 +812,11 @@ const getSkuTemplate = () => {
     })
 }
 /* 获取商品参数模板 */
-const getParameterTemplate = () => {
+const getParameterTemplate = (id) => {
     getGoodsParameterTemplate().then(res => {
         if (res.code === 200) {
             attrTemplate.value = [...res.data]
+            currentAttrTemplate.value = id
         }
     })
 }
@@ -1266,6 +1268,7 @@ onBeforeUnmount(() => {
         right: 0;
         bottom: 0;
         background: #fff;
+        z-index: 99;
         :deep(.el-button span){
             font-size: 18px;
             font-weight: 700;
@@ -1438,6 +1441,8 @@ onBeforeUnmount(() => {
     height: 48px;
     position: relative;
     border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 .thumb img {
@@ -1453,10 +1458,16 @@ onBeforeUnmount(() => {
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: none;
+    i{
+        color: #fff;
+        cursor: pointer;
+    }
 }
 
 .thumb:hover .el-upload-list__item-actions {
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .thumb .el-icon-delete {
@@ -1474,7 +1485,7 @@ onBeforeUnmount(() => {
 
 .more-input .more-li label {
     font-size: 12px;
-    color: #ccc;
+    color: #333;
     margin-right: 5px;
 }
 .good-picture .good-picture-list{
