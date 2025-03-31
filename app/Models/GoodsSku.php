@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int                             $goods_id   商品ID
  * @property string                          $sku_value  属性值ID“|”分割
  * @property string                          $price      价格
+ * @property string                          $integral   积分
  * @property int                             $number     库存
  * @property int                             $is_show    是否展示 1展示 0不展示
  * @property int                             $sort       排序
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereGoodsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereIntegral($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereIsShow($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsSku wherePrice($value)
