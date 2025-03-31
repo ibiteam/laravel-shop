@@ -12,6 +12,17 @@
         <div class="custom-dialog-content s-flex jc-bt">
             <div class="left-wrapper">
                 <div class="tree-content">
+                    <!-- <tabs v-model:active="treeMenuData.active" title-active-color="var(--main-color)">
+                        <tab v-for="menu in treeMenuData.menu" :key="menu.dir_type" :title="menu.name" :name="menu.dir_type"></tab>
+                    </tabs> -->
+                    <el-tree-v2
+                        style="max-width: 190px"
+                        :data="treeMenuData.tree"
+                        :props="{value: 'id', label: 'name', children: 'children'}"
+                        highlight-current
+                        check-on-click-node
+                        indent="6"
+                    />
                 </div>
                 <el-link class="link-button" :underline="false">前往素材中心</el-link>
             </div>
@@ -56,7 +67,7 @@
                 <div class="grid-wrapper" v-if="viewType">
                     <div class="grid-wrapper-content">
                         <div class="grid-item" v-for="(item,idx) in tableData" :key="idx">
-                            <div class="grid-item-mask" :class="{'select': idx == 0}" @click="handleClickItem(item)">
+                            <div class="grid-item-mask" :class="{'select': idx == 0}" @click="handleClickImageItem(item)">
                                 <el-badge :value="1" :hidden="idx != 0" class="select-index" type="primary" color="var(--main-color)" :offset="[-12,10]">
                                     <el-image style="width: 140px; height: 140px" :src="item.img" fit="scale-down" />
                                 </el-badge>
@@ -79,7 +90,8 @@
 </template>
 
 <script setup>
-import { ref, reactive , getCurrentInstance, defineEmits } from 'vue'
+import { ref, reactive , getCurrentInstance, defineEmits, onMounted } from 'vue'
+import { Tab, Tabs } from 'vant';
 import Page from '@/components/common/Pagination.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
 
@@ -88,6 +100,75 @@ const props = defineProps({
 })
 
 const dialogVisible = ref(true)
+const treeMenuData = reactive({
+    active: '',
+    menu: [],
+    tree: []
+})
+const treeData = ref([{
+    "id": 0,
+    "name": "商品管理",
+    "parent_id": -1,
+    "dir_type": 1,
+    "children": [
+        {
+            "id": 1,
+            "name": "商品图",
+            "parent_id": 0,
+            "dir_type": 1,
+            "children": [
+                {
+                    "id": 2,
+                    "name": "活动图",
+                    "parent_id": 1,
+                    "dir_type": 1,
+                    "children": [
+                        {
+                            "id": 3,
+                            "name": "特卖图",
+                            "parent_id": 2,
+                            "dir_type": 1
+                        },
+                        {
+                            "id": 4,
+                            "name": "秒杀图",
+                            "parent_id": 2,
+                            "dir_type": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+},
+{
+    "id": 0,
+    "name": "视频管理",
+    "parent_id": -1,
+    "dir_type": 2,
+    "children": [
+        {
+            "id": 5,
+            "name": "搞笑视频",
+            "parent_id": 0,
+            "dir_type": 2,
+            "children": [
+                {
+                    "id": 6,
+                    "name": "欢乐逗比",
+                    "parent_id": 5,
+                    "dir_type": 2
+                },
+                {
+                    "id": 7,
+                    "name": "倒霉熊",
+                    "parent_id": 5,
+                    "dir_type": 2
+                }
+            ]
+        }
+    ]
+}])
 const viewType = ref(1)
 const searchForm = reactive({
     status: 1,
@@ -193,6 +274,12 @@ const viewerData = reactive({
     srcList: [],
 
 })
+// 单击图片
+const handleClickImageItem = () => {
+
+}
+
+
 // 打开预览图片
 const handleClickViewer = (list) => {
     viewerData.index = list.$index
@@ -222,6 +309,17 @@ const handleCurrentChange = (val) => {
 const handleClose = () => {
     dialogVisible.value = false
 }
+
+onMounted(() => {
+    treeData.value.map((item,idx) => {
+        treeMenuData.menu.push(item)
+        if (item.dir_type == 1) {
+            treeMenuData.active = item.dir_type
+            treeMenuData.tree = item.children || []
+        }
+    })
+    console.log(treeMenuData)
+})
 </script>
 <style lang='scss' scoped>
 .custom-dialog-title {
@@ -237,7 +335,7 @@ const handleClose = () => {
     .left-wrapper {
         width: 210px;
         height: 100%;
-        padding: 14px 10px;
+        padding: 14px 10px 14px;
         text-align: center;
         border-right: 1px solid #d8d8d8;
         box-sizing: border-box;
@@ -303,6 +401,10 @@ const handleClose = () => {
         }
     }
 }
+
+
+</style>
+<style>
 .custom-dialog {
     padding: 0!important;
 }

@@ -32,7 +32,7 @@
                 <bottom-nav-bar v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}"></bottom-nav-bar>
             </div>
         </main>
-        <MaterialCenterDialog />
+        <MaterialCenterImageDialog />
     </div>
 </template>
 
@@ -45,7 +45,7 @@ import Search from './components/Search.vue'
 import AdvertisingOne from './components/AdvertisingOne.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
-import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
+import MaterialCenterImageDialog from '@/components/MaterialCenter/ImageDialog.vue'
 import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 

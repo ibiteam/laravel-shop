@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Manage\GoodsCategoryController;
 use App\Http\Controllers\Manage\GoodsController;
+use App\Http\Controllers\Manage\GoodsParameterTemplateController;
+use App\Http\Controllers\Manage\GoodsSkuTemplateController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('goods')->group(function () {
@@ -18,5 +20,17 @@ Route::prefix('goods')->group(function () {
         Route::get('/edit', [GoodsCategoryController::class, 'edit']); // 商品分类编辑
         Route::post('/update', [GoodsCategoryController::class, 'update']); // 商品分类更新(新增)
         Route::post('/destroy', [GoodsCategoryController::class, 'destroy']); // 商品分类删除
+    });
+    // 商品参数模板
+    Route::prefix('parameter/template')->group(function () {
+        Route::post('store', [GoodsParameterTemplateController::class, 'store']);
+        Route::post('update', [GoodsParameterTemplateController::class, 'update']);
+        Route::post('destroy', [GoodsParameterTemplateController::class, 'destroy']);
+    });
+    // 商品规格模板
+    Route::prefix('sku/template')->group(function () {
+        Route::post('store', [GoodsSkuTemplateController::class, 'store']);
+        Route::post('update', [GoodsSkuTemplateController::class, 'update']);
+        Route::post('destroy', [GoodsSkuTemplateController::class, 'destroy']);
     });
 });
