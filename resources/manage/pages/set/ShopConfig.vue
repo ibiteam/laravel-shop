@@ -1,6 +1,6 @@
 <script setup>
 import { Plus, Delete } from '@element-plus/icons-vue'
-import { shopConfigIndex, shopConfigUpdate } from '@/api/shopConfig.js';
+import { shopConfigIndex, shopConfigUpdate } from '@/api/set.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties

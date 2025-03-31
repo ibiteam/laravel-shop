@@ -6,7 +6,8 @@ import MaterialIndex from '@/pages/material/Index.vue';
 import Goods from '@/pages/goods/Goods.vue';
 import GoodsForm from '@/pages/goods/GoodsForm.vue';
 import SetShopConfig from '@/pages/set/ShopConfig.vue';
-
+import SetRouterCategory from '@/pages/set/RouterCategory.vue';
+import SetRouter from '@/pages/set/Router.vue';
 import UserIndex from '@/pages/user/UserIndex.vue';
 import UserAddress from '@/pages/user/UserAddress.vue';
 const router = createRouter({
@@ -22,6 +23,9 @@ const router = createRouter({
                 { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
                 { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
+                { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
+                { path: '/set/router_category', component: SetRouterCategory, name: 'SetRouterCategory' },
+                { path: '/set/router', component: SetRouter, name: 'SetRouter' },
                 { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
                 { path: '/user/index', component: UserIndex , name: 'UserIndex' },
                 { path: '/user/address', component: UserAddress , name: 'UserAddress' },
