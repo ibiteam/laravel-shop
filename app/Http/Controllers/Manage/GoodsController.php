@@ -39,7 +39,7 @@ class GoodsController extends BaseController
         $update_end_time = $request->get('update_end_time');
         $number = (int) $request->get('limit', 10);
 
-        $list = Goods::query()->latest()->with('category:id,name')
+        $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
             ->when($goods_id, fn (Builder $query) => $query->where('id', $goods_id))
             ->when($category_id, fn (Builder $query) => $query->where('category_id', $category_id))
             ->when($no, fn (Builder $query) => $query->where('no', $no))
@@ -49,7 +49,7 @@ class GoodsController extends BaseController
             ->when($create_end_time, fn (Builder $query) => $query->where('created_at', '<=', $create_end_time))
             ->when($update_start_time, fn (Builder $query) => $query->where('updated_at', '>=', $update_start_time))
             ->when($update_end_time, fn (Builder $query) => $query->where('updated_at', '<=', $update_end_time))
-            ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
+            ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
             ->paginate($number);
 
         return $this->success(new CommonResourceCollection($list));

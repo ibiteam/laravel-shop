@@ -14,3 +14,12 @@ export function categoryEdit(data) {
 export function categoryDestroy(data) {
     return $http.doPost('manage/goods/category/destroy', data)
 }
+
+export function goodsIndex(data) {
+    return $http.doGet('manage/goods/info', data)
+}
+
+
+export function goodsChangeStatus(data) {
+    return $http.doPost('manage/goods/info/change/status', data)
+}
