@@ -10,54 +10,54 @@ use Illuminate\Http\Request;
 class ShopConfigController extends BaseController
 {
     /**
-     * 站点信息.
+     * 获取配置信息.
      */
-    public function siteInfo(ShopConfigDao $shop_config_dao)
+    public function index(Request $request, ShopConfigDao $shop_config_dao)
     {
-        $configCodes = [
-            ShopConfig::SHOP_NAME,
-            ShopConfig::BANK_ACCOUNT,
-            ShopConfig::SHOP_ADDRESS,
-            ShopConfig::SERVICE_MOBILE,
-            ShopConfig::SHOP_COLOR,
-            ShopConfig::IS_GRAY,
-            ShopConfig::ICP_NUMBER,
-        ];
+        $active_name = $request->get('active_name', 'site_info');
+
+        $configCodes = match ($active_name) {
+            'site_info' => [// 站点信息
+                ShopConfig::SHOP_NAME,
+                ShopConfig::BANK_ACCOUNT,
+                ShopConfig::SHOP_ADDRESS,
+                ShopConfig::SERVICE_MOBILE,
+                ShopConfig::SHOP_COLOR,
+                ShopConfig::IS_GRAY,
+                ShopConfig::ICP_NUMBER,
+            ],
+            'site_logo' => [// 站点Logo
+                ShopConfig::SHOP_LOGO,
+                ShopConfig::SHOP_ICON,
+                ShopConfig::SHOP_MANAGE_LOGIN_IMAGE,
+            ],
+            'smtp_service' => [// 邮件服务
+                ShopConfig::SMTP_HOST,
+                ShopConfig::SMTP_PORT,
+                ShopConfig::SMTP_USER,
+                ShopConfig::SMTP_PASS,
+            ],
+        };
 
         return $this->success($shop_config_dao->getConfigByCodes($configCodes));
     }
-
-    /**
-     * 站点Logo.
-     */
-    public function siteLogo(ShopConfigDao $shop_config_dao)
-    {
-        $configCodes = [
-            ShopConfig::SHOP_LOGO,
-            ShopConfig::SHOP_ICON,
-            ShopConfig::SHOP_MANAGE_LOGIN_IMAGE,
-        ];
-
-        return $this->success($shop_config_dao->getConfigByCodes($configCodes));
-    }
-
 
     /**
      * 更新配置.
      */
     public function update(Request $request, ShopConfigDao $shop_config_dao)
     {
-        $title = $request->get('title');
         $tab_label = $request->get('tab_label');
         $data = $request->all();
 
         $all_codes = ShopConfig::query()->pluck('code')->toArray();
-        foreach (array_keys($data) as $v) {
-            if (!in_array($v, $all_codes)) {
+
+        foreach (array_keys($data) as $code) {
+            if (! in_array($code, $all_codes)) {
                 continue;
             }
 
-            ShopConfig::whereCode($v)->update(['value' => json_encode($data[$v] ?? '')]);
+            ShopConfig::whereCode($code)->update(['value' => json_encode($data[$code] ?? '')]);
         }
 
         // 删除缓存

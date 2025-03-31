@@ -1,6 +1,6 @@
 <script setup>
 import { Plus, Delete } from '@element-plus/icons-vue'
-import { siteInfo, siteLogo, shopConfigUpdate } from '@/api/shopConfig.js'
+import { shopConfigIndex, shopConfigUpdate } from '@/api/shopConfig.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -16,8 +16,10 @@ const tab_label = computed(() => {
     switch (secondActiveName.value) {
         case 'site_info':
             return '站点信息';
-        case 'logo_icon':
+        case 'site_logo':
             return '站点logo';
+        case 'smtp_service':
+            return '邮件服务';
         default:
             return '';
     }
@@ -27,7 +29,7 @@ const firstHandleClick = (tab, event) => {
     if (firstActiveName.value === 'site_setup') {
         secondActiveName.value = 'site_info';
     } else if (firstActiveName.value === 'system_docking') {
-        secondActiveName.value = 'smtp';
+        secondActiveName.value = 'smtp_service';
     }
     secondHandleClick(tab, event);
 };
@@ -37,19 +39,8 @@ const secondHandleClick = (tab, event) => {
     setInfo(secondActiveName.value);
 };
 
-const setInfo = (type) => {
-    let fetchFunction;
-    switch (type) {
-        case 'site_info':
-            fetchFunction = siteInfo;
-            break;
-        case 'logo_icon':
-            fetchFunction = siteLogo;
-            break;
-        default:
-            fetchFunction = () => Promise.resolve({ code: 200, data: {} });
-    }
-    fetchFunction().then(res => {
+const setInfo = (active_name) => {
+    shopConfigIndex({active_name:active_name}).then(res => {
         if (res.code === 200) {
             Object.assign(inputFrom, res.data);
         } else {
@@ -61,7 +52,6 @@ const setInfo = (type) => {
 const uploadFile = async (request, type) => {
     try {
         const res = await fileUpload({ file: request.file });
-
         if (res.code === 200) {
             inputFrom[type] = res.data.url;
         } else {
@@ -140,12 +130,12 @@ onMounted(() => {
                                     ></el-switch>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" class="contract_sub " :loading="loading">提交</el-button>
+                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
                                 </el-form-item>
                             </div>
                         </el-form>
                     </el-tab-pane>
-                    <el-tab-pane label="站点logo" name="logo_icon">
+                    <el-tab-pane label="站点logo" name="site_logo">
                         <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
                             <div style="margin:0 auto 0 100px;width: 800px;">
                                 <el-card class="box-card" style="margin-bottom: 30px;">
@@ -153,51 +143,38 @@ onMounted(() => {
                                         <span style="font-size:20px;">网站logo</span>
                                     </div>
                                     <el-form-item label="网站logo：" prop="shop_logo">
-                                        <div v-if="!inputFrom.shop_logo">
-                                            <el-upload
-                                                class="one-file-upload"
-                                                accept="image/jpeg,image/jpg,image/png"
-                                                :show-file-list="false"
-                                                list-type="picture-card"
-                                                action=""
-                                                :http-request="(request) => uploadFile(request, 'shop_logo')"
-                                                :with-credentials="true"
-                                            >
-                                                <div class="icon-button">
-                                                    <i class="el-icon-plus"></i>
-                                                </div>
-                                            </el-upload>
-                                        </div>
-                                        <div v-if="inputFrom.shop_logo" class="img-one" style="width: 80px;height: 80px;margin-right: 10px">
-                                            <img :src="inputFrom.shop_logo" style="width: 80px;height: 80px">
-                                            <span class="deleteBtn" @click="handleRemoveOne('shop_logo')">
-                                                <i class="el-icon-delete"></i>
-                                            </span>
-                                        </div>
+                                        <el-upload
+                                            class="logo-uploader"
+                                            accept="image/jpeg,image/jpg,image/png"
+                                            action=""
+                                            :show-file-list="false"
+                                            :http-request="(request) => uploadFile(request, 'shop_logo')"
+                                            :with-credentials="true"
+                                        >
+                                            <img v-if="inputFrom.shop_logo" :src="inputFrom.shop_logo" class="logo" alt=""/>
+                                            <el-icon class="logo-uploader-icon">
+                                                <Delete v-if="inputFrom.shop_logo" @click="handleRemoveOne('shop_logo')" />
+                                                <Plus v-else />
+                                            </el-icon>
+                                        </el-upload>
                                         <span><small>平台完整的logo，推荐尺寸280*100</small></span>
                                     </el-form-item>
+
                                     <el-form-item label="站点图标：" prop="shop_icon">
-                                        <div v-if="!inputFrom.shop_icon">
-                                            <el-upload
-                                                class="one-file-upload"
-                                                accept="image/jpeg,image/jpg,image/png"
-                                                :show-file-list="false"
-                                                list-type="picture-card"
-                                                action=""
-                                                :http-request="(request) => uploadFile(request, 'shop_icon')"
-                                                :with-credentials="true"
-                                            >
-                                                <div class="icon-button">
-                                                    <i class="el-icon-plus"></i>
-                                                </div>
-                                            </el-upload>
-                                        </div>
-                                        <div v-if="inputFrom.shop_icon" class="img-one" style="width: 80px;height: 80px;margin-right: 10px">
-                                            <img :src="inputFrom.shop_icon" style="width: 80px;height: 80px">
-                                            <span class="deleteBtn" @click="handleRemoveOne('shop_icon')">
-                                                <i class="el-icon-delete"></i>
-                                            </span>
-                                        </div>
+                                        <el-upload
+                                            class="logo-uploader"
+                                            accept="image/x-icon"
+                                            action=""
+                                            :show-file-list="false"
+                                            :http-request="(request) => uploadFile(request, 'shop_icon')"
+                                            :with-credentials="true"
+                                        >
+                                            <img v-if="inputFrom.shop_icon" :src="inputFrom.shop_icon" class="logo" alt=""/>
+                                            <el-icon class="logo-uploader-icon">
+                                                <Delete v-if="inputFrom.shop_icon" @click="handleRemoveOne('shop_icon')" />
+                                                <Plus v-else />
+                                            </el-icon>
+                                        </el-upload>
                                         <span><small>文件后缀.ico，推荐尺寸：16*16</small></span>
                                     </el-form-item>
                                 </el-card>
@@ -206,33 +183,25 @@ onMounted(() => {
                                         <span style="font-size:20px;">背景图</span>
                                     </div>
                                     <el-form-item label="后台登页背景：" prop="shop_manage_login_image">
-                                        <div v-if="!inputFrom.shop_manage_login_image">
-                                            <el-upload
-                                                class="one-file-upload"
-                                                accept="image/jpeg,image/jpg,image/png"
-                                                :show-file-list="false"
-                                                list-type="picture-card"
-                                                action=""
-                                                :http-request="(request) => uploadFile(request, 'shop_manage_login_image')"
-                                                :with-credentials="true"
-                                            >
-                                                <div class="icon-button">
-                                                    <i class="el-icon-plus"></i>
-                                                </div>
-                                            </el-upload>
-                                        </div>
-                                        <div v-if="inputFrom.shop_manage_login_image" class="img-one" style="width: 80px;height: 80px;margin-right: 10px">
-                                            <img :src="inputFrom.shop_manage_login_image" style="width: 80px;height: 80px">
-                                            <span class="deleteBtn" @click="handleRemoveOne('shop_manage_login_image')">
-                                                <i class="el-icon-delete"></i>
-                                            </span>
-                                        </div>
+                                        <el-upload
+                                            class="logo-uploader"
+                                            accept="image/jpeg,image/jpg,image/png"
+                                            action=""
+                                            :show-file-list="false"
+                                            :http-request="(request) => uploadFile(request, 'shop_manage_login_image')"
+                                            :with-credentials="true">
+                                            <img v-if="inputFrom.shop_manage_login_image" :src="inputFrom.shop_manage_login_image" class="logo" alt=""/>
+                                            <el-icon class="logo-uploader-icon">
+                                                <Delete v-if="inputFrom.shop_manage_login_image" @click="handleRemoveOne('shop_manage_login_image')" />
+                                                <Plus v-else />
+                                            </el-icon>
+                                        </el-upload>
                                         <span><small>推荐尺寸420*560</small></span>
                                     </el-form-item>
                                 </el-card>
                             </div>
-                            <el-form-item class="">
-                                <el-button style="margin-top: 20px;" type="primary" @click="submitForm('inputFrom')" :class="{disable:loading}" class="contract_sub" :loading="loading">提交</el-button>
+                            <el-form-item>
+                                <el-button style="margin-top: 20px;" type="primary" @click="submitForm('inputFrom')" :class="{disable:loading}" :loading="loading">提交</el-button>
                             </el-form-item>
                         </el-form>
                     </el-tab-pane>
@@ -240,7 +209,7 @@ onMounted(() => {
             </el-tab-pane>
             <el-tab-pane label="系统对接" name="system_docking">
                 <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card" @tab-click="secondHandleClick">
-                    <el-tab-pane label="邮件服务" name="smtp">
+                    <el-tab-pane label="邮件服务" name="smtp_service">
                         <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
                             <div style="margin:0 auto 0 100px;width: 1000px">
                                 <el-form-item label="发送邮件服务器地址(SMTP)：" prop="smtp_host">
@@ -249,8 +218,14 @@ onMounted(() => {
                                 <el-form-item label="服务器端口：" prop="smtp_port">
                                     <el-input v-model="inputFrom.smtp_port"></el-input>
                                 </el-form-item>
-                                <el-form-item class="">
-                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" class="contract_sub " :loading="loading">提交</el-button>
+                                <el-form-item label="邮件账号：" prop="smtp_user">
+                                    <el-input v-model="inputFrom.smtp_user"></el-input>
+                                </el-form-item>
+                                <el-form-item label="邮件密码：" prop="smtp_pass">
+                                    <el-input v-model="inputFrom.smtp_pass" type="password"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
                                 </el-form-item>
                             </div>
                         </el-form>
@@ -287,7 +262,7 @@ onMounted(() => {
     border-color: var(--el-color-primary);
 }
 
-.el-icon.logo-uploader-icon {
+.el-icon .logo-uploader-icon {
     font-size: 28px;
     color: #8c939d;
     width: 80px;
