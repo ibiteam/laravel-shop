@@ -7,7 +7,7 @@ use App\Models\Goods;
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
 
-class GoodsSpecValueService
+class ManageSpecValueService
 {
     private array $store_spec_value_data = [];
 
@@ -15,6 +15,9 @@ class GoodsSpecValueService
 
     private array $deleted_spec_value_data = [];
 
+    /**
+     * @throws BusinessException
+     */
     public function __construct(public Goods $goods, array $params)
     {
         $this->init($params);
