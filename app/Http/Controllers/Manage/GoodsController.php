@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CategoryDao;
-use App\Http\Dao\GoodsParameterTemplateDao;
 use App\Http\Dao\GoodsSkuDao;
-use App\Http\Dao\GoodsSkuTemplateDao;
 use App\Http\Dao\GoodsSpecValueDao;
 use App\Http\Requests\Manage\GoodsStoreRequest;
 use App\Http\Resources\CommonResourceCollection;
@@ -99,7 +97,7 @@ class GoodsController extends BaseController
     /**
      * 修改商品.
      */
-    public function edit(Request $request, CategoryDao $category_dao, GoodsSpecValueDao $goods_spec_value_dao, GoodsSkuDao $goods_sku_dao, GoodsParameterTemplateDao $goods_parameter_dao, GoodsSkuTemplateDao $goods_sku_template_dao): JsonResponse
+    public function edit(Request $request, CategoryDao $category_dao, GoodsSpecValueDao $goods_spec_value_dao, GoodsSkuDao $goods_sku_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -109,6 +107,7 @@ class GoodsController extends BaseController
             ]);
 
             $info = [
+                'id' => $validated['id'] ?? 0,
                 'category_id' => null,
                 'name' => '',
                 'label' => '',
@@ -116,14 +115,15 @@ class GoodsController extends BaseController
                 'parameters' => [],
                 'images' => [],
                 'video' => '',
-                'video_duration' => '',
+                'video_duration' => 0,
                 'content' => '',
                 'unit' => '',
                 'spec_data' => [],
                 'sku_data' => [],
-                'price' => '',
+                'price' => 0,
+                'integral' => 0,
                 'total' => '',
-                'type' => '',
+                'type' => Goods::TYPE_DONE_ORDER,
                 'status' => Goods::STATUS_ON_SALE,
                 'can_quota' => Goods::NOT_QUOTA,
                 'quota_number' => 0,

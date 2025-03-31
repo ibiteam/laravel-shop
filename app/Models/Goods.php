@@ -86,6 +86,9 @@ class Goods extends Model
     public const QUOTA = 1; // 限购
     public const NOT_QUOTA = 0; // 不限购
 
+    public const TYPE_DONE_ORDER = 1; // 下单减库存
+    public const TYPE_PAY_ORDER = 2; // 支付订单减库存
+
     protected $guarded = [];
 
     public function category(): BelongsTo

@@ -469,7 +469,8 @@ import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
 import 'vue-cropper/dist/index.css'
 import { VueDraggable } from 'vue-draggable-plus'
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
+const router = useRouter()
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
@@ -1207,8 +1208,6 @@ onMounted(() => {
             settings.value = res.data.settings
         }
     })
-    console.log('updateForm.value',updateForm.value);
-    // isInitialized.value = true
     getSkuTemplate()
     getParameterTemplate()
     wrapRef.value.parentElement.addEventListener('scroll', handleScroll);

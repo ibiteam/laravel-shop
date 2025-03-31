@@ -22,6 +22,7 @@ class GoodsService
             'label' => '',
             'unit' => '',
             'price' => 0,
+            'integral' => 0,
             'total' => 0,
             'type' => 1,
             'status' => 0,
