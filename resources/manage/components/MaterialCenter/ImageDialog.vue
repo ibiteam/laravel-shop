@@ -412,10 +412,10 @@ onMounted(() => {
     padding: 0;
     position: relative;
 }
-.el-dialog__header.show-close{
+.custom-dialog-header.el-dialog__header.show-close{
     padding: 0;
 }
-.el-dialog__headerbtn {
+.custom-dialog-header .el-dialog__headerbtn {
     bottom: 0;
     margin: auto 0;
 }
