@@ -35,7 +35,7 @@ class GoodsStoreRequest extends FormRequest
             'video' => 'nullable|string|url',
             'video_duration' => 'required_with:video|integer',
             'content' => 'required|string',
-            'unit' => 'nullable|string',
+            'unit' => 'nullable|string|max:30',
             'price' => 'nullable|numeric',
             'integral' => 'nullable|numeric|min:0',
             'total' => 'required|integer',
