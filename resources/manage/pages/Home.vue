@@ -15,7 +15,7 @@
                                 </div>
                                 <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">用户数</span>
-                                    <span class="fs22" style="color: #551A8B">373</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.user_number?number_data.user_number:'--' }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
@@ -24,7 +24,7 @@
                                 </div>
                                 <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">订单数</span>
-                                    <span class="fs22" style="color: #551A8B">373</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.order_number?number_data.order_number:'--' }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
@@ -33,7 +33,7 @@
                                 </div>
                                 <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">总交易额</span>
-                                    <span class="fs22" style="color: #551A8B">373</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.total_transaction_value?number_data.total_transaction_value:'--' }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
@@ -108,8 +108,8 @@
                             <div class="more-opt s-flex flex-wrap" v-if="my_collect.length">
                                 <div class="opt-list" v-for="item in my_collect" :key="item.value">
                                     <div class="icon">
-                                        <el-icon>
-                                            <component is="CirclePlus"/>
+                                        <el-icon v-if="item.icon" :size="20">
+                                            <component :is="item.icon"/>
                                         </el-icon>
                                     </div>
                                     <div class="titles">
@@ -128,17 +128,20 @@
                                     <span>最近访问</span>
                                 </div>
                             </div>
-                            <div class="more-opt s-flex flex-wrap">
-                                <div class="opt-list" v-for="item in recent_access_records">
+                            <div class="more-opt s-flex flex-wrap" v-if="access_record.length > 0">
+                                <div class="opt-list" v-for="item in access_record">
                                     <div class="icon">
-                                        <el-icon>
-                                            <component is="CirclePlus"/>
+                                        <el-icon v-if="item.icon" :size="20">
+                                            <component :is="item.icon"/>
                                         </el-icon>
                                     </div>
                                     <div class="titles">
-                                        <span>{{item.name}}</span>
+                                        <span>{{item.title}}</span>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
+                                <span>暂无访问记录</span>
                             </div>
                         </div>
                         <div class="line" style="border-bottom: solid 1px #F2F3F5;margin: 20px 0;"></div>
@@ -149,8 +152,9 @@
                                 </div>
                             </div>
                             <div class="more-opt s-flex flex-wrap">
-                                <div class="opt-list">
+                                <div class="opt-list" @click="clearCache">
                                     <div class="icon">
+                                        <el-icon :size="20"><DeleteFilled /></el-icon>
                                     </div>
                                     <div class="titles">
                                         <span>清除缓存</span>
@@ -173,7 +177,7 @@
                 <div class="right-collection flex-1">
                     <template v-if="my_collect.length">
                         <div class="menu-listRouter" v-for="(item,index) in my_collect" :key="item.value">
-                            <span>@{{ item.title }}</span>
+                            <span>{{ item.title }}</span>
                             <i class="el-icon-error" style="display: none;color: #ccc;"></i>
                         </div>
                     </template>
@@ -197,9 +201,10 @@
                                 <div class="menu-title"><span>{{ item.title }}</span></div>
                                 <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
                                     <div class="menu-title"><span>{{ its.title }}</span></div>
-                                    <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="itas in its.children" style="cursor: pointer;" @click="collectionFnc(itas,index,ids)">
+                                    <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(itas,idas) in its.children" :key="itas.value" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
                                         <span>{{ itas.title }}</span>
-                                        <em class="el-icon-star-on" style="color: #ff6a00" v-if="itas.collection"></em>
+                                        <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
+                                        <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
                                     </div>
                                 </div>
                             </div>
@@ -219,6 +224,8 @@ import * as echarts from 'echarts'
 import $public from '@/utils/public'
 import { Search } from '@element-plus/icons-vue'
 import {getMenuAxios} from "../api/set.js";
+import {clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
+
 
 
 let lineRef = null
@@ -228,9 +235,10 @@ let sourceRef = null
 const searchtoolsRef = ref(null)
 const searchtools = ref('')
 
-const recent_access_records = ref([{"name":"应用分组","url":"https://testdoc.ptdplat.com/manage/config_center/group","icon":"el-icon-tickets"},{"name":"应用列表","url":"https://testdoc.ptdplat.com/manage/config_center/application","icon":"el-icon-tickets"},{"name":"服务器","url":"https://testdoc.ptdplat.com/manage/serve_organ","icon":"el-icon-tickets"},{"name":"机器人列表","url":"https://testdoc.ptdplat.com/manage/chat/application_program_robot/list","icon":"el-icon-tickets"},{"name":"应用列表","url":"https://testdoc.ptdplat.com/manage/chat/application_program/list","icon":"el-icon-tickets"},{"name":"服务器分组","url":"https://testdoc.ptdplat.com/manage/serve_cate","icon":"el-icon-tickets"},{"name":"用户分组","url":"https://testdoc.ptdplat.com/manage/member_group","icon":"el-icon-tickets"},{"name":"消息","url":"","icon":"el-icon-chat-round"}])
+const number_data = ref({})
+const access_record = ref([])
 const my_collect = ref([])
-const access_statistic = reactive({"pc":{"name":"PC","statistic_date":["2025-03-20","2025-03-21","2025-03-22","2025-03-23","2025-03-24","2025-03-25","2025-03-26"],"uv_number":[16,16,2,1,20,16,18]},"admin":{"name":"Admin","statistic_date":["2025-03-20","2025-03-21","2025-03-22","2025-03-23","2025-03-24","2025-03-25","2025-03-26"],"uv_number":[0,0,0,0,0,0,0]},"ibi":{"name":"App","statistic_date":["2025-03-20","2025-03-21","2025-03-22","2025-03-23","2025-03-24","2025-03-25","2025-03-26"],"uv_number":[0,0,0,0,0,0,0]}})
+const access_statistic = ref({})
 const collectionVisible = ref<boolean>(false)
 const menus = ref([])
 const searchMenus = ref([])
@@ -384,6 +392,23 @@ const searchMenusFnc = $public.debounce(() => {
     searchMenus.value = newArr
 },500)
 
+const collectionFnc = (itas,index,ids,idas) =>{
+    let is_collect = itas.is_collection
+    homeCollectMenuAxios(itas.index).then(res => {
+        if (res.code === 200) {
+            if(is_collect){
+                let collectIndex = my_collect.value.findIndex(a => a.name === itas.name)
+                my_collect.value.splice(collectIndex,1)
+            }else{
+                my_collect.value.push(itas)
+            }
+            searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+}
+
 const getMenu = () => {
     getMenuAxios().then(res => {
         if (res.code === 200) {
@@ -394,12 +419,37 @@ const getMenu = () => {
     });
 }
 
+const getData = () => {
+    getHomeDashboardAxios().then(res => {
+        if (res.code === 200) {
+            number_data.value = res.data.number_data
+            my_collect.value = res.data.my_collect
+            access_record.value = res.data.access_record
+            access_statistic.value = res.data.access_statistic
+            nextTick(() => {
+                lineRef = echarts.init(document.getElementById('access-data'));
+                lineRef.setOption(getUvChartOption(access_statistic));
+            });
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+}
+
+const clearCache = () => {
+    clearCacheAxios().then(res => {
+        if (res.code === 200) {
+            cns.$message.success(res.message);
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+}
+
 onMounted(() => {
     getMenu()
-    nextTick(() => {
-        lineRef = echarts.init(document.getElementById('access-data'));
-        lineRef.setOption(getUvChartOption(access_statistic));
-    });
+    getData()
+
 
     window.addEventListener('resize', debounceResize)
 });
@@ -603,20 +653,20 @@ onUnmounted(() => {
                 height: 40px;
                 border-radius: 5px;
                 background: #f7f8fa;
-                text-align: center;
-                line-height: 40px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
-
-            .home-right .shortcut .opt-list .icon em {
-                font-size: 20px;
-                color: #333;
+            .home-right .shortcut .opt-list .icon svg{
+                width: 30px;
+                height: 30px;
             }
 
             .home-right .shortcut .opt-list .titles {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                width: 80px;
+                width: 85px;
                 text-align: center;
                 margin-top: 5px;
             }
@@ -734,21 +784,15 @@ onUnmounted(() => {
         padding: 0 10px;
         cursor: pointer;
         display: flex;
-        align-items: baseline;
         justify-content: space-between;
     }
 
     .collection-box .menu-listRouter {
         &:hover {
             background-color: #f4f6f7;
-
-            i {
+            .el-icon {
                 display: block !important;
             }
-        }
-
-        i &:hover {
-            color: rgb(124, 124, 124) !important;
         }
     }
 
@@ -757,7 +801,6 @@ onUnmounted(() => {
         cursor: pointer;
         color: #333;
         font-size: 14px;
-        line-height: 30px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;

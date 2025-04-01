@@ -135,33 +135,6 @@ if (! function_exists('connectStr')) {
     }
 }
 
-if (! function_exists('cache_forever')) {
-    /**
-     * 永久缓存.
-     *
-     * @param $code
-     */
-    function cache_forever($key, $callback)
-    {
-        //测试环境数据不缓存
-        if (config('app.debug')) {
-            return $callback();
-        }
-
-        return Cache::rememberForever(config('cache.prefix').$key, $callback);
-    }
-}
-
-if (! function_exists('cache_remove')) {
-    /**
-     * 移除缓存.
-     */
-    function cache_remove($key)
-    {
-        return Cache::forget(config('cache.prefix').$key);
-    }
-}
-
 if (! function_exists('is_m_request')) {
     /**
      * 判断来源是否为H5.

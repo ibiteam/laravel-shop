@@ -6,6 +6,7 @@ use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminOperationLog;
 use App\Models\ShopConfig;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class ShopConfigController extends BaseController
@@ -25,7 +26,6 @@ class ShopConfigController extends BaseController
             $group_name = $validated['group_name'] ?? 'site_info';
 
             return $this->success($shop_config_dao->getConfigByGroupName($group_name));
-
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (\Throwable $throwable) {
@@ -52,12 +52,12 @@ class ShopConfigController extends BaseController
         }
 
         // 删除缓存
-        cache_remove('shop_config_all_code');
+        Cache::forget('shop_config_all_code');
 
         // 重新更新缓存
         $shop_config_dao->getAll();
 
-        admin_operation_log($this->adminUser(), "更新了商店设置的【".$tab_label."】", AdminOperationLog::TYPE_UPDATE);
+        admin_operation_log($this->adminUser(), '更新了商店设置的【'.$tab_label.'】', AdminOperationLog::TYPE_UPDATE);
 
         return $this->success('更新成功');
     }
