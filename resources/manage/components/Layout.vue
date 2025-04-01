@@ -41,7 +41,9 @@
                                 <div class='menu-box'>
                                     <div class='s-flex'>
                                         <div class='menu-list s-flex jc-ct ai-ct' :class='{actived:index === menuIndex}' :key="item.index" v-for='(item,index) in menus'  @click="leftShow = true,menuIndex = index">
-                                            <div class="icon-imgs"><i class="iconfont co-666" :class='item.icon'></i></div>
+                                            <el-icon v-if="item.icon" :size="20">
+                                                <component :is="item.icon"/>
+                                            </el-icon>
                                             <div class="menu-first-name co-666"><span>{{item.title}}</span></div>
                                         </div>
                                     </div>
@@ -168,8 +170,8 @@
 import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import $public from '@/utils/public'
-import { Search , Bell , Setting , ArrowRight , Fold , Expand } from '@element-plus/icons-vue'
-import {getMenuAxios} from "../api/set.js";
+import { ArrowRight } from '@element-plus/icons-vue'
+import {getMenuAxios} from "../api/home.js";
 const pageLoad = ref(false)
 const menus = ref([])
 const menuIndex = ref(0)

@@ -59,37 +59,14 @@
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>
                     </div>
-                    <div class="module-main">
-                        <div class="module-title">会员</div>
+                    <div class="module-main" v-for="item in todo_list">
+                        <div class="module-title">{{ item.group_name }}</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -180px;"></div>
-                                <div class="module-text">订单评论</div>
-                            </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -240px;"></div>
-                                <div class="module-text">购买咨询</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="module-main">
-                        <div class="module-title">订单</div>
-                        <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -900px;"></div>
-                                <div class="module-text">待付款</div>
-                            </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -480px;"></div>
-                                <div class="module-text">待发货</div>
-                            </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -300px;"></div>
-                                <div class="module-text">待收货</div>
-                            </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
-                                <div class="module-imgs" style="background-position: 0px -780px;"></div>
-                                <div class="module-text">退款申请</div>
+                            <div class="module-model s-flex ai-ct jc-ct" v-for="ite in item.list">
+                                <el-icon v-if="ite.icon" :size="32">
+                                    <component :is="ite.icon"/>
+                                </el-icon>
+                                <div class="module-text">{{ ite.title }}</div>
                             </div>
                         </div>
                     </div>
@@ -222,8 +199,7 @@ import { nextTick, onMounted, ref, reactive, onUnmounted, computed,getCurrentIns
 const cns = getCurrentInstance().appContext.config.globalProperties
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
-import {getMenuAxios} from "../api/set.js";
-import {clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
+import {getMenuAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
 
 
 
@@ -236,6 +212,7 @@ const number_data = ref({})
 const access_record = ref([])
 const my_collect = ref([])
 const access_statistic = ref({})
+const todo_list = ref([])
 const collectionVisible = ref<boolean>(false)
 const menus = ref([])
 const searchMenus = ref([])
@@ -420,6 +397,7 @@ const getData = () => {
             my_collect.value = res.data.my_collect
             access_record.value = res.data.access_record
             access_statistic.value = res.data.access_statistic
+            todo_list.value = res.data.todo_list
             nextTick(() => {
                 lineRef = echarts.init(document.getElementById('access-data'));
                 lineRef.setOption(getUvChartOption(access_statistic));
@@ -583,11 +561,9 @@ onUnmounted(() => {
                 border-radius: 10px;
                 border: 1px dashed rgba(0, 0, 0, 0.1);
             }
-            .module-main .module-content .module-model>.module-imgs{
-                width: 40px;
-                height: 40px;
-                background: url('@/assets/images/home/home-menu.png');
-                background-repeat: no-repeat;
+            .module-main .module-content .module-model>.el-icon svg{
+                width: 20px;
+                height: 20px;
             }
             .module-main .module-content .module-model>.module-text{
                 margin-left: 10px;

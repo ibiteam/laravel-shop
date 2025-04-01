@@ -99,194 +99,244 @@ onMounted(() => {
 </script>
 
 <template>
-    <el-main style="margin-top: 20px;">
-        <el-tabs v-model="firstActiveName" type="card" @tab-click="firstHandleClick">
-            <el-tab-pane label="站点设置" name="site_setup">
-                <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card" @tab-click="secondHandleClick">
-                    <el-tab-pane label="站点信息" name="site_info">
-                        <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
-                            <div style="margin:0 auto 0 100px;width: 800px">
-                                <el-form-item label="站点名称：" prop="shop_name">
-                                    <el-input v-model="inputFrom.shop_name" placeholder="站点名称"></el-input>
-                                </el-form-item>
-                                <el-form-item label="公司名称：" prop="bank_account">
-                                    <el-input v-model="inputFrom.bank_account" placeholder="公司名称"></el-input>
-                                </el-form-item>
-                                <el-form-item label="公司地址：" prop="shop_address">
-                                    <el-input v-model="inputFrom.shop_address" placeholder="公司地址"></el-input>
-                                </el-form-item>
-                                <el-form-item label="客服热线：" prop="service_mobile">
-                                    <el-input v-model="inputFrom.service_mobile" placeholder="客服热线"></el-input>
-                                </el-form-item>
-                                <el-form-item label="ICP备案号：" prop="icp_number">
-                                    <el-input v-model="inputFrom.icp_number" placeholder="ICP备案号"></el-input>
-                                </el-form-item>
-                                <el-form-item label="站点主题色：" prop="shop_color">
-                                    <el-color-picker v-model="inputFrom.shop_color"></el-color-picker>
-                                </el-form-item>
-                                <el-form-item label="网站首页置灰：" prop="is_gray">
-                                    <el-switch
-                                        v-model="inputFrom.is_gray"
-                                        active-color="#13ce66" inactive-color="#EBE9E9"
-                                        :active-value="'1'" :inactive-value="'0'"
-                                    ></el-switch>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
-                                </el-form-item>
-                            </div>
-                        </el-form>
-                    </el-tab-pane>
-                    <el-tab-pane label="站点logo" name="site_logo">
-                        <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
-                            <div style="margin:0 auto 0 100px;width: 800px;">
-                                <el-card class="box-card" style="margin-bottom: 30px;">
-                                    <div slot="header" class="clearfix">
-                                        <span style="font-size:20px;">网站logo</span>
-                                    </div>
-                                    <el-form-item label="网站logo：" prop="shop_logo">
-                                        <el-upload
-                                            class="logo-uploader"
-                                            accept="image/jpeg,image/jpg,image/png"
-                                            action=""
-                                            :show-file-list="false"
-                                            :http-request="(request) => uploadFile(request, 'shop_logo')"
-                                            :with-credentials="true"
-                                        >
-                                            <img v-if="inputFrom.shop_logo" :src="inputFrom.shop_logo" class="logo" alt=""/>
-                                            <el-icon class="logo-uploader-icon">
-                                                <Delete v-if="inputFrom.shop_logo" @click="handleRemoveOne('shop_logo')" />
-                                                <Plus v-else />
-                                            </el-icon>
-                                        </el-upload>
-                                        <span><small>平台完整的logo，推荐尺寸280*100</small></span>
+    <div class="shopConfig-wrap">
+        <el-main>
+            <el-tabs v-model="firstActiveName" type="card" @tab-click="firstHandleClick" class="shopConfig-tab">
+                <el-tab-pane label="站点设置" name="site_setup">
+                    <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card" @tab-click="secondHandleClick" class="childConfig-tab">
+                        <el-tab-pane label="站点信息" name="site_info">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 50px;width: 550px">
+                                    <el-form-item label="站点名称：" prop="shop_name">
+                                        <el-input v-model="inputFrom.shop_name" placeholder="站点名称"></el-input>
                                     </el-form-item>
+                                    <el-form-item label="公司名称：" prop="bank_account">
+                                        <el-input v-model="inputFrom.bank_account" placeholder="公司名称"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="公司地址：" prop="shop_address">
+                                        <el-input v-model="inputFrom.shop_address" placeholder="公司地址"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="客服热线：" prop="service_mobile">
+                                        <el-input v-model="inputFrom.service_mobile" placeholder="客服热线"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="ICP备案号：" prop="icp_number">
+                                        <el-input v-model="inputFrom.icp_number" placeholder="ICP备案号"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="站点主题色：" prop="shop_color">
+                                        <el-color-picker v-model="inputFrom.shop_color"></el-color-picker>
+                                    </el-form-item>
+                                    <el-form-item label="网站首页置灰：" prop="is_gray">
+                                        <el-switch
+                                            v-model="inputFrom.is_gray"
+                                            active-color="#13ce66" inactive-color="#EBE9E9"
+                                            :active-value="'1'" :inactive-value="'0'"
+                                        ></el-switch>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                        <el-tab-pane label="站点logo" name="site_logo">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 50px;width: 550px;">
+                                    <el-card class="box-card" style="margin-bottom: 30px;">
+                                        <div slot="header" class="clearfix">
+                                            <span style="font-size:20px;">网站logo</span>
+                                        </div>
+                                        <el-form-item label="网站logo：" prop="shop_logo">
+                                            <el-upload
+                                                class="logo-uploader"
+                                                accept="image/jpeg,image/jpg,image/png"
+                                                action=""
+                                                :show-file-list="false"
+                                                :http-request="(request) => uploadFile(request, 'shop_logo')"
+                                                :with-credentials="true"
+                                            >
+                                                <template v-if="inputFrom.shop_logo">
+                                                    <img :src="inputFrom.shop_logo" class="logo" alt=""/>
+                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                        <Delete @click="handleRemoveOne('shop_logo')"/>
+                                                    </el-icon>
+                                                </template>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                    <Plus />
+                                                </el-icon>
+                                            </el-upload>
+                                            <span style="width: 100%"><small>平台完整的logo，推荐尺寸280*100</small></span>
+                                        </el-form-item>
 
-                                    <el-form-item label="站点图标：" prop="shop_icon">
-                                        <el-upload
-                                            class="logo-uploader"
-                                            accept="image/x-icon"
-                                            action=""
-                                            :show-file-list="false"
-                                            :http-request="(request) => uploadFile(request, 'shop_icon')"
-                                            :with-credentials="true"
-                                        >
-                                            <img v-if="inputFrom.shop_icon" :src="inputFrom.shop_icon" class="logo" alt=""/>
-                                            <el-icon class="logo-uploader-icon">
-                                                <Delete v-if="inputFrom.shop_icon" @click="handleRemoveOne('shop_icon')" />
-                                                <Plus v-else />
-                                            </el-icon>
-                                        </el-upload>
-                                        <span><small>文件后缀.ico，推荐尺寸：16*16</small></span>
-                                    </el-form-item>
-                                </el-card>
-                                <el-card class="box-card" style="">
-                                    <div slot="header" class="clearfix">
-                                        <span style="font-size:20px;">背景图</span>
-                                    </div>
-                                    <el-form-item label="后台登页背景：" prop="shop_manage_login_image">
-                                        <el-upload
-                                            class="logo-uploader"
-                                            accept="image/jpeg,image/jpg,image/png"
-                                            action=""
-                                            :show-file-list="false"
-                                            :http-request="(request) => uploadFile(request, 'shop_manage_login_image')"
-                                            :with-credentials="true">
-                                            <img v-if="inputFrom.shop_manage_login_image" :src="inputFrom.shop_manage_login_image" class="logo" alt=""/>
-                                            <el-icon class="logo-uploader-icon">
-                                                <Delete v-if="inputFrom.shop_manage_login_image" @click="handleRemoveOne('shop_manage_login_image')" />
-                                                <Plus v-else />
-                                            </el-icon>
-                                        </el-upload>
-                                        <span><small>推荐尺寸420*560</small></span>
-                                    </el-form-item>
-                                </el-card>
-                            </div>
-                            <el-form-item>
-                                <el-button style="margin-top: 20px;" type="primary" @click="submitForm('inputFrom')" :class="{disable:loading}" :loading="loading">提交</el-button>
-                            </el-form-item>
-                        </el-form>
-                    </el-tab-pane>
-                    <el-tab-pane label="积分设置" name="group_integral">
-                        <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
-                            <div style="margin:0 auto 0 100px;width: 800px">
-                                <el-form-item label="是否开启积分：" prop="is_open_integral">
-                                    <el-switch
-                                        v-model="inputFrom.is_open_integral"
-                                        active-color="#13ce66"
-                                        inactive-color="#EBE9E9"
-                                        :active-value="'1'"
-                                        :inactive-value="'0'"
-                                    ></el-switch>
-                                </el-form-item>
+                                        <el-form-item label="站点图标：" prop="shop_icon">
+                                            <el-upload
+                                                class="logo-uploader"
+                                                accept="image/x-icon"
+                                                action=""
+                                                :show-file-list="false"
+                                                :http-request="(request) => uploadFile(request, 'shop_icon')"
+                                                :with-credentials="true"
+                                            >
+                                                <template v-if="inputFrom.shop_icon">
+                                                    <img :src="inputFrom.shop_icon" class="logo" alt=""/>
+                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                        <Delete @click="handleRemoveOne('shop_icon')"/>
+                                                    </el-icon>
+                                                </template>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                    <Plus />
+                                                </el-icon>
+                                            </el-upload>
+                                            <span style="width: 100%"><small>文件后缀.ico，推荐尺寸：16*16</small></span>
+                                        </el-form-item>
+                                    </el-card>
+                                    <el-card class="box-card" style="">
+                                        <div slot="header" class="clearfix">
+                                            <span style="font-size:20px;">背景图</span>
+                                        </div>
+                                        <el-form-item label="后台登页背景：" prop="shop_manage_login_image">
+                                            <el-upload
+                                                class="logo-uploader"
+                                                accept="image/jpeg,image/jpg,image/png"
+                                                action=""
+                                                :show-file-list="false"
+                                                :http-request="(request) => uploadFile(request, 'shop_manage_login_image')"
+                                                :with-credentials="true">
+                                                <template v-if="inputFrom.shop_manage_login_image">
+                                                    <img :src="inputFrom.shop_manage_login_image" class="logo" alt=""/>
+                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                        <Delete @click="handleRemoveOne('shop_manage_login_image')"/>
+                                                    </el-icon>
+                                                </template>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                    <Plus />
+                                                </el-icon>
+                                            </el-upload>
+                                            <span style="width: 100%"><small>推荐尺寸420*560</small></span>
+                                        </el-form-item>
+                                    </el-card>
+                                </div>
                                 <el-form-item>
-                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    <el-button style="margin-top: 20px;" type="primary" @click="submitForm('inputFrom')" :class="{disable:loading}" :loading="loading">提交</el-button>
                                 </el-form-item>
-                            </div>
-                        </el-form>
-                    </el-tab-pane>
-                </el-tabs>
-            </el-tab-pane>
-            <el-tab-pane label="系统对接" name="system_docking">
-                <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card" @tab-click="secondHandleClick">
-                    <el-tab-pane label="邮件服务" name="smtp_service">
-                        <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
-                            <div style="margin:0 auto 0 100px;width: 1000px">
-                                <el-form-item label="发送邮件服务器地址(SMTP)：" prop="smtp_host">
-                                    <el-input v-model="inputFrom.smtp_host"></el-input>
-                                </el-form-item>
-                                <el-form-item label="服务器端口：" prop="smtp_port">
-                                    <el-input v-model="inputFrom.smtp_port"></el-input>
-                                </el-form-item>
-                                <el-form-item label="邮件账号：" prop="smtp_user">
-                                    <el-input v-model="inputFrom.smtp_user"></el-input>
-                                </el-form-item>
-                                <el-form-item label="邮件密码：" prop="smtp_pass">
-                                    <el-input v-model="inputFrom.smtp_pass" type="password"></el-input>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
-                                </el-form-item>
-                            </div>
-                        </el-form>
-                    </el-tab-pane>
-                </el-tabs>
-            </el-tab-pane>
-        </el-tabs>
-    </el-main>
+                            </el-form>
+                        </el-tab-pane>
+                        <el-tab-pane label="积分设置" name="group_integral">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 50px;width: 550px">
+                                    <el-form-item label="是否开启积分：" prop="is_open_integral">
+                                        <el-switch
+                                            v-model="inputFrom.is_open_integral"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-tab-pane>
+                <el-tab-pane label="系统对接" name="system_docking">
+                    <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card" @tab-click="secondHandleClick">
+                        <el-tab-pane label="邮件服务" name="smtp_service">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 100px;width: 1000px">
+                                    <el-form-item label="发送邮件服务器地址(SMTP)：" prop="smtp_host">
+                                        <el-input v-model="inputFrom.smtp_host"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="服务器端口：" prop="smtp_port">
+                                        <el-input v-model="inputFrom.smtp_port"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="邮件账号：" prop="smtp_user">
+                                        <el-input v-model="inputFrom.smtp_user"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="邮件密码：" prop="smtp_pass">
+                                        <el-input v-model="inputFrom.smtp_pass" type="password"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-tab-pane>
+            </el-tabs>
+        </el-main>
+    </div>
 </template>
 
 <style scoped lang="scss">
-    .logo-uploader .logo {
+.shopConfig-wrap{
+    background: #ffffff;
+    border-radius: 4px;
+    :deep(.shopConfig-tab){
+        width: 800px;
+    }
+    :deep(.shopConfig-tab>.el-tabs__header){
+        background: #F5F7FA;
+        border: 1px solid #E4E7ED;
+    }
+    :deep(.shopConfig-tab>.el-tabs__header .el-tabs__item){
+        border: none!important;
+    }
+    :deep(.shopConfig-tab>.el-tabs__header .el-tabs__item.is-active){
+        background: #ffffff;
+    }
+    :deep(.shopConfig-tab>.el-tabs__header .el-tabs__nav){
+        border: none;
+    }
+    :deep(.el-tabs--left.el-tabs--card .el-tabs__nav){
+        border-bottom: none;
+    }
+    :deep(.childConfig-tab .el-tabs__nav){
+        width: 175px;
+    }
+    :deep(.childConfig-tab .el-tabs__nav .el-tabs__item){
+        justify-content: center;
+    }
+}
+    :deep(.logo-uploader .el-upload){
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: var(--el-transition-duration-fast);
+    }
+    :deep(.logo-uploader .el-upload:hover){
+        .logo-uploader-icon-delete{
+            display: flex;
+        }
+    }
+    :deep(.logo-uploader .logo){
+        max-width: 80px;
+        max-height: 80px;
+        width: auto;
+        height: auto;
+    }
+    :deep(.logo-uploader .logo-uploader-icon){
+        font-size: 28px;
+        color: #8c939d;
         width: 80px;
         height: 80px;
-        display: block;
+        text-align: center;
+    }
+    :deep(.logo-uploader .logo-uploader-icon.logo-uploader-icon-plus){
+        border: 1px dashed #dcdfe6;
+    }
+    :deep(.logo-uploader .logo-uploader-icon.logo-uploader-icon-delete){
+        position: absolute;
+        display: none;
+        background: rgba(0, 0, 0, 0.5);
+        color: #ffffff;
     }
     :deep(.el-table__row .cell){
         display: flex;
         align-items: center;
     }
-</style>
-
-<style>
-.logo-uploader .el-upload {
-    border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: var(--el-transition-duration-fast);
-}
-
-.logo-uploader .el-upload:hover {
-    border-color: var(--el-color-primary);
-}
-
-.el-icon .logo-uploader-icon {
-    font-size: 28px;
-    color: #8c939d;
-    width: 80px;
-    height: 80px;
-    text-align: center;
-}
 </style>
