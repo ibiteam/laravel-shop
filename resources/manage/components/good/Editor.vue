@@ -8,9 +8,10 @@
         />
         <Editor
             style="height: 500px; overflow-y: hidden;"
-            v-model="editorContent"
+            :value="modelValue"
             :defaultConfig="editorConfig"
             :mode="mode"
+            @customPaste="customPasteSet"
             @onChange="handleChange"
             @onCreated="handleCreated"
         />
@@ -45,7 +46,7 @@
 
 <script setup>
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
-import { onBeforeUnmount, ref, shallowRef, onMounted, reactive, getCurrentInstance } from 'vue'
+import { onBeforeUnmount, ref, shallowRef, onMounted, reactive, getCurrentInstance, watch } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import html2canvas from 'html2canvas-pro';
 import { fileUpload } from '@/api/common'
@@ -53,10 +54,10 @@ import { fileUpload } from '@/api/common'
 const cns = getCurrentInstance().appContext.config.globalProperties
 const editorRef = shallowRef()
 
-const emit = defineEmits(['update:content', 'change'])
+const emit = defineEmits(['update:modelValue', 'change'])
 
 const props = defineProps({
-    content: {
+    modelValue: {
         type: String,
         default: ''
     }
@@ -80,14 +81,9 @@ const uploadValidateType  = ref('1');
 const editor_upload_accept = ref('image/gif,image/jpeg,image/png,image/jpg,image/bmp')
 //  记录当前富文本光标对象
 const img_width = ref(''); // 图片宽度
-const editorContent = ref(props.content)
 const exclude_keys = ['code', 'blockquote', 'fontFamily', 'codeBlock' , 'fullScreen']
 const mode = ref('default')
 const msgErr = ref(null)
-
-onMounted(async () => {
-    editorContent.value = props.content ? await handleFilterAudioAddAttribute(props.content) : ''
-})
 
 const toolbarConfig = ref({
     excludeKeys: exclude_keys
@@ -123,78 +119,78 @@ const editorConfig = {
                 }
             }
         }
-    },
-    /** 自定义粘贴，拦截复制表格 */
-    customPaste (editor, event) {
-        const html = event.clipboardData.getData('text/html')
-        //  如果获取到的html有值，则拦截并过滤表格，将表格生成为图片，并将表格标签替换为图片
-        if (html) {
-            const parent = document.createElement('div')
-            parent.innerHTML = html
-            const table_view = document.querySelector('.import-table')
-            table_view.style.position = 'fixed'
-            table_view.style.left = '-100vw'
-            table_view.style.top = '-100vh'
-            let uploadImages = []
-            let tableList = parent.querySelectorAll('table')
-            const pElement = parent.querySelectorAll('p')
+    }
+}
 
-            if (tableList.length) {
-                if (pElement.length) {
-                    //  将 HTMLCollection 数据转换为数组
-                    let arrayChildren = Array.from(parent.children)
-                    async function asyncForEach (array, callback) {
-                        for (let index in array) {
-                            if (array[index].tagName === 'TABLE') {
-                                table_view.appendChild(array[index])
-                                const img_url = await handleTableTransToImage(table_view)
-                                table_view.removeChild(table_view.children[0])
-                                const image = document.createElement('img')
-                                image.setAttribute('width', 'auto')
-                                image.setAttribute('data-type', 'table-image')
-                                image.setAttribute('alt', '')
-                                image.setAttribute('src', img_url)
-                                array.splice(index, 1, image)
-                                uploadImages.push(1)
-                                await callback(array[index])
-                            }
+const customPasteSet = (editor, event)=> {
+    const html = event.clipboardData.getData('text/html')
+    //  如果获取到的html有值，则拦截并过滤表格，将表格生成为图片，并将表格标签替换为图片
+    if (html) {
+        const parent = document.createElement('div')
+        parent.innerHTML = html
+        const table_view = document.querySelector('.import-table')
+        table_view.style.position = 'fixed'
+        table_view.style.left = '-100vw'
+        table_view.style.top = '-100vh'
+        let uploadImages = []
+        let tableList = parent.querySelectorAll('table')
+        const pElement = parent.querySelectorAll('p')
+
+        if (tableList.length) {
+            if (pElement.length) {
+                //  将 HTMLCollection 数据转换为数组
+                let arrayChildren = Array.from(parent.children)
+                async function asyncForEach (array, callback) {
+                    for (let index in array) {
+                        if (array[index].tagName === 'TABLE') {
+                            table_view.appendChild(array[index])
+                            const img_url = await handleTableTransToImage(table_view)
+                            table_view.removeChild(table_view.children[0])
+                            const image = document.createElement('img')
+                            image.setAttribute('width', 'auto')
+                            image.setAttribute('data-type', 'table-image')
+                            image.setAttribute('alt', '')
+                            image.setAttribute('src', img_url)
+                            array.splice(index, 1, image)
+                            uploadImages.push(1)
+                            await callback(array[index])
                         }
                     }
-
-                    //  同步等待循环操作结束后，执行下一步操作
-                    asyncForEach(arrayChildren, async () => {
-                        if (uploadImages.length === tableList.length) {
-                            //  将数组转换为 HTMLCollection 数据
-                            const create = document.createElement('div')
-                            for (let item of arrayChildren) {
-                                create.appendChild(item)
-                            }
-                            for (let item of create.children) {
-                                if (item.tagName === 'P') {
-                                    item.style.lineHeight = 2
-                                }
-                            }
-                            handleInsertHtmlToEditor(create.innerHTML, editor)
-                        }
-                    })
-                } else {
-                    setTimeout(async () => {
-                        table_view.innerHTML = parent.innerHTML
-                        const img_url = await handleTableTransToImage(table_view)
-                        const img_html = `<img src='${img_url}' alt='' width='auto' />`
-                        handleInsertHtmlToEditor(img_html, editor)
-                    }, 200)
                 }
-                // 阻止默认的粘贴行为
-                event.preventDefault();
-                return false
+
+                //  同步等待循环操作结束后，执行下一步操作
+                asyncForEach(arrayChildren, async () => {
+                    if (uploadImages.length === tableList.length) {
+                        //  将数组转换为 HTMLCollection 数据
+                        const create = document.createElement('div')
+                        for (let item of arrayChildren) {
+                            create.appendChild(item)
+                        }
+                        for (let item of create.children) {
+                            if (item.tagName === 'P') {
+                                item.style.lineHeight = 2
+                            }
+                        }
+                        handleInsertHtmlToEditor(create.innerHTML, editor)
+                    }
+                })
             } else {
+                setTimeout(async () => {
+                    table_view.innerHTML = parent.innerHTML
+                    const img_url = await handleTableTransToImage(table_view)
+                    const img_html = `<img src='${img_url}' alt='' width='auto' />`
+                    handleInsertHtmlToEditor(img_html, editor)
+                }, 200)
             }
+            // 阻止默认的粘贴行为
+            event.preventDefault();
+            return false
+        } else {
         }
-        setTimeout(() => {
-            scrollToCursor(editor);
-        },20)
     }
+    setTimeout(() => {
+        scrollToCursor(editor);
+    },20)
 }
 const resetElementInlineStyle = (editor)=> {
     return new Promise(resolve => {
@@ -336,11 +332,12 @@ const handleClickUploadFile = (data)=> {
 
 const handleCreated = (editor) => {
     editorRef.value = editor // 记录 editor 实例，重要！
+    editorRef.value.setHtml(props.modelValue)
 }
 
 const handleChange = async (editor) => {
     const parent = await resetElementInlineStyle(editor)
-    emit('update:content', parent.innerHTML)
+    emit('update:modelValue', parent.innerHTML)
     emit('change', parent.innerHTML)
 }
 const scrollToCursor = (editor) => {
@@ -361,34 +358,34 @@ const scrollToCursor = (editor) => {
     }
 }
 
-/** 过滤audio元素，添加属性 */
-const handleFilterAudioAddAttribute = (content) => {
-    return new Promise(resolve => {
-        const parent = document.createElement('p')
-        parent.innerHTML = content.value
-        let audioList = [], audioContent = parent.querySelectorAll('audio')
-        if (audioContent.length) {
-            async function asyncForEach (array, callback) {
-                for (let item of array) {
-                    if (item.tagName === 'AUDIO') {
-                        item.setAttribute('data-w-e-type', 'audio')
-                        audioList.push(1)
-                        await callback(item)
-                    }
-                }
-            }
-
-            asyncForEach(parent.children, async () => {
-                if (audioList.length === audioContent.length) {
-                    resolve(parent.innerHTML)
-                }
-            })
-
-        } else {
-            resolve(parent.innerHTML)
-        }
-    })
-}
+// /** 过滤audio元素，添加属性 */
+// const handleFilterAudioAddAttribute = (content) => {
+//     return new Promise(resolve => {
+//         const parent = document.createElement('p')
+//         parent.innerHTML = content
+//         let audioList = [], audioContent = parent.querySelectorAll('audio')
+//         if (audioContent.length) {
+//             async function asyncForEach (array, callback) {
+//                 for (let item of array) {
+//                     if (item.tagName === 'AUDIO') {
+//                         item.setAttribute('data-w-e-type', 'audio')
+//                         audioList.push(1)
+//                         await callback(item)
+//                     }
+//                 }
+//             }
+//
+//             asyncForEach(parent.children, async () => {
+//                 if (audioList.length === audioContent.length) {
+//                     resolve(parent.innerHTML)
+//                 }
+//             })
+//
+//         } else {
+//             resolve(parent.innerHTML)
+//         }
+//     })
+// }
 
 /** 执行上传图片操作 **/
 const handleChangeUploadFile = async (event, type) => {
@@ -579,12 +576,13 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
     .editor-wrap{
         :deep(.w-e-text-placeholder){
             font-style: normal;
-            top:12px;
+            top: 12px;
+            line-height: 1.5;
         }
         :deep(.w-e-text-container){
             padding: 0;
             [data-slate-editor] p{
-                line-height: normal; margin: 0; white-space: pre-wrap;
+                line-height: 1.5!important; margin: 0; white-space: pre-wrap;
             }
             line-height: normal !important; margin: 0 !important;
         }

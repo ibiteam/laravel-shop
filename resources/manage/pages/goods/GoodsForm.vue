@@ -1,5 +1,5 @@
 <template>
-    <div class="s-flex jc-bt" ref="wrapRef">
+    <div class="s-flex jc-bt" ref="wrapRef" v-loading="pageDataLoading">
         <div class="manage-public-wrap update-box flex-1">
             <el-form ref="updateFormRef" :model="updateForm" :rules="updateFormRules" label-width="150px">
                 <div class="manage-public-cont good-form" ref="baseRef">
@@ -155,8 +155,9 @@
                                 <span>仅支持mp4格式上传，大小100M内</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="商品详情" prop="goods_desc">
-                            <Editor v-model="updateForm.goods_desc" @change="handleChangeGoodsDetail" height="500px" min-height="500px" />
+                        <el-form-item label="商品详情" prop="content">
+                            <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="pageDataLoading"></div>
+                            <Editor v-model="updateForm.content" @change="handleChangeGoodsDetail" height="500px" min-height="500px" v-else/>
                         </el-form-item>
                     </div>
                 </div>
@@ -474,6 +475,7 @@ const router = useRouter()
 const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties
+const pageDataLoading = ref(true)
 
 /* 校验模板名称 */
 const validatorTemplateName = (rule, value, callback) => {
@@ -642,7 +644,7 @@ const validatePrice = (rule, value, callback, type) => {
 }
 
 const validateContent = (rule, value, callback) => {
-    if (updateForm.value.content == '' || updateForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
+    if (updateForm.value.content == '' || updateForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>' || updateForm.value.content == '<p style="line-height: 2; color: rgb(51, 51, 51);"><br></p>') {
         callback(new Error('商品详情不能为空'));
     } else {
         callback();
@@ -674,6 +676,7 @@ const updateForm = ref({
     sub_name: '',
     parameters: [],
     images: [],
+    content: '',
     video: '',
     video_duration: 0,
     unit: '',
@@ -681,7 +684,6 @@ const updateForm = ref({
     integral:0, //积分价格
     total: 0,
     type: 1,
-    content: '',
     status: 1,
     can_quota: 0,
     quota_number: 0,
@@ -690,6 +692,7 @@ const updateForm = ref({
 });
 
 // 图文相关
+const isInitContent = ref(true);
 const uploadImageRef = ref(null);
 const fileImgRef = ref(null);
 const fileVideoRef = ref(null);
@@ -836,7 +839,11 @@ const getSkuTemplate = () => {
 }
 
 const handleChangeGoodsDetail = () => {
-    // updateFormRef.value.validateField('content')
+    if(!isInitContent.value){
+        updateFormRef.value.validateField('content')
+    }else {
+        isInitContent.value = false
+    }
 }
 
 const addGoodsAttr = () => {
@@ -1207,6 +1214,7 @@ onMounted(() => {
             updateForm.value = {...res.data.info}
             category.value = res.data.category
             settings.value = res.data.settings
+            pageDataLoading.value = false
         }
     })
     getSkuTemplate()
