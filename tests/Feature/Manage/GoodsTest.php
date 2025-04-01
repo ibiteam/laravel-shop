@@ -8,9 +8,9 @@ it('add goods api interface', function () {
         'label' => '热卖',
         'sub_name' => '测试商品1-副标题',
         'images' => [
-            ['image' => 'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png', 'type' => 'main'],
-            ['image' => 'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png', 'type' => 'detail'],
-            ['image' => 'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png', 'type' => 'detail'],
+            'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png',
+            'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png',
+            'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png',
         ],
         'video' => 'https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.mp4',
         'video_duration' => 20,
@@ -22,9 +22,10 @@ it('add goods api interface', function () {
             ['id' => 0, 'name' => '送装服务', 'values' => [['id' => 0, 'name' => '不送装'], ['id' => 0, 'name' => '送装']]],
         ],
         'sku_data' => [
-            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxx.png', 'price' => 10.06, 'number' => 288, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '不送装'],
-            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png', 'price' => 12.01, 'number' => 299, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '送装'],
+            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxx.png','integral' => 0, 'price' => 10.06, 'number' => 288, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '不送装'],
+            ['id' => 0, 'thumb' => 'https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png','integral' => 0, 'price' => 12.01, 'number' => 299, 'is_show' => 1, 'template_1' => '红色', 'template_2' => 'L', 'template_3' => '送装'],
         ],
+        'integral' => 0,
         'price' => 10.23,
         'total' => 139,
         'type' => 1,
@@ -37,6 +38,7 @@ it('add goods api interface', function () {
         ],
     ];
     $response = $this->doPost('api/manage/goods/info/update', $data);
+    dump($response);
 
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);

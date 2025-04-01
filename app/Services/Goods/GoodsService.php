@@ -2,17 +2,31 @@
 
 namespace App\Services\Goods;
 
+use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Dao\CartDao;
+use App\Http\Dao\GoodsCollectDao;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\Goods;
+use App\Models\GoodsCollect;
+use App\Models\GoodsSku;
+use App\Models\GoodsSpec;
+use App\Models\GoodsSpecValue;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class GoodsService
 {
+    /**
+     * @throws BusinessException
+     * @throws \Throwable
+     */
     public function storeOrUpdate(AdminUser $admin_user, array $params, int $goods_id = 0): void
     {
         $default_data = [
@@ -148,5 +162,86 @@ class GoodsService
 
             throw new BusinessException('新增失败');
         }
+    }
+
+    /**
+     * 商品详情.
+     *
+     * @throws BusinessException
+     */
+    public function show(string $no, ?User $user): Goods
+    {
+        $goods = Goods::query()->with(['images', 'parameters', 'detail', 'specValues', 'specValues.spec'])->withTrashed()->whereNo($no)->first();
+
+        if (! $goods instanceof Goods) {
+            throw new BusinessException('商品过期不存在');
+        }
+
+        // 判断商品是否删除
+        if ($goods->deleted_at) {
+            throw new BusinessException('商品已删除', CustomCodeEnum::GOODS_DESTROY);
+        }
+
+        // 判断商品是否上架
+        if ($goods->status !== Goods::STATUS_ON_SALE) {
+            throw new BusinessException('商品已下架', CustomCodeEnum::GOODS_OFF_SALE);
+        }
+        // 多规格商品处理
+        $tmp_sku_params_list = [
+            'skus' => [],
+            'spec_values' => [],
+        ];
+        $tmp_sku_data = $goods->skus;
+        $tmp_spec_value_data = $goods->specValues;
+
+        if (! empty($tmp_sku_data) && ! empty($tmp_spec_value_data)) {
+            $tmp_sku_params_list = [
+                'skus' => $tmp_sku_data->map(function (GoodsSku $sku) {
+                    return [
+                        'id' => $sku->id,
+                        'unique' => implode('_', explode('|', $sku->sku_value)),
+                        'price' => $sku->price,
+                        'number' => $sku->number,
+                        'has_number' => $sku->number > 0,
+                    ];
+                }),
+                'spec_values' => $this->reverseSpecData($tmp_spec_value_data),
+            ];
+        }
+        $goods->sku_params_list = $tmp_sku_params_list;
+
+        if ($user instanceof User) {
+            $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
+
+            $tmp_collect = app(GoodsCollectDao::class)->getInfoByUserAndGoodsId($goods->id, $user->id);
+            $goods->can_collect = $tmp_collect instanceof GoodsCollect && $tmp_collect->is_attention == GoodsCollect::ATTENTION_YES;
+        } else {
+            $goods->cart_number = 0;
+            $goods->can_collect = false;
+        }
+
+        return $goods;
+    }
+
+    /**
+     * @param Collection<int,GoodsSpecValue> $collection
+     */
+    private function reverseSpecData(Collection $collection): EloquentCollection|Collection
+    {
+        $group_collection = $collection->groupBy('goods_spec_id');
+
+        return GoodsSpec::query()->whereIn('id', $group_collection->keys())->get()->map(function (GoodsSpec $goods_spec) use ($group_collection) {
+            return [
+                'id' => $goods_spec->id,
+                'name' => $goods_spec->name,
+                'values' => $group_collection->get($goods_spec->id)->map(function (GoodsSpecValue $goods_spec_value) {
+                    return [
+                        'id' => $goods_spec_value->id,
+                        'name' => $goods_spec_value->value,
+                        'thumb' => $goods_spec_value->thumb,
+                    ];
+                })->values(),
+            ];
+        });
     }
 }
