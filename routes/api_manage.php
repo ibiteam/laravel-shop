@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('manage.login');
 Route::post('login', [LoginController::class, 'login'])->name('manage.login.submit');
 
-Route::middleware([/*'manage.auth', 'manage.access.record'*/])->group(function () {
+Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
     Route::post('upload', [UploadController::class, 'upload']);
 
     Route::prefix('home')->group(function () {
