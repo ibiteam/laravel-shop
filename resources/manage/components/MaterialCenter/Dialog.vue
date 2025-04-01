@@ -163,6 +163,8 @@ const handleSelect = (selection, row) => {
     if (!props.multiple && tableRef.value) {
         tableRef.value.clearSelection()
         tableRef.value.toggleRowSelection(row)
+        check_group.value = [row]
+        return
     }
     check_group.value = selection
 }
@@ -174,6 +176,7 @@ const handleClickImageItem = (item) => {
             check_group.value.push(item)
         } else {
             check_group.value = [item]
+            tableRef.value.clearSelection()
         }
         tableRef.value.toggleRowSelection(item, true)
     } else {
