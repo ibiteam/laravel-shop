@@ -44,10 +44,10 @@ class GoodsStoreRequest extends FormRequest
             'can_quota' => 'required|integer|in:0,1',
             'quota_number' => 'required|integer|min:0',
             'spec_data' => 'required_with:sku_data|array',
-            'spec_data.*.id' => 'required|integer',
+            'spec_data.*.id' => 'nullable|integer',
             'spec_data.*.name' => 'required|string|max:191',
             'spec_data.*.values' => 'required|array',
-            'spec_data.*.values.*.id' => 'required|integer',
+            'spec_data.*.values.*.id' => 'nullable|integer',
             'spec_data.*.values.*.name' => 'required|string',
             'sku_data' => 'required_with:spec_data|array',
             'sku_data.*.id' => 'required|integer',
@@ -62,7 +62,7 @@ class GoodsStoreRequest extends FormRequest
         ];
     }
 
-    public function attributes()
+    public function attributes(): array
     {
         return [
             'category_id' => '分类',
