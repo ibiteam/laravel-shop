@@ -17,7 +17,7 @@
         <aside class="setting-bar-wrapper s-flex">
             <div class="setting-bar-header s-flex ai-ct jc-bt">
                 <p class="fs16 fw-b">{{ name }}</p>
-                <el-radio-group v-model="formType">
+                <el-radio-group v-model="formType" v-if="show_radio">
                     <el-radio-button label="内容" :value="0" />
                     <el-radio-button label="样式" :value="1" />
                 </el-radio-group>
@@ -41,6 +41,10 @@ const props = defineProps({
     name: {
         type: String,
         default: ''
+    },
+    show_radio: {
+        type: Boolean,
+        default: true
     }
 })
 
