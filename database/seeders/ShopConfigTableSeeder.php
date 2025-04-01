@@ -16,6 +16,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addSiteLogo();       // 站点Logo
         $this->addSmtpService();    // 邮件服务
         $this->addManageSettings(); // 后台设置
+        $this->addIntegralSettings(); // 积分设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -55,6 +56,11 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_SMTP_SERVICE, ShopConfig::SMTP_PORT, '');
         $this->addItem(ShopConfig::GROUP_SMTP_SERVICE, ShopConfig::SMTP_USER, '');
         $this->addItem(ShopConfig::GROUP_SMTP_SERVICE, ShopConfig::SMTP_PASS, '');
+    }
+
+    private function addIntegralSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '');
     }
 
     private function addManageSettings(): void

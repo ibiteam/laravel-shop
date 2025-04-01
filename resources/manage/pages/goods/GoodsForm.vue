@@ -1,12 +1,12 @@
 <template>
-    <div class="s-flex jc-bt" ref="wrapRef">
+    <div class="s-flex jc-bt" ref="wrapRef" v-loading="pageDataLoading">
         <div class="manage-public-wrap update-box flex-1">
             <el-form ref="updateFormRef" :model="updateForm" :rules="updateFormRules" label-width="150px">
                 <div class="manage-public-cont good-form" ref="baseRef">
                     <div class="manage-public-title">基础信息</div>
                     <div>
                         <el-form-item label="分类" prop="category_id">
-                            <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
+                            <el-cascader v-model="updateForm.category_id" style="width: 360px;" :options="category" @change="selectedCategory" placeholder="请选择分类" :props="{value:'id',label:'name'}"/>
                         </el-form-item>
                         <el-form-item label="商品名称" prop="name">
                             <el-input v-model="updateForm.name" placeholder="请输入商品名称" style="width: 450px;" maxlength="60" show-word-limit></el-input>
@@ -54,8 +54,8 @@
                                     <div style="width: 100%;">
                                         <div>
                                             <el-button type="danger" @click="addGoodsAttr">添加</el-button>
-                                            <el-button @click="ctrlAttrTemplate('save')" v-if="updateForm.parameters.length">存为模板</el-button>
-                                            <el-button @click="ctrlAttrTemplate('update')" v-if="currentAttrTemplate&&updateForm.parameters.length">更新模板</el-button>
+                                            <el-button @click="ctrlParameterTemplate('save')" v-if="updateForm.parameters.length">存为模板</el-button>
+                                            <el-button @click="ctrlParameterTemplate('update')" v-if="currentParameterTemplate&&updateForm.parameters.length">更新模板</el-button>
                                         </div>
 
                                         <div class="tips" v-if="!updateForm.parameters.length">
@@ -63,11 +63,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="width: 200px;" ref="attrSelectTemplateRef" class="attr-select-template">
-                                    <el-select placeholder="属性模板" v-model="currentAttrTemplate" :append-to="attrSelectTemplateRef" @change="changeAttrTemplate">
-                                        <el-option v-for="(templateItem,i) in attrTemplate" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
+                                <div style="width: 200px;" ref="selectParameterTemplateRef" class="attr-select-template">
+                                    <el-select placeholder="属性模板" v-model="currentParameterTemplate" :append-to="selectParameterTemplateRef" @change="selectedParameterTemplate">
+                                        <el-option v-for="(templateItem,i) in parameterTemplateArr" :key="templateItem.id" :value="templateItem.id" :label="templateItem.name">
                                             <div class="attr-custom-item">
-                                                <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateAttrTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateAttrTemplate(templateItem,i,'delete')"></i></div>
+                                                <div class="s-flex ai-ct">{{ templateItem.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateParameterTemplate(templateItem,i,'edit')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateParameterTemplate(templateItem,i,'delete')"></i></div>
                                                 <p class="co-999 fs14">更新时间: {{ templateItem.updated_at }}</p>
                                             </div>
                                         </el-option>
@@ -155,8 +155,9 @@
                                 <span>仅支持mp4格式上传，大小100M内</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="商品详情" prop="goods_desc">
-                            <Editor v-model="updateForm.goods_desc" @change="handleChangeGoodsDetail" height="500px" min-height="500px" />
+                        <el-form-item label="商品详情" prop="content">
+                            <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="pageDataLoading"></div>
+                            <Editor v-model="updateForm.content" @change="handleChangeGoodsDetail" height="500px" min-height="500px" v-else/>
                         </el-form-item>
                     </div>
                 </div>
@@ -172,9 +173,9 @@
                         <el-form-item label="商品规格">
                             <div class="specifications s-flex">
                                 <div style="min-width: 500px;">
-                                    <div class="specifications-box" v-if="specDataTemplate.values.length">
-                                        <el-form ref="templateFormRef" :model="specDataTemplate" :rules="templateRules">
-                                            <el-card class="specifications-list" style="padding-top: 0;width: 600px;" v-for="(item,index) in specDataTemplate.values" :key="index">
+                                    <div class="specifications-box" v-if="goodsSkuTemplate.values.length">
+                                        <el-form ref="templateFormRef" :model="goodsSkuTemplate" :rules="templateRules">
+                                            <el-card class="specifications-list" style="padding-top: 0;width: 600px;" v-for="(item,index) in goodsSkuTemplate.values" :key="index">
                                                 <div class="s-flex jc-fe" style="height: 20px;">
                                                     <div style="cursor: pointer;" @click="delGoodsSpecs(index)">
                                                         <em class="iconfont" style="font-size: 14px;">&#xe79b;</em>
@@ -185,8 +186,8 @@
                                                         <div class="label">
                                                             <span>名称</span>
                                                         </div>
-                                                        <el-form-item :prop="'values.' + index + '.spec_name'" style="margin: 3px 0;">
-                                                            <el-input v-model="item.spec_name" placeholder="请输入规格名" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
+                                                        <el-form-item :prop="'values.' + index + '.name'" style="margin: 3px 0;">
+                                                            <el-input v-model="item.name" placeholder="请输入规格名" maxlength="4" style="width: 120px;margin-right: 10px;"></el-input>
                                                         </el-form-item>
                                                         <div class="tips" style="padding-top: 8px;">
                                                             <span class="fs12" style="line-height: 16px;">名称如颜色、尺码等，最长4个字</span>
@@ -197,9 +198,9 @@
                                                             <span>名称</span>
                                                         </div>
                                                         <div class="specifications-input">
-                                                            <template v-for="(its,ids) in item.spec_value">
-                                                                <el-form-item :prop="'values.' + index + '.spec_value.' + ids + '.spec_value_name'" style="margin: 3px 0;">
-                                                                    <el-input v-model="its.spec_value_name"
+                                                            <template v-for="(its,ids) in item.values">
+                                                                <el-form-item :prop="'values.' + index + '.values.' + ids + '.name'" style="margin: 3px 0;">
+                                                                    <el-input v-model="its.name"
                                                                               placeholder="请输入规格值"
                                                                               maxlength="6"
                                                                               style="width: 150px;margin-right: 10px;"
@@ -210,7 +211,7 @@
                                                                     </el-input>
                                                                 </el-form-item>
                                                             </template>
-                                                            <template v-if="specDataTemplate.values[index].spec_value.length < 6">
+                                                            <template v-if="goodsSkuTemplate.values[index].values.length < 6">
                                                                 <el-popover
                                                                     placement="right"
                                                                     title=""
@@ -233,24 +234,20 @@
                                         </el-form>
                                     </div>
                                     <div class="specifications-btn">
-                                        <el-button type="danger" @click="addGoodsSpecs()" v-if="specDataTemplate.values.length < 3">添加</el-button>
-                                        <template v-if="specDataTemplate.values.length">
-                                            <el-button type="primary" v-if="!specDataTemplate.id" @click="updaterTemplate()">保存模板</el-button>
-                                            <el-button type="primary" @click="updaterTemplate()" v-else>更新模板</el-button>
+                                        <el-button type="danger" @click="addGoodsSpecs()" v-if="goodsSkuTemplate.values.length < 3">添加</el-button>
+                                        <template v-if="goodsSkuTemplate.values.length">
+                                            <el-button type="primary" @click="ctrlSkuTemplate('save')" v-if="goodsSkuTemplate.values.length">保存模板</el-button>
+                                            <el-button type="primary" @click="ctrlSkuTemplate('update')" v-if="currentSkuTemplate && goodsSkuTemplate.values.length">更新模板</el-button>
                                         </template>
                                     </div>
                                 </div>
-                                <div class="specifications-select s-flex jc-fe">
-                                    <el-select placeholder="请选择" style="width: 160px;position: relative;height: 40px;" ref="mySelectRef" :style="{'left':specDataTemplate.values.length?'-160px':0}">
-                                        <el-option v-for="(item,index) in specificationsArr" :key="item.id">
-                                            <template #default>
-                                                <div class="option-li s-flex jc-bt ai-bs" @click="chooseSpecs(index)">
-                                                    <span>{{ item.name }}</span>
-                                                    <el-tag effect="dark" @click.native.stop="delSelect(index)" style="float: right; margin-top: 8px; margin-left: 3px">
-                                                        <em class="iconfont">&#xe8b6;</em>
-                                                    </el-tag>
-                                                </div>
-                                            </template>
+                                <div class="specifications-select s-flex jc-fe attr-select-template" ref="selectedSkuTemplateRef">
+                                    <el-select placeholder="请选择模板" v-model="currentSkuTemplate" style="width: 160px;position: relative;height: 40px;left: -160px;" :append-to="selectedSkuTemplateRef" @change="changeSkuTemplate">
+                                        <el-option v-for="(item,index) in specificationsArr" :key="item.id" :value="item.id" :label="item.name">
+                                            <div class="attr-custom-item">
+                                                <div class="s-flex ai-ct">{{ item.name }} <i class="iconfont icon-bianji" @click.prevent.stop="updateSkuTemplate(item,index,'update')"></i> <i class="iconfont icon-shanchu" @click.prevent.stop="updateSkuTemplate(item,index,'destroy')"></i></div>
+                                                <p class="co-999 fs14">更新时间: {{ item.updated_at }}</p>
+                                            </div>
                                         </el-option>
                                     </el-select>
                                 </div>
@@ -259,22 +256,22 @@
                                 <span>可添加多个规格属性的商品</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="价格与库存" v-if="specDataTemplate.values.length" class="is-required">
+                        <el-form-item label="价格与库存" v-if="goodsSkuTemplate.values.length" class="is-required">
                             <template #label>
                                 <label class="el-form-item__label">价格与库存</label>
                             </template>
                             <div class="more-input s-flex jc-fe" style="width: 100%;">
-                                <div class="more-li">
+                                <div class="more-li" v-if="settings.is_open_integral">
                                     <label>
                                         <span>积分</span>
                                     </label>
-                                    <el-input v-model="moreInput.integral_money" style="width: 80px;" size="small" placeholder="" @input="moreInput.integral_money = formatInput(moreInput.integral_money)"></el-input>
+                                    <el-input v-model="moreInput.integral" style="width: 80px;" size="small" placeholder="" @input="moreInput.integral = formatInput(moreInput.integral)"></el-input>
                                 </div>
                                 <div class="more-li">
                                     <label>
                                         <span>价格</span>
                                     </label>
-                                    <el-input v-model="moreInput.shop_price" style="width: 80px;" size="small" placeholder="" @input="moreInput.shop_price = formatInput(moreInput.shop_price)"></el-input>
+                                    <el-input v-model="moreInput.price" style="width: 80px;" size="small" placeholder="" @input="moreInput.price = formatInput(moreInput.price)"></el-input>
                                 </div>
                                 <div class="more-li">
                                     <label>
@@ -290,9 +287,9 @@
                                 border
                                 style="width: 100%; margin-top: 20px">
                                 <el-table-column
-                                    v-for="(its,ids) in specDataTemplate.values"
+                                    v-for="(its,ids) in goodsSkuTemplate.values"
                                     :prop="`template_${ids + 1}`"
-                                    :label="its.spec_name?its.spec_name:'--'"
+                                    :label="its.name?its.name:'--'"
                                     align="center"
                                     :width="100">
                                     <template #default="scope">
@@ -315,35 +312,27 @@
                                             :before-upload="beforeUpload">
                                             <i class="iconfont icon-jiahao1 avatar-uploader-icon"></i>
                                         </el-upload>
-                                        <div v-else class="thumb">
-                                            <img :src="scope.row.thumb" alt="">
-                                            <span class="el-upload-list__item-actions">
-                                                <i class="iconfont icon-shanchu" @click="handleTableRemove(scope.$index)"></i>
-                                            </span>
+                                        <div class="s-flex ai-ct jc-ct" v-else style="width: 100%;">
+                                            <div class="thumb">
+                                                <img :src="scope.row.thumb" alt="">
+                                                <span class="el-upload-list__item-actions">
+                                                    <i class="iconfont icon-shanchu" @click="handleTableRemove(scope.$index)"></i>
+                                                </span>
+                                            </div>
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column
-                                    label="积分"
-                                    align="center"
-                                    min-width="120">
+                                <el-table-column v-if="settings.is_open_integral" label="积分" align="center" min-width="120">
                                     <template #default="scope">
-                                        <el-form-item :prop="'sku_data.' + scope.$index + '.integral_money'"
-                                                      :rules="moreIntegralPrice(scope.$index)">
-                                            <el-input v-model="scope.row.integral_money" placeholder=""
-                                                      @input="scope.row.integral_money = formatInput(scope.row.integral_money)"></el-input>
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.integral'" :rules="moreIntegralPrice(scope.$index)">
+                                            <el-input v-model="scope.row.integral" placeholder="" @input="scope.row.integral = formatInput(scope.row.integral)"></el-input>
                                         </el-form-item>
                                     </template>
                                 </el-table-column>
-                                <el-table-column
-                                    label="价格"
-                                    align="center"
-                                    min-width="120">
+                                <el-table-column label="价格" align="center" min-width="120">
                                     <template #default="scope">
-                                        <el-form-item :prop="'sku_data.' + scope.$index + '.shop_price'"
-                                                      :rules="moreIntegralPrice(scope.$index)">
-                                            <el-input v-model="scope.row.shop_price" placeholder=""
-                                                      @input="scope.row.shop_price = formatInput(scope.row.shop_price)"></el-input>
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.price'" :rules="moreIntegralPrice(scope.$index)">
+                                            <el-input v-model="scope.row.price" placeholder="" @input="scope.row.price = formatInput(scope.row.price)"></el-input>
                                         </el-form-item>
                                     </template>
                                 </el-table-column>
@@ -352,52 +341,41 @@
                                     align="center"
                                     min-width="120">
                                     <template #default="scope">
-                                        <el-form-item :prop="'sku_data.' + scope.$index + '.number'"
-                                                      :rules="updateFormRules.number">
-                                            <el-input v-model="scope.row.number" placeholder=""
-                                                      @input="scope.row.number = formatInput(scope.row.number)"></el-input>
+                                        <el-form-item :prop="'sku_data.' + scope.$index + '.number'" :rules="updateFormRules.number">
+                                            <el-input v-model="scope.row.number" placeholder="" @input="scope.row.number = formatInput(scope.row.number)"></el-input>
                                         </el-form-item>
                                     </template>
                                 </el-table-column>
-                                <el-table-column
-                                    label="是否显示"
-                                    :width="100"
-                                    align="center">
+                                <el-table-column label="是否显示" :width="100" align="center">
                                     <template #default="scope">
-                                        <el-switch
-                                            v-model="scope.row.is_show"
-                                            :active-value="1"
-                                            :inactive-value="0"
-                                            active-color="#13ce66"
-                                            inactive-color="#ff4949">
-                                        </el-switch>
+                                        <el-switch v-model="scope.row.is_show" :active-value="1" :inactive-value="0" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
                                     </template>
                                 </el-table-column>
                             </el-table>
-                            <div class="tips" v-if="specDataTemplate.values.length">
+                            <div class="tips" v-if="goodsSkuTemplate.values.length">
                                 <span>给第一组规格设置图片，用户选择不同规格会看到对应规格图片，建议尺寸：80 x 80 px</span>
                             </div>
                         </el-form-item>
                         <el-form-item label="价格" v-else>
                             <div class="s-flex ai-ct">
-                                <el-form-item prop="integral_money">
-                                    <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral_money')">积分</el-checkbox>
-                                    <el-input style="width: 100px;margin:0 10px;" @input="updateForm.integral_money = formatInput(updateForm.integral_money)" v-model="updateForm.integral_money" placeholder=""></el-input>
+                                <el-form-item prop="integral" v-if="settings.is_open_integral">
+                                    <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral')">积分</el-checkbox>
+                                    <el-input style="width: 100px;margin:0 10px;" @input="updateForm.integral = formatInput(updateForm.integral)" v-model="updateForm.integral" placeholder=""></el-input>
                                 </el-form-item>
-                                <el-form-item prop="shop_price">
-                                    <el-checkbox v-model="shopPriceShow" @change="(val) => setCheck(val,'shop_price')">现金</el-checkbox>
-                                    <el-input style="width: 100px;" v-model="updateForm.shop_price" @input="updateForm.shop_price = formatInput(updateForm.shop_price)" placeholder=""><template #suffix>元</template></el-input>
+                                <el-form-item prop="price">
+                                    <el-checkbox v-if="settings.is_open_integral" v-model="shopPriceShow" @change="(val) => setCheck(val,'price')">现金</el-checkbox>
+                                    <el-input style="width: 100px;" v-model="updateForm.price" @input="updateForm.price = formatInput(updateForm.price)" placeholder=""><template #suffix>元</template></el-input>
                                 </el-form-item>
                             </div>
                         </el-form-item>
-                        <el-form-item label="库存" prop="goods_number">
-                            <el-input-number v-model="updateForm.goods_number" :disabled="!!updateForm.sku_data.length" :min="1" style="width: 160px;"></el-input-number>
-                            <div class="tips" v-if="specDataTemplate.values.length" style="width: 100%;flex: none;">
+                        <el-form-item label="库存" prop="total">
+                            <el-input-number v-model="updateForm.total" :disabled="!!updateForm.sku_data.length" :min="1" style="width: 160px;"></el-input-number>
+                            <div class="tips" v-if="goodsSkuTemplate.values.length" style="width: 100%;flex: none;">
                                 <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="订单库存" prop="goods_number">
-                            <el-radio-group v-model="updateForm.is_order_goods_number">
+                        <el-form-item label="订单库存" prop="type">
+                            <el-radio-group v-model="updateForm.type">
                                 <el-radio :value="1">下单减库存</el-radio>
                                 <el-radio :value="2">付款减库存</el-radio>
                             </el-radio-group>
@@ -407,22 +385,22 @@
                 <div class="manage-public-cont good-form" ref="serviceRef">
                     <div class="manage-public-title">服务售后</div>
                     <div>
-                        <el-form-item label="上架" prop="is_on_sale">
-                            <el-radio-group v-model="updateForm.is_on_sale">
+                        <el-form-item label="上架" prop="status">
+                            <el-radio-group v-model="updateForm.status">
                                 <el-radio :value="1">立即上架</el-radio>
                                 <el-radio :value="0">放入仓库</el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="限购" prop="limit_number" class="limit-number">
+                        <el-form-item label="限购" prop="can_quota" class="limit-number">
                             <div>
-                                <el-radio-group v-model="isLimitNumber" @change="changeLimitNumber">
-                                    <el-radio :value="false">不限购</el-radio>
-                                    <el-radio :value="true">限购</el-radio>
+                                <el-radio-group v-model="updateForm.can_quota" @change="changeCanQuota">
+                                    <el-radio :value="0">不限购</el-radio>
+                                    <el-radio :value="1">限购</el-radio>
                                 </el-radio-group>
-                                <div v-if="isLimitNumber">
-                                    <el-input-number v-model="updateForm.limit_number" :min="1"></el-input-number>
+                                <div v-if="updateForm.can_quota">
+                                    <el-input-number v-model="updateForm.quota_number" :min="1"></el-input-number>
                                     <div class="tips" style="width: 100%;flex: none;">
-                                        <span>用户总购买数量不超过{{ updateForm.limit_number }}</span>
+                                        <span>用户总购买数量不超过{{ updateForm.quota_number }} {{ updateForm.unit }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -431,7 +409,7 @@
                 </div>
             </el-form>
             <div class="goods-footer-btn s-flex jc-ct ai-ct">
-                <el-button type="danger" style="width: 140px;height: 50px;font-size: 20px;" @click="sumbitGood" :loading="loading">发布商品</el-button>
+                <el-button type="danger" style="width: 140px;height: 50px;font-size: 20px;" @click="submitGoods" :loading="loading">发布商品</el-button>
             </div>
         </div>
         <div style="width: 380px;flex: none;">
@@ -460,12 +438,12 @@
                     :autoCropWidth="500"
                     :autoCropHeight="500"
                     :fixedBox="true"
-                    :img="curentFileCropBlob">
+                    :img="currentFileCropBlob">
                 </vue-cropper>
             </div>
             <div class="s-flex ai-ct jc-ct" style="padding-top: 15px;">
                 <el-button type="primary" @click="cropImageConfirm">确定裁剪</el-button>
-                <el-button type="default" @click="cropperDialogShow = false, curentFileCropBlob = null">取消</el-button>
+                <el-button type="default" @click="cropperDialogShow = false, currentFileCropBlob = null">取消</el-button>
             </div>
         </el-dialog>
         <input type="file" ref="fileImgRef" style="display: none" @change="(event) => {handleFileChange(event, 'image')}" accept="image/*">
@@ -477,27 +455,137 @@
 <script setup>
 import Editor from '@/components/good/Editor.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
-import { goodsDetailInit, getGoodsSkuTemplate, getGoodsParameterTemplate, goodsParameterTemplateStore, goodsParameterTemplateUpdate, goodsParameterTemplateDestroy } from '@/api/goods';
+import {
+    goodsDetailInit,
+    getGoodsSkuTemplate,
+    getGoodsParameterTemplate,
+    goodsParameterTemplateStore,
+    goodsParameterTemplateUpdate,
+    goodsParameterTemplateDestroy,
+    goodsSkuTemplateStore,
+    goodsSkuTemplateUpdate,
+    goodsSkuTemplateDestroy,
+    goodsUpdate
+} from '@/api/goods';
 import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
 import 'vue-cropper/dist/index.css'
 import { VueDraggable } from 'vue-draggable-plus'
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
+const router = useRouter()
+const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties
-const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
+const pageDataLoading = ref(true)
 
+/* 校验模板名称 */
+const validatorTemplateName = (rule, value, callback) => {
+    if (value == '' || value == null) {
+        callback(new Error('模板名称不能为空'));
+    }else if(value.length > 20){
+        callback(new Error('模板名称不能超过10个字符'));
+    }else{
+        callback();
+    }
+}
+
+/* 商品分类 */
+const category = ref([]);
+/* 商品分类选择触发函数 */
+const selectedCategory = (item) => {
+    if (item == undefined) {
+        updateForm.value.category_id = '';
+    } else {
+        updateForm.value.category_id = item[parseInt(item.length) - 1]
+    }
+}
+
+/* 产品参数模板 */
+const selectParameterTemplateRef = ref(null)
+const currentParameterTemplate = ref('')
+const parameterTemplateArr = ref([])
+const updateParameterTemplate = (item,i,type) => {
+    if(type == 'edit'){
+        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('修改产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        })
+    }else {
+        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
+            parameterTemplateArr.value.splice(i, 1);
+            goodsParameterTemplateDestroy({id: item.id}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('删除产品参数模板成功')
+                    getParameterTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        }).catch(() => {
+        });
+    }
+}
+const selectedParameterTemplate = (value) => {
+    if(value){
+        parameterTemplateArr.value.forEach((item,i) => {
+            if(item.id == value){
+                updateForm.value.parameters = item.values
+            }
+        })
+    }
+}
+const ctrlParameterTemplate = (type) => {
+    if(type == 'save'){
+        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
+                if (res.code === 200) {
+                    getParameterTemplate(res.data.id)
+                    cns.$message.success('保存产品参数模板成功')
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        })
+    }else if(type == 'update'){
+        goodsParameterTemplateUpdate({ id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
+            if (res.code === 200) {
+                cns.$message.success('更新产品参数模板成功')
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
+    }
+}
+const getParameterTemplate = (id) => {
+    getGoodsParameterTemplate().then(res => {
+        if (res.code === 200) {
+            parameterTemplateArr.value = [...res.data]
+            currentParameterTemplate.value = id
+        }
+    })
+}
+
+/* 商品规格模板 */
+
+
+// 图片裁剪
+const currentFileCropBlob = ref(null);
+const cropperRef = ref(null);
+const cropperDialogShow = ref(false);
+
+const activeContType = ref('baseRef') // 基础信息：baseRef;图文信息：imgRef;价格库存：priceRef;服务售后：serviceRef
 const wrapRef = ref(null);
 const baseRef = ref(null);
 const imgRef = ref(null);
 const priceRef = ref(null);
 const serviceRef = ref(null);
-// 图片裁剪
-const curentFileCropBlob = ref(null);
-const cropperRef = ref(null);
-const cropperDialogShow = ref(false);
-
 const scrollToCont = (type) => {
     const element = {
         baseRef: baseRef,
@@ -536,13 +624,13 @@ const validateFile = (rule, value, callback) => {
 }
 
 const validatePrice = (rule, value, callback, type) => {
-    if (!updateForm.value.sku_data.length && updateForm.value[type === 'shop_price' ? 'integral_money' : 'shop_price'] < 0 && Number(value) < 0) {
+    if (!updateForm.value.sku_data.length && updateForm.value[type === 'price' ? 'integral' : 'price'] < 0 && Number(value) < 0) {
         callback(new Error('积分和价格不能同时小于0'));
     } else if (updateForm.value.sku_data.length) {
         const checkPrices = (data) => {
             return data.filter(item => {
-                const shopPrice = parseFloat(item.shop_price) || 0;
-                const integralMoney = parseFloat(item.integral_money) || 0;
+                const shopPrice = parseFloat(item.price) || 0;
+                const integralMoney = parseFloat(item.integral) || 0;
                 return shopPrice < 0 && integralMoney < 0;
             });
         };
@@ -556,83 +644,9 @@ const validatePrice = (rule, value, callback, type) => {
         callback();
     }
 }
-const attrSelectTemplateRef = ref(null)
-const currentAttrTemplate = ref('')
-const attrTemplate = ref([])
 
-const inputValidatorTemplate = (rule, value, callback) => {
-    if (value == '' || value == null) {
-        callback(new Error('模板名称不能为空'));
-    }else if(value.length > 20){
-        callback(new Error('模板名称不能超过10个字符'));
-    }else{
-        callback();
-    }
-}
-const updateAttrTemplate = (item,i,type) => {
-    if(type == 'edit'){
-        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
-                if (res.code === 200) {
-                    cns.$message.success('修改产品参数模板成功')
-                    getParameterTemplate()
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        })
-    }else {
-        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
-            attrTemplate.value.splice(i, 1);
-            goodsParameterTemplateDestroy({id: item.id}).then(res => {
-                if (res.code === 200) {
-                    cns.$message.success('删除产品参数模板成功')
-                    getParameterTemplate()
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        }).catch(() => {
-        });
-    }
-}
-
-const changeAttrTemplate = (value) => {
-    if(value){
-        attrTemplate.value.forEach((item,i) => {
-            if(item.id == value){
-                updateForm.value.parameters = item.values
-            }
-        })
-    }
-}
-
-const ctrlAttrTemplate = (type) => {
-    if(type == 'save'){
-        // 存为新模板，需要把currentAttrTemplate.value置为当前返回的id
-        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: inputValidatorTemplate}).then(({ value }) => {
-            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
-                if (res.code === 200) {
-                    getParameterTemplate(res.data.id)
-                    cns.$message.success('保存产品参数模板成功')
-                } else {
-                    cns.$message.error(res.message)
-                }
-            })
-        })
-    }else if(type == 'update'){
-        // 更新当前模板，需传currentAttrTemplate.value
-        goodsParameterTemplateUpdate({ id: currentAttrTemplate.value, values: updateForm.value.parameters }).then(res => {
-            if (res.code === 200) {
-                cns.$message.success('更新产品参数模板成功')
-            } else {
-                cns.$message.error(res.message)
-            }
-        })
-    }
-}
-const validateDesc = (rule, value, callback) => {
-    if (updateForm.value.goods_desc == '' || updateForm.value.goods_desc == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>') {
+const validateContent = (rule, value, callback) => {
+    if (updateForm.value.content == '' || updateForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>' || updateForm.value.content == '<p style="line-height: 2; color: rgb(51, 51, 51);"><br></p>') {
         callback(new Error('商品详情不能为空'));
     } else {
         callback();
@@ -640,12 +654,12 @@ const validateDesc = (rule, value, callback) => {
 }
 
 const specValue = (rule, value, callback, index, id) => {
-    let arr = specDataTemplate.value.values[index].spec_value
+    let arr = goodsSkuTemplate.value.values[index].values
     const hasDuplicates = arr.reduce((acc, current) => {
-        if (acc.names[current.spec_value_name]) {
+        if (acc.names[current.name]) {
             acc.hasDuplicates = true;
         } else {
-            acc.names[current.spec_value_name] = true;
+            acc.names[current.name] = true;
         }
         return acc;
     }, {names: {}, hasDuplicates: false}).hasDuplicates;
@@ -655,30 +669,32 @@ const specValue = (rule, value, callback, index, id) => {
         callback();
     }
 }
-// 分类数据
-const category = ref([]);
 
 const updateForm = ref({
     id: 0,
     category_id: null,
-    member_id: null,
     name: '',
     label: '',
     sub_name: '',
     parameters: [],
     images: [],
+    content: '',
+    video: '',
+    video_duration: 0,
     unit: '',
-    shop_price: 0,
-    integral_money:0, //积分价格
-    goods_number: 10,
-    goods_desc: '',
-    is_on_sale: 1,
-    limit_number: 0,
+    price: 0,
+    integral:0, //积分价格
+    total: 0,
+    type: 1,
+    status: 1,
+    can_quota: 0,
+    quota_number: 0,
     sku_data: [],
     spec_data: [],
 });
 
 // 图文相关
+const isInitContent = ref(true);
 const uploadImageRef = ref(null);
 const fileImgRef = ref(null);
 const fileVideoRef = ref(null);
@@ -689,7 +705,7 @@ const currentChangeImageIndex = ref(-1);
 
 const updateFormRef = ref(null);
 const templateFormRef = ref(null);
-const mySelectRef = ref(null);
+const selectedSkuTemplateRef = ref(null);
 const updateFormRules = ref({
     category_id: [
         { required: true, message: '请选择商品分类', trigger: 'change' },
@@ -701,56 +717,60 @@ const updateFormRules = ref({
         {required: true, message: '请上传商品图片', trigger: 'change'},
         {validator: validateFile, trigger: 'change'}
     ],
-    goods_number: [
+    total: [
         { required: true, message: '请输入商品库存', trigger: 'blur' },
     ],
-    goods_desc: [
+    content: [
         { required: true, message: '请输入商品详情', trigger: 'blur' },
-        {validator: validateDesc, trigger: 'blur'}
+        {validator: validateContent, trigger: 'blur'}
     ],
-    is_on_sale: [
+    status: [
         { required: true, message: '请选择是否上架', trigger: 'change' },
     ],
-    limit_number: [
+    can_quota: [
+        { required: true, message: '请选择是否限购', trigger: 'blur' },
+    ],
+    quota_number: [
         { required: true, message: '请输入限购数量', trigger: 'blur' },
     ],
-    shop_price: [
+    price: [
         { required: false, message: '请输入价格', trigger: 'blur' },
-        { validator: (rule, value, callback) => validatePrice(rule, value, callback, 'shop_price'), trigger: 'blur' }
+        { validator: (rule, value, callback) => validatePrice(rule, value, callback, 'price'), trigger: 'blur' }
     ],
-    integral_money: [
+    integral: [
         { required: false, message: '请输入积分价格', trigger: 'blur' },
-        { validator: (rule, value, callback) => validatePrice(rule, value, callback, 'integral_money'), trigger: 'blur' }
+        { validator: (rule, value, callback) => validatePrice(rule, value, callback, 'integral'), trigger: 'blur' }
     ],
     number: [
         { required: true, message: '请输入商品库存', trigger: 'blur' },
     ]
 });
+/* 设置信息 */
+const settings = ref({
+    is_open_integral: false
+})
 // 价格/规格 相关
 const shopPriceShow = ref(false);
 const integralMoneyShow = ref(false);
-const isLimitNumber = ref(false);
 const specificationsArr = ref([]);
-const specDataTemplate = ref({
-    name: '',
-    template_id: null,
-    values: [],
-});
-const moreInput = ref({
-    shop_price: '',
-    integral_money: '',
-    number: ''
-});
+const goodsSkuTemplate = ref({ name: '', template_id: null, values: [], });
+const moreInput = ref({ price: '', integral: '', number: '' });
 const loading = ref(false);
+
+const changeCanQuota = () => {
+  if (updateForm.value.can_quota == 0) {
+      updateForm.value.quota_number = 1
+  }
+}
 
 const templateRules = computed(() => {
     const rules = {};
-    specDataTemplate.value.values.forEach((field, index) => {
-        rules[`values.${index}.spec_name`] = [
+    goodsSkuTemplate.value.values.forEach((field, index) => {
+        rules[`values.${index}.name`] = [
             { required: true, message: '请输入规格名称', trigger: 'blur' }
         ];
-        field.spec_value.forEach((fd, id) => {
-            rules[`values.${index}.spec_value.${id}.spec_value_name`] = [
+        field.values.forEach((fd, id) => {
+            rules[`values.${index}.values.${id}.name`] = [
                 { required: true, message: '请输入规格项', trigger: 'blur' },
                 { validator: (rule, value, callback) => specValue(rule, value, callback, index, id), trigger: 'blur' }
             ];
@@ -759,7 +779,7 @@ const templateRules = computed(() => {
     return rules;
 });
 
-watch(() => specDataTemplate.value.values, _.debounce((newVal, oldVal) => {
+watch(() => goodsSkuTemplate.value.values, _.debounce((newVal, oldVal) => {
     if (newVal.length) {
         toTableArray(newVal)
     } else {
@@ -768,7 +788,7 @@ watch(() => specDataTemplate.value.values, _.debounce((newVal, oldVal) => {
     }
 }, 500), { deep: true, immediate: false });
 
-watch(() => updateForm.value.shop_price, (val) => {
+watch(() => updateForm.value.price, (val) => {
     if (val && val > 0) {
         shopPriceShow.value = true
     } else {
@@ -776,7 +796,7 @@ watch(() => updateForm.value.shop_price, (val) => {
     }
 });
 
-watch(() => updateForm.value.integral_money, (val) => {
+watch(() => updateForm.value.integral, (val) => {
     if (val && val > 0) {
         integralMoneyShow.value = true
     } else {
@@ -788,18 +808,18 @@ watch(() => updateForm.value.sku_data, (val) => {
     if (val.length) {
         let numberArr = Array.from(val, a => a.number)
         let sum = numberArr.reduce((accumulator, currentValue) => Number(accumulator) + Number(currentValue), 0);
-        updateForm.value.goods_number = sum
+        updateForm.value.total = sum
     }
 }, { deep: true, immediate: false });
 
 const moreIntegralPrice = (index) => {
     let skus = updateForm.value.sku_data[index]
-    const prop1 = `sku_data.${index}.integral_money`;
-    const prop2 = `sku_data.${index}.shop_price`;
+    const prop1 = `sku_data.${index}.integral`;
+    const prop2 = `sku_data.${index}.price`;
     return [
         {
             validator: (rule, value, callback) => {
-                if (Number(skus.shop_price) < 0 && Number(skus.integral_money) < 0) {
+                if (Number(skus.price) < 0 && Number(skus.integral) < 0) {
                     callback(new Error(`价格和积分必须大于0`));
                 } else {
                     updateFormRef.value.clearValidate(prop1);
@@ -819,33 +839,17 @@ const getSkuTemplate = () => {
         }
     })
 }
-/* 获取商品参数模板 */
-const getParameterTemplate = (id) => {
-    getGoodsParameterTemplate().then(res => {
-        if (res.code === 200) {
-            attrTemplate.value = [...res.data]
-            currentAttrTemplate.value = id
-        }
-    })
-}
 
 const handleChangeGoodsDetail = () => {
-    // updateFormRef.value.validateField('goods_desc')
-}
-
-const changeLimitNumber = (val) => {
-    if (val) {
-        updateForm.value.limit_number = 1
-    } else {
-        updateForm.value.limit_number = 0
+    if(!isInitContent.value){
+        updateFormRef.value.validateField('content')
+    }else {
+        isInitContent.value = false
     }
 }
 
 const addGoodsAttr = () => {
-    updateForm.value.parameters.push({
-        name: '',
-        value: ''
-    })
+    updateForm.value.parameters.push({ name: '', value: '' })
 }
 
 const delGoodsAttr = (index) => {
@@ -853,40 +857,28 @@ const delGoodsAttr = (index) => {
 }
 
 const delGoodsSpecs = (index) => {
-    specDataTemplate.value.values.splice(index, 1)
+    goodsSkuTemplate.value.values.splice(index, 1)
 }
 
 const addGoodsSpecs = () => {
-    specDataTemplate.value.values.push({
-        spec_name: '',
-        spec_id: '',
-        spec_value: [
-            {
-                spec_value_name: '',
-                spec_value_id: ''
-            }
-        ]
-    })
+    goodsSkuTemplate.value.values.push({ name: '', id: '', values: [{ name: '', id: '' }] })
 }
 
 const computedSpecs = (index) => {
-    return specDataTemplate.value.values[index].spec_value.every(a => a.spec_value_name)
+    return goodsSkuTemplate.value.values[index].values.every(a => a.name)
 }
 
 const addSpecs = (index) => {
-    if (computedSpecs(index) && specDataTemplate.value.values[index].spec_value.length < 6) {
-        specDataTemplate.value.values[index].spec_value.push({
-            spec_value_name: '',
-            spec_value_id: ''
-        })
+    if (computedSpecs(index) && goodsSkuTemplate.value.values[index].values.length < 6) {
+        goodsSkuTemplate.value.values[index].values.push({ name: '', id: '' })
     }
 }
 
 const delSpecs = (index, index2) => {
-    if (specDataTemplate.value.values[index].spec_value.length === 1) {
-        specDataTemplate.value.values[index].spec_value[index2].spec_value_name = ''
+    if (goodsSkuTemplate.value.values[index].values.length === 1) {
+        goodsSkuTemplate.value.values[index].values[index2].name = ''
     } else {
-        specDataTemplate.value.values[index].spec_value.splice(index2, 1)
+        goodsSkuTemplate.value.values[index].values.splice(index2, 1)
     }
 }
 
@@ -912,33 +904,59 @@ const objectSpanMethod = ({row, column, rowIndex, columnIndex}) => {
 
 const toTableArray = (specs) => {
     const result = [];
+    const existingSkus = updateForm.value.sku_data || [];
 
     function helper(current, index) {
         if (index === specs.length) {
-            result.push({...current});
+            // 检查是否存在匹配的现有SKU
+            const existingSku = existingSkus.find(sku => {
+                // 检查所有template字段是否匹配
+                return specs.every((spec, idx) => {
+                    const templateKey = `template_${idx + 1}`;
+                    return sku[templateKey] === current[templateKey];
+                });
+            });
+
+            // 如果找到匹配的SKU，使用其值
+            if (existingSku) {
+                result.push({
+                    ...current,
+                    id: existingSku.id,
+                    goods_id: existingSku.goods_id,
+                    thumb: existingSku.thumb,
+                    price: existingSku.price,
+                    integral: existingSku.integral,
+                    number: existingSku.number,
+                    is_show: existingSku.is_show
+                });
+            } else {
+                // 如果没有找到匹配的SKU，使用默认值
+                result.push({
+                    ...current,
+                    id: null,
+                    goods_id: null,
+                    thumb: '',
+                    price: '',
+                    integral: '',
+                    number: '',
+                    is_show: 1
+                });
+            }
             return;
         }
 
         const spec = specs[index];
         const templateName = `template_${index + 1}`;
-        spec.spec_value.forEach(value => {
+        spec.values.forEach(value => {
             const next = {...current};
-            next[templateName] = value.spec_value_name;
+            next[templateName] = value.name;
             helper(next, index + 1);
         });
     }
 
-    helper({
-        goods_id: null,
-        goods_sku_id: null,
-        thumb: '',
-        shop_price: '',
-        integral_money: '', // 积分价格
-        number: '',
-        is_show: 1,
-    }, 0);
-    updateForm.value.sku_data = [...result]
-    updateForm.value.spec_data = [...specs]
+    helper({}, 0);
+    updateForm.value.sku_data = [...result];
+    updateForm.value.spec_data = [...specs];
 }
 
 const formatInput = (value) => {
@@ -954,8 +972,8 @@ const filling = () => {
     let newArray = updateForm.value.sku_data.map(item => {
         return {
             ...item,
-            integral_money: moreInput.value.integral_money === '' ? item.integral_money : moreInput.value.integral_money,
-            shop_price: moreInput.value.shop_price === '' ? item.shop_price : moreInput.value.shop_price,
+            integral: moreInput.value.integral === '' ? item.integral : moreInput.value.integral,
+            price: moreInput.value.price === '' ? item.price : moreInput.value.price,
             number: moreInput.value.number === '' ? item.number : moreInput.value.number
         }
     })
@@ -967,11 +985,7 @@ const filling = () => {
             }
         }
     })
-    moreInput.value = {
-        integral_money: '',
-        shop_price: '',
-        number: ''
-    }
+    moreInput.value = { integral: '', price: '', number: '' }
 }
 
 const setMain = (index) => {
@@ -980,36 +994,15 @@ const setMain = (index) => {
         updateForm.value.images.unshift(picture[0])
     }
 }
-
-const chooseSpecs = (index) => {
-    let obj = specificationsArr.value.find((_a, b) => b === index)
-    specDataTemplate.value = obj
-}
-
-const delSelect = (index) => {
-    mySelectRef.value.visible = true
-    cns.$dialog.confirm('是否删除模板', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-        cns.$http.doPost('front.sku_template.destroy', {template_id: specificationsArr.value[index].id}).then(res => {
-            if (res.code === 200) {
-                specificationsArr.value.splice(index, 1)
-                cns.$message.success(res.message)
-            }
-        })
-    })
-}
 const beforeUpload = (file) => {
-    let valiType = false;
+    let validateType = false;
     if (file.type != "image/jpg" && file.type != "image/jpeg" && file.type != "image/png") {
         if (file.type) {
-            valiType = true
+            validateType = true
         }
     }
     const isLt2M = file.size / 1024 / 1024 <= 5;
-    if (valiType || !isLt2M) {
+    if (validateType || !isLt2M) {
         cns.$message.error("支持 .png .jpg .jpeg格式，单个附件不得超过5M!");
         return false;
     }else {
@@ -1018,15 +1011,15 @@ const beforeUpload = (file) => {
 }
 
 const beforeUploadVideo = (file) => {
-    let valiType = false;
+    let validateType = false;
 
     if (file.type != "video/mp4") {
         if (file.type) {
-            valiType = true
+            validateType = true
         }
     }
     const isLt100M = file.size / 1024 / 1024 <= 100;
-    if (valiType || !isLt100M) {
+    if (validateType || !isLt100M) {
         cns.$message.error("仅支持mp4格式上传，大小100M内");
         return false;
     }
@@ -1107,7 +1100,7 @@ const cropImageConfirm = () => {
 const uploadImage = async (file, type, name) => {
     if(type === 'images'){
         const dataUrl = await loadFile(file.file);
-        curentFileCropBlob.value = dataUrl
+        currentFileCropBlob.value = dataUrl
         cropperDialogShow.value  = true
     }else {
         fileUpload(file).then((res) => {
@@ -1119,9 +1112,7 @@ const uploadImage = async (file, type, name) => {
                             a.thumb = res.data.url
                         }
                     })
-                    updateForm.value.sku_data = [
-                        ...sku_data
-                    ]
+                    updateForm.value.sku_data = [...sku_data]
                 } else if(type === 'video'){
                     updateForm.value.video = res.data.url
                 }else {
@@ -1143,30 +1134,46 @@ const uploadImage = async (file, type, name) => {
 const setCheck = (val, type) => {
     updateForm.value[type] = val ? 1 : 0
 }
-
-const updaterTemplate = () => {
+/* 保存商品规格或更新商品规格模板 */
+const ctrlSkuTemplate = (type) => {
     templateFormRef.value.validate((valid) => {
         if (valid) {
-            if (specDataTemplate.value.name) {
-                cns.$http.doPost('front.sku_template.update', specDataTemplate.value).then(res => {
-                    if (res.code === 200) {
-                        cns.$message.success('保存模板成功')
-                    } else {
-                        cns.$message.error(res.message)
-                    }
-                    specDataTemplate.value.name = ''
-                    getSkuTemplate()
-                })
-            } else {
-                cns.$dialog.prompt('请输入模板名称', '提示', {
+            if (!goodsSkuTemplate.value.name) {
+                cns.$dialog.prompt({
+                    message: '',
+                    title: '请输入模板名称',
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     inputPattern: /\S+/,
                     inputErrorMessage: '请输入模板名称'
                 }).then(({value}) => {
-                    specDataTemplate.value.name = value
-                    updaterTemplate()
+                    goodsSkuTemplate.value.name = value
+                    ctrlSkuTemplate(type)
                 })
+            } else {
+                if (type === 'save') {
+                    // 保存SKU模板
+                    goodsSkuTemplateStore(goodsSkuTemplate.value).then(res => {
+                        if (res.code === 200) {
+                            cns.$message.success('保存模板成功')
+                        } else {
+                            cns.$message.error(res.message)
+                        }
+                        goodsSkuTemplate.value.name = ''
+                        getSkuTemplate()
+                    });
+                } else if (type === 'update') {
+                    // 更新SKU模板
+                    goodsSkuTemplateUpdate(goodsSkuTemplate.value).then(res => {
+                        if (res.code === 200) {
+                            cns.$message.success('更新模板成功')
+                        } else {
+                            cns.$message.error(res.message)
+                        }
+                        goodsSkuTemplate.value.name = ''
+                        getSkuTemplate()
+                    });
+                }
             }
         } else {
             cns.$message.error("请完善销售规格");
@@ -1174,23 +1181,60 @@ const updaterTemplate = () => {
         }
     })
 }
-
-const sumbitGood = () => {
-    loading.value = true
-    updateFormRef.value.validate((valid) => {
-        if (valid) {
-            cns.$http.doPost('front.goods.update', updateForm.value).then(res => {
+/* 修改模板名称或删除模板 */
+const updateSkuTemplate = (item,i,type) => {
+    if(type == 'update'){
+        cns.$dialog.prompt({message: '修改商品规格模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+            goodsSkuTemplateUpdate({id: item.id, name: value}).then(res => {
                 if (res.code === 200) {
-                    cns.$message.success(res.message)
-                    setTimeout(() => {
-                        window.location.href = ''
-                    }, 500)
+                    cns.$message.success('修改商品规格模板成功')
+                    getSkuTemplate()
                 } else {
                     cns.$message.error(res.message)
                 }
-                loading.value = false
-            }).catch(error => {
-                loading.value = false
+            })
+        })
+    }else {
+        cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
+            parameterTemplateArr.value.splice(i, 1);
+            goodsSkuTemplateDestroy({id: item.id}).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('删除商品规格模板成功')
+                    getSkuTemplate()
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
+        }).catch(() => {
+        });
+    }
+}
+
+const currentSkuTemplate = ref('')
+
+const changeSkuTemplate = (value) => {
+    if(value){
+        specificationsArr.value.forEach((item,i) => {
+            if(item.id == value){
+                goodsSkuTemplate.value.values = item.values
+            }
+        })
+    }
+}
+
+const submitGoods = () => {
+    loading.value = true
+    updateFormRef.value.validate((valid) => {
+        if (valid) {
+            goodsUpdate(updateForm.value).then(res => {
+                if (res.code === 200) {
+                    cns.$message.success('保存商品成功')
+                    loading.value = false
+                    router.push({name: 'goods'})
+                } else {
+                    cns.$message.error(res.message)
+                    loading.value = false
+                }
             })
         } else {
             cns.$message.error("请完善商品信息");
@@ -1199,14 +1243,17 @@ const sumbitGood = () => {
         }
     })
 }
-const route = useRoute();
 
 onMounted(() => {
     goodsDetailInit({id:route.params.id}).then(res => {
         if (res.code === 200) {
             updateForm.value = {...res.data.info}
-            isLimitNumber.value = !!res.data.info.quota_number
             category.value = res.data.category
+            settings.value = res.data.settings
+            pageDataLoading.value = false
+            if(updateForm.value.spec_data&&updateForm.value.spec_data.length){
+                goodsSkuTemplate.value.values = [...updateForm.value.spec_data]
+            }
         }
     })
     getSkuTemplate()

@@ -232,6 +232,7 @@ class ManageSkusService
         return [
             'sku_value' => rtrim($sku_value, '|'),
             'price' => $sku_item['price'],
+            'integral' => $sku_item['integral'] ?? 0,
             'number' => $sku_item['number'],
             'sort' => $sku_item['sort'] ?? 1,
             'is_show' => $sku_item['is_show'] ?? 1,

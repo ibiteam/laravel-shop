@@ -77,6 +77,7 @@ const handleClickTools = (params) => {
         margin: 0 auto;
         box-sizing: content-box;
         border: 2px solid transparent;
+        background: #f2f2f2;
         user-select: none;
         position: relative;
         &.drag-select {

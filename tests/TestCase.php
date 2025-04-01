@@ -34,6 +34,7 @@ abstract class TestCase extends BaseTestCase
 
     public function getAccountToken()
     {
+        return '14|c4JKS20Fy4KkYbVM4qKO0cX8ptveDXezd89tglo1c3278b85';
         $token = '';
         $access_token_file = $this->access_token_file();
         if (! file_exists($access_token_file)) {

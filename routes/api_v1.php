@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,15 @@ Route::get('category', [CategoryController::class, 'index']); // 树状结构
 Route::prefix('region')->group(function () {
     Route::post('/', [AddressController::class, 'region']); // 地区数据
     Route::post('/group', [AddressController::class, 'regionGroup']); // 地区分组数据
+});
+// 商品详情
+Route::prefix('goods')->group(function () {
+    Route::middleware('api.auth')->group(function () {
+        Route::post('follow', [GoodsController::class, 'follow']); // 关注商品
+        Route::post('unfollow', [GoodsController::class, 'unfollow']); // 取消关注商品
+    });
+    Route::get('/{no}', [GoodsController::class, 'detail']);
+    Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
 });
 
 /**

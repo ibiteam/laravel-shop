@@ -204,7 +204,7 @@ onMounted( () => {
             <el-form-item>
                 <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
                 <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                <el-button :icon="Plus" type="warning" @click="openDetailView()">添加</el-button>
+                <el-button :icon="Plus" type="warning" @click="openDetailView(0)">添加</el-button>
             </el-form-item>
         </el-form>
     </el-header>

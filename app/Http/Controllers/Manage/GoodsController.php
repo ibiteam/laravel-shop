@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CategoryDao;
-use App\Http\Dao\GoodsParameterTemplateDao;
 use App\Http\Dao\GoodsSkuDao;
-use App\Http\Dao\GoodsSkuTemplateDao;
 use App\Http\Dao\GoodsSpecValueDao;
 use App\Http\Requests\Manage\GoodsStoreRequest;
 use App\Http\Resources\CommonResourceCollection;
@@ -14,6 +12,7 @@ use App\Models\AdminOperationLog;
 use App\Models\Goods;
 use App\Models\GoodsImage;
 use App\Models\GoodsParameter;
+use App\Models\ShopConfig;
 use App\Services\Goods\GoodsService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -98,7 +97,7 @@ class GoodsController extends BaseController
     /**
      * 修改商品.
      */
-    public function edit(Request $request, CategoryDao $category_dao, GoodsSpecValueDao $goods_spec_value_dao, GoodsSkuDao $goods_sku_dao, GoodsParameterTemplateDao $goods_parameter_dao, GoodsSkuTemplateDao $goods_sku_template_dao): JsonResponse
+    public function edit(Request $request, CategoryDao $category_dao, GoodsSpecValueDao $goods_spec_value_dao, GoodsSkuDao $goods_sku_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -108,6 +107,7 @@ class GoodsController extends BaseController
             ]);
 
             $info = [
+                'id' => $validated['id'] ?? 0,
                 'category_id' => null,
                 'name' => '',
                 'label' => '',
@@ -115,14 +115,15 @@ class GoodsController extends BaseController
                 'parameters' => [],
                 'images' => [],
                 'video' => '',
-                'video_duration' => '',
+                'video_duration' => 0,
                 'content' => '',
                 'unit' => '',
                 'spec_data' => [],
                 'sku_data' => [],
-                'price' => '',
+                'price' => 0,
+                'integral' => 0,
                 'total' => '',
-                'type' => '',
+                'type' => Goods::TYPE_DONE_ORDER,
                 'status' => Goods::STATUS_ON_SALE,
                 'can_quota' => Goods::NOT_QUOTA,
                 'quota_number' => 0,
@@ -161,6 +162,9 @@ class GoodsController extends BaseController
             return $this->success([
                 'category' => $category_dao->getTreeList(),
                 'info' => $info,
+                'settings' => [
+                    'is_open_integral' => shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                ],
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
@@ -188,7 +192,7 @@ class GoodsController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('添加失败'.$throwable->getMessage());
+            return $this->error('添加失败');
         }
     }
 }

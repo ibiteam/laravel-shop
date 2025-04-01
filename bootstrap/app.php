@@ -13,6 +13,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -74,5 +75,12 @@ return Application::configure(basePath: dirname(__DIR__))
             };
 
             return $api_response->error($exception->getMessage(), CustomCodeEnum::UNAUTHORIZED);
+        })->render(function (NotFoundHttpException $exception) {
+            $api_response = new class
+            {
+                use ApiResponse;
+            };
+
+            return $api_response->error('请求失败了~');
         });
     })->create();

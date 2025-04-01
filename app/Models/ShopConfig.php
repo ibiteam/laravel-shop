@@ -34,6 +34,7 @@ class ShopConfig extends Model
     public const GROUP_SITE_LOGO = 'site_logo'; // 站点Logo
     public const GROUP_SMTP_SERVICE = 'smtp_service'; // 邮件服务
     public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置
+    public const GROUP_INTEGRAL = 'group_integral'; // 积分设置
 
     // code值
     public const SHOP_NAME = 'shop_name'; // 商城名称
@@ -59,6 +60,8 @@ class ShopConfig extends Model
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
     public const CURRENCY_FORMAT = 'currency_format'; // 对价格进行格式化
     public const PRICE_FORMAT = 'price_format'; // 保留几位小数
+
+    public const IS_OPEN_INTEGRAL = 'is_open_integral'; // 是否开启积分
 
     protected $guarded = [];
 
