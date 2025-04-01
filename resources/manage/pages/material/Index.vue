@@ -65,7 +65,7 @@
                                 />
                             </div>
                             <div class="search-form-item">
-                                <el-button type="primary" @click="searchMaterial">查询</el-button>
+                                <el-button type="primary" @click="searchMaterial" style="margin-right: 10px;">查询</el-button>
                                 <el-upload
                                     class="logo-uploader"
                                     :accept="tabValue === '1' ? 'image/jpeg,image/jpg,image/png' : 'video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb'"
@@ -173,7 +173,7 @@
                             <el-tree-select
                                 v-model="currentCtrlMaterial.parent_id"
                                 :data="folderData"
-                                value-key="id"
+                                :props="{label: 'name',value: 'id'}"
                                 :check-strictly="true"
                                 placeholder="请选择上一级文件夹"
                                 :render-after-expand="false"
@@ -622,6 +622,15 @@ const allowDrag = (draggingNode) => {
         >span{
             white-space: nowrap;
             margin-right: 10px;
+        }
+        .logo-uploader{
+            margin-right: 10px;
+        }
+        :deep(.logo-uploader .el-upload){
+            border:none;
+            &:hover{
+                border:none;
+            }
         }
     }
 }
