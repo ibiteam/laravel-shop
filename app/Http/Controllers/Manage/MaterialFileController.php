@@ -10,7 +10,6 @@ use App\Models\MaterialFile;
 use App\Services\MaterialFileService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class MaterialFileController extends BaseController
@@ -26,6 +25,7 @@ class MaterialFileController extends BaseController
         $time = $request->get('time');
         $start_time = $time[0] ?? '';
         $end_time = $time[1] ?? '';
+        $sort = $request->get('sort');
         $list = MaterialFile::query()
             ->with('admin_user:id,user_name')
             ->when($parent_id > -1, fn (Builder $query) => $query->whereParentId($parent_id))
@@ -39,7 +39,13 @@ class MaterialFileController extends BaseController
                     ->whereLike('user_name', "%{$admin_name}%")
                 )
             )
+            ->when(in_array($sort, MaterialFile::$sorts), fn (Builder $query) => $query->orderByRaw(MaterialFile::$orderBy[$sort]))
             ->paginate($request->get('number', 10));
+        $list->getCollection()->transform(function (MaterialFile $faterialFile) {
+            $faterialFile->size = $faterialFile->size . 'KB';
+
+            return $faterialFile;
+        });
 
         return $this->success(new CommonResourceCollection($list));
     }
@@ -314,7 +320,6 @@ class MaterialFileController extends BaseController
                 'ids' => '文件/文件夹 ID 列表',
                 'target_directory_id' => '目标文件夹 ID',
             ]);
-
             // 获取目标文件夹
             $targetDirectoryId = $data['target_directory_id'];
             $targetDirectory = MaterialFile::find($targetDirectoryId);
@@ -370,7 +375,7 @@ class MaterialFileController extends BaseController
             $admin_user_id = $request->user()?->id ?: 0;
 
             if (! $file || ! $file->isValid()) {
-                return $this->error('文件上传失败');
+                return $this->error('文件上传失1败');
             }
             $res = $materialFileService->saveMaterialFile($admin_user_id, $file, $dir_type, $parent_id);
 

@@ -60,7 +60,7 @@ class ShopConfigTableSeeder extends Seeder
 
     private function addIntegralSettings(): void
     {
-        $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '');
+        $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '0');
     }
 
     private function addManageSettings(): void

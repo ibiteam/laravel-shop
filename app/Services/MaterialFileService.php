@@ -56,6 +56,12 @@ class MaterialFileService
     }
 
     /**
+     * 保存素材文件
+     * @param $admin_user_id
+     * @param $file
+     * @param $dir_type
+     * @param $parent_id
+     * @return MaterialFile
      * @throws BusinessException
      */
     public function saveMaterialFile($admin_user_id, $file, $dir_type, $parent_id)
@@ -64,38 +70,43 @@ class MaterialFileService
         $fileSize = $file->getSize();
         // 文件名称
         $fileName = $file->getClientOriginalName();
-        // 检查是否为图片文件
+        // 获取文件的 MIME 类型
         $mimeType = $file->getMimeType();
 
-        if (strpos($mimeType, 'image/') === 0) {
-            // 获取图片的宽高
-            $imageInfo = getimagesize($file->getPathname());
-            if ($imageInfo) {
-                $width = $imageInfo[0];  // 宽度
-                $height = $imageInfo[1]; // 高度
-            } else {
-                throw new BusinessException('无法解析图片信息');
-            }
-        } else {
-            $width = null;
-            $height = null;
-        }
-
-        $fileSizeInKB = round($fileSize / 1024, 2); // 转换为 KB 并保留两位小数
-
-        $file_path = $this->getFileUrl($file);
-
-        return MaterialFile::create([
+        // 初始化数据数组
+        $data = [
             'type' => MaterialFile::TYPE_FILE,
             'parent_id' => $parent_id,
             'admin_user_id' => $admin_user_id,
             'name' => $fileName,
-            'file_path' => $file_path,
-            'size' => $fileSizeInKB,
-            'width' => $width,
-            'height' => $height,
+            'file_path' => $this->getFileUrl($file),
             'dir_type' => $dir_type,
-        ]);
+            'size' => round($fileSize / 1024), // 存储 KB 大小
+            'width' => null,
+            'height' => null,
+        ];
+
+        if (MaterialFile::DIR_TYPE_IMAGE == $dir_type) {
+            if (strpos($mimeType, 'image/') !== 0) {
+                throw new BusinessException('文件类型不是图片 (MIME: ' . $mimeType . ')');
+            }
+            // 获取图片的宽高
+            $imageInfo = getimagesize($file->getPathname());
+            if ($imageInfo) {
+                $data['width'] = $imageInfo[0];  // 宽度
+                $data['height'] = $imageInfo[1]; // 高度
+            } else {
+                throw new BusinessException('无法解析图片信息');
+            }
+        } elseif (MaterialFile::DIR_TYPE_VIDEO == $dir_type) {
+            if (strpos($mimeType, 'video/') !== 0) {
+                throw new BusinessException('文件类型不是视频 (MIME: ' . $mimeType . ')');
+            }
+        } else {
+            throw new BusinessException('文件夹类型必须为图片或者视频');
+        }
+
+        return MaterialFile::create($data);
     }
 
     public function getFileUrl($file): string

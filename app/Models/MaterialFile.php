@@ -87,6 +87,27 @@ class MaterialFile extends Model
         ],
     ];
 
+    // 排序
+    public static $orderBy = [
+        '1' => 'created_at desc',
+        '2' => 'created_at asc',
+        '3' => 'updated_at desc',
+        '4' => 'updated_at asc',
+        '5' => 'name COLLATE utf8mb4_general_ci desc',
+        '6' => 'name COLLATE utf8mb4_general_ci asc',
+    ];
+
+    /*
+     * 排序数组
+     * 最新上传在前 1
+     * 最新上传在后 2
+     * 最新更新在前 3
+     * 最新更新在后 4
+     * 按文件名降序 5
+     * 按文件名升序 6
+     */
+    public static $sorts = [1, 2, 3, 4, 5, 6];
+
     public function admin_user()
     {
         return $this->belongsTo(AdminUser::class, 'admin_user_id', 'id');

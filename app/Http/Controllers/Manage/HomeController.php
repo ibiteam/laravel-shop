@@ -11,12 +11,13 @@ use App\Models\Collect;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class HomeController extends BaseController
 {
     /**
-     * 获取菜单
+     * 获取菜单.
      */
     public function menus(Request $request, PermissionDao $permission_dao)
     {
@@ -26,11 +27,12 @@ class HomeController extends BaseController
         $collect_permission_ids = Collect::query()->whereAdminUserId($admin_user->id)->select('permission_id')->get()->keyBy('permission_id')->toArray();
 
         $menus = $permission_dao->getTreePermissionByAdminUser($admin_user, $collect_permission_ids);
+
         return $this->success($menus);
     }
 
     /**
-     * 首页数据
+     * 首页数据.
      */
     public function dashboard(AccessRecordDao $access_record_dao)
     {
@@ -76,24 +78,8 @@ class HomeController extends BaseController
         return $this->success($data);
     }
 
-    private function getOption($referer_group, $name, $type)
-    {
-        $data = [
-            'name' => '',
-            'statistic_date' => [],
-            'uv_number' => [],
-        ];
-        if (!isset($referer_group[$type])) {
-            return $data;
-        }
-        $data['name'] = $name;
-        $data['statistic_date'] = $referer_group[$type]->pluck('statistic_date');
-        $data['uv_number'] = $referer_group[$type]->pluck('uv_number');
-        return $data;
-    }
-
     /**
-     * 收藏菜单
+     * 收藏菜单.
      */
     public function collectMenu(Request $request)
     {
@@ -107,43 +93,64 @@ class HomeController extends BaseController
             ]);
             $menu_id = $validated['id'];
             $menu = Permission::query()->whereId($menu_id)->first();
-            if (!$menu) {
+
+            if (! $menu) {
                 throw new BusinessException('菜单不存在');
             }
 
             $permission_codes = $admin_user->getAllPermissions()->pluck('name')->flip();
-            if (!isset($permission_codes[$menu->name])) {
+
+            if (! isset($permission_codes[$menu->name])) {
                 throw new BusinessException('没有权限');
             }
 
             $collect = Collect::query()->whereAdminUserId($admin_user->id)->wherePermissionId($menu_id)->first();
+
             if ($collect) {
                 $collect->delete();
-                return $this->success('取消收藏成功');
-            } else {
-                Collect::create([
-                    'admin_user_id' => $admin_user->id,
-                    'permission_id' => $menu_id
-                ]);
-                return $this->success('收藏成功');
-            }
 
+                return $this->success('取消收藏成功');
+            }
+            Collect::create([
+                'admin_user_id' => $admin_user->id,
+                'permission_id' => $menu_id,
+            ]);
+
+            return $this->success('收藏成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('收藏菜单异常~' . $throwable->getMessage());
+            return $this->error('收藏菜单异常~'.$throwable->getMessage());
         }
     }
 
     /**
-     * 清除缓存
+     * 清除缓存.
      */
     public function clearCache()
     {
-        cache_remove('shop_config_all_code');
+        Cache::forget('shop_config_all_code');
 
         return $this->success('清除成功');
+    }
+
+    private function getOption($referer_group, $name, $type)
+    {
+        $data = [
+            'name' => '',
+            'statistic_date' => [],
+            'uv_number' => [],
+        ];
+
+        if (! isset($referer_group[$type])) {
+            return $data;
+        }
+        $data['name'] = $name;
+        $data['statistic_date'] = $referer_group[$type]->pluck('statistic_date');
+        $data['uv_number'] = $referer_group[$type]->pluck('uv_number');
+
+        return $data;
     }
 }

@@ -5,7 +5,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
 use App\Http\Middleware\Manage\AccessRecord as ManageAccessRecord;
-use App\Http\Middleware\Manage\Permission as ManagePermission;
+use App\Http\Middleware\Manage\PermissionCheck as ManagePermission;
 use App\Traits\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
