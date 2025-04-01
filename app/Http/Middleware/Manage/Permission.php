@@ -4,18 +4,16 @@ namespace App\Http\Middleware\Manage;
 
 use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
-use App\Http\Dao\AccessRecordDao;
 use App\Models\AdminUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 
-class AccessRecord
+class Permission
 {
     /**
      * @throws BusinessException
      */
-    public function handle(Request $request, \Closure $next): Response
+    public function handle(Request $request, \Closure $next, $permission)
     {
         $admin_user = Auth::guard(config('auth.manage.guard'))->user();
 
@@ -23,9 +21,11 @@ class AccessRecord
             throw new BusinessException('用户未登录或用户异常', CustomCodeEnum::UNAUTHORIZED);
         }
 
-        $route_name = $request->route()->getName();
+        $permissions = is_array($permission) ? $permission : explode('|', $permission);
 
-        app(AccessRecordDao::class)->updateOrCreate($admin_user->id, $route_name);
+        if (! $admin_user->canAny($permissions)) {
+            throw new BusinessException('用户无权限访问', CustomCodeEnum::FORBIDDEN);
+        }
 
         return $next($request);
     }

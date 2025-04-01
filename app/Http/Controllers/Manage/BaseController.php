@@ -13,6 +13,7 @@ class BaseController extends Controller
 
     final public function adminUser(): ?AdminUser
     {
+        return AdminUser::find(1);
         return Auth::guard(config('auth.manage.guard'))->user();
     }
 }

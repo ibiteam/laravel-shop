@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Enums\CommonEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AccessRecordDao;
 use App\Http\Dao\PermissionDao;
+use App\Models\AccessStatistic;
 use App\Models\Collect;
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -33,6 +36,23 @@ class HomeController extends BaseController
     {
         $admin_user = $this->adminUser();
 
+        // 数量统计
+        $number_data['user_number'] = User::query()->count();  // 用户数
+        $number_data['order_number'] = 100;  // 订单数
+        $number_data['total_transaction_value'] = 10000;  // 总交易额
+
+        // 用户数据
+        $statistic_time = [date('Y-m-d', strtotime('-1 week')), date('Y-m-d', strtotime('-1 day'))];
+        $access_statistics = AccessStatistic::query()->whereBetween('statistic_date', $statistic_time)->orderByDesc('statistic_date')->get()->toArray();
+        $accessStatistic = \collect();
+
+        if (count($access_statistics)) {
+            array_multisort(array_column($access_statistics, 'statistic_date'), SORT_ASC, $access_statistics);
+            $referer_group = collect($access_statistics)->groupBy('referer');
+            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', CommonEnum::PC->value);
+            $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', CommonEnum::H5->value);
+        }
+
         // 我的收藏
         $myCollect = Collect::query()->with('permission:id,name,display_name,icon')
             ->whereAdminUserId($admin_user->id)->orderByDesc('updated_at')
@@ -48,38 +68,27 @@ class HomeController extends BaseController
         // 最近访问
         $accessRecord = $access_record_dao->getListByAdminUserId($admin_user->id);
 
-        // 用户数据
-        // $statistic_time = [date('Y-m-d', strtotime('-1 week')), date('Y-m-d', strtotime('-1 day'))];
-        // $access_statistics = AccessStatistic::query()->whereBetween('statistic_date', $statistic_time)->orderByDesc('statistic_date')->get()->toArray();
-        // $access_statistic = \collect();
-        //
-        // if (count($access_statistics)) {
-        //     array_multisort(array_column($access_statistics, 'statistic_date'), SORT_ASC, $access_statistics);
-        //     $res = collect($access_statistics)->groupBy('referer');
-        //     $access_statistic['pc'] = $this->getOption($res, 'PC', 'pc');
-        //     $access_statistic['h5'] = $this->getOption($res, 'Admin', 'h5');
-        // }
-
-        $data['access_statistic'] = [];
+        $data['number_data'] = $number_data;
+        $data['access_statistic'] = $accessStatistic;
         $data['my_collect'] = $myCollect;
         $data['access_record'] = $accessRecord;
 
         return $this->success($data);
     }
 
-    private function getOption($res, $name, $type)
+    private function getOption($referer_group, $name, $type)
     {
         $data = [
             'name' => '',
             'statistic_date' => [],
             'uv_number' => [],
         ];
-        if (!isset($res[$type])) {
+        if (!isset($referer_group[$type])) {
             return $data;
         }
         $data['name'] = $name;
-        $data['statistic_date'] = $res[$type]->pluck('statistic_date');
-        $data['uv_number'] = $res[$type]->pluck('uv_number');
+        $data['statistic_date'] = $referer_group[$type]->pluck('statistic_date');
+        $data['uv_number'] = $referer_group[$type]->pluck('uv_number');
         return $data;
     }
 
@@ -126,5 +135,15 @@ class HomeController extends BaseController
         } catch (\Throwable $throwable) {
             return $this->error('收藏菜单异常~' . $throwable->getMessage());
         }
+    }
+
+    /**
+     * 清除缓存
+     */
+    public function clearCache()
+    {
+        cache_remove('shop_config_all_code');
+
+        return $this->success('清除成功');
     }
 }
