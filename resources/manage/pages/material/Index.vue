@@ -28,7 +28,7 @@
                             :expand-on-click-node="false"
                         >
                             <template #default="{ node, data }">
-                                <div class="custom-tree-node" @click="checkDir(data.id)">
+                                <div class="custom-tree-node" @click="checkDir(data.id, data.type)">
                                     <i class="iconfont" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
                                     <span>{{ data.name }}</span>
                                 </div>
@@ -81,7 +81,7 @@
                         </div>
                         <div class="material-ctrl" style="padding: 10px 0;">
                             <el-button type="default" size="small" @click="handleBatchDelete">批量删除</el-button>
-                            <el-button type="default" size="small" @click="handleBatchMove">批量移动</el-button>
+                            <el-button type="default" size="small" @click="batchMoveTo">批量移动</el-button>
                             <el-select placeholder="排序方式" v-model="searchForm.sort" style="width: 150px;margin-left: 10px;" size="small">
                                 <el-option label="默认排序" value="0"></el-option>
                                 <el-option label="最新上传在前" value="1"></el-option>
@@ -104,7 +104,7 @@
                                 <el-table-column prop="name" label="素材名称" width="220">
                                     <template #default="scope">
                                         <div class="s-flex ai-ct">
-                                            <div @click="checkDir(scope.row.id)">
+                                            <div @click="checkDir(scope.row.id, scope.row.type)" :class="scope.row.type === 1 ? 'pointer' : ''">
                                                 <div v-if="scope.row.type == 1">
                                                     <div class="material-table-item-name">
                                                         <i class="iconfont folder" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
@@ -166,10 +166,10 @@
                     </div>
                 </div>
             </div>
-            <el-dialog v-model="editMaterialVisible" :title="editMaterialTitle" width="500" center>
+            <el-dialog v-model="editMaterialVisible" :title="editMaterialTitle" width="500" center :close-on-click-modal="false" :close-on-press-escape="false">
                 <div class="edit-material-form" style="padding-top: 30px;">
                     <el-form :model="currentCtrlMaterial" ref="ctrlMaterialRef" label-width="120px" :rules="ctrlMaterialRules">
-                        <el-form-item label="上级文件夹" prop="parent_id" v-if="editMaterialType == 'move' || editMaterialType == 'new-folder'">
+                        <el-form-item label="上级文件夹" prop="parent_id" v-if="editMaterialType == 'move' || editMaterialType == 'new-folder' || editMaterialType == 'batch_move'">
                             <el-tree-select
                                 v-model="currentCtrlMaterial.parent_id"
                                 :data="folderData"
@@ -202,7 +202,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, watch, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
-import { folderIndex, folderList, materialIndex, rename, newFolder, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
+import { folderList, materialIndex, rename, newFolder, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
 
 const tabValue = ref('1');
 const multipleSelection = ref([]);
@@ -345,47 +345,73 @@ const closeMaterialDialog = () => {
     editMaterialTitle.value = '';
     editMaterialType.value = '';
 }
-const moveTo = (item) => {
-    multipleSelectionId.value = item.id;
-    editMaterialTitle.value = '移动至';
-    editMaterialVisible.value = true;
-    editMaterialType.value = 'move';
-
+/**
+ * 公共方法：更新 folderData 并禁用目标节点及其子节点
+ */
+const updateFolderData = (ids) => {
     // 复制 folderData 以避免直接修改原始数据
     const updatedFolderData = JSON.parse(JSON.stringify(folderData.value));
 
     // 禁用目标节点及其所有子节点
-    disableFolderAndChildren(updatedFolderData, multipleSelectionId.value);
+    disableFolderAndChildren(updatedFolderData, ids);
 
     // 更新 folderData
     folderData.value = updatedFolderData;
+    console.log(folderData.value);
 };
 
-// 递归查找并设置禁用状态（包括所有子节点）
-const disableFolderAndChildren = (data, id) => {
-    for (let i = 0; i < data.length; i++) {
-        if (data[i].id === id) {
-            // 禁用当前节点
-            data[i].disabled = true;
+/**
+ * 移动单个文件或文件夹
+ */
+const moveTo = (item) => {
+    multipleSelectionId.value = item.id; // 记录当前选中的单个节点 ID
+    editMaterialTitle.value = '移动至';
+    editMaterialVisible.value = true;
+    editMaterialType.value = 'move';
 
-            // 如果有子节点，递归禁用所有子节点
-            if (data[i].children && data[i].children.length > 0) {
-                disableAllChildren(data[i].children);
+    // 调用公共方法更新 folderData
+    updateFolderData([multipleSelectionId.value]);
+};
+
+/**
+ * 批量移动多个文件或文件夹
+ */
+const batchMoveTo = () => {
+    editMaterialTitle.value = '移动至';
+    editMaterialVisible.value = true;
+    editMaterialType.value = 'batch_move';
+
+    // 调用公共方法更新 folderData
+    updateFolderData(multipleSelection.value);
+};
+
+/**
+ * 递归查找并设置禁用状态（包括所有子节点）
+ */
+const disableFolderAndChildren = (data, ids) => {
+    for (let d = 0; d < ids.length; d++) {
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].id === ids[d]) {
+                // 禁用当前节点
+                data[i].disabled = true;
+
+                // 如果有子节点，递归禁用所有子节点
+                if (data[i].children && data[i].children.length > 0) {
+                    disableAllChildren(data[i].children);
+                }
             }
-            return true; // 找到并设置后返回
-        }
 
-        // 如果当前节点有子节点，继续递归查找
-        if (data[i].children && data[i].children.length > 0) {
-            if (disableFolderAndChildren(data[i].children, id)) {
-                return true; // 如果子节点中找到了，也返回
+            // 如果当前节点有子节点，继续递归查找
+            if (data[i].children && data[i].children.length > 0) {
+                disableFolderAndChildren(data[i].children, ids);
             }
         }
     }
-    return false; // 如果没有找到，返回 false
 };
 
-// 递归禁用所有子节点
+/**
+ * 递归禁用所有子节点
+ */
 const disableAllChildren = (children) => {
     for (let i = 0; i < children.length; i++) {
         children[i].disabled = true;
@@ -499,9 +525,11 @@ const handleBatchMove = () => {
         cns.$message.error('取消移动')
     })
 }
-const checkDir = (id) => {
-    searchForm.value.parent_id = id
-    getMaterialData()
+const checkDir = (id, type) => {
+    if (type === 1) {
+        searchForm.value.parent_id = id
+        getMaterialData()
+    }
 }
 const changTab = () => {
     getFolderData()
@@ -596,5 +624,8 @@ const allowDrag = (draggingNode) => {
             margin-right: 10px;
         }
     }
+}
+.pointer {
+    cursor: pointer;
 }
 </style>
