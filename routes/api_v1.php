@@ -39,6 +39,10 @@ Route::prefix('region')->group(function () {
 });
 // 商品详情
 Route::prefix('goods')->group(function () {
+    Route::middleware('api.auth')->group(function () {
+        Route::post('follow', [GoodsController::class, 'follow']); // 关注商品
+        Route::post('unfollow', [GoodsController::class, 'unfollow']); // 取消关注商品
+    });
     Route::get('/{no}', [GoodsController::class, 'detail']);
     Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
 });
