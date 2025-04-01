@@ -75,6 +75,7 @@ watch([() => props.component], (newValue) => {
 <style lang='scss' scoped>
 .search-wrapper{
     padding: 10px 10px 5px;
+    background: #f2f2f2;
     .search-swiper {
         flex: 1;
         padding-left: 10px;

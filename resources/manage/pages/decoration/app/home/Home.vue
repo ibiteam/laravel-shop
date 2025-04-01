@@ -23,9 +23,10 @@
                     @add="handleDragAdd">
                     <div v-for="(temp, index) in decoration.data" :key="temp.id">
                         <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
-                        <advertising-one v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-one>
-                        <advertising-two v-else-if="temp.component_name == 'advertising_two'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-two>
-                        <advertising-three v-else-if="temp.component_name == 'advertising_three'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></advertising-three>
+                        <AdvertisingOne v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingOne>
+                        <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTwo>
+                        <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingThree>
+                        <HotZone v-else-if="temp.component_name == 'hot_zone'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></HotZone>
                         <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else>{{ temp.component_name }}{{ temp.name }}</div>
                     </div>
                 </VueDraggable>
@@ -33,7 +34,6 @@
             </div>
         </main>
         <MaterialCenterImageDialog />
-        <HotZoneDialog v-bind="{show: true, title: '编辑热区'}"/>
     </div>
 </template>
 
@@ -46,8 +46,8 @@ import Search from './components/Search.vue'
 import AdvertisingOne from './components/AdvertisingOne.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
+import HotZone from './components/HotZone.vue';
 import MaterialCenterImageDialog from '@/components/MaterialCenter/ImageDialog.vue'
-import HotZoneDialog from './components/HotZoneDialog.vue'
 import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 
@@ -111,6 +111,33 @@ const sortDecorationData = (id, direction) => {
 }
 
 onMounted(() => {
+    decoration.data.unshift({
+        component_name: 'hot_zone',
+        content: {
+            image: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg',
+            areas: [{
+                x: 89,
+                y: 86,
+                width: 100,
+                height: 100,
+                url: 'https://h5.toodudu.com/'
+            }]
+        },
+        data: {
+            component_name: 'hot_zone',
+            image: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg',
+            items: [{
+                x: 89,
+                y: 86,
+                width: 100,
+                height: 100,
+                url: 'https://h5.toodudu.com/'
+            }]
+        },
+        id: 999,
+        is_show: 1,
+        name: '热区',
+    })
     nextTick(() => {
         cns.$bus.on('chooseDragItem', (res) => {
             decoration.temp_index = res.temp_index
@@ -167,11 +194,11 @@ onUnmounted(() => {
         overflow: hidden;
         position: relative;
         z-index: 1;
+        background: #F4F4FA;
         .app-wrapper{
-            // height: 720px;
+            // height: 780px;
             padding-top: 20px;
             box-sizing: border-box;
-            background-color: var(--page-bg-color);
             overflow: hidden;
             position: relative;
             &::before {
@@ -179,7 +206,7 @@ onUnmounted(() => {
                 display: block;
                 width: 375px;
                 height: 20px;
-                background: #fff url('@/assets/images/decoration/app-header.png') top center no-repeat;
+                background: #f2f2f2 url('@/assets/images/decoration/app-header.png') top center no-repeat;
                 background-size: 375px 20px;
                 position: absolute;
                 top: 0;

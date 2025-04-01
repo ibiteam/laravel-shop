@@ -2,9 +2,9 @@
     <div 
         class="free-zone-container"
         ref="containerRef"
-        :style="{width: width, height: height}"
         @mousedown="startSelection"
     >
+        <img class="background-image" :src="backgroundImage" ondragstart="return false;" oncontextmenu="return false;" onselect="document.selection.empty();"  alt="热区">
         <div class="area" v-for="(area, index) in areas" :key="index" :style="getAreaStyle(area)" @mousedown.stop="startDrag(index, $event)">
             <div class="area-content" v-if="currentAreaIndex != index || (currentAreaIndex == index && !isSelecting)">
                 <span class="co-fff">热区{{ index+1 }}</span>
@@ -17,28 +17,24 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
+import { ref, getCurrentInstance, watch, defineEmits } from 'vue'
 import { Icon } from 'vant'
 
 const props = defineProps({
-    width: {
+    backgroundImage: {
         type: String,
-        default: '750px'
-    },  
-    height: {
-        type: String,
-        default: '375px'
+        default: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg'
     },
+    data: {
+        type: Array,
+        default: () => []
+    }
 })
 
+const emit = defineEmits(['update'])
+
 const containerRef = ref(null);
-const areas = ref([{
-    x: 89,
-    y: 86,
-    width: 100,
-    height: 100,
-    url: ''
-}]);
+const areas = ref([]);
 let isSelecting = ref(false);
 let startX = ref(0);
 let startY = ref(0);
@@ -95,6 +91,7 @@ const endSelection = () => {
     isSelecting.value = false;
     document.removeEventListener('mousemove', updateSelection);
     document.removeEventListener('mouseup', endSelection);
+    emit('update', areas.value);
 };
 
 // 移动选区开始
@@ -142,11 +139,13 @@ const dragArea = (e) => {
 const endDrag = () => {
     document.removeEventListener('mousemove', dragArea);
     document.removeEventListener('mouseup', endDrag);
+    emit('update', areas.value);
 };
 
 // 删除选区
 const removeArea = (index) => {
     areas.value.splice(index, 1);
+    emit('update', areas.value);
 };
 
 let currentResizeIndex = ref(-1);
@@ -194,6 +193,7 @@ const stopResize = () => {
     document.removeEventListener('mousemove', handleResize);
     document.removeEventListener('mouseup', stopResize);
     currentResizeIndex.value = -1;
+    emit('update', areas.value);
 };
 
 // 获取选区样式
@@ -205,15 +205,33 @@ const getAreaStyle = (area) => {
         height: `${area.height}px`
     };
 };
+
+watch(() => props, (newVal) => {
+    if (newVal) {
+        areas.value = newVal.data
+    }
+}, {
+    immediate: true,
+    deep: true
+})
+
+
 </script>
 
 <style lang='scss' scoped>
 .free-zone-container {
-    background-image: url('./hot-zone-bg.png');
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+    width: 750px;
+    height: fit-content;
+    border: 1px solid #d8d8d8;
+    box-sizing: border;
     position: relative;
     cursor: crosshair;
+    .background-image {
+        width: 100%;
+        height: auto;
+        vertical-align: bottom;
+        user-select: none;
+    }
     .area {
         position: absolute;
         border: 1px dashed var(--main-color);
