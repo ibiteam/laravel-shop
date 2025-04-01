@@ -88,7 +88,7 @@ class GoodsService
                     throw new BusinessException('商品价格不能为空！');
                 }
             }
-            $store_data['price'] = min(array_column($request_sku_data, 'price'));
+            $store_data['price'] = min(array_column($request_sku_data, 'price')) ?? 0;
             $store_data['integral'] = min(array_column($request_sku_data, 'integral')) ?? 0;
         }
 
@@ -269,7 +269,7 @@ class GoodsService
     private function checkPriceOrIntegral(mixed $price, mixed $integral = null, bool $is_check_integral = false): bool
     {
         if ($is_check_integral) {
-            return (! is_numeric($price) || $price <= 0) && (! isset($integral) || ! is_numeric($integral) || $integral <= 0);
+            return (! is_numeric($price) || $price <= 0) && (! is_numeric($integral) || $integral <= 0);
         }
 
         return ! is_numeric($price) || $price <= 0;

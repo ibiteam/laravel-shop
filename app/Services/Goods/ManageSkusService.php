@@ -228,10 +228,11 @@ class ManageSkusService
         if (! $sku_value) {
             throw new BusinessException('整理销售规格数据失败，请核对后重试');
         }
+        // 已经校验了商品 sku 的价格与积分 无需重复校验
 
         return [
             'sku_value' => rtrim($sku_value, '|'),
-            'price' => $sku_item['price'],
+            'price' => $sku_item['price'] ?? 0,
             'integral' => $sku_item['integral'] ?? 0,
             'number' => $sku_item['number'],
             'sort' => $sku_item['sort'] ?? 1,
