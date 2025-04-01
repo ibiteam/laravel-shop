@@ -48,24 +48,40 @@ use Spatie\Permission\PermissionRegistrar;
 class Permission extends SpatiePermission
 {
     use DatetimeTrait;
+
+    // 是否在左侧菜单栏
     public const NOT_IS_LEFT_NAV = 0;
     public const IS_LEFT_NAV = 1;
-    public const MANAGE_SETTINGS = 'manage.settings'; // 设置
-    public const MANAGE_GOODS = 'manage.goods'; // 商品
-    public const MANAGE_GOODS_SETTINGS = 'manage.goods.settings'; // 商品管理
+
+    // 一级
+    public const MODULE_SET = 'module.set'; // 设置
+    public const MODULE_GOODS = 'module.goods'; // 商品
+    public const MODULE_USER = 'module.user'; // 用户
+    public const MODULE_ORDER = 'module.order'; // 订单
+    public const MODULE_ARTICLE = 'module.article'; // 文章
+    public const MODULE_TOOLS = 'module.tools'; // 工具
+    public const MODULE_DATA = 'module.data'; // 数据
+
+    // 二级 设置部分
+    public const BASIC_SET_MANAGE = 'basic_set.manage'; // 基础设置
+    public const MANAGE_SHOP_CONFIG_INDEX = 'manage.shop_config.index'; // 商店设置
+    public const MANAGE_SHOP_CONFIG_UPDATE = 'manage.shop_config.update'; // 商店设置编辑
+    public const MANAGE_ROUTER_CATEGORY_INDEX = 'manage.router_category.index'; // 访问地址分类
+    public const MANAGE_ROUTER_CATEGORY_UPDATE = 'manage.router_category.update'; // 访问地址分类新增|编辑
+    public const MANAGE_ROUTER_CATEGORY_DELETE = 'manage.router_category.delete'; // 访问地址分类删除
+    public const MANAGE_ROUTER_INDEX = 'manage.router.index'; // 访问地址
+    public const MANAGE_ROUTER_UPDATE = 'manage.router.update'; // 访问地址新增|编辑
+    public const MANAGE_ROUTER_DELETE = 'manage.router.delete'; // 访问地址删除
+
+    // 二级 商品部分
+    public const GOODS_MANAGE = 'goods.manage'; // 商品管理
     public const MANAGE_GOODS_INDEX = 'manage.goods.index'; // 商品列表
-    public const MANAGE_GOODS_CATEGORY = 'manage.goods.category'; // 商品分类
-    public const MANAGE_GOODS_BRAND = 'manage.goods.brand'; // 商品品牌
-    public const MANAGE_GOODS_LABELS = 'manage.goods.label'; // 商品标签
-    public const MANAGE_GOODS_GUARANTEE = 'manage.goods.guarantee'; // 商品保障
-    public const MANAGE_GOODS_SKU_TEMPLATE = 'manage.goods.sku_template'; // 商品SKU模板
-
-    public const MANAGE_USER = 'manage.user'; // 用户
-    public const MANAGE_ORDER = 'manage.order'; // 订单
-    public const MANAGE_ARTICLE = 'manage.article'; // 文章
-    public const MANAGE_TOOLS = 'manage.tools'; // 工具
-    public const MANAGE_DATA = 'manage.data'; // 数据
-
+    public const MANAGE_GOODS_UPDATE = 'manage.goods.update'; // 商品列表新增|编辑
+    public const MANAGE_GOODS_DELETE = 'manage.goods.delete'; // 商品列表删除
+    public const CATEGORY_MANAGE = 'category.manage'; // 分类管理
+    public const MANAGE_CATEGORY_INDEX = 'manage.category.index'; // 商品分类
+    public const MANAGE_CATEGORY_UPDATE = 'manage.category.update'; // 商品分类新增|编辑
+    public const MANAGE_CATEGORY_DELETE = 'manage.category.delete'; // 商品分类删除
 
     public function __construct(array $attributes = [])
     {

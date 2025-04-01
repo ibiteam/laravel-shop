@@ -4,6 +4,7 @@ use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
+use App\Http\Middleware\Manage\AccessRecord as ManageAccessRecord;
 use App\Traits\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance']);
 
         $middleware->alias([
+            'manage.access.record' => ManageAccessRecord::class,
             'manage.auth' => ManageAuthenticate::class,
             'api.auth' => ApiAuthenticate::class,
         ]);

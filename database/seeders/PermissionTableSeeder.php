@@ -12,80 +12,89 @@ class PermissionTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $guard_name = (new Permission)->guardName();
-
-        $this->addSettingsPermission($guard_name);
-        $this->addGoodsPermission($guard_name);
-        $this->addUserPermission($guard_name);
-        $this->addOrderPermission($guard_name);
-        $this->addArticlePermission($guard_name);
-        $this->addToolPermission($guard_name);
-        $this->addDataPermission($guard_name);
+        $this->addSetPermission();
+        $this->addGoodsPermission();
+        $this->addUserPermission();
+        $this->addOrderPermission();
+        $this->addArticlePermission();
+        $this->addToolPermission();
+        $this->addDataPermission();
     }
 
-    private function addSettingsPermission(string $guard_name): void
+    private function addPermission(string $display_name, string $name, int $sort = 0, int $is_left_nav = Permission::NOT_IS_LEFT_NAV, string $icon = '', ?string $parent_name = null): void
     {
-        $this->addPermission($guard_name, '设置', Permission::MANAGE_SETTINGS, 100, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addGoodsPermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '商品', Permission::MANAGE_GOODS, 99, '', Permission::IS_LEFT_NAV);
-        $this->addPermission($guard_name, '商品管理', Permission::MANAGE_GOODS_SETTINGS, 100, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS);
-        $this->addPermission($guard_name, '商品列表', Permission::MANAGE_GOODS_INDEX, 100, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-        $this->addPermission($guard_name, '商品分类', Permission::MANAGE_GOODS_CATEGORY, 99, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-        $this->addPermission($guard_name, '商品品牌', Permission::MANAGE_GOODS_BRAND, 98, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-        $this->addPermission($guard_name, '商品标签', Permission::MANAGE_GOODS_LABELS, 97, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-        $this->addPermission($guard_name, '商品保障', Permission::MANAGE_GOODS_GUARANTEE, 96, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-        $this->addPermission($guard_name, '商品规格', Permission::MANAGE_GOODS_SKU_TEMPLATE, 95, '', Permission::IS_LEFT_NAV, Permission::MANAGE_GOODS_SETTINGS);
-    }
-
-    private function addUserPermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '用户', Permission::MANAGE_USER, 98, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addOrderPermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '订单', Permission::MANAGE_ORDER, 97, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addArticlePermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '文章', Permission::MANAGE_ARTICLE, 96, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addToolPermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '工具', Permission::MANAGE_TOOLS, 95, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addDataPermission(string $guard_name): void
-    {
-        $this->addPermission($guard_name, '数据', Permission::MANAGE_DATA, 94, '', Permission::IS_LEFT_NAV);
-    }
-
-    private function addPermission(
-        string $guard_name,
-        string $display_name,
-        string $name,
-        int $sort = 0,
-        string $icon = '',
-        int $is_left_nav = Permission::NOT_IS_LEFT_NAV,
-        ?string $parent_name = null,
-    ): void {
         $permission = Permission::query()->firstOrNew([
             'name' => $name,
-            'guard_name' => $guard_name,
+            'guard_name' => (new Permission)->guardName(),
         ]);
 
-        if (! $permission->exists) {
+        if (!$permission->exists) {
             $permission->display_name = $display_name;
             $permission->parent_id = $parent_name ? Permission::query()->whereName($parent_name)->value('id') : 0;
             $permission->sort = $sort;
-            $permission->icon = $icon;
             $permission->is_left_nav = $is_left_nav;
+            $permission->icon = $icon;
             $permission->save();
         }
+    }
+
+    private function addSetPermission(): void
+    {
+        $this->addPermission('设置', Permission::MODULE_SET, 100, Permission::IS_LEFT_NAV, 'Setting');
+
+        $this->addPermission('基础设置', Permission::BASIC_SET_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
+
+        $this->addPermission('商店设置', Permission::MANAGE_SHOP_CONFIG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('商店设置编辑', Permission::MANAGE_SHOP_CONFIG_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+
+        $this->addPermission('访问地址分类', Permission::MANAGE_ROUTER_CATEGORY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('访问地址分类新增|编辑', Permission::MANAGE_ROUTER_CATEGORY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('访问地址分类删除', Permission::MANAGE_ROUTER_CATEGORY_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+
+        $this->addPermission('访问地址', Permission::MANAGE_ROUTER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('访问地址新增|编辑', Permission::MANAGE_ROUTER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('访问地址删除', Permission::MANAGE_ROUTER_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+    }
+
+    private function addGoodsPermission(): void
+    {
+        $this->addPermission('商品', Permission::MODULE_GOODS, 99, Permission::IS_LEFT_NAV, 'Goods');
+
+        $this->addPermission('商品管理', Permission::GOODS_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_GOODS);
+
+        $this->addPermission('商品列表', Permission::MANAGE_GOODS_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
+        $this->addPermission('商品列表新增|编辑', Permission::MANAGE_GOODS_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
+        $this->addPermission('商品列表删除', Permission::MANAGE_GOODS_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
+
+        $this->addPermission('分类管理', Permission::CATEGORY_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_GOODS);
+
+        $this->addPermission('商品分类', Permission::MANAGE_CATEGORY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
+        $this->addPermission('商品分类新增|编辑', Permission::MANAGE_CATEGORY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
+        $this->addPermission('商品分类删除', Permission::MANAGE_CATEGORY_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
+    }
+
+    private function addUserPermission(): void
+    {
+        $this->addPermission('用户', Permission::MODULE_USER, 98, Permission::IS_LEFT_NAV, 'User');
+    }
+
+    private function addOrderPermission(): void
+    {
+        $this->addPermission('订单', Permission::MODULE_ORDER, 97, Permission::IS_LEFT_NAV, 'ShoppingBag');
+    }
+
+    private function addArticlePermission(): void
+    {
+        $this->addPermission('文章', Permission::MODULE_ARTICLE, 96, Permission::IS_LEFT_NAV, 'Notebook');
+    }
+
+    private function addToolPermission(): void
+    {
+        $this->addPermission('工具', Permission::MODULE_TOOLS, 95, Permission::IS_LEFT_NAV, 'Tools');
+    }
+
+    private function addDataPermission(): void
+    {
+        $this->addPermission('数据', Permission::MODULE_DATA, 94, Permission::IS_LEFT_NAV, 'DataAnalysis');
     }
 }

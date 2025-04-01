@@ -17,21 +17,20 @@ class PermissionDao
     /**
      * 根据用户获取对应的菜单权限.
      */
-    public function getTreePermissionByAdminUser(AdminUser $admin_user, array $collection = []): array
+    public function getTreePermissionByAdminUser(AdminUser $admin_user, array $collect_permission_ids = []): array
     {
         $guard_name = config('auth.manage.guard') ?: 'manage';
         $menus = $admin_user->getPermissionsViaRoles()
             ->where('is_left_nav', Permission::IS_LEFT_NAV)
-            ->where('guard_name', $guard_name)->unique('id')->values()->map(function (SpatiePermission $permission) use ($collection) {
+            ->where('guard_name', $guard_name)->unique('id')->values()->map(function (SpatiePermission $permission) use ($collect_permission_ids) {
                 return [
                     'index' => (string) $permission->id,
-                    'is_collection' => isset($collection[$permission->id]),
                     'parent_id' => $permission->parent_id,
                     'name' => $permission->name,
                     'title' => $permission->display_name,
                     'icon' => $permission->icon,
-                    'src' => $permission->parent_id && Route::has($permission->name) ? route($permission->name) : '',
                     'sort' => $permission->sort,
+                    'is_collection' => isset($collect_permission_ids[$permission->id]),
                 ];
             })->toArray();
 
