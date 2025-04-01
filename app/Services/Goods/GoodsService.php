@@ -2,7 +2,6 @@
 
 namespace App\Services\Goods;
 
-use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
@@ -214,7 +213,11 @@ class GoodsService
     {
         $goods = Goods::query()->with(['images', 'parameters', 'detail', 'specValues', 'specValues.spec'])->withTrashed()->whereNo($no)->first();
 
-        $this->checkGoods($goods);
+        if (! $goods instanceof Goods) {
+            throw new BusinessException('商品过期不存在');
+        }
+        app(GoodsDao::class)->checkGoodsIsDestroy($goods);
+
         // 多规格商品处理
         $tmp_sku_params_list = [
             'skus' => [],
@@ -245,68 +248,12 @@ class GoodsService
     }
 
     /**
-     * 关注商品.
-     *
-     * @throws BusinessException
-     */
-    public function followGoods(string $no, User $user): void
-    {
-        $goods = app(GoodsDao::class)->getInfoByNo($no);
-        $this->checkGoods($goods);
-
-        $goods_collect = app(GoodsCollectDao::class)->getInfoByUserAndGoodsId($goods->id, $user->id);
-
-        if ($goods_collect instanceof GoodsCollect) {
-            if ($goods_collect->is_attention == GoodsCollect::ATTENTION_YES) {
-                throw new BusinessException('您已经关注过该商品', CustomCodeEnum::SUCCESS);
-            }
-
-            if (! $goods_collect->update(['is_attention' => GoodsCollect::ATTENTION_YES])) {
-                throw new BusinessException('关注失败');
-            }
-
-            return;
-        }
-
-        if (! app(GoodsCollectDao::class)->store($goods->id, $user->id)) {
-            throw new BusinessException('关注失败');
-        }
-    }
-
-    /**
-     * 取消关注商品.
-     *
-     * @throws BusinessException
-     */
-    public function unfollowGoods(string $no, User $user): void
-    {
-        $goods = app(GoodsDao::class)->getInfoByNo($no);
-        $this->checkGoods($goods);
-
-        $goods_collect = app(GoodsCollectDao::class)->getInfoByUserAndGoodsId($goods->id, $user->id);
-
-        if (! $goods_collect instanceof GoodsCollect) {
-            return;
-        }
-
-        if ($goods_collect->is_attention == GoodsCollect::ATTENTION_NO) {
-            throw new BusinessException('您已取消关注该商品', CustomCodeEnum::SUCCESS);
-        }
-
-        if (! $goods_collect->update(['is_attention' => GoodsCollect::ATTENTION_NO])) {
-            throw new BusinessException('取消关注失败');
-        }
-    }
-
-    /**
      * 获取商品SKU信息.
      *
      * @throws BusinessException
      */
-    public function getSkuInfoByNo(string $no, string $unique): Collection
+    public function getSkuInfoByNo(Goods $goods, string $unique): Collection
     {
-        $goods = app(GoodsDao::class)->getInfoByNo($no);
-        $this->checkGoods($goods);
         $goods_sku = $goods->skus()->where('sku_value', implode('|', explode('_', $unique)))->first();
 
         if (! $goods_sku instanceof GoodsSku) {
@@ -363,25 +310,5 @@ class GoodsService
                 })->values(),
             ];
         });
-    }
-
-    /**
-     * @throws BusinessException
-     */
-    private function checkGoods(?Goods $goods): void
-    {
-        if (! $goods instanceof Goods) {
-            throw new BusinessException('商品过期不存在');
-        }
-
-        // 判断商品是否删除
-        if ($goods->deleted_at) {
-            throw new BusinessException('商品已删除', CustomCodeEnum::GOODS_DESTROY);
-        }
-
-        // 判断商品是否上架
-        if ($goods->status !== Goods::STATUS_ON_SALE) {
-            throw new BusinessException('商品已下架', CustomCodeEnum::GOODS_OFF_SALE);
-        }
     }
 }
