@@ -25,6 +25,7 @@ class GoodsSkuDao
             $info = [
                 'id' => $goods_sku->id,
                 'price' => $goods_sku->price,
+                'integral' => $goods_sku->integral,
                 'thumb' => '',
                 'number' => $goods_sku->number,
                 'is_show' => $goods_sku->is_show,

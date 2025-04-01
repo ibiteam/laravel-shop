@@ -151,6 +151,7 @@ class GoodsController extends BaseController
                     'spec_data' => $goods_spec_value_dao->reverseData($goods->specValues),
                     'sku_data' => $goods_sku_dao->reverseData($goods->skus),
                     'price' => $goods->price,
+                    'integral' => $goods->integral,
                     'total' => $goods->total,
                     'type' => $goods->type,
                     'status' => $goods->status,
@@ -171,7 +172,7 @@ class GoodsController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败'.$throwable->getMessage());
+            return $this->error('操作失败');
         }
     }
 
@@ -192,7 +193,7 @@ class GoodsController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('添加失败');
+            return $this->error('操作失败');
         }
     }
 }

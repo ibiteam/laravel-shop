@@ -14,6 +14,7 @@ use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
+use App\Models\ShopConfig;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
@@ -30,6 +31,9 @@ class GoodsService
      */
     public function storeOrUpdate(AdminUser $admin_user, array $params, int $goods_id = 0): void
     {
+        $settings_is_open_integral = shop_config(ShopConfig::IS_OPEN_INTEGRAL);
+
+        // 默认数据处理
         $default_data = [
             'category_id' => 0,
             'name' => '',
@@ -59,24 +63,49 @@ class GoodsService
         }
         $store_data = array_merge($store_data, ['image' => $main_image]);
 
+        // 商品参数处理
         $parameters = array_map(function ($item) {
             return ['name' => $item['name'], 'value' => $item['value']];
         }, $params['parameters'] ?? []);
 
+        // 多规格商品校验与处理价格和积分
         $request_sku_data = $params['sku_data'] ?? [];
 
-        // 商品价格
         if (! empty($request_sku_data)) {
+            if ($settings_is_open_integral) {
+                $validate_sku_integral = array_filter($request_sku_data, function ($tmp_item) {
+                    return $this->checkPriceOrIntegral($tmp_item['price'] ?? 0, $tmp_item['integral'] ?? 0, true);
+                });
+
+                if (! empty($validate_sku_integral)) {
+                    throw new BusinessException('商品价格与积分不能同时为空~');
+                }
+            } else {
+                $validate_sku_integral = array_filter($request_sku_data, function ($tmp_item) {
+                    return $this->checkPriceOrIntegral($tmp_item['price'] ?? 0);
+                });
+
+                if (! empty($validate_sku_integral)) {
+                    throw new BusinessException('商品价格不能为空！');
+                }
+            }
             $store_data['price'] = min(array_column($request_sku_data, 'price'));
             $store_data['integral'] = min(array_column($request_sku_data, 'integral')) ?? 0;
         }
 
-        if (! isset($store_data['price']) || ! is_numeric($store_data['price']) || $store_data['price'] <= 0) {
-            throw new BusinessException('商品价格不能为空');
+        // 校验价格与积分
+        if ($settings_is_open_integral) {
+            if ($this->checkPriceOrIntegral($store_data['price'], $store_data['integral'], true)) {
+                throw new BusinessException('商品价格与积分不能同时为空');
+            }
+        } else {
+            if ($this->checkPriceOrIntegral($store_data['price'])) {
+                throw new BusinessException('商品价格不能为空~');
+            }
         }
 
+        // 修改商品
         if ($goods_id) {
-            // 修改
             $goods = Goods::query()->whereId($goods_id)->first();
 
             if (! $goods instanceof Goods) {
@@ -111,7 +140,7 @@ class GoodsService
                 (new ManageSpecValueService($goods, $params['spec_data'] ?? []))->exec();
 
                 /* 商品 SKU 处理 */
-                (new ManageSkusService($goods, $params['sku_data'] ?? []))->exec();
+                (new ManageSkusService($goods, $request_sku_data))->exec();
 
                 admin_operation_log($admin_user, "修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
                 DB::commit();
@@ -129,8 +158,7 @@ class GoodsService
             }
         }
 
-        // 新增
-
+        // 新增商品
         DB::beginTransaction();
 
         try {
@@ -161,7 +189,7 @@ class GoodsService
             /* 商品 SPEC 处理 */
             (new ManageSpecValueService($goods, $params['spec_data'] ?? []))->exec();
             /* 商品 SKU 处理 */
-            (new ManageSkusService($goods, $params['sku_data'] ?? []))->exec();
+            (new ManageSkusService($goods, $request_sku_data))->exec();
 
             admin_operation_log($admin_user, "新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
             DB::commit();
@@ -286,6 +314,18 @@ class GoodsService
         }
 
         return $this->skuItemFormat($goods_sku);
+    }
+
+    /**
+     * 检查商品价格和积分是否满足要求.
+     */
+    private function checkPriceOrIntegral(mixed $price, mixed $integral = null, bool $is_check_integral = false): bool
+    {
+        if ($is_check_integral) {
+            return (! is_numeric($price) || $price <= 0) && (! isset($integral) || ! is_numeric($integral) || $integral <= 0);
+        }
+
+        return ! is_numeric($price) || $price <= 0;
     }
 
     /**
