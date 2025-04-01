@@ -312,11 +312,13 @@
                                             :before-upload="beforeUpload">
                                             <i class="iconfont icon-jiahao1 avatar-uploader-icon"></i>
                                         </el-upload>
-                                        <div v-else class="thumb">
-                                            <img :src="scope.row.thumb" alt="">
-                                            <span class="el-upload-list__item-actions">
-                                                <i class="iconfont icon-shanchu" @click="handleTableRemove(scope.$index)"></i>
-                                            </span>
+                                        <div class="s-flex ai-ct jc-ct" v-else style="width: 100%;">
+                                            <div class="thumb">
+                                                <img :src="scope.row.thumb" alt="">
+                                                <span class="el-upload-list__item-actions">
+                                                    <i class="iconfont icon-shanchu" @click="handleTableRemove(scope.$index)"></i>
+                                                </span>
+                                            </div>
                                         </div>
                                     </template>
                                 </el-table-column>
@@ -902,10 +904,44 @@ const objectSpanMethod = ({row, column, rowIndex, columnIndex}) => {
 
 const toTableArray = (specs) => {
     const result = [];
+    const existingSkus = updateForm.value.sku_data || [];
 
     function helper(current, index) {
         if (index === specs.length) {
-            result.push({...current});
+            // 检查是否存在匹配的现有SKU
+            const existingSku = existingSkus.find(sku => {
+                // 检查所有template字段是否匹配
+                return specs.every((spec, idx) => {
+                    const templateKey = `template_${idx + 1}`;
+                    return sku[templateKey] === current[templateKey];
+                });
+            });
+
+            // 如果找到匹配的SKU，使用其值
+            if (existingSku) {
+                result.push({
+                    ...current,
+                    id: existingSku.id,
+                    goods_id: existingSku.goods_id,
+                    thumb: existingSku.thumb,
+                    price: existingSku.price,
+                    integral: existingSku.integral,
+                    number: existingSku.number,
+                    is_show: existingSku.is_show
+                });
+            } else {
+                // 如果没有找到匹配的SKU，使用默认值
+                result.push({
+                    ...current,
+                    id: null,
+                    goods_id: null,
+                    thumb: '',
+                    price: '',
+                    integral: '',
+                    number: '',
+                    is_show: 1
+                });
+            }
             return;
         }
 
@@ -918,9 +954,9 @@ const toTableArray = (specs) => {
         });
     }
 
-    helper({ id: null, goods_id: null, thumb: '', price: '', integral: '', number: '',is_show: 1,}, 0);
-    updateForm.value.sku_data = [...result]
-    updateForm.value.spec_data = [...specs]
+    helper({}, 0);
+    updateForm.value.sku_data = [...result];
+    updateForm.value.spec_data = [...specs];
 }
 
 const formatInput = (value) => {
@@ -1215,6 +1251,9 @@ onMounted(() => {
             category.value = res.data.category
             settings.value = res.data.settings
             pageDataLoading.value = false
+            if(updateForm.value.spec_data&&updateForm.value.spec_data.length){
+                goodsSkuTemplate.value.values = [...updateForm.value.spec_data]
+            }
         }
     })
     getSkuTemplate()
