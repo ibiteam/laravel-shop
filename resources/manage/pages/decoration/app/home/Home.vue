@@ -23,9 +23,10 @@
                     @add="handleDragAdd">
                     <div v-for="(temp, index) in decoration.data" :key="temp.id">
                         <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
-                        <AdvertisingOne v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingOne>
+                        <AdvertisingOne v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" @openUploadDialog="handleOpenUploadDialog"></AdvertisingOne>
                         <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTwo>
                         <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingThree>
+                        <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTheme>
                         <HotZone v-else-if="temp.component_name == 'hot_zone'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></HotZone>
                         <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else>{{ temp.component_name }}{{ temp.name }}</div>
                     </div>
@@ -33,7 +34,8 @@
                 <bottom-nav-bar v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}"></bottom-nav-bar>
             </div>
         </main>
-        <MaterialCenterImageDialog />
+        <!-- <MaterialCenterDialog v-bind="{show: false, dir_type: 1, multiple: false}" @close="" @confirm=""/> -->
+        <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
     </div>
 </template>
 
@@ -46,8 +48,9 @@ import Search from './components/Search.vue'
 import AdvertisingOne from './components/AdvertisingOne.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
+import AdvertisingTheme from './components/AdvertisingTheme.vue'
 import HotZone from './components/HotZone.vue';
-import MaterialCenterImageDialog from '@/components/MaterialCenter/ImageDialog.vue'
+import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 
@@ -68,6 +71,12 @@ const decoration = reactive({
 })
 // 拖拽占位 下标显示位置
 const dragPlaceholderIndex = ref(null)
+
+const materialCenterDialogData = reactive({
+    show: false,
+    dir_type: 1,
+    multiple: false
+})
 
 // 查找不可拖拽的数据
 const findNotForData = (component_name) => {
@@ -109,6 +118,28 @@ const sortDecorationData = (id, direction) => {
         decoration.data[index + 1] = temp;
     }
 }
+
+// 打开素材中心弹窗
+const handleOpenUploadDialog = (params = {show: false, dir_type: 1, multiple: false, temp_index: ''}) => {
+    console.log(params)
+    const { show, dir_type, multiple, temp_index } = params
+    materialCenterDialogData.show = show
+    materialCenterDialogData.dir_type = dir_type
+    materialCenterDialogData.multiple = multiple
+}
+
+// 关闭素材中心弹窗
+const handlematerialCenterDialogClose = () => {
+    materialCenterDialogData.show = false
+}
+
+// 接收素材中心弹窗数据
+const handlematerialCenterDialogConfirm = (res) => {
+    materialCenterDialogData.show = false
+    console.log(res)
+}
+
+
 
 onMounted(() => {
     decoration.data.unshift({
@@ -174,9 +205,39 @@ onUnmounted(() => {
 })
 
 </script>
-<style>
+<style lang="scss">
 .drag-item {
     cursor: move;
+}
+// 公用装修组件标题
+.decoration-title-wrapper{
+    width: 100%;
+    height: 46px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    position: relative;
+    .decoration-title {
+        width: 70%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-weight: bold;
+        font-size: 15px;
+        color: #010101;
+    }
+    .decoration-title-right {
+        color: #666;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 10px;
+        margin: auto 0;
+    }
 }
 </style>
 <style lang='scss' scoped>

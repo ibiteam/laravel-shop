@@ -2,21 +2,35 @@
     <section>
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
-                <div class="ad-wrapper" @click="handleChooseDragItem">
-                    <div class="ad-item"  v-if="!form.data.items || form.data.items.length == 0">
-                        <image-wrapper v-bind="{width: '100%', height: '100px', radius: '10px'}" />
+                <div class="ad-content-wrapper" v-if="!form.data.items || form.data.items.length == 0" @click="handleChooseDragItem">
+                    <div class="decoration-title-wrapper">
+                        <div class="decoration-title">主题广告</div>
+                        <div class="decoration-title-right">
+                            更多<Icon name="arrow" />
+                        </div>
                     </div>
-                    <el-carousel
-                        v-else
-                        class="ad-swiper"
-                        :height="(form.data.height ? form.data.height / 2 : 100) + 'px'"
-                        :pause-on-hover="false"
-                        trigger="click"
-                        arrow="never">
-                        <el-carousel-item class="ad-item" v-for="item in form.data.items" :key="item.url">
-                            <image-wrapper v-bind="{src: item.icon, width: '100%', height: (form.data.height ? form.data.height / 2 : 100) + 'px', radius: '10px'}" />
-                        </el-carousel-item>
-                    </el-carousel>
+                    <div class="ad-wrapper s-flex ai-ct jc-bt">
+                        <image-wrapper
+                            class="ad-item"
+                            v-bind="{width: '165px', height: '75px', radius: '10px'}" 
+                            v-for="item in 4" :key="item"
+                        />
+                    </div>
+                </div>
+                <div class="ad-content-wrapper" v-else @click="handleChooseDragItem">
+                    <div class="decoration-title-wrapper">
+                        <div class="decoration-title">{{ form.data.name }}</div>
+                        <div class="decoration-title-right" v-if="form.data.url">
+                            更多<Icon name="arrow" />
+                        </div>
+                    </div>
+                    <div class="ad-wrapper s-flex ai-ct jc-bt">
+                        <image-wrapper
+                            class="ad-item"
+                            v-bind="{src: item.icon, width: form.data.width / 2 + 'px', height: form.data.height / 2 + 'px', radius: '10px'}" 
+                            v-for="(item, idx) in form.data.items" :key="idx"
+                        />
+                    </div>
                 </div>
             </template>
         </drag-wrapper>
@@ -36,20 +50,6 @@
                         >
                         <div class="group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
                             <icon name="bars" class="icon-drag" size="20px"/>
-                            <div class="group-content">
-                                <el-form lable-width="auto">
-                                    <el-form-item label="图片">
-                                        <ImageUpload @click.stop="$emit('openUploadDialog', {temp_index: form.id, show: true, dir_type: 1, multiple: false})" />
-                                    </el-form-item>
-                                    <el-form-item label="链接">
-                                        <el-input>
-                                            <template #suffix>
-                                                <Icon name="link-o" />
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                </el-form>
-                            </div>
                         </div>
                     </VueDraggable>
                 </div>
@@ -61,7 +61,6 @@
 import DragWrapper from '@/pages/decoration/components/app/DragWrapper.vue'
 import ImageWrapper from '@/pages/decoration/components/app/ImageWrapper.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
-import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import { ref, reactive, watch, getCurrentInstance } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { Icon } from 'vant';
@@ -117,22 +116,19 @@ watch([() => props.component], (newValue) => {
 </script>
 
 <style lang='scss' scoped>
-.ad-wrapper{
+.ad-content-wrapper{
     padding: 5px 10px 5px;
-    .ad-item {
-        border-radius: 10px;
+    background: #f2f2f2;
+    .decoration-title-wrapper {
+        border-radius: 10px 10px 0 0;
     }
-    .ad-swiper {
-        :deep(.el-carousel__button) {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-        }
-        :deep(.is-active .el-carousel__button) {
-            width: 13px;
-            border-radius: 20px;
-            background-color: var(--main-color);
+    .ad-wrapper {
+        flex-wrap: wrap;
+        padding: 0 7.5px;
+        background: #fff;
+        border-radius: 0 0 10px 10px;
+        .ad-item {
+            margin-bottom: 5px;
         }
     }
 }
@@ -147,9 +143,6 @@ watch([() => props.component], (newValue) => {
     .icon-drag {
         padding: 10px;
         cursor: move;
-    }
-    .group-content {
-        width: calc(100% - 40px);
     }
 }
 </style>
