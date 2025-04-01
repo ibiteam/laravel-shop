@@ -64,7 +64,6 @@ class PermissionTableSeeder extends Seeder
 
         $this->addPermission('商品列表', Permission::MANAGE_GOODS_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
         $this->addPermission('商品列表新增|编辑', Permission::MANAGE_GOODS_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
-        $this->addPermission('商品列表删除', Permission::MANAGE_GOODS_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::GOODS_MANAGE);
 
         $this->addPermission('分类管理', Permission::CATEGORY_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_GOODS);
 
