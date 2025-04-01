@@ -173,19 +173,7 @@ class GoodsService
     {
         $goods = Goods::query()->with(['images', 'parameters', 'detail', 'specValues', 'specValues.spec'])->withTrashed()->whereNo($no)->first();
 
-        if (! $goods instanceof Goods) {
-            throw new BusinessException('商品过期不存在');
-        }
-
-        // 判断商品是否删除
-        if ($goods->deleted_at) {
-            throw new BusinessException('商品已删除', CustomCodeEnum::GOODS_DESTROY);
-        }
-
-        // 判断商品是否上架
-        if ($goods->status !== Goods::STATUS_ON_SALE) {
-            throw new BusinessException('商品已下架', CustomCodeEnum::GOODS_OFF_SALE);
-        }
+        $this->checkGoods($goods);
         // 多规格商品处理
         $tmp_sku_params_list = [
             'skus' => [],
@@ -197,13 +185,7 @@ class GoodsService
         if (! empty($tmp_sku_data) && ! empty($tmp_spec_value_data)) {
             $tmp_sku_params_list = [
                 'skus' => $tmp_sku_data->map(function (GoodsSku $sku) {
-                    return [
-                        'id' => $sku->id,
-                        'unique' => implode('_', explode('|', $sku->sku_value)),
-                        'price' => $sku->price,
-                        'number' => $sku->number,
-                        'has_number' => $sku->number > 0,
-                    ];
+                    return $this->skuItemFormat($sku);
                 }),
                 'spec_values' => $this->reverseSpecData($tmp_spec_value_data),
             ];
@@ -221,6 +203,39 @@ class GoodsService
         }
 
         return $goods;
+    }
+
+    /**
+     * 获取商品SKU信息.
+     *
+     * @throws BusinessException
+     */
+    public function getSkuInfoByNo(string $no, string $unique): array
+    {
+        $goods = Goods::query()->whereNo($no)->first();
+        $this->checkGoods($goods);
+        $goods_sku = $goods->skus()->where('sku_value', implode('|', explode('_', $unique)))->first();
+
+        if (! $goods_sku instanceof GoodsSku) {
+            throw new BusinessException('商品规格不存在');
+        }
+
+        return $this->skuItemFormat($goods_sku);
+    }
+
+    /**
+     * 商品规格格式化.
+     */
+    private function skuItemFormat(GoodsSku $goods_sku): array
+    {
+        return [
+            'id' => $goods_sku->id,
+            'unique' => implode('_', explode('|', $goods_sku->sku_value)),
+            'price' => $goods_sku->price,
+            'integral' => $goods_sku->integral,
+            'number' => $goods_sku->number,
+            'has_number' => $goods_sku->number > 0,
+        ];
     }
 
     /**
@@ -243,5 +258,25 @@ class GoodsService
                 })->values(),
             ];
         });
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    private function checkGoods(?Goods $goods): void
+    {
+        if (! $goods instanceof Goods) {
+            throw new BusinessException('商品过期不存在');
+        }
+
+        // 判断商品是否删除
+        if ($goods->deleted_at) {
+            throw new BusinessException('商品已删除', CustomCodeEnum::GOODS_DESTROY);
+        }
+
+        // 判断商品是否上架
+        if ($goods->status !== Goods::STATUS_ON_SALE) {
+            throw new BusinessException('商品已下架', CustomCodeEnum::GOODS_OFF_SALE);
+        }
     }
 }
