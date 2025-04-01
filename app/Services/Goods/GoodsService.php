@@ -46,7 +46,7 @@ class GoodsService
             'video' => '',
             'video_duration' => 0,
         ];
-        $store_data = array_merge($default_data, Arr::only($params, array_keys($default_data)));
+        $store_data = array_merge($default_data, array_filter(Arr::only($params, array_keys($default_data)), fn ($value) => ! is_null($value)));
 
         // 商品图片的处理
         $detail_images = $params['images'];
@@ -62,6 +62,18 @@ class GoodsService
         $parameters = array_map(function ($item) {
             return ['name' => $item['name'], 'value' => $item['value']];
         }, $params['parameters'] ?? []);
+
+        $request_sku_data = $params['sku_data'] ?? [];
+
+        // 商品价格
+        if (! empty($request_sku_data)) {
+            $store_data['price'] = min(array_column($request_sku_data, 'price'));
+            $store_data['integral'] = min(array_column($request_sku_data, 'integral')) ?? 0;
+        }
+
+        if (! isset($store_data['price']) || ! is_numeric($store_data['price']) || $store_data['price'] <= 0) {
+            throw new BusinessException('商品价格不能为空');
+        }
 
         if ($goods_id) {
             // 修改

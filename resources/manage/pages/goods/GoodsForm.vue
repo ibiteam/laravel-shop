@@ -1254,6 +1254,9 @@ onMounted(() => {
             if(updateForm.value.spec_data&&updateForm.value.spec_data.length){
                 goodsSkuTemplate.value.values = [...updateForm.value.spec_data]
             }
+        } else {
+            cns.$message.error(res.message)
+            router.push({name: 'goods'})
         }
     })
     getSkuTemplate()
