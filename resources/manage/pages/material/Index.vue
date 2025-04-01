@@ -97,6 +97,7 @@
                                 :data="tableList"
                                 @selection-change="handleSelectionChange"
                                 style="width: 100%"
+                                v-loading="tableListLoading"
                                 row-key="id"
                                 ref="materialTableRef"
                             >
@@ -152,7 +153,7 @@
 
                         </div>
                         <!-- 添加分页组件 -->
-                        <div class="pagination-container" v-if="pageInfo.total > 0">
+                        <div class="pagination-container" v-if="pageInfo.total > 0" style="padding-top:20px;">
                             <el-pagination
                                 @size-change="handleSizeChange"
                                 @current-change="handleCurrentChange"
@@ -218,6 +219,7 @@ const searchForm = ref({
     parent_id: 0, // 文件夹id
 })
 const tableList = ref([])
+const tableListLoading = ref(true)
 const folderData = ref([])
 const currentCtrlMaterial = ref({
     'parent_id' : 0,
@@ -299,6 +301,7 @@ const searchMaterial = () => {
 const getMaterialData = (page = 1) => {
     // 更新当前页码
     searchForm.value.page = page;
+    tableListLoading.value = true;
     materialIndex(searchForm.value).then(res => {
         if (res.code === 200) {
             tableList.value = res.data.list;
@@ -307,6 +310,7 @@ const getMaterialData = (page = 1) => {
         } else {
             cns.$message.error(res.message)
         }
+        tableListLoading.value = false;
     }).catch(() => {})
 }
 
