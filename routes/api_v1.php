@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
@@ -40,8 +41,8 @@ Route::prefix('region')->group(function () {
 // 商品详情
 Route::prefix('goods')->group(function () {
     Route::middleware('api.auth')->group(function () {
-        Route::post('follow', [GoodsController::class, 'follow']); // 关注商品
-        Route::post('unfollow', [GoodsController::class, 'unfollow']); // 取消关注商品
+        Route::post('follow', [GoodsCollectController::class, 'follow']); // 关注商品
+        Route::post('unfollow', [GoodsCollectController::class, 'unfollow']); // 取消关注商品
     });
     Route::get('/{no}', [GoodsController::class, 'detail']);
     Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
