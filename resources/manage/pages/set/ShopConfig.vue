@@ -146,6 +146,12 @@ onMounted(() => {
                                             <span style="font-size:20px;">网站logo</span>
                                         </div>
                                         <el-form-item label="网站logo：" prop="shop_logo">
+                                            <div v-if="inputFrom.shop_logo" class="logo-uploader-preview">
+                                                <img :src="inputFrom.shop_logo" class="logo" alt=""/>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                    <Delete @click="handleRemoveOne('shop_logo')"/>
+                                                </el-icon>
+                                            </div>
                                             <el-upload
                                                 class="logo-uploader"
                                                 accept="image/jpeg,image/jpg,image/png"
@@ -153,14 +159,9 @@ onMounted(() => {
                                                 :show-file-list="false"
                                                 :http-request="(request) => uploadFile(request, 'shop_logo')"
                                                 :with-credentials="true"
+                                                v-else
                                             >
-                                                <template v-if="inputFrom.shop_logo">
-                                                    <img :src="inputFrom.shop_logo" class="logo" alt=""/>
-                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
-                                                        <Delete @click="handleRemoveOne('shop_logo')"/>
-                                                    </el-icon>
-                                                </template>
-                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus">
                                                     <Plus />
                                                 </el-icon>
                                             </el-upload>
@@ -168,21 +169,22 @@ onMounted(() => {
                                         </el-form-item>
 
                                         <el-form-item label="站点图标：" prop="shop_icon">
+                                            <div v-if="inputFrom.shop_icon" class="logo-uploader-preview">
+                                                <img :src="inputFrom.shop_icon" class="logo" alt=""/>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                    <Delete @click="handleRemoveOne('shop_icon')"/>
+                                                </el-icon>
+                                            </div>
                                             <el-upload
                                                 class="logo-uploader"
-                                                accept="image/x-icon"
+                                                accept="image/jpeg,image/jpg,image/png"
                                                 action=""
                                                 :show-file-list="false"
                                                 :http-request="(request) => uploadFile(request, 'shop_icon')"
                                                 :with-credentials="true"
+                                                v-else
                                             >
-                                                <template v-if="inputFrom.shop_icon">
-                                                    <img :src="inputFrom.shop_icon" class="logo" alt=""/>
-                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
-                                                        <Delete @click="handleRemoveOne('shop_icon')"/>
-                                                    </el-icon>
-                                                </template>
-                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus">
                                                     <Plus />
                                                 </el-icon>
                                             </el-upload>
@@ -194,20 +196,22 @@ onMounted(() => {
                                             <span style="font-size:20px;">背景图</span>
                                         </div>
                                         <el-form-item label="后台登页背景：" prop="shop_manage_login_image">
+                                            <div v-if="inputFrom.shop_manage_login_image" class="logo-uploader-preview">
+                                                <img :src="inputFrom.shop_manage_login_image" class="logo" alt=""/>
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                                                    <Delete @click="handleRemoveOne('shop_manage_login_image')"/>
+                                                </el-icon>
+                                            </div>
                                             <el-upload
                                                 class="logo-uploader"
                                                 accept="image/jpeg,image/jpg,image/png"
                                                 action=""
                                                 :show-file-list="false"
                                                 :http-request="(request) => uploadFile(request, 'shop_manage_login_image')"
-                                                :with-credentials="true">
-                                                <template v-if="inputFrom.shop_manage_login_image">
-                                                    <img :src="inputFrom.shop_manage_login_image" class="logo" alt=""/>
-                                                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
-                                                        <Delete @click="handleRemoveOne('shop_manage_login_image')"/>
-                                                    </el-icon>
-                                                </template>
-                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus" v-else>
+                                                :with-credentials="true"
+                                                v-else
+                                            >
+                                                <el-icon class="logo-uploader-icon logo-uploader-icon-plus">
                                                     <Plus />
                                                 </el-icon>
                                             </el-upload>
@@ -308,17 +312,6 @@ onMounted(() => {
         overflow: hidden;
         transition: var(--el-transition-duration-fast);
     }
-    :deep(.logo-uploader .el-upload:hover){
-        .logo-uploader-icon-delete{
-            display: flex;
-        }
-    }
-    :deep(.logo-uploader .logo){
-        max-width: 80px;
-        max-height: 80px;
-        width: auto;
-        height: auto;
-    }
     :deep(.logo-uploader .logo-uploader-icon){
         font-size: 28px;
         color: #8c939d;
@@ -329,11 +322,31 @@ onMounted(() => {
     :deep(.logo-uploader .logo-uploader-icon.logo-uploader-icon-plus){
         border: 1px dashed #dcdfe6;
     }
-    :deep(.logo-uploader .logo-uploader-icon.logo-uploader-icon-delete){
+    :deep(.logo-uploader-preview){
+        width: 80px;
+        height: 80px;
+        border-radius: 6px;
+        position: relative;
+    }
+    :deep(.logo-uploader-preview .logo){
+        max-width: 80px;
+        max-height: 80px;
+        width: auto;
+        height: auto;
+    }
+    :deep(.logo-uploader-preview .logo-uploader-icon.logo-uploader-icon-delete){
         position: absolute;
         display: none;
         background: rgba(0, 0, 0, 0.5);
         color: #ffffff;
+        top: 0;
+        left: 0;
+        cursor: pointer;
+    }
+    :deep(.logo-uploader-preview:hover){
+        .logo-uploader-icon-delete{
+            display: flex;
+        }
     }
     :deep(.el-table__row .cell){
         display: flex;
