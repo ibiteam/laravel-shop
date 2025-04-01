@@ -11,10 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * 商品分类.
+ */
 class GoodsCategoryController extends BaseController
 {
     /**
-     * 商品分类列表.
+     * 列表.
      */
     public function index(Request $request): JsonResponse
     {
@@ -24,7 +27,7 @@ class GoodsCategoryController extends BaseController
     }
 
     /**
-     * 商品分类编辑.
+     * 获取信息.
      */
     public function edit(Request $request): JsonResponse
     {
@@ -47,7 +50,7 @@ class GoodsCategoryController extends BaseController
     }
 
     /**
-     * 添加|修改商品分类.
+     * 添加|修改.
      */
     public function update(Request $request): JsonResponse
     {
@@ -125,7 +128,7 @@ class GoodsCategoryController extends BaseController
     }
 
     /**
-     * 删除商品分类.
+     * 删除.
      */
     public function destroy(Request $request): JsonResponse
     {
@@ -163,6 +166,47 @@ class GoodsCategoryController extends BaseController
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 切换是否显示.
+     */
+    public function changeShow(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer',
+                'is_show' => 'required|integer|in:0,1',
+            ], [], [
+                'id' => '分类ID',
+                'is_show' => '是否显示',
+            ]);
+
+            $category = Category::query()->whereId($validated['id'])->first();
+
+            if (! $category) {
+                throw new BusinessException('商品分类不存在');
+            }
+            $category->is_show = $validated['is_show'];
+
+            if (! $category->save()) {
+                throw new BusinessException('切换失败');
+            }
+
+            $log = "更改商品分类显示隐藏[id:{$validated['id']}]".implode(
+                    ',',
+                    array_map(function ($k, $v) {
+                        return sprintf('%s=`%s`', $k, $v);
+                    }, array_keys($category->getChanges()), $category->getChanges())
+                );
+            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+
+            return $this->success('切换成功');
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('切换是否展示异常~');
         }
     }
 }

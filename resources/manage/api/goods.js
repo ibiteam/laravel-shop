@@ -5,17 +5,22 @@ export function categoryIndex(data) {
     return $http.doGet('manage/goods/category', data)
 }
 
+export function categoryEdit(data) {
+    return $http.doGet('manage/goods/category/edit', data)
+}
+
 export function categoryUpdate(data) {
     return $http.doPost('manage/goods/category/update', data)
 }
 
-export function categoryEdit(data) {
-    return $http.doGet('manage/goods/category/edit', data)
+export function categoryChangeShow(data) {
+    return $http.doPost('manage/goods/category/change_show', data)
 }
 
 export function categoryDestroy(data) {
     return $http.doPost('manage/goods/category/destroy', data)
 }
+
 
 /* goods api interface start */
 export function goodsIndex(data) {
