@@ -192,7 +192,7 @@ class GoodsController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('添加失败'.$throwable->getMessage());
+            return $this->error('添加失败');
         }
     }
 }

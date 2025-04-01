@@ -39,7 +39,8 @@ Route::prefix('region')->group(function () {
 });
 // 商品详情
 Route::prefix('goods')->group(function () {
-    Route::get('/', [GoodsController::class, 'detail']);
+    Route::get('/{no}', [GoodsController::class, 'detail']);
+    Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
 });
 
 /**

@@ -210,7 +210,7 @@ class GoodsService
      *
      * @throws BusinessException
      */
-    public function getSkuInfoByNo(string $no, string $unique): array
+    public function getSkuInfoByNo(string $no, string $unique): Collection
     {
         $goods = Goods::query()->whereNo($no)->first();
         $this->checkGoods($goods);
@@ -226,16 +226,16 @@ class GoodsService
     /**
      * 商品规格格式化.
      */
-    private function skuItemFormat(GoodsSku $goods_sku): array
+    private function skuItemFormat(GoodsSku $goods_sku): Collection
     {
-        return [
+        return collect([
             'id' => $goods_sku->id,
             'unique' => implode('_', explode('|', $goods_sku->sku_value)),
             'price' => $goods_sku->price,
             'integral' => $goods_sku->integral,
             'number' => $goods_sku->number,
             'has_number' => $goods_sku->number > 0,
-        ];
+        ]);
     }
 
     /**
