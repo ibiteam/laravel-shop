@@ -54,7 +54,7 @@ const areasData = () => {
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
-    queryParams.page = page;
+    queryParams.value.page = page;
 
     getUserAddress(queryParams).then(res => {
         loading.value = false;

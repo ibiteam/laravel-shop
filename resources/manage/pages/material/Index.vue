@@ -25,6 +25,7 @@
                             @node-drag-over="handleDragOver"
                             @node-drag-end="handleDragEnd"
                             @node-drop="handleDrop"
+                            :expand-on-click-node="false"
                         >
                             <template #default="{ node, data }">
                                 <div class="custom-tree-node" @click="checkDir(data.id)">
@@ -67,7 +68,7 @@
                                 <el-button type="primary" @click="searchMaterial">查询</el-button>
                                 <el-upload
                                     class="logo-uploader"
-                                    accept="image/jpeg,image/jpg,image/png"
+                                    :accept="tabValue === '1' ? 'image/jpeg,image/jpg,image/png' : 'video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb'"
                                     action=""
                                     :show-file-list="false"
                                     :http-request="(request) => uploadFile(request, 'shop_logo')"
@@ -83,8 +84,12 @@
                             <el-button type="default" size="small" @click="handleBatchMove">批量移动</el-button>
                             <el-select placeholder="排序方式" v-model="searchForm.sort" style="width: 150px;margin-left: 10px;" size="small">
                                 <el-option label="默认排序" value="0"></el-option>
-                                <el-option label="最近更新在前" value="1"></el-option>
-                                <el-option label="最近更新在后" value="2"></el-option>
+                                <el-option label="最新上传在前" value="1"></el-option>
+                                <el-option label="最新上传在后" value="2"></el-option>
+                                <el-option label="最新更新在前" value="3"></el-option>
+                                <el-option label="最新更新在后" value="4"></el-option>
+                                <el-option label="按文件名降序" value="5"></el-option>
+                                <el-option label="按文件名升序" value="6"></el-option>
                             </el-select>
                         </div>
                         <div class="material-list">
@@ -99,18 +104,20 @@
                                 <el-table-column prop="name" label="素材名称" width="220">
                                     <template #default="scope">
                                         <div class="s-flex ai-ct">
-                                            <div v-if="scope.row.type == 1">
-                                                <div class="material-table-item-name">
-                                                    <i class="iconfont folder" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
-                                                    {{scope.row.name}}
-                                                </div>
-                                            </div>
-                                            <div v-else>
-                                                <div class="material-table-item-name">
-                                                    <div class="material-img">
-                                                        <img :src="scope.row.file_path" alt="" />
+                                            <div @click="checkDir(scope.row.id)">
+                                                <div v-if="scope.row.type == 1">
+                                                    <div class="material-table-item-name">
+                                                        <i class="iconfont folder" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
+                                                        {{scope.row.name}}
                                                     </div>
-                                                    {{scope.row.name}}
+                                                </div>
+                                                <div v-else>
+                                                    <div class="material-table-item-name">
+                                                        <div class="material-img">
+                                                            <img :src="scope.row.file_path" alt="" />
+                                                        </div>
+                                                        {{scope.row.name}}
+                                                    </div>
                                                 </div>
                                             </div>
                                             <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>
@@ -126,7 +133,7 @@
                                 </el-table-column>
                                 <el-table-column prop="px" label="尺寸" width="120">
                                     <template #default="scope">
-                                        {{scope.row.type == 1?'--':scope.row.width+'*'+scope.row.height}}
+                                        {{scope.row.type == 2 && scope.row.dir_type == 1 ? scope.row.width+'*'+scope.row.height : '--'}}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="size" label="大小" width="100">
@@ -184,7 +191,8 @@
                 <div class="s-flex ai-ct jc-ct">
                     <el-button v-if="editMaterialType == 'new-folder'" type="primary" @click="handleEditMaterial">确定</el-button>
                     <el-button v-else-if="editMaterialType == 'only-name'" type="primary" @click="handleRenameMaterial">确定</el-button>
-                    <el-button v-else type="primary" @click="handleMove">确定</el-button>
+                    <el-button v-else-if="editMaterialType == 'move'" type="primary" @click="handleMove">确定</el-button>
+                    <el-button v-else type="primary" @click="handleBatchMove">确定</el-button>
                     <el-button type="default" @click="closeMaterialDialog">取消</el-button>
                 </div>
             </el-dialog>
@@ -194,7 +202,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, watch, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
-import { folderIndex, folderList, materialIndex, rename, newFolder, newFile, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
+import { folderIndex, folderList, materialIndex, rename, newFolder, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
 
 const tabValue = ref('1');
 const multipleSelection = ref([]);
@@ -204,7 +212,8 @@ const searchForm = ref({
     admin_name:'', // 添加人
     type: '0', // 素材类型 1、文件夹 2、文件
     time: '',
-    sort: '', // 排序字段
+    page: 1,
+    sort: '0', // 排序字段
     dir_type: 1, // 文件夹类型 1、图片 2、视频
     parent_id: 0, // 文件夹id
 })
@@ -234,6 +243,26 @@ const pageInfo = reactive({
     per_page: 10,
     current_page: 1
 });
+
+
+// 页码改变
+const handleCurrentChange = (val) => {
+    getMaterialData(val);
+}
+
+// 每页条数改变
+const handleSizeChange = (val) => {
+    searchForm.number = val;
+    pageInfo.per_page = val;
+    getMaterialData(1);
+}
+
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
+}
 
 onMounted( () => {
     getFolderData()
@@ -269,7 +298,7 @@ const searchMaterial = () => {
 
 const getMaterialData = (page = 1) => {
     // 更新当前页码
-    searchForm.page = page;
+    searchForm.value.page = page;
     materialIndex(searchForm.value).then(res => {
         if (res.code === 200) {
             tableList.value = res.data.list;
@@ -293,24 +322,6 @@ const getFolderData = () => {
     }).catch(() => {})
 }
 
-// 页码改变
-const handleCurrentChange = (val) => {
-    getMaterialData(val);
-}
-
-// 每页条数改变
-const handleSizeChange = (val) => {
-    searchForm.number = val;
-    pageInfo.per_page = val;
-    getMaterialData(1);
-}
-
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
 
 const editMaterial = (item) => {
     currentCtrlMaterial.value = item;
@@ -472,9 +483,10 @@ const handleMove = () => {
 }
 const handleBatchMove = () => {
     const info = {
-        id: multipleSelectionId.value,
+        ids: multipleSelection.value,
         target_directory_id: currentCtrlMaterial.value.parent_id
     }
+    console.log(info);
     batchMove(info).then(res => {
         if (res.code === 200) {
             editMaterialVisible.value = false
