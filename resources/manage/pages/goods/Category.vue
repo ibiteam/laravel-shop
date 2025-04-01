@@ -1,18 +1,19 @@
 <script setup>
-import { Plus, Delete } from '@element-plus/icons-vue'
-import { categoryIndex,categoryUpdate,categoryEdit,categoryDestroy } from '@/api/goods.js'
+import { Plus, Delete } from '@element-plus/icons-vue';
+import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import _ from 'lodash';
-const cns = getCurrentInstance().appContext.config.globalProperties
+
+const cns = getCurrentInstance().appContext.config.globalProperties;
 
 const tableData = ref([]);
 const loading = ref(false);
 
-const detailDialogVisible = ref(false)
-const detailDialogTitle = ref('')
-const detailFormLoading = ref(false)
-const topCategories = ref([])
+const detailDialogVisible = ref(false);
+const detailDialogTitle = ref('');
+const detailFormLoading = ref(false);
+const topCategories = ref([]);
 const detailForm = reactive({
     id: 0,
     name: '',
@@ -22,28 +23,28 @@ const detailForm = reactive({
     logo: '',
     parent_id: 0,
     sort: 0,
-    is_show: 1,
-})
+    is_show: 1
+});
 const detailFormRules = reactive({
-    name: [{ required: true, message: '请输入分类名称', trigger: 'blur' },],
-    title: [{ required: true, message: '请输入分类标题', trigger: 'blur' },],
-    keywords: [{ required: true, message: '请输入关键词', trigger: 'blur' },],
-    description: [{ required: true, message: '请输入描述', trigger: 'blur' },],
-    logo: [{ required: true, message: '请上传图片', trigger: 'change' },],
-    parent_id: [{ required: true, message: '请选择父级分类', trigger: 'change' },],
-    sort: [{ required: true, message: '请输入排序', trigger: 'blur' },],
-    is_show: [{ required: true, message: '请设置是否显示', trigger: 'change' },],
-})
-const detailFormRef = ref(null)
-const detailSubmitLoading = ref(false)
+    name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }],
+    title: [{ required: true, message: '请输入分类标题', trigger: 'blur' }],
+    keywords: [{ required: true, message: '请输入关键词', trigger: 'blur' }],
+    description: [{ required: true, message: '请输入描述', trigger: 'blur' }],
+    logo: [{ required: true, message: '请上传图片', trigger: 'change' }],
+    parent_id: [{ required: true, message: '请选择父级分类', trigger: 'change' }],
+    sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+    is_show: [{ required: true, message: '请设置是否显示', trigger: 'change' }]
+});
+const detailFormRef = ref(null);
+const detailSubmitLoading = ref(false);
 const uploadRef = ref(null);
 
 const openDetailDialog = (goodsCategoryId = 0) => {
-    detailDialogVisible.value = true
+    detailDialogVisible.value = true;
     detailDialogTitle.value = goodsCategoryId > 0 ? '添加分类' : '编辑分类';
-    detailFormLoading.value = true
-    categoryEdit({ id:goodsCategoryId }).then(res => {
-        detailFormLoading.value = false
+    detailFormLoading.value = true;
+    categoryEdit({ id: goodsCategoryId }).then(res => {
+        detailFormLoading.value = false;
         if (res.code === 200) {
             topCategories.value = res.data.top_categories;
             if (goodsCategoryId > 0) {
@@ -58,38 +59,37 @@ const openDetailDialog = (goodsCategoryId = 0) => {
                 detailForm.is_show = res.data.info.is_show;
             }
         } else {
-            cns.$message.error(res.message)
-            closeDetailDialog()
+            cns.$message.error(res.message);
+            closeDetailDialog();
         }
     }).catch(error => {
-        detailFormLoading.value = false
-        cns.$message.error('操作失败')
-        closeDetailDialog()
-    })
-}
+        detailFormLoading.value = false;
+        cns.$message.error('操作失败');
+        closeDetailDialog();
+    });
+};
 const closeDetailDialog = () => {
-    detailDialogVisible.value = false
-    detailDialogTitle.value = ''
-    detailFormLoading.value = false
+    detailDialogVisible.value = false;
+    detailDialogTitle.value = '';
+    detailFormLoading.value = false;
 
-    detailForm.id = 0
-    detailForm.name = ''
-    detailForm.title = ''
-    detailForm.keywords = ''
-    detailForm.description = ''
-    detailForm.logo = ''
-    detailForm.parent_id = 0
-    detailForm.sort = 0
-    detailForm.is_show = 1
-}
+    detailForm.id = 0;
+    detailForm.name = '';
+    detailForm.title = '';
+    detailForm.keywords = '';
+    detailForm.description = '';
+    detailForm.logo = '';
+    detailForm.parent_id = 0;
+    detailForm.sort = 0;
+    detailForm.is_show = 1;
+};
 const uploadFile = async (request) => {
     try {
         const res = await fileUpload({ file: request.file });
-
         if (res.code === 200) {
             detailForm.logo = res.data.url;
         } else {
-            cns.$message.error(res.message)
+            cns.$message.error(res.message);
         }
     } catch (error) {
         console.error('Failed:', error);
@@ -103,15 +103,16 @@ const submitDetailForm = _.throttle(() => {
             categoryUpdate(detailForm).then(res => {
                 detailSubmitLoading.value = false;
                 if (res.code === 200) {
-                    closeDetailDialog()
-                    getData()
+                    closeDetailDialog();
+                    getData();
                 } else {
-                    cns.$message.error(res.message)
+                    cns.$message.error(res.message);
                 }
-            })
+            });
         }
-    })
-},1000)
+    });
+}, 1000);
+
 const handleDestroy = (goodsCategoryId) => {
     cns.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -119,30 +120,44 @@ const handleDestroy = (goodsCategoryId) => {
         type: 'warning',
         center: true
     }).then(() => {
-        categoryDestroy({id:goodsCategoryId}).then(res => {
+        categoryDestroy({ id: goodsCategoryId }).then(res => {
             if (res.code === 200) {
-                getData()
-                cns.$message.success(res.message)
+                getData();
+                cns.$message.success(res.message);
             } else {
-                cns.$message.error(res.message)
+                cns.$message.error(res.message);
             }
         }).catch(error => {
-            cns.$message.error('操作失败')
-        })
-    })
-}
+            cns.$message.error('操作失败');
+        });
+    });
+};
+
+const changeShow = (row) => {
+    categoryChangeShow({
+        id: row.id,
+        is_show: row.is_show
+    }).then(res => {
+        if (res.code === 200) {
+            cns.$message.success(res.message);
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+};
+
 const getData = () => {
     categoryIndex().then(res => {
         if (res.code === 200) {
             tableData.value = res.data;
         } else {
-            cns.$message.error(res.message)
+            cns.$message.error(res.message);
         }
-    })
-}
+    });
+};
 
-onMounted( () => {
-    getData()
+onMounted(() => {
+    getData();
 });
 </script>
 <template>
@@ -160,7 +175,8 @@ onMounted( () => {
         <el-table-column label="分类名称" min-width="200">
             <template #default="scope">
                 <div class="s-flex ai-ct">
-                    <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo" style="margin-right: 10px;width: 40px;height: 40px;" :fit="cover"></el-image>
+                    <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo"
+                              style="margin-right: 10px;width: 40px;height: 40px;" :fit="cover"></el-image>
                     {{ scope.row.name }}【{{ scope.row.id }}】
                 </div>
             </template>
@@ -170,7 +186,12 @@ onMounted( () => {
         <el-table-column label="描述" prop="description"></el-table-column>
         <el-table-column label="是否展示" prop="is_show">
             <template #default="scope">
-                <el-switch disabled v-model="scope.row.is_show" :active-value="1" :inactive-value="0" />
+                <el-switch
+                    v-model="scope.row.is_show"
+                    :active-value="1" :inactive-value="0"
+                    active-color="#13ce66" inactive-color="#ff4949"
+                    @click="changeShow(scope.row)">
+                </el-switch>
             </template>
         </el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
@@ -189,7 +210,8 @@ onMounted( () => {
         center
         :before-close="closeDetailDialog">
         <div v-loading="detailFormLoading" class="s-flex jc-ct">
-            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="width: 480px" size="default">
+            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto"
+                     style="width: 480px" size="default">
                 <el-form-item label="上级分类" prop="parent_id">
                     <el-select v-model="detailForm.parent_id" placeholder="请选择上级分类">
                         <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
@@ -223,7 +245,9 @@ onMounted( () => {
                         :with-credentials="true"
                     >
                         <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" />
-                        <el-icon v-else class="logo-uploader-icon"><Plus /></el-icon>
+                        <el-icon v-else class="logo-uploader-icon">
+                            <Plus />
+                        </el-icon>
                     </el-upload>
                 </el-form-item>
             </el-form>
@@ -238,21 +262,22 @@ onMounted( () => {
 </template>
 
 <style scoped lang="scss">
-    .goods-category-logo {
-        width: 30px;
-        height: 30px;
-        margin-right: 10px;
-    }
+.goods-category-logo {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
 
-    .logo-uploader .logo {
-        width: 80px;
-        height: 80px;
-        display: block;
-    }
-    :deep(.el-table__row .cell){
-        display: flex;
-        align-items: center;
-    }
+.logo-uploader .logo {
+    width: 80px;
+    height: 80px;
+    display: block;
+}
+
+:deep(.el-table__row .cell) {
+    display: flex;
+    align-items: center;
+}
 </style>
 
 <style>
