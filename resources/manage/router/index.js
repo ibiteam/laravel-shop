@@ -18,7 +18,7 @@ const router = createRouter({
             path:'/',
             component: () => import('@/components/Layout.vue'),
             children:[
-                { path: 'home', component: import('@/pages/Home.vue'), name: 'home' },
+                { path: 'home', component: Home, name: 'home' },
                 { path: '/goods/index', component: Goods , name: 'goods' },
                 { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
