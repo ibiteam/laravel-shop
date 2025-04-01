@@ -222,15 +222,12 @@ import { nextTick, onMounted, ref, reactive, onUnmounted, computed,getCurrentIns
 const cns = getCurrentInstance().appContext.config.globalProperties
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
-import { Search } from '@element-plus/icons-vue'
 import {getMenuAxios} from "../api/set.js";
 import {clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
 
 
 
 let lineRef = null
-let saleRef = null
-let sourceRef = null
 
 const searchtoolsRef = ref(null)
 const searchtools = ref('')
@@ -334,9 +331,6 @@ const getUvChartOption = (item) => {
 }
 
 const resizeFnc = () => {
-    console.log(111);
-    saleRef.resize()
-    sourceRef.resize()
     lineRef.resize()
 }
 

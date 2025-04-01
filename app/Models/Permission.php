@@ -77,7 +77,6 @@ class Permission extends SpatiePermission
     public const GOODS_MANAGE = 'goods.manage'; // 商品管理
     public const MANAGE_GOODS_INDEX = 'manage.goods.index'; // 商品列表
     public const MANAGE_GOODS_UPDATE = 'manage.goods.update'; // 商品列表新增|编辑
-    public const MANAGE_GOODS_DELETE = 'manage.goods.delete'; // 商品列表删除
     public const CATEGORY_MANAGE = 'category.manage'; // 分类管理
     public const MANAGE_CATEGORY_INDEX = 'manage.category.index'; // 商品分类
     public const MANAGE_CATEGORY_UPDATE = 'manage.category.update'; // 商品分类新增|编辑

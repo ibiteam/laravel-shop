@@ -174,26 +174,9 @@ const pageLoad = ref(false)
 const menus = ref([])
 const menuIndex = ref(0)
 
-const data = [
-    {
-        label: '基础设置',
-    },
-    {
-        label: '权限管理',
-        children: [
-            {
-                label: '商品管理',
-
-            },
-            {
-                label: '商品编辑',
-            },
-        ],
-    },
-]
 const editableTabs = [
     {
-        title: '基础设置',
+        title: '首页',
         name: '1',
     },
     {

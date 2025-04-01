@@ -23,7 +23,7 @@ class MaterialFileService
         $materialFile = MaterialFile::query()
             ->whereDirType($dir_type)
             ->whereType(MaterialFile::TYPE_DIR)
-            ->select('id', 'name', 'parent_id', 'dir_type')
+            ->select('id', 'name', 'parent_id', 'dir_type', 'type')
             ->latest()->get();
         $top_dir = MaterialFile::$dirTopManage[$dir_type];
         $top_dir['children'] = $this->buildTree($materialFile->toArray());

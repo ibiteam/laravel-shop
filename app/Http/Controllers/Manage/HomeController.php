@@ -16,6 +16,9 @@ use Illuminate\Validation\ValidationException;
 
 class HomeController extends BaseController
 {
+    private array $todoList = [];   // 代办列表
+    private int $todoCount = 0;     // 代办数量
+
     /**
      * 获取菜单.
      */
@@ -38,7 +41,7 @@ class HomeController extends BaseController
     {
         $admin_user = $this->adminUser();
 
-        // 数量统计
+        // 数量统计 todo
         $number_data['user_number'] = User::query()->count();  // 用户数
         $number_data['order_number'] = 100;  // 订单数
         $number_data['total_transaction_value'] = 10000;  // 总交易额
@@ -72,6 +75,7 @@ class HomeController extends BaseController
 
         $data['number_data'] = $number_data;
         $data['access_statistic'] = $accessStatistic;
+        $data['todo_list'] = $this->getTodoList();
         $data['my_collect'] = $myCollect;
         $data['access_record'] = $accessRecord;
 
@@ -152,5 +156,82 @@ class HomeController extends BaseController
         $data['uv_number'] = $referer_group[$type]->pluck('uv_number');
 
         return $data;
+    }
+
+    /**
+     * 获取代办任务
+     */
+    private function getTodoList(): array
+    {
+        $this->todoList = [];
+
+        try {
+            $permission_codes = $this->adminUser()->getAllPermissions()->pluck('name')->flip();
+        } catch (\Exception $e) {
+            $permission_codes = [];
+        }
+
+        // todo 替换数据
+        $i = 0;
+
+        if (isset($permission_codes['manage.shop_config.index'])) {
+            $order_comment_good_number = 100;
+            $this->buildTodoList($i, '会员', '订单评论', $order_comment_good_number, 'manage.user.index', 'Comment');
+        }
+
+        if (isset($permission_codes['manage.shop_config.index'])) {
+            $consult_number = 2;
+            $this->buildTodoList($i, '会员', '购买咨询', $consult_number, 'manage.user.index', 'ChatDotSquare');
+        }
+
+        if (isset($permission_codes['manage.goods.index'])) {
+            $order_pending_number = 10;
+            $this->buildTodoList($i, '订单', '待付款', $order_pending_number, 'manage.goods.index', 'Notification');
+        }
+
+        if (isset($permission_codes['manage.goods.index'])) {
+            $order_sending_number = 9;
+            $this->buildTodoList($i, '订单', '待发货', $order_sending_number, 'manage.goods.index', 'Notification');
+        }
+
+        if (isset($permission_codes['manage.goods.index'])) {
+            $order_accepting_number = 8;
+            $this->buildTodoList($i, '订单', '待收货', $order_accepting_number, 'manage.goods.index', 'Notification');
+        }
+
+        if (isset($permission_codes['manage.goods.index'])) {
+            $order_backing_number = 0;
+            $this->buildTodoList($i, '订单', '退款申请', $order_backing_number, 'manage.goods.index', 'Notification');
+        }
+
+        return array_values($this->todoList);
+    }
+
+    /**
+     * 构建待办列表.
+     */
+    private function buildTodoList(int &$i, string $groupName, string $title, int $count, string $name, string $icon = ''): void
+    {
+        $px = 60;
+
+        if ($count < 0) {
+            return;
+        }
+
+        if (! isset($this->todoList[$groupName])) {
+            $this->todoList[$groupName] = [
+                'group_name' => $groupName,
+                'list' => [],
+            ];
+        }
+        $this->todoList[$groupName]['list'][] = [
+            'title' => $title,
+            'count' => min($count, 99),
+            'icon' => $icon,
+            'name' => $name,  // 路由 前端页面名称
+            'backgroundPosition' => $i * $px,
+        ];
+        $i++;
+        $this->todoCount += $count;
     }
 }
