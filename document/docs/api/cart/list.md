@@ -14,16 +14,19 @@
   "data": {
     "valid_carts": [// 有效商品
       {
-        "id": 3,
+        "id": 3, // 购物车id
         "buy_number": 3, // 购买数量
         "is_check": 1,   // 是否选中 0-未选中 1-选中
         "goods_sku_id": 0, // 商品sku id
         "goods": {// 商品信息
-          "id": 3,
+          "id": 3, // 商品goods id
           "name": "商品B",
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "299.99",
           "unit": "个",
+          "total": 100,  // 库存
+          "can_quota": 1, // 是否限购 0-不限购 1-限购
+          "quota_number": 10, // 限购数量
           "skus": [ ]  // 商品sku信息
         }
       },

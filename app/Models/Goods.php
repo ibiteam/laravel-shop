@@ -18,8 +18,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null                     $sub_name        商品副标题
  * @property string|null                     $label           商品标签
  * @property string                          $image           商品主图
- * @property string                          $unit            商品单位
+ * @property string|null                     $unit            商品单位
  * @property string                          $price           商品价格
+ * @property string                          $integral        积分
  * @property int                             $total           商品库存
  * @property int                             $sales_volume    销量
  * @property int                             $type            库存类型 1下单减库存 2付款减库存
@@ -55,6 +56,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static Builder<static>|Goods whereDeletedAt($value)
  * @method static Builder<static>|Goods whereId($value)
  * @method static Builder<static>|Goods whereImage($value)
+ * @method static Builder<static>|Goods whereIntegral($value)
  * @method static Builder<static>|Goods whereLabel($value)
  * @method static Builder<static>|Goods whereName($value)
  * @method static Builder<static>|Goods whereNo($value)
@@ -83,6 +85,9 @@ class Goods extends Model
     public const STATUS_NOT_SALE = 0; // 下架
     public const QUOTA = 1; // 限购
     public const NOT_QUOTA = 0; // 不限购
+
+    public const TYPE_DONE_ORDER = 1; // 下单减库存
+    public const TYPE_PAY_ORDER = 2; // 支付订单减库存
 
     protected $guarded = [];
 
