@@ -50,7 +50,7 @@ class GoodsStoreRequest extends FormRequest
             'spec_data.*.values.*.id' => 'nullable|integer',
             'spec_data.*.values.*.name' => 'required|string',
             'sku_data' => 'required_with:spec_data|array',
-            'sku_data.*.id' => 'required|integer',
+            'sku_data.*.id' => 'nullable|integer',
             'sku_data.*.thumb' => 'required|string|url',
             'sku_data.*.price' => 'required|numeric|min:0.01',
             'sku_data.*.integral' => 'required|numeric|min:0',
