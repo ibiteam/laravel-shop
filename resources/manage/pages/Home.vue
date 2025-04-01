@@ -6,43 +6,43 @@
                     <div class="information">
                         <div class="welcome">
                             <em class=""></em>
-                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>早上好，胡俊</span>
+                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>上午好，张三</span>
                         </div>
                         <div class="quick-view-box s-flex">
                             <div class="quick-view s-flex ai-ct">
                                 <div class="fonts s-flex ai-ct jc-ct">
-                                    <em class="iconfont icon-reyonghushujufenxi" style="color: #789bfa"></em>
+                                    <img src="@/assets/images/home/user.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs">
-                                    <span>订单数量</span>
-                                    <span>373</span>
-                                </div>
-                            </div>
-                            <div class="quick-view s-flex ai-ct">
-                                <div class="fonts s-flex ai-ct jc-ct">
-                                    <em class="iconfont icon-wenzhang1" style="color: #b557fc;font-size: 22px;"></em>
-                                </div>
-                                <div class="s-flex flex-dir ai-fs">
-                                    <span>销售额</span>
-                                    <span>368</span>
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                    <span class="fs12">用户数</span>
+                                    <span class="fs22" style="color: #551A8B">373</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
                                 <div class="fonts s-flex ai-ct jc-ct">
-                                    <em class="iconfont icon-xiaoxi" style="color: #fdae62;font-size: 22px;"></em>
+                                    <img src="@/assets/images/home/order.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs">
-                                    <span>商品数</span>
-                                    <span>368</span>
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                    <span class="fs12">订单数</span>
+                                    <span class="fs22" style="color: #551A8B">373</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
                                 <div class="fonts s-flex ai-ct jc-ct">
-                                    <em class="iconfont icon-icon-rizhi" style="color: #2cb5fa"></em>
+                                    <img src="@/assets/images/home/transcation.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs">
-                                    <span>未发货订单数</span>
-                                    <span>0</span>
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                    <span class="fs12">总交易额</span>
+                                    <span class="fs22" style="color: #551A8B">373</span>
+                                </div>
+                            </div>
+                            <div class="quick-view s-flex ai-ct">
+                                <div class="fonts s-flex ai-ct jc-ct">
+                                    <img src="@/assets/images/home/log.png" alt="">
+                                </div>
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                    <span class="fs12">操作日志</span>
+                                    <span class="fs22" style="color: #551A8B">日志</span>
                                 </div>
                             </div>
                         </div>
@@ -50,31 +50,47 @@
                             <div class="access-data-header s-flex jc-bt ai-ct">
                                 <div class="data-header">
                                     <span>销售数据</span>
-                                    <span style="font-size: 12px;color: #ccc">（近7日）</span>
+                                    <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <div class="mores">
+                                <div class="mores" style="margin-right: 50px">
                                     <span>查看更多</span>
                                 </div>
                             </div>
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>
                     </div>
-                    <div class="information-bottom s-flex jc-bt">
-                        <div class="project-proportion">
-                            <div class="access-data-header s-flex ai-ct">
-                                <div class="data-header">
-                                    <span>商品销售品类占比</span>
-                                </div>
+                    <div class="module-main">
+                        <div class="module-title">会员</div>
+                        <div class="module-content s-flex flex-wrap">
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -180px;"></div>
+                                <div class="module-text">订单评论</div>
                             </div>
-                            <div style="width: 100%;height:350px;" id="sector-data"></div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -240px;"></div>
+                                <div class="module-text">购买咨询</div>
+                            </div>
                         </div>
-                        <div class="project-proportion">
-                            <div class="access-data-header s-flex ai-ct">
-                                <div class="data-header">
-                                    <span>订单来源占比</span>
-                                </div>
+                    </div>
+                    <div class="module-main">
+                        <div class="module-title">订单</div>
+                        <div class="module-content s-flex flex-wrap">
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -900px;"></div>
+                                <div class="module-text">待付款</div>
                             </div>
-                            <div style="width: 100%;height:350px;" id="order-data"></div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -480px;"></div>
+                                <div class="module-text">待发货</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -300px;"></div>
+                                <div class="module-text">待收货</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -780px;"></div>
+                                <div class="module-text">退款申请</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,6 +131,23 @@
                                     </div>
                                     <div class="titles">
                                         <span>{{item.name}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="line" style="border-bottom: solid 1px #F2F3F5;margin: 20px 0;"></div>
+                        <div class="support-main">
+                            <div class="access-data-header s-flex jc-bt ai-ct">
+                                <div class="data-header">
+                                    <span>辅助功能</span>
+                                </div>
+                            </div>
+                            <div class="more-opt s-flex flex-wrap">
+                                <div class="opt-list">
+                                    <div class="icon">
+                                    </div>
+                                    <div class="titles">
+                                        <span>清除缓存</span>
                                     </div>
                                 </div>
                             </div>
@@ -348,102 +381,6 @@ onMounted(() => {
     nextTick(() => {
         lineRef = echarts.init(document.getElementById('access-data'));
         lineRef.setOption(getUvChartOption(access_statistic));
-
-        let dataSector = [
-            { value: 500, name: '钛白', itemStyle: { color: '#259eff' } },
-            { value: 400, name: '化工', itemStyle: { color: '#21ccff' } },
-            { value: 300, name: '粮油', itemStyle: { color: '#313ba8' } },
-            { value: 200, name: '芯片', itemStyle: { color: '#313ba8' } }
-        ];
-
-        let sumSector = dataSector.reduce(function(prev, curr) {
-            return prev + curr.value;
-        }, 0);
-        saleRef = echarts.init(document.getElementById('sector-data'));
-        saleRef.setOption({
-            title: {
-                text: '数量' + sumSector, // 将总和显示在标题中
-                left: 'center', // 标题居中显示
-                top: 'middle', // 标题垂直居中显示
-                textStyle: {
-                    fontSize: 14,
-                    fontWeight: 400,
-                    color: '#333'
-                }
-            },
-            legend: {
-                orient: 'horizontal', // 设置图例水平排列
-                bottom: 10, // 设置图例位置为底部，距离底部的距离为10px
-                data: ['钛白', '化工', '粮油', '芯片'] // 设置图例的数据，与数据项的名称对应
-            },
-            series: [
-                {
-                    type: 'pie',
-                    radius: ['40%', '60%'],
-                    label: {
-                        formatter: '{d}% \n{c}个', // 设置标签格式化，显示名称、数值和百分比
-                        position: 'top', // 标签位置在图中心
-                        color: '#333', // 标签文字颜色
-                        fontSize: 14, // 标签文字大小
-                        fontWeight: 400
-
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{b}: {c}' // 设置tooltip的格式，显示名称和值
-                    },
-                    data:dataSector
-                }
-            ]
-        });
-
-        let dataOrder = [
-            { value: 500, name: 'pc', itemStyle: { color: '#259eff' } },
-            { value: 400, name: 'app', itemStyle: { color: '#21ccff' } },
-            { value: 300, name: 'h5', itemStyle: { color: '#313ba8' } },
-            { value: 200, name: '小程序', itemStyle: { color: '#313ba8' } }
-        ];
-
-        let sumOrder = dataOrder.reduce(function(prev, curr) {
-            return prev + curr.value;
-        }, 0);
-        sourceRef = echarts.init(document.getElementById('order-data'));
-        sourceRef.setOption({
-            title: {
-                text: '数量' + sumOrder, // 将总和显示在标题中
-                left: 'center', // 标题居中显示
-                top: 'middle', // 标题垂直居中显示
-                textStyle: {
-                    fontSize: 14,
-                    fontWeight: 400,
-                    color: '#333'
-                }
-            },
-            legend: {
-                orient: 'horizontal', // 设置图例水平排列
-                bottom: 10, // 设置图例位置为底部，距离底部的距离为10px
-                data: ['pc', 'app', 'h5', '小程序'] // 设置图例的数据，与数据项的名称对应
-            },
-            series: [
-                {
-                    type: 'pie',
-                    radius: ['40%', '60%'],
-                    label: {
-                        formatter: '{d}% \n{c}个', // 设置标签格式化，显示名称、数值和百分比
-                        position: 'top', // 标签位置在图中心
-                        color: '#333', // 标签文字颜色
-                        fontSize: 14, // 标签文字大小
-                        fontWeight: 400
-
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: '{b}: {c}' // 设置tooltip的格式，显示名称和值
-                    },
-                    data:dataOrder
-                }
-            ]
-        });
     });
 
     window.addEventListener('resize', debounceResize)
@@ -475,16 +412,16 @@ onUnmounted(() => {
         .home-content {
 
             .home-left {
-                /*width: 75%;*/
                 width: 0;
                 flex: 1;
-                margin-right: 20px;
+                margin-right: 50px;
             }
 
             .home-left .information {
                 padding: 10px 20px;
                 box-sizing: border-box;
                 background: #fff;
+                border-radius: 4px;
             }
 
             .home-left .information .welcome {
@@ -493,9 +430,9 @@ onUnmounted(() => {
             }
 
             .home-left .information .welcome span {
-                font-size: 18px;
-                color: #333;
-                font-weight: 600;
+                font-size: 20px;
+                color: #1D2129;
+                font-weight: 400;
             }
 
             .home-left .information .quick-view-box {
@@ -504,10 +441,14 @@ onUnmounted(() => {
             }
 
             .home-left .information .quick-view-box .fonts {
-                width: 60px;
-                height: 60px;
+                width: 54px;
+                height: 54px;
                 background: #f6f7fb;
                 border-radius: 50px;
+            }
+            .home-left .information .quick-view-box .fonts img{
+                width: 32px;
+                height: 32px;
             }
 
             .home-left .information .quick-view-box .quick-view {
@@ -555,6 +496,42 @@ onUnmounted(() => {
                 margin-top: 15px;
                 font-weight: 500;
             }
+            .home-left .information .quick-view-box .quick-view .quick-view-info{
+                height: 100%;
+            }
+
+            .module-main{
+                padding: 30px 40px;
+                background: #ffffff;
+                margin-top: 15px;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            .module-main .module-title{
+                font-size: 16px;
+                color: #333333;
+            }
+            .module-main .module-content{
+
+            }
+            .module-main .module-content .module-model{
+                margin: 20px 30px 0;
+                width: 176px;
+                height: 70px;
+                border-radius: 10px;
+                border: 1px dashed rgba(0, 0, 0, 0.1);
+            }
+            .module-main .module-content .module-model>.module-imgs{
+                width: 40px;
+                height: 40px;
+                background: url('@/assets/images/home/home-menu.png');
+                background-repeat: no-repeat;
+            }
+            .module-main .module-content .module-model>.module-text{
+                margin-left: 10px;
+                font-size: 14px;
+                color: #333333;
+            }
 
             .information .access-data {
                 margin-top: 20px;
@@ -566,31 +543,18 @@ onUnmounted(() => {
 
             .access-data-header .data-header span {
                 font-size: 18px;
-                color: #333;
-                font-weight: 600;
+                color: #000;
+                font-weight: 400;
             }
 
             .access-data-header .mores {
-                color: #0C54A6;
-                font-size: 14px;
+                color: #165DFF;
+                font-size: 12px;
                 cursor: pointer;
             }
 
-            .home-left .information-bottom {
-                margin-top: 20px;
-            }
-
-
-
-            .home-left .information-bottom .project-proportion {
-                width: 49%;
-                background: #fff;
-                padding: 10px 20px;
-                box-sizing: border-box;
-            }
-
             .home-right {
-                width: 450px;
+                width: 280px;
             }
 
             .home-right .shortcut {
@@ -641,9 +605,8 @@ onUnmounted(() => {
 
             .home-right .shortcut .opt-list span {
                 font-size: 14px;
-                color: #ccc;
+                color: #666666;
                 font-weight: 400;
-                margin-top: 5px;
             }
         }
     }

@@ -995,14 +995,14 @@ const setMain = (index) => {
     }
 }
 const beforeUpload = (file) => {
-    let valiType = false;
+    let validateType = false;
     if (file.type != "image/jpg" && file.type != "image/jpeg" && file.type != "image/png") {
         if (file.type) {
-            valiType = true
+            validateType = true
         }
     }
     const isLt2M = file.size / 1024 / 1024 <= 5;
-    if (valiType || !isLt2M) {
+    if (validateType || !isLt2M) {
         cns.$message.error("支持 .png .jpg .jpeg格式，单个附件不得超过5M!");
         return false;
     }else {
@@ -1011,15 +1011,15 @@ const beforeUpload = (file) => {
 }
 
 const beforeUploadVideo = (file) => {
-    let valiType = false;
+    let validateType = false;
 
     if (file.type != "video/mp4") {
         if (file.type) {
-            valiType = true
+            validateType = true
         }
     }
     const isLt100M = file.size / 1024 / 1024 <= 100;
-    if (valiType || !isLt100M) {
+    if (validateType || !isLt100M) {
         cns.$message.error("仅支持mp4格式上传，大小100M内");
         return false;
     }
