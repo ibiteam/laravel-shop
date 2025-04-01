@@ -12,19 +12,26 @@
         <div class="custom-dialog-content s-flex jc-bt">
             <div class="left-wrapper">
                 <div class="tree-content">
-                    <!-- <tabs v-model:active="treeMenuData.active" title-active-color="var(--main-color)">
-                        <tab v-for="menu in treeMenuData.menu" :key="menu.dir_type" :title="menu.name" :name="menu.dir_type"></tab>
-                    </tabs> -->
-                    <el-tree-v2
+                    <el-tree
                         style="max-width: 190px"
-                        :data="treeMenuData.tree"
+                        :data="treeData"
                         :props="{value: 'id', label: 'name', children: 'children'}"
+                        node-key="id"
                         highlight-current
                         check-on-click-node
-                        indent="6"
-                    />
+                        default-expand-all
+                        :indent="6"
+                    >
+                        <template #default="{ node, data }">
+                            <!--  @click="checkDir(data.id)" -->
+                            <div class="custom-tree-node" @click="checkDir(data.id)">
+                                <i class="iconfont" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
+                                <span>{{ data.name }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
                 </div>
-                <el-link class="link-button" :underline="false">前往素材中心</el-link>
+                <el-link class="link-button" :underline="false" href="/manage/material/index">前往素材中心</el-link>
             </div>
             <div class="right-wrapper">
                 <div class="search-wrapper s-flex ai-ct">
@@ -40,20 +47,25 @@
                             </template>
                         </el-radio-button>
                     </el-radio-group>
-                    <el-select v-model="searchForm.status" style="width: 120px" >
-                        <el-option label="最新" :value="1" />
-                        <el-option label="最旧" :value="2" />
+                    <el-select v-model="searchForm.sort" style="width: 120px" @change="handleCurrentChange(1)">
+                        <el-option label="默认排序" value="0"></el-option>
+                        <el-option label="最近更新在前" value="1"></el-option>
+                        <el-option label="最近更新在后" value="2"></el-option>
                     </el-select>
-                    <el-input v-model="searchForm.keyword" placeholder="搜索图片名称" style="width: 200px" />
+                    <el-input v-model="searchForm.name" placeholder="搜索图片名称" style="width: 200px" @change="handleCurrentChange(1)"/>
                 </div>
-                <div class="table-wrapper" v-if="!viewType">
-                    <el-table :data="tableData" style="width: 100%" height="100%">
+                <div class="table-wrapper" v-show="!viewType" v-loading="tableLoading">
+                    <el-table :data="tableData" ref="tableRef" style="width: 100%" height="100%" @select="handleSelect">
                         <el-table-column fixed type="selection" width="55" />
-                        <el-table-column label="素材名称" width="240">
+                        <el-table-column label="素材名称" width="240" show-overflow-tooltip>
                             <template #default="scope">
                                 <div class="s-flex ai-ct">
-                                    <img :src="scope.row.img" alt="" style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" @click="handleClickViewer(scope)" />
-                                    <p class="elli-1">{{scope.row.name}}</p>
+                                    <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.file_path" fit="scale-down" @click="handleClickViewer(scope)">
+                                        <template #error>
+                                            <img src="@/assets/images/decoration/app-nopic.png" width="35" height="35"/>
+                                        </template>
+                                    </el-image>
+                                    <p class="elli-1" style="max-width: 70%;">{{scope.row.name}}</p>
                                 </div>
                             </template>
                         </el-table-column>
@@ -61,26 +73,27 @@
                         <el-table-column label="大小">
                             <template #default="scope">{{ scope.row.width }}*{{ scope.row.height }}px</template>
                         </el-table-column>
-                        <el-table-column property="time" label="更新时间" />
+                        <el-table-column property="updated_at" label="更新时间" />
                     </el-table>
                 </div>
-                <div class="grid-wrapper" v-if="viewType">
-                    <div class="grid-wrapper-content">
+                <div class="grid-wrapper" v-show="viewType" v-loading="tableLoading">
+                    <div class="grid-wrapper-content" v-if="tableData.length">
                         <div class="grid-item" v-for="(item,idx) in tableData" :key="idx">
-                            <div class="grid-item-mask" :class="{'select': idx == 0}" @click="handleClickImageItem(item)">
-                                <el-badge :value="1" :hidden="idx != 0" class="select-index" type="primary" color="var(--main-color)" :offset="[-12,10]">
-                                    <el-image style="width: 140px; height: 140px" :src="item.img" fit="scale-down" />
+                            <div class="grid-item-mask" :class="{'select': hasCheckGroup(item.id)}" @click="handleClickImageItem(item)">
+                                <el-badge :value="checkGroupIndex(item.id)" :hidden="!hasCheckGroup(item.id)" class="select-index" type="primary" color="var(--main-color)" :offset="[-12,10]">
+                                    <el-image style="width: 140px; height: 140px" :src="item.file_path" fit="scale-down" />
                                 </el-badge>
                             </div>
                             <p class="elli-1">{{item.width}}*{{item.height}}px</p>
                         </div>
                     </div>
+                    <el-empty description="暂无数据" image="" style="width: 100%; height: 100%;" v-else />
                 </div>
                 <div class="pagination-wrapper s-flex ai-ct jc-ct">
                     <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
                 </div>
                 <div class="button-wrapper s-flex ai-ct jc-ct">
-                    <el-button type="primary" @click="handleClose">确定</el-button>
+                    <el-button type="primary" @click="handleConfirm">确定</el-button>
                     <el-button @click="handleClose">取消</el-button>
                 </div>
             </div>
@@ -90,89 +103,40 @@
 </template>
 
 <script setup>
-import { ref, reactive , getCurrentInstance, defineEmits, onMounted } from 'vue'
-import { Tab, Tabs } from 'vant';
+import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } from 'vue'
 import Page from '@/components/common/Pagination.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
+import { folderList, materialIndex } from '@/api/material.js';
+
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
+    show: {
+        type: Boolean,
+        default: false
+    },
+    dir_type: {
+        type: [Number, String],
+        default: '1', // 1、图片 2、视频
+    },
+    multiple: {
+        type: Boolean,
+        default: false, // 是否多选
+    }
 })
+const emit = defineEmits(['confirm', 'close'])
 
 const dialogVisible = ref(false)
-const treeMenuData = reactive({
-    active: '',
-    menu: [],
-    tree: []
-})
-const treeData = ref([{
-    "id": 0,
-    "name": "商品管理",
-    "parent_id": -1,
-    "dir_type": 1,
-    "children": [
-        {
-            "id": 1,
-            "name": "商品图",
-            "parent_id": 0,
-            "dir_type": 1,
-            "children": [
-                {
-                    "id": 2,
-                    "name": "活动图",
-                    "parent_id": 1,
-                    "dir_type": 1,
-                    "children": [
-                        {
-                            "id": 3,
-                            "name": "特卖图",
-                            "parent_id": 2,
-                            "dir_type": 1
-                        },
-                        {
-                            "id": 4,
-                            "name": "秒杀图",
-                            "parent_id": 2,
-                            "dir_type": 1
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-},
-{
-    "id": 0,
-    "name": "视频管理",
-    "parent_id": -1,
-    "dir_type": 2,
-    "children": [
-        {
-            "id": 5,
-            "name": "搞笑视频",
-            "parent_id": 0,
-            "dir_type": 2,
-            "children": [
-                {
-                    "id": 6,
-                    "name": "欢乐逗比",
-                    "parent_id": 5,
-                    "dir_type": 2
-                },
-                {
-                    "id": 7,
-                    "name": "倒霉熊",
-                    "parent_id": 5,
-                    "dir_type": 2
-                }
-            ]
-        }
-    ]
-}])
-const viewType = ref(1)
+// 右侧层级树
+const treeData = ref([])
+// 预览模式 0-列表 1-缩略图
+const viewType = ref(0)
 const searchForm = reactive({
-    status: 1,
-    keyword: ''
+    name: '', // 素材名称
+    type: '2', // 素材类型 1、文件夹 2、文件
+    sort: '0', // 排序字段
+    dir_type: 1, // 文件夹类型 1、图片 2、视频
+    parent_id: 0, // 文件夹id
 })
 const pageInfo = reactive({
     page: 1,
@@ -181,144 +145,138 @@ const pageInfo = reactive({
     currentPage: 1,
     layout: 'total, sizes, prev, pager, next',
 })
-const tableData = ref([
-    {
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },{
-        id: 1,
-        name: '图片名称',
-        img: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-        size: '1MB',
-        width: 1200,
-        height: 1200,
-    },
-])
+const tableRef = ref(null)
+const tableLoading = ref(false)
+const tableData = ref([])
+// 预览数据
 const viewerData = reactive({
     show: false,
     index: 0,
     srcList: [],
 
 })
-// 单击图片
-const handleClickImageItem = () => {
+// 勾选数据
+const check_group = ref([])
 
+// 表格单选
+const handleSelect = (selection, row) => {
+    if (!props.multiple && tableRef.value) {
+        tableRef.value.clearSelection()
+        tableRef.value.toggleRowSelection(row)
+    }
+    check_group.value = selection
 }
-
+// 单击图片
+const handleClickImageItem = (item) => {
+    const index = check_group.value.findIndex(group => group.id == item.id)
+    if (index == -1) {
+        if (props.multiple) {
+            check_group.value.push(item)
+        } else {
+            check_group.value = [item]
+        }
+        tableRef.value.toggleRowSelection(item, true)
+    } else {
+        check_group.value.splice(index, 1)
+        tableRef.value.toggleRowSelection(item, false)
+    }
+}
+// 缩略图模式-判断是否有选中数据
+const hasCheckGroup = (id) => {
+    const index = check_group.value.findIndex(item => item.id == id)
+    return index > -1
+}
+// 缩略图模式-获取当前选择的下标索引
+const checkGroupIndex = (id) => {
+    const index = check_group.value.findIndex(item => item.id == id)
+    return index == -1 ? '' : index + 1
+}
 
 // 打开预览图片
 const handleClickViewer = (list) => {
     viewerData.index = list.$index
     viewerData.srcList = []
     tableData.value.map((item,idx) => {
-        viewerData.srcList.push(item.img)
+        viewerData.srcList.push(item.file_path)
     })
     viewerData.show = true
+}
+// 层级树选择
+const checkDir = (id) => {
+    searchForm.parent_id = id
+    getMaterialData()
 }
 
 const handleSizeChange = (val) => {
     //切换一页显示数据条数
-    let data = searchForm;
-    data.number = val;
-    // this.getData(data);
+    getMaterialData({page: pageInfo.currentPage, number: val})
 }
 
 const handleCurrentChange = (val) => {
     //切换页码
-    let data = searchForm;
-    data.number = searchForm.number;
-    data.page = val;
-    // this.getData(data);
+    getMaterialData({page: val, number: pageInfo.number})
 }
 
 
 const handleClose = () => {
     dialogVisible.value = false
+    emit('close')
 }
 
-onMounted(() => {
-    treeData.value.map((item,idx) => {
-        treeMenuData.menu.push(item)
-        if (item.dir_type == 1) {
-            treeMenuData.active = item.dir_type
-            treeMenuData.tree = item.children || []
+const handleConfirm = () => {
+    dialogVisible.value = false
+    emit('confirm', check_group.value)
+}
+ 
+// 获取文件树
+const getFolderData = () => {
+    folderList({dir_type: 1}).then(res => {
+        if (res.code === 200) {
+            treeData.value = res.data;
+            getMaterialData()
+        } else {
+            cns.$message.error(res.message)
         }
+    }).catch(() => {})
+}
+// 获取文件列表
+const getMaterialData = (params = {page: 1, number: 10}) => {
+    const {page, number} = params;
+    searchForm.page = page;
+    searchForm.number = number;
+    tableLoading.value = true
+    materialIndex(searchForm).then(res => {
+        if (res.code === 200) {
+            tableData.value = res.data.list;
+            // 更新分页信息
+            pageInfo.total = res.data.meta.total;
+            pageInfo.number = Number(res.data.meta.per_page);
+            pageInfo.currentPage = res.data.meta.current_page;
+        } else {
+            cns.$message.error(res.message)
+        }
+        tableLoading.value = false
+    }).catch(() => {
+        tableLoading.value = false
     })
-    console.log(treeMenuData)
+}
+
+const routeTo = () => {
+    cns.$router.push({name: 'MaterialIndex'})
+}
+
+watch(() => props, (newVal) => {
+    if (newVal) {
+        dialogVisible.value = newVal.show
+        searchForm.dir_type = newVal.dir_type
+        dialogVisible.value && getFolderData()
+    }
+}, {
+    immediate: true,
+    deep: true
+})
+
+onMounted(() => {
 })
 </script>
 <style lang='scss' scoped>
