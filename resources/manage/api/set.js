@@ -1,5 +1,9 @@
 import $http from '../utils/http'
 
+export function getMenuAxios() {
+    return $http.doGet('manage/home/menus')
+}
+
 // 商店设置
 export function shopConfigIndex(data) {
     return $http.doGet('manage/set/shop_config', data)
