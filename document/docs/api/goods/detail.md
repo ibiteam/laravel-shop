@@ -137,19 +137,23 @@ data.banner 参数说明
 
 data.center 参数说明
 
-| 字段               | 字段类型    | 说明                                    |
-|------------------|---------|---------------------------------------|
-| no               | String  | 商品编号                                  |
-| name             | String  | 商品名称                                  |
-| sub_name         | String  | 商品副标题                                 |
-| label            | String  | 商品标签                                  |
-| price            | String  | 商品价格                                  |
-| unit             | String  | 商品单位                                  |
-| content          | String  | 商品详情                                  |
-| evaluate         | Array   | 商品评价，详见 `data.center.evaluate` 参数说明   |
-| parameters         | Array   | 产品参数，详见 `data.center.parameters` 参数说明 |
-| recommend        | Array   | 商品推荐，详见 `data.center.recommend` 参数说明  |
-| sku_params       | Object  | 商品规格，详见 `data.center.sku_params` 参数说明 |
+| 字段           | 字段类型    | 说明                                    |
+|--------------|---------|---------------------------------------|
+| no           | String  | 商品编号                                  |
+| name         | String  | 商品名称                                  |
+| sub_name     | String  | 商品副标题                                 |
+| label        | String  | 商品标签                                  |
+| price        | String  | 商品价格                                  |
+| total        | Integer | 商品库存，多规格时为总库存                         |
+| unit         | String  | 商品单位                                  |
+| status       | Integer | 商品状态 1上架 0下架                          |
+| can_quota    | Integer | 是否限购，0：不限购，1：限购                       |
+| quota_number | Integer | 限购数量                                  |
+| content      | String  | 商品详情                                  |
+| evaluate     | Array   | 商品评价，详见 `data.center.evaluate` 参数说明   |
+| parameters   | Array   | 产品参数，详见 `data.center.parameters` 参数说明 |
+| recommend    | Array   | 商品推荐，详见 `data.center.recommend` 参数说明  |
+| sku_params   | Object  | 商品规格，详见 `data.center.sku_params` 参数说明 |
 
 
 data.center.evaluate 参数说明
@@ -207,5 +211,3 @@ data.bottom 参数说明
 | CODE值 | 说明    |
 |-------|-------|
 | 4000  | 商品被删除 |
-| 4001  | 商品被下架 |
-| 4002  | 商品已售完 |
