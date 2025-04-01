@@ -37,6 +37,7 @@ class GoodsService
         $detail_images = $params['images'];
 
         $main_image = array_shift($detail_images);
+        $detail_images = array_map(fn ($image) => ['image' => $image], $detail_images);
 
         if (! $main_image) {
             throw new BusinessException('请上传商品主图');
