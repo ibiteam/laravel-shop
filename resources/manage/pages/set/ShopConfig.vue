@@ -20,6 +20,8 @@ const tab_label = computed(() => {
             return '站点logo';
         case 'smtp_service':
             return '邮件服务';
+        case 'group_integral':
+            return '积分设置';
         default:
             return '';
     }
@@ -203,6 +205,24 @@ onMounted(() => {
                             <el-form-item>
                                 <el-button style="margin-top: 20px;" type="primary" @click="submitForm('inputFrom')" :class="{disable:loading}" :loading="loading">提交</el-button>
                             </el-form-item>
+                        </el-form>
+                    </el-tab-pane>
+                    <el-tab-pane label="积分设置" name="group_integral">
+                        <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                            <div style="margin:0 auto 0 100px;width: 800px">
+                                <el-form-item label="是否开启积分：" prop="is_open_integral">
+                                    <el-switch
+                                        v-model="inputFrom.is_open_integral"
+                                        active-color="#13ce66"
+                                        inactive-color="#EBE9E9"
+                                        :active-value="'1'"
+                                        :inactive-value="'0'"
+                                    ></el-switch>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                </el-form-item>
+                            </div>
                         </el-form>
                     </el-tab-pane>
                 </el-tabs>
