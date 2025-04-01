@@ -18,12 +18,11 @@
                         :props="{value: 'id', label: 'name', children: 'children'}"
                         node-key="id"
                         highlight-current
-                        check-on-click-node
                         default-expand-all
                         :indent="6"
+                        :expand-on-click-node="false"
                     >
                         <template #default="{ node, data }">
-                            <!--  @click="checkDir(data.id)" -->
                             <div class="custom-tree-node" @click="checkDir(data.id)">
                                 <i class="iconfont" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
                                 <span>{{ data.name }}</span>
@@ -362,7 +361,10 @@ onMounted(() => {
         }
     }
 }
-
+.custom-tree-node{
+    width: 100%;
+    text-align: left;
+}
 
 </style>
 <style>
