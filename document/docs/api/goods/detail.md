@@ -1,0 +1,211 @@
+# 商品详情
+
+* 获取用户商品详情信息
+
+### 请求URL
+
+* /api/v1/goods/:no
+
+### 路由参数：
+
+|字段| 是否必填 |字段类型|说明|
+|-----|------|-----|----|
+|no| String     | Y    |商品编号|
+
+
+
+### 请求方式
+* GET
+
+### 返回示例
+
+```json
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "banner": {
+      "images": [
+        "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
+        "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
+        "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png"
+      ],
+      "video": {
+        "url": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.mp4",
+        "duration": 20
+      }
+    },
+    "center": {
+      "no": "eda482c3-df45-47a4-abc5-f795db6fefae",
+      "name": "测试商品1",
+      "sub_name": "测试商品1-副标题",
+      "label": "热卖",
+      "price": "10.23",
+      "unit": "个",
+      "evaluate": [ ],
+      "parameters": [
+        {
+          "name": "产地",
+          "value": "中国"
+        },
+        {
+          "name": "许可证号",
+          "value": "X0000000001"
+        }
+      ],
+      "content": "<p> xxxxxxxxxxxxxxxxxxxxxx </p>",
+      "recommend": [ ],
+      "sku_params": {
+        "skus": [
+          {
+            "id": 3,
+            "unique": "13_14_15",
+            "price": "10.06",
+            "integral": "0.00",
+            "number": 288,
+            "has_number": true
+          },
+          {
+            "id": 4,
+            "unique": "13_14_16",
+            "price": "12.01",
+            "integral": "0.00",
+            "number": 299,
+            "has_number": true
+          }
+        ],
+        "spec_values": [
+          {
+            "id": 1,
+            "name": "颜色",
+            "values": [
+              {
+                "id": 13,
+                "name": "红色",
+                "thumb": "https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "号码",
+            "values": [
+              {
+                "id": 14,
+                "name": "L",
+                "thumb": ""
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "送装服务",
+            "values": [
+              {
+                "id": 15,
+                "name": "不送装",
+                "thumb": ""
+              },
+              {
+                "id": 16,
+                "name": "送装",
+                "thumb": ""
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "bottom": {
+      "cart_number": 0,
+      "can_collect": false
+    }
+  }
+}
+```
+
+### 返回参数说明
+data.banner 参数说明
+
+| 字段             | 字段类型    | 说明      |
+|----------------|---------|---------|
+| images         | Array   | 商品轮播图   |
+| images.*       | String  | 商品轮播图地址 |
+| video          | Object  | 商品视频    |
+| video.url      | String  | 视频地址    |
+| video.duration | Integer | 视频时长    |
+
+data.center 参数说明
+
+| 字段               | 字段类型    | 说明                                    |
+|------------------|---------|---------------------------------------|
+| no               | String  | 商品编号                                  |
+| name             | String  | 商品名称                                  |
+| sub_name         | String  | 商品副标题                                 |
+| label            | String  | 商品标签                                  |
+| price            | String  | 商品价格                                  |
+| unit             | String  | 商品单位                                  |
+| content          | String  | 商品详情                                  |
+| evaluate         | Array   | 商品评价，详见 `data.center.evaluate` 参数说明   |
+| parameters         | Array   | 产品参数，详见 `data.center.parameters` 参数说明 |
+| recommend        | Array   | 商品推荐，详见 `data.center.recommend` 参数说明  |
+| sku_params       | Object  | 商品规格，详见 `data.center.sku_params` 参数说明 |
+
+
+data.center.evaluate 参数说明
+
+| 字段               | 字段类型    | 说明      |
+|------------------|---------|---------|
+
+
+data.center.parameters 参数说明
+
+| 字段               | 字段类型    | 说明      |
+|------------------|---------|---------|
+| name | String  | 参数名称   |
+| value | String  | 参数值   |
+
+
+data.center.recommend 参数说明
+
+| 字段               | 字段类型    | 说明      |
+|------------------|---------|---------|
+
+
+data.center.sku_params 参数说明
+
+| 字段                           | 字段类型    | 说明       |
+|------------------------------|---------|----------|
+| skus                         | Array   | 商品规格值数据  |
+| skus.*.id                    | Integer | 商品规格ID   |
+| skus.*.unique                | String  | 商品规格唯一标识 |
+| skus.*.price                 | String  | 商品规格价格   |
+| skus.*.integral              | String  | 商品规格积分   |
+| skus.*.number                | Integer | 商品规格库存   |
+| skus.*.has_number            | Boolean | 是否还有库存   |
+| spec_values                  | Array   | 商品规格数据   |
+| spec_values.*.id             | Integer | 商品规格ID   |
+| spec_values.*.name           | String  | 商品规格名    |
+| spec_values.*.values         | Array   | 商品规格值数据  |
+| spec_values.*.values.*.id    | Integer | 商品规格值ID  |
+| spec_values.*.values.*.name  | String  | 商品规格值名称  |
+| spec_values.*.values.*.thumb | String  | 商品规格值缩略图 |
+
+
+
+
+data.bottom 参数说明
+
+| 字段          | 字段类型 | 说明|
+|-------------|--------|----|
+| cart_number  | Integer | 购物车商品数量 |
+| can_collect  | Boolean | 是否收藏 |
+
+
+### 特殊 code 说明
+
+| CODE值 | 说明    |
+|-------|-------|
+| 4000  | 商品被删除 |
+| 4001  | 商品被下架 |
+| 4002  | 商品已售完 |

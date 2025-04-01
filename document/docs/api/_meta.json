@@ -43,6 +43,12 @@
     },
     {
         "type": "dir",
+        "name": "goods",
+        "label": "商品详情",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
         "name": "cart",
         "label": "购物车",
         "collapsed": true
