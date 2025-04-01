@@ -15,6 +15,8 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'material' => env('FILESYSTEM_DISK_MATERIAL', 'public'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

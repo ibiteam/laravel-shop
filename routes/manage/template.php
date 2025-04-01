@@ -37,6 +37,7 @@ Route::group(['prefix' => 'material'], function () {
     Route::post('/batch/destory', [Manage\MaterialFileController::class, 'batchDestroy']);// 批量删除
     Route::post('/move', [Manage\MaterialFileController::class, 'move']);// 移动
     Route::post('/batch/move', [Manage\MaterialFileController::class, 'batchMove']);// 批量移动
+    Route::post('/upload', [Manage\MaterialFileController::class, 'upload']);// 上传素材
     Route::group(['prefix' => 'folder'], function () {
         Route::get('/', [Manage\MaterialFileController::class, 'folderList']); // 文件夹列表
         Route::get('list', [Manage\MaterialFileController::class, 'folderListForDirType']); // 上级文件夹

@@ -37,3 +37,7 @@ export function batchMove(data) {
 export function move(data) {
     return $http.doPost('manage/material/move', data)
 }
+
+export function materialUpload(data) {
+    return $http.doPost('manage/material/upload', data)
+}

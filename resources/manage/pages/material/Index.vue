@@ -65,7 +65,16 @@
                             </div>
                             <div class="search-form-item">
                                 <el-button type="primary" @click="searchMaterial">查询</el-button>
-                                <el-button type="danger">上传文件</el-button>
+                                <el-upload
+                                    class="logo-uploader"
+                                    accept="image/jpeg,image/jpg,image/png"
+                                    action=""
+                                    :show-file-list="false"
+                                    :http-request="(request) => uploadFile(request, 'shop_logo')"
+                                    :with-credentials="true"
+                                >
+                                    <el-button type="danger">上传文件</el-button>
+                                </el-upload>
                                 <el-button type="default" @click="openAddFolder">新建文件夹</el-button>
                             </div>
                         </div>
@@ -99,7 +108,7 @@
                                             <div v-else>
                                                 <div class="material-table-item-name">
                                                     <div class="material-img">
-                                                        <img :src="scope.row.url" alt="" />
+                                                        <img :src="scope.row.file_path" alt="" />
                                                     </div>
                                                     {{scope.row.name}}
                                                 </div>
@@ -185,7 +194,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, watch, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
-import { folderIndex, folderList, materialIndex, rename, newFolder, newFile, destory, batchDestory, batchMove, move } from '@/api/material.js';
+import { folderIndex, folderList, materialIndex, rename, newFolder, newFile, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
 
 const tabValue = ref('1');
 const multipleSelection = ref([]);
@@ -230,6 +239,24 @@ onMounted( () => {
     getFolderData()
 });
 
+const uploadFile = async (request, type) => {
+    const info = {
+        file: request.file,
+        parent_id: searchForm.value.parent_id,
+        dir_type: searchForm.value.dir_type
+    }
+    try {
+        const res = await materialUpload(info);
+        if (res.code === 200) {
+            getFolderData()
+        } else {
+            cns.$message.error(res.message)
+        }
+    } catch (error) {
+        console.error('Failed:', error);
+    }
+};
+
 const handleSelectionChange = (val) => {
     multipleSelection.value = []
     // 筛选出 id 字段并存入数组
@@ -258,7 +285,7 @@ const getFolderData = () => {
     folderList({dir_type: tabValue.value}).then(res => {
         if (res.code === 200) {
             folderData.value = res.data;
-            searchForm.dir_type = tabValue.value;
+            searchForm.value.dir_type = tabValue.value;
             getMaterialData()
         } else {
             cns.$message.error(res.message)

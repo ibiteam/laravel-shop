@@ -10,6 +10,7 @@ use App\Models\MaterialFile;
 use App\Services\MaterialFileService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class MaterialFileController extends BaseController
@@ -353,6 +354,35 @@ class MaterialFileController extends BaseController
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('移动失败');
+        }
+    }
+
+    /**
+     * 素材上传
+     * @throws BusinessException
+     */
+    public function upload(Request $request, MaterialFileService $materialFileService)
+    {
+        try {
+            $file = $request->file('file');
+            $dir_type = $request->get('dir_type');
+            $parent_id = $request->get('parent_id');
+            $admin_user_id = $request->user()?->id ?: 0;
+
+            if (! $file || ! $file->isValid()) {
+                return $this->error('文件上传失败');
+            }
+            $res = $materialFileService->saveMaterialFile($admin_user_id, $file, $dir_type, $parent_id);
+
+            if (!$res) {
+                return $this->error('上传失败');
+            }
+
+            return $this->success('上传成功');
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('上传失败');
         }
     }
 

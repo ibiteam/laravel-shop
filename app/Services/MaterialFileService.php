@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Exceptions\BusinessException;
 use App\Models\MaterialFile;
+use Illuminate\Support\Facades\Storage;
 
 class MaterialFileService
 {
@@ -21,6 +22,7 @@ class MaterialFileService
 
         $materialFile = MaterialFile::query()
             ->whereDirType($dir_type)
+            ->whereType(MaterialFile::TYPE_DIR)
             ->select('id', 'name', 'parent_id', 'dir_type')
             ->latest()->get();
         $top_dir = MaterialFile::$dirTopManage[$dir_type];
@@ -51,5 +53,61 @@ class MaterialFileService
         }
 
         return $branch;
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function saveMaterialFile($admin_user_id, $file, $dir_type, $parent_id)
+    {
+        // 获取文件大小（单位：字节）
+        $fileSize = $file->getSize();
+        // 文件名称
+        $fileName = $file->getClientOriginalName();
+        // 检查是否为图片文件
+        $mimeType = $file->getMimeType();
+
+        if (strpos($mimeType, 'image/') === 0) {
+            // 获取图片的宽高
+            $imageInfo = getimagesize($file->getPathname());
+            if ($imageInfo) {
+                $width = $imageInfo[0];  // 宽度
+                $height = $imageInfo[1]; // 高度
+            } else {
+                throw new BusinessException('无法解析图片信息');
+            }
+        } else {
+            $width = null;
+            $height = null;
+        }
+
+        $fileSizeInKB = round($fileSize / 1024, 2); // 转换为 KB 并保留两位小数
+
+        $file_path = $this->getFileUrl($file);
+
+        return MaterialFile::create([
+            'type' => MaterialFile::TYPE_FILE,
+            'parent_id' => $parent_id,
+            'admin_user_id' => $admin_user_id,
+            'name' => $fileName,
+            'file_path' => $file_path,
+            'size' => $fileSizeInKB,
+            'width' => $width,
+            'height' => $height,
+            'dir_type' => $dir_type,
+        ]);
+    }
+
+    public function getFileUrl($file): string
+    {
+        $storage = Storage::disk();
+
+        $file_path = $storage->put(config('app.manage_prefix') . '/' . date('Y/m/d'), $file);
+
+        if (! $file_path) {
+            throw new BusinessException('文件上传失败~');
+        }
+
+        return $storage->url($file_path);
     }
 }
