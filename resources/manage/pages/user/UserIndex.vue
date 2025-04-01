@@ -1,7 +1,6 @@
 <script setup>
 import { Plus, Search, RefreshLeft} from '@element-plus/icons-vue';
-import { getUserIndex } from '@/api/user.js'
-import { userUpdate } from '@/api/user.js'
+import { getUserIndex, userUpdate } from '@/api/user.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -43,6 +42,13 @@ const handleSizeChange = (val) => {
     getData(1);
 }
 
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
+}
+
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
@@ -63,12 +69,7 @@ const getData = (page = 1) => {
     })
 }
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
+
 
 const updateForm = () => {
     updateLoading.value = true

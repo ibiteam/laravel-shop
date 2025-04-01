@@ -5,24 +5,40 @@ use Illuminate\Support\Facades\Route;
 
 // 移动端装修
 Route::group(['prefix' => 'app_web_decoration'], function () {
-    Route::any('index', [Manage\AppWebsiteDecorationController::class, 'index'])->name('manage.app_web_decoration.index');
-    Route::any('children_index', [Manage\AppWebsiteDecorationController::class, 'children_index'])->name('manage.app_web_decoration.children_index');
-    Route::any('copy', [Manage\AppWebsiteDecorationController::class, 'copy'])->name('manage.app_web_decoration.copy');
-    Route::any('destroy', [Manage\AppWebsiteDecorationController::class, 'destroy'])->name('manage.app_web_decoration.destroy');
-    Route::any('change_is_show', [Manage\AppWebsiteDecorationController::class, 'change_is_show'])->name('manage.app_web_decoration.change_is_show');
-    Route::any('edit', [Manage\AppWebsiteDecorationController::class, 'edit'])->name('manage.app_web_decoration.edit');
-    Route::any('store', [Manage\AppWebsiteDecorationController::class, 'store'])->name('manage.app_web_decoration.store');
-    Route::any('decoration', [Manage\AppWebsiteDecorationController::class, 'decoration'])->name('manage.app_web_decoration.decoration');
-    Route::any('decoration_store', [Manage\AppWebsiteDecorationController::class, 'decoration_store'])->name('manage.app_web_decoration.decoration_store');
-    Route::any('get_content_data_by_alias', [Manage\AppWebsiteDecorationController::class, 'get_content_data_by_alias'])->name('manage.app_web_decoration.get_content_data_by_alias');
-    Route::any('get_second_cats_news', [Manage\AppWebsiteDecorationController::class, 'get_second_cats_news'])->name('manage.app_web_decoration.get_second_cats_news');
-    Route::any('get_hot_sale_goods_by_cat_id', [Manage\AppWebsiteDecorationController::class, 'get_hot_sale_goods_by_cat_id'])->name('manage.app_web_decoration.get_hot_sale_goods_by_cat_id');
-    Route::any('router_options', [Manage\AppWebsiteDecorationController::class, 'router_options'])->name('manage.app_web_decoration.router_options');
-    Route::any('get_options', [Manage\AppWebsiteDecorationController::class, 'get_options'])->name('manage.app_web_decoration.get_options');
-    Route::any('router_search', [Manage\AppWebsiteDecorationController::class, 'router_search'])->name('manage.app_web_decoration.router_search');
-    Route::any('get_cat_list', [Manage\AppWebsiteDecorationController::class, 'get_cat_list'])->name('manage.app_web_decoration.get_cat_list');
-    Route::any('seller_router_options', [Manage\AppWebsiteDecorationController::class, 'seller_router_options'])->name('manage.app_web_decoration.seller_router_options');
-    Route::any('seller_router_search', [Manage\AppWebsiteDecorationController::class, 'seller_router_search'])->name('manage.app_web_decoration.seller_router_search');
-    Route::any('get_free_try_goods', [Manage\AppWebsiteDecorationController::class, 'get_free_try_goods'])->name('manage.app_web_decoration.get_free_try_goods');
-    Route::any('get_charge_try_goods', [Manage\AppWebsiteDecorationController::class, 'get_charge_try_goods'])->name('manage.app_web_decoration.get_charge_try_goods');
+    Route::any('index', [Manage\AppWebsiteDecorationController::class, 'index']);
+    Route::any('children_index', [Manage\AppWebsiteDecorationController::class, 'childrenIndex']);
+    Route::any('copy', [Manage\AppWebsiteDecorationController::class, 'copy']);
+    Route::any('destroy', [Manage\AppWebsiteDecorationController::class, 'destroy']);
+    Route::any('change_is_show', [Manage\AppWebsiteDecorationController::class, 'changeIsShow']);
+    Route::any('edit', [Manage\AppWebsiteDecorationController::class, 'edit']);
+    Route::any('store', [Manage\AppWebsiteDecorationController::class, 'store']);
+    Route::any('decoration', [Manage\AppWebsiteDecorationController::class, 'decoration']);
+    Route::any('decoration_store', [Manage\AppWebsiteDecorationController::class, 'decorationStore']);
+    Route::any('get_content_data_by_alias', [Manage\AppWebsiteDecorationController::class, 'getContentDataByAlias']);
+    Route::any('get_second_cats_news', [Manage\AppWebsiteDecorationController::class, 'getSecondCatsNews']);
+    Route::any('get_hot_sale_goods_by_cat_id', [Manage\AppWebsiteDecorationController::class, 'getHotSaleGoodsByCatId']);
+    Route::any('router_options', [Manage\AppWebsiteDecorationController::class, 'routerOptions']);
+    Route::any('get_options', [Manage\AppWebsiteDecorationController::class, 'getOptions']);
+    Route::any('router_search', [Manage\AppWebsiteDecorationController::class, 'routerSearch']);
+    Route::any('get_cat_list', [Manage\AppWebsiteDecorationController::class, 'getCatList']);
+    Route::any('seller_router_options', [Manage\AppWebsiteDecorationController::class, 'sellerRouterOptions']);
+    Route::any('seller_router_search', [Manage\AppWebsiteDecorationController::class, 'sellerRouterSearch']);
+    Route::any('get_free_try_goods', [Manage\AppWebsiteDecorationController::class, 'getFreeTryGoods']);
+    Route::any('get_charge_try_goods', [Manage\AppWebsiteDecorationController::class, 'getChargeTryGoods']);
+ });
+
+// 素材中心
+Route::group(['prefix' => 'material'], function () {
+    Route::get('/', [Manage\MaterialFileController::class, 'index']); // 素材列表
+    Route::post('/rename', [Manage\MaterialFileController::class, 'rename']); // 修改素材文件名
+    Route::post('/new/file', [Manage\MaterialFileController::class, 'newFile']); // 新建文件 - 素材
+    Route::post('/new/folder', [Manage\MaterialFileController::class, 'newFolder']); // 新建文件夹
+    Route::post('/destory', [Manage\MaterialFileController::class, 'destory']);// 删除
+    Route::post('/batch/destory', [Manage\MaterialFileController::class, 'batchDestroy']);// 批量删除
+    Route::post('/move', [Manage\MaterialFileController::class, 'move']);// 移动
+    Route::post('/batch/move', [Manage\MaterialFileController::class, 'batchMove']);// 批量移动
+    Route::group(['prefix' => 'folder'], function () {
+        Route::get('/', [Manage\MaterialFileController::class, 'folderList']); // 文件夹列表
+        Route::get('list', [Manage\MaterialFileController::class, 'folderListForDirType']); // 上级文件夹
+    });
 });

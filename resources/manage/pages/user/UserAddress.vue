@@ -1,8 +1,6 @@
 <script setup>
 import { Plus, Search, RefreshLeft} from '@element-plus/icons-vue';
-import { getUserAddress } from '@/api/user.js'
-import { addressUpdate } from '@/api/user.js'
-import { getAreasData } from '@/api/user.js'
+import { getUserAddress, addressUpdate, getAreasData } from '@/api/user.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties

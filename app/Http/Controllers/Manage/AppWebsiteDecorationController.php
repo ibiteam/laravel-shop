@@ -80,7 +80,7 @@ class AppWebsiteDecorationController extends BaseController
         return $this->success($data->toArray());
     }
 
-    public function children_index(Request $request)
+    public function childrenIndex(Request $request)
     {
         $alias = $request->input('alias');
         $number = $request->input('number', 10);
@@ -235,7 +235,7 @@ class AppWebsiteDecorationController extends BaseController
         return $this->success('删除成功');
     }
 
-    public function change_is_show(Request $request)
+    public function changeIsShow(Request $request)
     {
         $app_website_decoration = AppWebsiteDecorationModel::query()->with('item')->whereId($request->input('id'))->childLevel()->first();
 
@@ -505,7 +505,7 @@ class AppWebsiteDecorationController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse|null
      */
-    public function decoration_store(Request $request)
+    public function decorationStore(Request $request)
     {
         $id = $request->input('id');
         $data = $request->input('data');
@@ -688,7 +688,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_content_data_by_alias(Request $request)
+    public function getContentDataByAlias(Request $request)
     {
         $component_name = $request->input('component_name'); // 页面别名
 
@@ -718,7 +718,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_hot_sale_goods_by_cat_id(Request $request)
+    public function getHotSaleGoodsByCatId(Request $request)
     {
         $content = $request->input('content'); // item_id
         $cat_id = $request->input('cat_id'); // cat_id
@@ -742,7 +742,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_second_cats_news(Request $request)
+    public function getSecondCatsNews(Request $request)
     {
         $content = $request->input('content'); // item_id
         $cat_id = $request->input('cat_id'); // cat_id
@@ -759,7 +759,7 @@ class AppWebsiteDecorationController extends BaseController
         return $this->success($info);
     }
 
-    public function router_options()
+    public function routerOptions()
     {
         return $this->success((new MobileRouterService)->routers());
     }
@@ -776,7 +776,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_options(Request $request)
+    public function getOptions(Request $request)
     {
         $page_type = $request->input('page_type');
         $keywords = $request->input('keywords');
@@ -797,7 +797,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function router_search(Request $request)
+    public function routerSearch(Request $request)
     {
         $alias = $request->input('alias');
         $keywords = $request->input('keywords');
@@ -818,7 +818,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_cat_list(Request $request)
+    public function getCatList(Request $request)
     {
         $keywords = $request->input('keywords');
         $data = (new RomoteSearchService)->getCatList($keywords);
@@ -831,7 +831,7 @@ class AppWebsiteDecorationController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse|void
      */
-    public function seller_router_options()
+    public function sellerRouterOptions()
     {
         return $this->success((new SellerMobileRouterService)->routers());
     }
@@ -848,7 +848,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function seller_router_search(Request $request)
+    public function sellerRouterSearch(Request $request)
     {
         $alias = $request->input('alias');
         $keywords = $request->input('keywords');
@@ -864,7 +864,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_free_try_goods(Request $request)
+    public function getFreeTryGoods(Request $request)
     {
         $content = $request->input('content'); // item_id
         $cat_name = $request->input('cat_name'); // cat_name
@@ -888,7 +888,7 @@ class AppWebsiteDecorationController extends BaseController
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    public function get_charge_try_goods(Request $request)
+    public function getChargeTryGoods(Request $request)
     {
         $content = $request->input('content'); // item_id
         $cat_name = $request->input('cat_name'); // cat_name

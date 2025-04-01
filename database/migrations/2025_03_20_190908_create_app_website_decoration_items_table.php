@@ -26,7 +26,7 @@ return new class extends Migration
 
             $table->foreign('app_website_decoration_id')->references('id')->on((new AppWebsiteDecoration())->getTable());
         });
-        DB::statement("ALTER TABLE `user_addresses` COMMENT '移动端装修组件表'");
+        DB::statement("ALTER TABLE `app_website_decoration_items` COMMENT '移动端装修组件表'");
     }
 
     /**

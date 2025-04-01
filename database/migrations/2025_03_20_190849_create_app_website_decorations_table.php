@@ -24,10 +24,10 @@ return new class extends Migration
             $table->string('title')->nullable()->comment('网页TDK:标题');
             $table->string('keywords')->nullable()->comment('网页TDK:关键词');
             $table->string('description')->nullable()->comment('网页TDK:描述');
-            $table->boolean('version')->default(1)->comment('版本：1买家版 2卖家版');
+            $table->timestamp('release_time')->nullable()->comment('发布时间');
             $table->timestamps();
         });
-        DB::statement("ALTER TABLE `user_addresses` COMMENT '移动端装修表'");
+        DB::statement("ALTER TABLE `app_website_decorations` COMMENT '移动端装修表'");
     }
 
     /**

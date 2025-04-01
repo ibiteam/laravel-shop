@@ -412,6 +412,59 @@ if (! function_exists('get_sensitive_words')) {
     }
 }
 
+if (! function_exists('get_chat_url')) {
+    /**
+     * 获取聊天室链接.
+     * @param $source_url 来源地址
+     * @param $goods_id 商品id
+     * @param $user_id 用户id
+     * @param $user_name 用户名称
+     * @param $user_head_img 用户头像
+     * @param $mobile_phone 手机号
+     * @return string
+     */
+    function get_chat_url($source_url = '', $goods_id = 0, $user_id = '', $user_name = '', $user_head_img = '', $mobile_phone = '')
+    {
+        $url = '';
+        $suffix = '';
+        $platform_is_show = '是否显示平台客服';
+
+        if ($platform_is_show) {
+            $user = get_user();
+            $platform_id = '客服平台id';
+            $platform_platform_secret = '客服平台secret';
+            $server_platform_url = '客服平台地址';
+
+            if ($user || $user_id) {
+                $data = [
+                    'platform_id' => $platform_id,
+                    'user_id' => $user ? $user->user_id : $user_id,
+                    'user_name' => $user ? $user->user_name.$suffix : $user_name.$suffix,
+                    'user_phone' => $mobile_phone != '' ? $mobile_phone : ($user ? $user->mobile_phone : ''),
+                    'user_head_img' => $user_head_img != '' ? $user_head_img : ($user ? $user->portrait : ''),
+                    'source' => get_source(),
+                    'source_url' => $source_url,
+                ];
+            } else {
+                $data = [
+                    'platform_id' => $platform_id,
+                    'source' => get_source(),
+                    'source_url' => $source_url,
+                ];
+            }
+            if ($goods_id) {
+                $data['goods_id'] = $goods_id;
+            }
+            $sign_params = Md5Utils::sign($data, $platform_platform_secret);
+            $sign_params['seller_id'] = 0;
+
+            $url = $server_platform_url.'?'.http_build_query($sign_params);
+        }
+
+        return $url;
+    }
+}
+
 
 if (! function_exists('is_spider')) {
     /**
