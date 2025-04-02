@@ -116,11 +116,11 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'goods_amount' => 'decimal',
-            'order_amount' => 'decimal',
-            'shipping_fee' => 'decimal',
-            'coupon_amount' => 'decimal',
-            'money_paid' => 'decimal',
+            'goods_amount' => 'decimal:2',
+            'order_amount' => 'decimal:2',
+            'shipping_fee' => 'decimal:2',
+            'coupon_amount' => 'decimal:2',
+            'money_paid' => 'decimal:2',
             'paid_at' => 'datetime',
             'shipped_at' => 'datetime',
             'received_at' => 'datetime',

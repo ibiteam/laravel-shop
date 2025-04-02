@@ -352,7 +352,7 @@ class RecommendComponent extends PageComponent
                 foreach ($content['ad_space'] as &$val){
                     if(isset($content['img_data'])){
                         foreach ($val['img_data'] as &$v){
-                            $v['url'] = app(MobileRouterService::class)->handleUrl($v['alias'],$v['value'],sourcePort());
+                            $v['url'] = app(MobileRouterService::class)->handleUrl($v['alias'],$v['value'],source_port());
                         }
                     }
                 }

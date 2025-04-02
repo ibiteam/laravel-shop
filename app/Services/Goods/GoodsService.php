@@ -7,6 +7,7 @@ use App\Exceptions\CustomException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
+use App\Http\Dao\OrderEvaluateDao;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\Goods;
@@ -251,6 +252,20 @@ class GoodsService
         }
         $goods->sku_params_list = $tmp_sku_params_list;
 
+        // 商品评价处理
+        [$evaluate_total, $evaluate_list] = app(OrderEvaluateDao::class)->getEvaluateByGoodsId($goods->id);
+        $tmp_evaluate = [
+            'total' => $evaluate_total,
+            'tag_data' => [],
+            'items' => $evaluate_list,
+        ];
+
+        if ($evaluate_total > 0) {
+            $tmp_evaluate['tag_data'] = app(OrderEvaluateDao::class)->getTagListByGoodsId($goods->id);
+        }
+        $goods->evaluate = $tmp_evaluate;
+
+        // 购物车数量以及是否收藏处理
         if ($user instanceof User) {
             $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
 

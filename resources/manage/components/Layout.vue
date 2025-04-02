@@ -426,7 +426,7 @@ const tabRemove = (name) =>{
             if (latestView) {
                 router.push(latestView.path)
             } else {
-                router.push('/home')
+                router.push({name: 'manage.home.index'})
             }
         }
     })
@@ -468,7 +468,7 @@ const closeSelectedTag = (view) => {
             if (latestView) {
                 router.push(latestView.path)
             } else {
-                router.push('/home')
+                router.push({name: 'manage.home.index'})
             }
         }
     })
@@ -483,7 +483,7 @@ const closeOthersTags = () =>{
 
 const closeAllTags = () => {
     tabsStore.delAllViews()
-    router.push('/home')
+    router.push({name: 'manage.home.index'})
 }
 
 onMounted(() => {
