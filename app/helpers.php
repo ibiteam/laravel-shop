@@ -522,15 +522,3 @@ if (! function_exists('to_number_format')) {
     }
 }
 
-
-if (! function_exists('page_path')) {
-    /**
-     * 前台路由路径.
-     */
-    function page_path($route_name): string
-    {
-        $no_domain_route = route($route_name, [], false);
-
-        return str_replace('api/manage/', '', $no_domain_route);
-    }
-}

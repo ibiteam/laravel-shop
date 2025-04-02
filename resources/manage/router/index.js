@@ -19,18 +19,22 @@ const router = createRouter({
             path:'/',
             component: () => import('@/components/Layout.vue'),
             children:[
-                { path: 'home', component: Home, name: 'home' },
-                { path: '/goods/index', component: Goods , name: 'goods' },
-                { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
-                { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
-                { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
-                { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
-                { path: '/set/router_category', component: SetRouterCategory, name: 'SetRouterCategory' },
-                { path: '/set/router', component: SetRouter, name: 'SetRouter' },
-                { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
-                { path: '/set/payment_method', component: PaymentMethod, name: 'PaymentMethod' },
-                { path: '/user/index', component: UserIndex , name: 'UserIndex' },
-                { path: '/user/address', component: UserAddress , name: 'UserAddress' },
+                // 首页
+                { path: 'home', component: Home, name: 'manage.home.index' },
+                // 设置
+                { path: '/set/shop_config', component: SetShopConfig, name: 'manage.shop_config.index' },
+                { path: '/set/router_category', component: SetRouterCategory, name: 'manage.router_category.index' },
+                { path: '/set/router', component: SetRouter, name: 'manage.router.index' },
+                { path: '/set/payment_method', component: PaymentMethod, name: 'manage.payment_method.index' },
+                // 商品
+                { path: '/goods/index', component: Goods , name: 'manage.goods.index' },
+                { path: '/goods/form/:id', component: GoodsForm , name: 'manage.goods.form' },
+                { path: '/goods/category', component: GoodsCateGoryIndex, name: 'manage.category.index' },
+                // 用户
+                { path: '/user/index', component: UserIndex , name: 'manage.user.index' },
+                { path: '/user/address', component: UserAddress , name: 'manage.user.address' },
+                // 工具
+                { path: '/material/index', component: MaterialIndex, name: 'manage.material.index' },
             ]
         },
         {

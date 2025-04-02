@@ -4,7 +4,6 @@ namespace App\Http\Dao;
 
 use App\Models\Permission;
 use App\Models\AccessRecord;
-use Illuminate\Support\Facades\Route;
 
 class AccessRecordDao
 {
@@ -53,7 +52,6 @@ class AccessRecordDao
                     'title' => $permission->display_name,
                     'name' => $permission->name,
                     'icon' => $permission->icon,
-                    'src' => $permission->parent_id && Route::has($permission->name) ? page_path($permission->name) : '',
                 ];
             })->toArray();
     }

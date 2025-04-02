@@ -12,7 +12,6 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 
 class HomeController extends BaseController
@@ -68,7 +67,6 @@ class HomeController extends BaseController
                     'title' => $item->permission->display_name,
                     'name' => $item->permission->name,
                     'icon' => $item->permission->icon,
-                    'src' => $item->permission->parent_id && Route::has($item->permission->name) ? page_path($item->permission->name) : '',
                 ];
             });
 

@@ -4,7 +4,6 @@ namespace App\Http\Dao;
 
 use App\Models\AdminUser;
 use App\Models\Permission;
-use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
 class PermissionDao
@@ -29,7 +28,6 @@ class PermissionDao
                     'name' => $permission->name,
                     'title' => $permission->display_name,
                     'icon' => $permission->icon,
-                    'src' => $permission->parent_id && Route::has($permission->name) ? page_path($permission->name) : '',
                     'sort' => $permission->sort,
                     'is_collection' => isset($collect_permission_ids[$permission->id]),
                 ];
