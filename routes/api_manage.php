@@ -22,7 +22,5 @@ Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
 
     require __DIR__.'/manage/goods.php';
 
-    require __DIR__.'/manage/template.php';
-
     require __DIR__.'/manage/user.php';
 });

@@ -50,51 +50,6 @@ class MaterialFileController extends BaseController
         return $this->success(new CommonResourceCollection($list));
     }
 
-    // 新建素材
-    public function newFile(Request $request)
-    {
-        try {
-            // 验证请求参数
-            $data = $request->validate([
-                'name' => 'required|string|max:20', // 文件夹名，最大长度 20
-                'parent_id' => 'required|integer', // 上级文件夹 ID
-            ], [], [
-                'name' => '文件夹名',
-                'parent_id' => '上级文件夹 ID',
-            ]);
-
-            // 检查上级文件夹是否存在
-            $parentId = $data['parent_id'];
-
-            if ($parentId > 0) { // 如果 parent_id > 0，则需要验证上级文件夹是否存在
-                $parentFolder = MaterialFile::find($parentId);
-
-                if (! $parentFolder || $parentFolder->type !== MaterialFile::TYPE_DIR) {
-                    throw new BusinessException('上级文件夹无效');
-                }
-            }
-
-            // 创建新文件夹
-            $newFolder = new MaterialFile;
-            $newFolder->name = $data['name'];
-            $newFolder->admin_user_id = $request->user()?->id ?: 0;
-            $newFolder->parent_id = $parentId == -1 ? 0 : $parentId;
-            $newFolder->type = MaterialFile::TYPE_FILE; // 设置为素材类型
-
-            if (! $newFolder->save()) {
-                throw new BusinessException('文件素材创建失败');
-            }
-
-            return $this->success('保存成功');
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (\Throwable $throwable) {
-            return $this->error('保存失败');
-        }
-    }
-
     // 新建文件夹
     public function newFolder(Request $request)
     {

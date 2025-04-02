@@ -530,7 +530,7 @@ const handleBatchMove = () => {
     })
 }
 const checkDir = (id, type) => {
-    if (type === 1) {
+    if (type === 1 || id === 0) {
         searchForm.value.parent_id = id
         getMaterialData()
     }

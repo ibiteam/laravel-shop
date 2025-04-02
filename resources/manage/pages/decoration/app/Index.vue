@@ -1,6 +1,7 @@
 <script setup>
 import { Plus, Search, RefreshLeft} from '@element-plus/icons-vue';
-import { getUserAddress, addressUpdate, getAreasData } from '@/api/user.js'
+import { getUserIndex, userUpdate } from '@/api/user.js'
+import { fileUpload } from '@/api/decoration.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -9,8 +10,7 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 const queryParams = reactive({
     page: 1,
     number: 10,
-    user_id: '1', // 用户id
-    recipient_name: '', // 收货人
+    user_name: '', // 用户名称搜索
 });
 
 // 添加分页相关状态
@@ -27,7 +27,7 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const resetSearch = () => {
-    queryParams.user_id = '';
+    queryParams.user_name = '';
     getData(1);
 };
 
@@ -43,23 +43,22 @@ const handleSizeChange = (val) => {
     getData(1);
 }
 
-const areasData = () => {
-    getAreasData(queryParams).then(res => {
-        if (res.code === 200) {
-            areas.value = res.data;
-        }
-    }).catch(() => {})
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
 }
 
 const getData = (page = 1) => {
-    loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-
-    getUserAddress(queryParams).then(res => {
+    loading.value = true;
+    getUserIndex(queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data.list;
+            console.log(tableData.value);
             // 更新分页信息
             setPageInfo(res.data.meta);
         } else {
@@ -70,18 +69,13 @@ const getData = (page = 1) => {
     })
 }
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
+
 
 const updateForm = () => {
     updateLoading.value = true
     subFormRef.value.validate((valid, fields) => {
         if (valid) {
-            addressUpdate(subForm.value).then(function (res) {
+            userUpdate(subForm.value).then(function (res) {
                 if (res.code === 200) {
                     dialogFormVisible.value = false;
                     cns.$message.success('保存成功');
@@ -99,49 +93,54 @@ const updateForm = () => {
     })
 };
 
-const modifyAddress = (row) => {
+const userAddress = (row) => {
+
+};
+
+const modifyUser = (row) => {
     subForm.value = {
         id: row.id,
-        user_id: queryParams.user_id,
-        address_detail: row.address_detail,
-        area: row.area,
-        recipient_name: row.recipient_name,
-        recipient_phone: row.recipient_phone,
-        province: row.province,
-        city: row.city,
-        district: row.district,
+        user_name: row.user_name,
+        phone: row.phone,
+        avatar: row.avatar,
+        password: "",
+        confirm_password: "",
     }
     dialogFormVisible.value = true
-    updateTitle.value = '编辑地址'
+    updateTitle.value = '编辑用户'
+};
+
+const addUser = () => {
+    subForm.value = {
+        id: 0,
+        user_name: "",
+        phone: "",
+        password: "",
+        confirm_password: "",
+        avatar: "",
+    }
+    dialogFormVisible.value = true
+    updateTitle.value = '添加用户'
 };
 
 // 关闭弹窗
 const closePasswordDialog = (form) => {
     subForm.value = {
         id: 0,
-        address_detail: "",
-        area: [],
-        recipient_name: "",
-        recipient_phone: "",
-        province: "",
-        city: "",
-        district: "",
+        user_name: "",
+        phone: "",
+        password: "",
+        confirm_password: "",
+        avatar: "",
     }
     subFormRef.value.resetFields()
     dialogFormVisible.value = false;
 };
-const handleChange = (value) => {
-    subForm.value.province = value[0];
-    subForm.value.city = value[1];
-    subForm.value.district = value[2];
-}
 
 onMounted( () => {
     getData()
-    areasData()
 });
 
-const areas = ref([]);
 const tableData = ref([]);
 const updateTitle = ref('');
 const subFormRef = ref(null);
@@ -150,29 +149,34 @@ const loading = ref(false);
 const dialogFormVisible = ref(false);
 const subForm = ref({
     id: 0,
-    user_id: queryParams.user_id,
-    address_detail: "",
-    area: [],
-    recipient_name: "",
-    recipient_phone: "",
-    province: "",
-    city: "",
-    district: "",
+    password: "",
+    confirm_password: "",
 });
+const validateConfirmPassword = (rule, value, callback) => {
+    if (value === '') {
+        callback(new Error('请输入确认密码'));
+    } else if (value !== subForm.password) {
+        callback(new Error('两次输入密码不一致!'));
+    } else {
+        callback();
+    }
+};
 
 const rules = reactive({
-    recipient_name: [
-        { required: true, message: '请输入收货人', trigger: 'blur' },
+    user_name: [
+        { required: true, message: '请输入用户名', trigger: 'blur' },
     ],
-    recipient_phone: [
+    phone: [
         { required: true, message: '请输入手机号', trigger: 'blur' },
     ],
-    address_detail: [
-        { required: true, message: '请输入详细地址', trigger: 'blur' },
-        { min: 3, max: 100, message: '长度在 3 到 100 个字符', trigger: 'blur' }
+    password: [
+        { required: true, message: '请输入密码', trigger: 'blur' },
+        { min: 8, max: 30, message: '长度在 8 到 30 个字符', trigger: 'blur' }
     ],
-    area: [
-        { required: true, message: '请选择省市区', trigger: 'blur' },
+    confirm_password: [
+        { required: true, message: '请输入确认密码', trigger: 'blur' },
+        { min: 8, max: 30, message: '长度在 8 到 30 个字符', trigger: 'blur' },
+        { validator: validateConfirmPassword, trigger: 'blur'}
     ],
 })
 
@@ -182,10 +186,10 @@ const rules = reactive({
     <el-header style="padding: 10px 0;">
         <!-- 添加搜索表单 -->
         <el-form :inline="true" :model="queryParams" class="search-form">
-            <el-form-item label="收货人" prop="recipient_name">
+            <el-form-item label="用户名" prop="user_name">
                 <el-input
-                    v-model="queryParams.recipient_name"
-                    placeholder="请输入收货人"
+                    v-model="queryParams.user_name"
+                    placeholder="请输入用户名"
                     clearable
                     @keyup.enter="handleSearch"
                 />
@@ -193,6 +197,7 @@ const rules = reactive({
             <el-form-item>
                 <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
                 <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
+                <el-button :icon="Plus" @click="addUser()" type="warning">添加</el-button>
             </el-form-item>
         </el-form>
     </el-header>
@@ -202,19 +207,30 @@ const rules = reactive({
         border
         v-loading="loading"
         style="width: 100%;">
-        <el-table-column label="地址ID" prop="id"></el-table-column>
-        <el-table-column label="收货人" prop="recipient_name"></el-table-column>
-        <el-table-column label="收货手机号" prop="recipient_phone"></el-table-column>
-        <el-table-column label="收货地址">
-            <template #default="scope">
-                {{ scope.row.province_name + scope.row.city_name + scope.row.district_name + scope.row.address_detail }}
+        <el-table-column label="用户ID" prop="id"></el-table-column>
+        <el-table-column label="用户名" prop="username">
+            <template #default="scope" >
+                <div class="flex-user-information s_flex ai_ct">
+                    <div class="header-picture">
+                        <div class="imgs">
+                            <img :src="scope.row.avatar" alt="">
+                        </div>
+                    </div>
+                    <div class="header-user-names">
+                        <span> {{ scope.row.user_name }}</span>
+                    </div>
+                </div>
             </template>
         </el-table-column>
+        <el-table-column label="昵称" prop="nickname"></el-table-column>
+        <el-table-column label="手机号" prop="phone"></el-table-column>
+        <el-table-column label="来源" prop="source"></el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
         <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="操作">
             <template #default="scope">
-                <el-button type="primary" @click="modifyAddress(scope.row)">编辑</el-button>
+                <el-button type="primary" @click="modifyUser(scope.row)">编辑</el-button>
+                <el-button type="success" @click="userAddress(scope.row)">收货地址</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -238,17 +254,17 @@ const rules = reactive({
                center
                width="500">
         <el-form :model="subForm" :rules="rules" ref="subFormRef">
-            <el-form-item label="收货人" prop="recipient_name">
-                <el-input v-model="subForm.recipient_name" autocomplete="off" />
+            <el-form-item label="用户名" prop="user_name" :label-width="formLabelWidth">
+                <el-input v-model="subForm.user_name" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="手机号" prop="recipient_phone">
-                <el-input v-model="subForm.recipient_phone" autocomplete="off" />
+            <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
+                <el-input v-model="subForm.phone" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="省市区" prop="area">
-                <el-cascader v-model="subForm.area" :options="areas" @change="handleChange" />
+            <el-form-item label="密码" :prop="subForm.id ? '' : 'password'" :label-width="formLabelWidth">
+                <el-input v-model="subForm.password" type="password" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="详细地址" prop="address_detail">
-                <el-input v-model="subForm.address_detail" autocomplete="off" />
+            <el-form-item label="确认密码" :prop="subForm.id ? '' : 'confirm_password'" :label-width="formLabelWidth">
+                <el-input v-model="subForm.confirm_password" type="password" autocomplete="off" />
             </el-form-item>
         </el-form>
         <template #footer>

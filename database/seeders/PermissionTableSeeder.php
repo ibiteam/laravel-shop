@@ -59,6 +59,10 @@ class PermissionTableSeeder extends Seeder
 
         $this->addPermission('支付方式', Permission::MANAGE_PAYMENT_METHOD_INDEX, 99, Permission::IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
         $this->addPermission('支付方式编辑', Permission::MANAGE_PAYMENT_METHOD_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
+
+        $this->addPermission('网站管理', Permission::WEBSITE_MANAGE, 1, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
+
+        $this->addPermission('移动端装修', Permission::MANAGE_APP_DECORATION, 1, Permission::IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);
     }
 
     private function addGoodsPermission(): void
@@ -80,6 +84,11 @@ class PermissionTableSeeder extends Seeder
     private function addUserPermission(): void
     {
         $this->addPermission('用户', Permission::MODULE_USER, 98, Permission::IS_LEFT_NAV, 'User');
+
+        $this->addPermission('会员管理', Permission::USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_USER);
+
+        $this->addPermission('会员列表', Permission::MANAGE_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::USER_MANAGE);
+        $this->addPermission('会员列表新增|编辑', Permission::MANAGE_USER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::USER_MANAGE);
     }
 
     private function addOrderPermission(): void
@@ -95,6 +104,11 @@ class PermissionTableSeeder extends Seeder
     private function addToolPermission(): void
     {
         $this->addPermission('工具', Permission::MODULE_TOOLS, 95, Permission::IS_LEFT_NAV, 'Tools');
+
+        $this->addPermission('素材中心', Permission::MANAGE_MATERIAL_CENTER, 2, Permission::IS_LEFT_NAV, '', Permission::MODULE_TOOLS);
+        $this->addPermission('素材中心新增|编辑', Permission::MANAGE_MATERIAL_CENTER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::MODULE_TOOLS);
+        $this->addPermission('素材中心删除', Permission::MANAGE_MATERIAL_CENTER_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::MODULE_TOOLS);
+
     }
 
     private function addDataPermission(): void

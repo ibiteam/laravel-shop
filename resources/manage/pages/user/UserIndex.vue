@@ -52,7 +52,7 @@ const setPageInfo = (meta) => {
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
-    queryParams.value.page = page;
+    queryParams.page = page;
 
     getUserIndex(queryParams).then(res => {
         loading.value = false;
