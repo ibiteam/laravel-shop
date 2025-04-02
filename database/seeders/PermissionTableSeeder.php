@@ -28,7 +28,7 @@ class PermissionTableSeeder extends Seeder
             'guard_name' => (new Permission)->guardName(),
         ]);
 
-        if (!$permission->exists) {
+        if (! $permission->exists) {
             $permission->display_name = $display_name;
             $permission->parent_id = $parent_name ? Permission::query()->whereName($parent_name)->value('id') : 0;
             $permission->sort = $sort;
@@ -42,7 +42,7 @@ class PermissionTableSeeder extends Seeder
     {
         $this->addPermission('设置', Permission::MODULE_SET, 100, Permission::IS_LEFT_NAV, 'Setting');
 
-        $this->addPermission('基础设置', Permission::BASIC_SET_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
+        $this->addPermission('基础设置', Permission::BASIC_SET_MANAGE, 99, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
 
         $this->addPermission('商店设置', Permission::MANAGE_SHOP_CONFIG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('商店设置编辑', Permission::MANAGE_SHOP_CONFIG_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
@@ -54,6 +54,11 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('访问地址', Permission::MANAGE_ROUTER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('访问地址新增|编辑', Permission::MANAGE_ROUTER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('访问地址删除', Permission::MANAGE_ROUTER_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+
+        $this->addPermission('支付管理', Permission::BASIC_PAYMENT_MANAGE, 98, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
+
+        $this->addPermission('支付方式', Permission::MANAGE_PAYMENT_METHOD_INDEX, 99, Permission::IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
+        $this->addPermission('支付方式编辑', Permission::MANAGE_PAYMENT_METHOD_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
     }
 
     private function addGoodsPermission(): void

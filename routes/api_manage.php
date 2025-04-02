@@ -18,8 +18,11 @@ Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
         Route::get('clear_cache', [HomeController::class, 'clearCache']);   // 清除缓存
     });
 
-    require __DIR__ . '/manage/set.php';
-    require __DIR__ . '/manage/goods.php';
-    require __DIR__ . '/manage/template.php';
-    require __DIR__ . '/manage/user.php';
+    require __DIR__.'/manage/set.php';
+
+    require __DIR__.'/manage/goods.php';
+
+    require __DIR__.'/manage/template.php';
+
+    require __DIR__.'/manage/user.php';
 });

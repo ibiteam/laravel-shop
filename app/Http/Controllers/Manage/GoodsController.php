@@ -36,7 +36,7 @@ class GoodsController extends BaseController
         $create_end_time = $request->get('create_end_time');
         $update_start_time = $request->get('update_start_time');
         $update_end_time = $request->get('update_end_time');
-        $number = (int) $request->get('limit', 10);
+        $number = (int) $request->get('number', 10);
 
         $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
             ->when($goods_id, fn (Builder $query) => $query->where('id', $goods_id))
