@@ -232,6 +232,11 @@ onMounted(() => {
         <el-table-column label="ID" prop="id"></el-table-column>
         <el-table-column label="名称" prop="name"></el-table-column>
         <el-table-column label="支付码" prop="alias"></el-table-column>
+        <el-table-column label="ICON">
+            <template #default="scope">
+                <el-image class="payment-method-icon" :src="scope.row.icon"></el-image>
+            </template>
+        </el-table-column>
         <el-table-column label="描述" prop="description" width="350px" show-overflow-tooltip></el-table-column>
         <el-table-column label="排序" prop="sort"></el-table-column>
         <el-table-column label="状态" prop="is_enabled">
@@ -313,7 +318,7 @@ onMounted(() => {
                         :http-request="(request) => uploadFile(request)"
                         :with-credentials="true"
                     >
-                        <img v-if="detailForm.icon" :src="detailForm.icon" class="logo" />
+                        <img v-if="detailForm.icon" :src="detailForm.icon" class="payment-method-icon" />
                         <el-icon v-else class="logo-uploader-icon">
                             <Plus />
                         </el-icon>
@@ -362,9 +367,9 @@ onMounted(() => {
     }
 }
 
-.logo-uploader .logo {
-    width: 80px;
-    height: 80px;
+.payment-method-icon {
+    width: 50px;
+    height: 50px;
     display: block;
 }
 
@@ -388,8 +393,8 @@ onMounted(() => {
 .el-icon.logo-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     text-align: center;
 }
 </style>
