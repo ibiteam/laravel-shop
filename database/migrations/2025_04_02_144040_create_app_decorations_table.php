@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('app_website_decorations', function (Blueprint $table) {
+        Schema::create('app_decorations', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('名称');
-            $table->string('type',191)->comment('类型:1：底部菜单；2：一级页面；3：二级页面');
             $table->boolean('is_show')->comment('是否显示');
             $table->string('alias')->comment('页面别名');
             $table->integer('parent_id')->comment('父级集合id');
@@ -27,7 +25,7 @@ return new class extends Migration
             $table->timestamp('release_time')->nullable()->comment('发布时间');
             $table->timestamps();
         });
-        DB::statement("ALTER TABLE `app_website_decorations` COMMENT '移动端装修表'");
+        DB::statement("ALTER TABLE `app_decorations` COMMENT '移动端装修表'");
     }
 
     /**
@@ -35,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('app_website_decorations');
+        Schema::dropIfExists('app_decorations');
     }
 };

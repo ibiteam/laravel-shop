@@ -144,7 +144,7 @@ return [
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
             \App\Models\Goods::class => [
-                'filterableAttributes' => ['id', 'name', 'category_id', 'price'], // 可过滤属性
+                'filterableAttributes' => ['id', 'name', 'category_id', 'price', 'status'], // 可过滤属性
                 'sortableAttributes' => ['id', 'price', 'sort', 'sales_volume'], // 可排序属性
             ],
         ],
