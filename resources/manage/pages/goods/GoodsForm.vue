@@ -117,6 +117,10 @@
                                     :http-request="(file) => uploadImage(file, 'images')"
                                     :before-upload="beforeUpload">
                                     <i class="iconfont icon-jiahao1"></i>
+                                    <div class="masking">
+                                        <i class="iconfont icon-shangchuan" @click.stop.prevent="changeImages(-1, 'http')" title="从本地上传图片"></i>
+                                        <i class="iconfont icon-shangchuan1" @click.stop.prevent="changeImages(-1, 'material')" title="从素材库选择"></i>
+                                    </div>
                                 </el-upload>
                             </div>
                             <div class="tips" style="width: 100%;flex: none;">
@@ -149,6 +153,10 @@
                                     :http-request="(file) => uploadImage(file, 'video')"
                                     :before-upload="beforeUploadVideo">
                                     <i class="iconfont icon-jiahao1"></i>
+                                    <div class="masking">
+                                        <i class="iconfont icon-shangchuan" @click.stop.prevent="changeVideo('http')" title="从本地上传图片"></i>
+                                        <i class="iconfont icon-shangchuan1" @click.stop.prevent="changeVideo('material')" title="从素材库选择"></i>
+                                    </div>
                                 </el-upload>
                             </div>
                             <div class="tips" style="width: 100%;flex: none;">
@@ -448,25 +456,16 @@
         </el-dialog>
         <input type="file" ref="fileImgRef" style="display: none" @change="(event) => {handleFileChange(event, 'image')}" accept="image/*">
         <input type="file" ref="fileVideoRef" style="display: none" @change="(event) => {handleFileChange(event, 'video')}" accept="video/*">
+        <MaterialCenterDialog v-bind="{show: materialDialogShow, dir_type: materialSelectType, multiple: false}" @close="materialDialogShow = false" @confirm="confirmSelectMaterial"/>
     </div>
 
 </template>
 
 <script setup>
 import Editor from '@/components/good/Editor.vue'
+import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
-import {
-    goodsDetailInit,
-    getGoodsSkuTemplate,
-    getGoodsParameterTemplate,
-    goodsParameterTemplateStore,
-    goodsParameterTemplateUpdate,
-    goodsParameterTemplateDestroy,
-    goodsSkuTemplateStore,
-    goodsSkuTemplateUpdate,
-    goodsSkuTemplateDestroy,
-    goodsUpdate
-} from '@/api/goods';
+import { goodsDetailInit, getGoodsSkuTemplate, getGoodsParameterTemplate, goodsParameterTemplateStore, goodsParameterTemplateUpdate, goodsParameterTemplateDestroy, goodsSkuTemplateStore, goodsSkuTemplateUpdate, goodsSkuTemplateDestroy, goodsUpdate } from '@/api/goods';
 import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
@@ -700,6 +699,8 @@ const fileImgRef = ref(null);
 const fileVideoRef = ref(null);
 const uploadVideoRef = ref(null);
 const videoDialogShow = ref(false);
+const materialDialogShow = ref(false);
+const materialSelectType = ref(1);
 const videoRef = ref(null);
 const currentChangeImageIndex = ref(-1);
 
@@ -901,7 +902,7 @@ const objectSpanMethod = ({row, column, rowIndex, columnIndex}) => {
     }
     return {rowspan: 1, colspan: 1};
 }
-
+// 格式化规格数据
 const toTableArray = (specs) => {
     const result = [];
     const existingSkus = updateForm.value.sku_data || [];
@@ -968,6 +969,7 @@ const handleTableRemove = (index) => {
     updateForm.value.sku_data[index].thumb = ''
 }
 
+// 批量填充多规格数据
 const filling = () => {
     let newArray = updateForm.value.sku_data.map(item => {
         return {
@@ -987,7 +989,7 @@ const filling = () => {
     })
     moreInput.value = { integral: '', price: '', number: '' }
 }
-
+// 设置主图
 const setMain = (index) => {
     if (index) {
         let picture = updateForm.value.images.splice(index, 1)
@@ -1031,8 +1033,26 @@ const changeImages = (i , type) => {
             fileImgRef.value.click()
         })
     }else{
-        // 调用素材
+        // 调用选择素材
+        materialSelectType.value = 1
+        materialDialogShow.value = true
     }
+}
+// 选择素材确认回调
+const confirmSelectMaterial = (data) => {
+    const url = data[0].file_path
+    if(url){
+        if(materialSelectType.value == 1){
+            if(currentChangeImageIndex.value>=0){
+                updateForm.value.images[currentChangeImageIndex.value] = url
+            }else {
+                updateForm.value.images.push(url)
+            }
+        }else {
+            updateForm.value.video = url
+        }
+    }
+    materialDialogShow.value = false
 }
 
 const handleFileChange = (event, type)=> {
@@ -1055,7 +1075,9 @@ const changeVideo = (type) => {
     if(type == 'http'){
         fileVideoRef.value.click()
     }else{
-        // 调用素材
+        // 调用选择素材
+        materialSelectType.value = 2
+        materialDialogShow.value = true
     }
 }
 
@@ -1557,6 +1579,7 @@ onBeforeUnmount(() => {
     cursor: move;
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
+    overflow: hidden;
 }
 
 .good-picture .good-picture-li .el-image, .good-picture .good-picture-li video{
@@ -1577,6 +1600,28 @@ onBeforeUnmount(() => {
     justify-content: space-around;
     border-radius: 0 0 6px 6px;
     z-index: 2;
+}
+.avatar-uploader .masking {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: default;
+    display: none;
+    justify-content: space-around;
+    border-radius: 0 0 6px 6px;
+    z-index: 2;
+    align-items: center;
+    i{
+        cursor: pointer;
+        color: #fff;
+        font-size: 16px;
+    }
+}
+.avatar-uploader:hover .masking{
+    display: flex;
 }
 .good-picture .good-picture-li .video-play{
     position: absolute;

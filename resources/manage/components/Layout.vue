@@ -467,7 +467,7 @@ onUnmounted(() => {
                         align-items: center;
                         cursor: pointer;
                         position: relative;
-                        z-index: 3000;
+                        z-index: 2000;
                         .header-search{
                             position: relative;
                             width: 32px; /* 初始宽度 */
