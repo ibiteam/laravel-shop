@@ -10,7 +10,6 @@ use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -520,5 +519,18 @@ if (! function_exists('to_number_format')) {
         }
 
         return number_format($price, $config_price_format ?: 2, '.', $thousands_separator);
+    }
+}
+
+
+if (! function_exists('page_path')) {
+    /**
+     * 前台路由路径.
+     */
+    function page_path($route_name): string
+    {
+        $no_domain_route = route($route_name, [], false);
+
+        return str_replace('api/manage/', '', $no_domain_route);
     }
 }

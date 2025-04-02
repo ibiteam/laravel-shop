@@ -17,6 +17,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addSmtpService();    // 邮件服务
         $this->addManageSettings(); // 后台设置
         $this->addIntegralSettings(); // 积分设置
+        $this->addSearchSettings(); // 搜索设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -63,11 +64,16 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '0');
     }
 
+    private function addSearchSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_SEARCH, ShopConfig::SEARCH_DRIVER, '1');
+    }
+
     private function addManageSettings(): void
     {
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
-        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, 2);
+        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, '2');
     }
 }

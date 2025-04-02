@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Laravel\Scout\Searchable;
 
 /**
  * @property int                             $id
@@ -80,7 +81,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Goods extends Model
 {
-    use DatetimeTrait, SoftDeletes;
+    use DatetimeTrait, SoftDeletes, Searchable;
     public const STATUS_ON_SALE = 1; // 上架
     public const STATUS_NOT_SALE = 0; // 下架
     public const QUOTA = 1; // 限购
@@ -90,6 +91,18 @@ class Goods extends Model
     public const TYPE_PAY_ORDER = 2; // 支付订单减库存
 
     protected $guarded = [];
+
+    // 配置模型索引
+    public function searchableAs(): string
+    {
+        return 'goods_index';
+    }
+
+    // 配置可搜索数据
+    public function toSearchableArray(): array
+    {
+        return $this->toArray();
+    }
 
     public function category(): BelongsTo
     {

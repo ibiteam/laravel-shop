@@ -4,11 +4,10 @@ namespace App\Http\Dao;
 
 use App\Models\Category;
 use App\Models\Goods;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\ShopConfig;
 
 class SearchDao
 {
-
     public const PRICE_DESC = 'price_desc';
     public const PRICE_ASC = 'price_asc';
     public const SALE_DESC = 'sale_desc';
@@ -16,57 +15,101 @@ class SearchDao
     /**
      * 执行搜索并返回分页结果.
      */
-    public function searchGoods(array $params, int $user_id): LengthAwarePaginator
+    public function searchGoods(array $params, int $user_id)
     {
-        $query = Goods::query()->show() // 只查询上架且审核通过的商品
-            ->select(['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume']);
+        if (shop_config(ShopConfig::SEARCH_DRIVER) == 2) {
+            // MeiliSearch搜索
+            $options = [
+                'attributesToSearchOn' => ['name'],
+                'filter' => ['status = ' . Goods::STATUS_ON_SALE], // 上架商品
+                'sort' => ['sort:desc'], // 默认排序
+                'attributesToRetrieve' => ['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume'], // 指定返回的字段
+            ];
 
-        $add_keywords = '';
+            if (! empty($params['category_id'])) {
+                $options['filter'][] = 'category_id = ' . $params['category_id'];
+            }
+
+            if (! empty($params['min_price'])) {
+                $options['filter'][] = 'price >= ' . $params['min_price'];
+            }
+
+            if (! empty($params['max_price'])) {
+                $options['filter'][] = 'price <= ' . $params['max_price'];
+            }
+
+            if (! empty($params['sort_type'])) {
+                $options['sort'] = match ($params['sort_type']) {
+                    static::PRICE_ASC => ['price:asc'],
+                    static::PRICE_DESC => ['price:desc'],
+                    static::SALE_DESC => ['sales_volume:desc'],
+                    default => ['sort:desc'],
+                };
+            }
+
+            $query = Goods::search($params['keywords'] ?? '')->options($options);
+
+        } else {
+            // 数据库搜索
+
+            $query = Goods::query()->show()->select(['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume']);
+
+            if (! empty($params['keywords'])) {
+                $query->where('name', 'like', '%'.$params['keywords'].'%');
+            }
+
+            if (! empty($params['category_id'])) {
+                $query->where('category_id', $params['category_id']);
+            }
+
+            if (! empty($params['min_price'])) {
+                $query->where('price', '>=', $params['min_price']);
+            }
+
+            if (! empty($params['max_price'])) {
+                $query->where('price', '<=', $params['max_price']);
+            }
+
+            if (! empty($params['sort_type'])) {
+                switch ($params['sort_type']) {
+                    case static::PRICE_ASC:
+                        $query->orderBy('price', 'asc');
+
+                        break;
+
+                    case static::PRICE_DESC:
+                        $query->orderBy('price', 'desc');
+
+                        break;
+
+                    case static::SALE_DESC:
+                        $query->orderBy('sales_volume', 'desc');
+
+                        break;
+
+                    default:
+                        $query->orderBy('sort', 'desc');
+
+                        break;
+                }
+            } else {
+                $query->orderBy('sort', 'desc');
+            }
+        }
+
+        $list = $query->paginate(perPage: $params['number'] ?? 15, page: $params['page'] ?? 1);
+
+        $add_keywords = '';  // 搜索关键词
 
         if (! empty($params['keywords'])) {
-            $query->where('name', 'like', '%'.$params['keywords'].'%');
             $add_keywords = $params['keywords'];
         }
 
         if (! empty($params['category_id'])) {
-            $query->where('category_id', $params['category_id']);
-
             if (! $add_keywords) {
                 $add_keywords = Category::query()->whereId($params['category_id'])->value('name') ?? '';
             }
         }
-
-        if (! empty($params['min_price'])) {
-            $query->where('price', '>=', $params['min_price']);
-        }
-
-        if (! empty($params['max_price'])) {
-            $query->where('price', '<=', $params['max_price']);
-        }
-
-        if (! empty($params['sort_type'])) {
-            switch ($params['sort_type']) {
-                case static::PRICE_ASC:
-                    $query->orderBy('price', 'asc');
-                    break;
-
-                case static::PRICE_DESC:
-                    $query->orderBy('price', 'desc');
-                    break;
-
-                case static::SALE_DESC:
-                    $query->orderBy('sales_volume', 'desc');
-                    break;
-
-                default:
-                    $query->orderBy('sort', 'desc');
-                    break;
-            }
-        } else {
-            $query->orderBy('sort', 'desc');
-        }
-
-        $list = $query->paginate($params['number']);
 
         // 记录用户搜索
         $this->addUserKeyword($user_id, $add_keywords, $list->pluck('id')->toArray());

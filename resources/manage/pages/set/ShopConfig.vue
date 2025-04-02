@@ -22,6 +22,8 @@ const tab_label = computed(() => {
             return '邮件服务';
         case 'group_integral':
             return '积分设置';
+        case 'group_search':
+            return '搜索设置';
         default:
             return '';
     }
@@ -236,6 +238,25 @@ onMounted(() => {
                                             :inactive-value="'0'"
                                         ></el-switch>
                                     </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                        <el-tab-pane label="搜索设置" name="group_search">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 50px;width: 550px">
+                                    <el-form-item label="搜索方式：" prop="search_driver">
+                                        <el-radio v-model="inputFrom.search_driver" label="1">数据库</el-radio>
+                                        <el-radio v-model="inputFrom.search_driver" label="2">MeiliSearch</el-radio>
+                                    </el-form-item>
+                                    <!--<el-form-item label="请求地址：" prop="search_host">
+                                        <el-input v-model="inputFrom.search_host" placeholder="请求地址"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="请求密钥：" prop="search_key">
+                                        <el-input v-model="inputFrom.search_key" placeholder="请求密钥"></el-input>
+                                    </el-form-item>-->
                                     <el-form-item>
                                         <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
                                     </el-form-item>

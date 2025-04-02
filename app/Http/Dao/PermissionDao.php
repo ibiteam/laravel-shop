@@ -29,6 +29,7 @@ class PermissionDao
                     'name' => $permission->name,
                     'title' => $permission->display_name,
                     'icon' => $permission->icon,
+                    'src' => $permission->parent_id && Route::has($permission->name) ? page_path($permission->name) : '',
                     'sort' => $permission->sort,
                     'is_collection' => isset($collect_permission_ids[$permission->id]),
                 ];
@@ -36,6 +37,7 @@ class PermissionDao
 
         return $this->build_tree($menus, 'index');
     }
+
 
     // 获取菜单树
     public function allData($keywords = '')
