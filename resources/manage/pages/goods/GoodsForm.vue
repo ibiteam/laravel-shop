@@ -210,7 +210,7 @@
                                                                 <el-form-item :prop="'values.' + index + '.values.' + ids + '.name'" style="margin: 3px 0;">
                                                                     <el-input v-model="its.name"
                                                                               placeholder="请输入规格值"
-                                                                              maxlength="6"
+                                                                              maxlength="10"
                                                                               style="width: 150px;margin-right: 10px;"
                                                                               :key="ids">
                                                                         <template #suffix>
@@ -234,7 +234,7 @@
                                                             </template>
                                                         </div>
                                                         <div class="tips" style="padding-top: 8px;">
-                                                            <span class="fs12" style="line-height: 16px;">规格项最长为6个字，最多可添加6个规格项。</span>
+                                                            <span class="fs12" style="line-height: 16px;">规格项最长为10个字，最多可添加6个规格项。</span>
                                                         </div>
                                                     </div>
                                                 </div>
