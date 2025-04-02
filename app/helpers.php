@@ -313,3 +313,32 @@ if (! function_exists('to_number_format')) {
         return number_format($price, $config_price_format ?: 2, '.', $thousands_separator);
     }
 }
+
+if (! function_exists('chinese_number_down_format')) {
+    /**
+     * 中文数字下标格式化.
+     */
+    function chinese_number_down_format(int $number): string
+    {
+        $unit = '';
+
+        if ($number == 0) {
+            return (string) $number;
+        }
+
+        if ($number >= 100000000) {
+            $fixed_number = 100000000;
+            $unit = '亿+';
+        } elseif ($number >= 10000) {
+            $fixed_number = 10000;
+            $unit = '万+';
+        } elseif ($number >= 1000) {
+            $fixed_number = 1;
+            $unit = '+';
+        } else {
+            $fixed_number = 1;
+        }
+
+        return (string) (floor($number / $fixed_number).$unit);
+    }
+}

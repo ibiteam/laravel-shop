@@ -143,7 +143,7 @@ class Goods extends Model
     protected function casts(): array
     {
         return [
-            'price' => 'decimal',
+            'price' => 'decimal:2',
             'status_datetime' => 'datetime',
         ];
     }
