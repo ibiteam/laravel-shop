@@ -18,6 +18,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addManageSettings(); // 后台设置
         $this->addIntegralSettings(); // 积分设置
         $this->addSearchSettings(); // 搜索设置
+        $this->addGoodsSettings(); // 商品设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -62,6 +63,7 @@ class ShopConfigTableSeeder extends Seeder
     private function addIntegralSettings(): void
     {
         $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '0');
+        $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::INTEGRAL_NAME, '积分');
     }
 
     private function addSearchSettings(): void
@@ -75,5 +77,10 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, '2');
+    }
+
+    private function addGoodsSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_SALES_VOLUME, '0');
     }
 }

@@ -276,6 +276,11 @@ class GoodsService
             $goods->can_collect = false;
         }
 
+        // 积分名称
+        $goods->integral_name = shop_config(ShopConfig::INTEGRAL_NAME);
+        // 是否展示销量
+        $goods->is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
+
         return $goods;
     }
 
