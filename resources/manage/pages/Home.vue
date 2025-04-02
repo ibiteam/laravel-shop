@@ -432,8 +432,6 @@ const clearCache = () => {
 onMounted(() => {
     getMenu()
     getData()
-
-
     window.addEventListener('resize', debounceResize)
 });
 onUnmounted(() => {
