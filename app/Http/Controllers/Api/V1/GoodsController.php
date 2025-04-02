@@ -9,6 +9,7 @@ use App\Http\Resources\ApiGoodsDetailResource;
 use App\Http\Resources\CommonResource;
 use App\Services\Goods\GoodsService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class GoodsController extends BaseController
@@ -16,10 +17,10 @@ class GoodsController extends BaseController
     /**
      * 商品详情.
      */
-    public function detail(string $no, GoodsService $goods_service): JsonResponse
+    public function detail(Request $request, string $no, GoodsService $goods_service): JsonResponse
     {
         try {
-            $goods = $goods_service->show($no, $this->user());
+            $goods = $goods_service->show($no, $this->user(), (int) $request->get('unique', 0));
 
             return $this->success(ApiGoodsDetailResource::make($goods));
         } catch (ValidationException $validation_exception) {

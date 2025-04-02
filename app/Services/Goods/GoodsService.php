@@ -209,7 +209,7 @@ class GoodsService
      *
      * @throws BusinessException
      */
-    public function show(string $no, ?User $user): Goods
+    public function show(string $no, ?User $user, int $request_sku_id = 0): Goods
     {
         $goods = Goods::query()->with(['images', 'parameters', 'detail', 'specValues', 'specValues.spec'])->withTrashed()->whereNo($no)->first();
 
@@ -220,16 +220,32 @@ class GoodsService
 
         // 多规格商品处理
         $tmp_sku_params_list = [
-            'skus' => [],
+            'sku_item' => null,
             'spec_values' => [],
         ];
         $tmp_sku_data = $goods->skus;
         $tmp_spec_value_data = $goods->specValues;
 
         if (! empty($tmp_sku_data) && ! empty($tmp_spec_value_data)) {
+            $tmp_sku_item = null;
+            $tmp_sku_item_format = null;
+
+            if ($request_sku_id > 0) {
+                $tmp_sku_item = $tmp_sku_data->where('id', $request_sku_id)->first();
+            }
+
+            if (! $tmp_sku_item instanceof GoodsSku) {
+                $tmp_sku_item = $tmp_sku_data->first();
+            }
+            $tmp_selected_spec_value_ids = [];
+
+            if ($tmp_sku_item instanceof GoodsSku) {
+                $tmp_sku_item_format = $this->skuItemFormat($tmp_sku_item);
+                $tmp_selected_spec_value_ids = explode('|', $tmp_sku_item->sku_value);
+            }
             $tmp_sku_params_list = [
-                'skus' => $tmp_sku_data->map(fn (GoodsSku $sku) => $this->skuItemFormat($sku)),
-                'spec_values' => $this->reverseSpecData($tmp_spec_value_data),
+                'sku_item' => $tmp_sku_item_format,
+                'spec_values' => $this->reverseSpecData($tmp_spec_value_data, $tmp_selected_spec_value_ids),
             ];
         }
         $goods->sku_params_list = $tmp_sku_params_list;
@@ -293,19 +309,20 @@ class GoodsService
     /**
      * @param Collection<int,GoodsSpecValue> $collection
      */
-    private function reverseSpecData(Collection $collection): EloquentCollection|Collection
+    private function reverseSpecData(Collection $collection, array $selected_ids = []): EloquentCollection|Collection
     {
         $group_collection = $collection->groupBy('goods_spec_id');
 
-        return GoodsSpec::query()->whereIn('id', $group_collection->keys())->get()->map(function (GoodsSpec $goods_spec) use ($group_collection) {
+        return GoodsSpec::query()->whereIn('id', $group_collection->keys())->get()->map(function (GoodsSpec $goods_spec) use ($group_collection, $selected_ids) {
             return [
                 'id' => $goods_spec->id,
                 'name' => $goods_spec->name,
-                'values' => $group_collection->get($goods_spec->id)->map(function (GoodsSpecValue $goods_spec_value) {
+                'values' => $group_collection->get($goods_spec->id)->map(function (GoodsSpecValue $goods_spec_value) use ($selected_ids) {
                     return [
                         'id' => $goods_spec_value->id,
                         'name' => $goods_spec_value->value,
                         'thumb' => $goods_spec_value->thumb,
+                        'selected' => in_array($goods_spec_value->id, $selected_ids),
                     ];
                 })->values(),
             ];
