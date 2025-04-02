@@ -12,8 +12,14 @@ export function shopConfigUpdate(data) {
 export function routerCategoryIndex(data) {
     return $http.doGet('manage/set/router_category', data)
 }
+export function routerCategoryInfo(data) {
+    return $http.doGet('manage/set/router_category/info', data)
+}
 export function routerCategoryStore(data) {
     return $http.doPost('manage/set/router_category/store', data)
+}
+export function routerCategoryDestroy(data) {
+    return $http.doPost('manage/set/router_category/destroy', data)
 }
 export function routerCategoryChangeShow(data) {
     return $http.doPost('manage/set/router_category/change_show', data)

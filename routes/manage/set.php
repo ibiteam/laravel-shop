@@ -24,10 +24,14 @@ Route::prefix('set')->group(function () {
     Route::prefix('router_category')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
             Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
+            Route::get('info', [RouterCategoryController::class, 'info']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
             Route::post('store', [RouterCategoryController::class, 'store']);
             Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
+        });
+        Route::middleware(['manage.permission:' . Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
+            Route::post('/destroy', [RouterCategoryController::class, 'destroy']);
         });
     });
 
