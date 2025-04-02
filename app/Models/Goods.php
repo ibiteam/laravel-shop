@@ -4,46 +4,48 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Laravel\Scout\Searchable;
 
 /**
- * @property int                             $id
- * @property int                             $category_id     分类ID
- * @property string                          $no              商品编号
- * @property string                          $name            商品标题
- * @property string|null                     $sub_name        商品副标题
- * @property string|null                     $label           商品标签
- * @property string                          $image           商品主图
- * @property string|null                     $unit            商品单位
- * @property string                          $price           商品价格
- * @property string                          $integral        积分
- * @property int                             $total           商品库存
- * @property int                             $sales_volume    销量
- * @property int                             $type            库存类型 1下单减库存 2付款减库存
- * @property int                             $status          上下架状态 1上架 0下架
- * @property string|null                     $status_datetime 上下架时间
- * @property int                             $can_quota       是否限购 1限购 0不限购
- * @property int                             $quota_number    限购数量
- * @property int                             $sort            排序，值越大越靠前
- * @property string|null                     $video           视频地址
- * @property int                             $video_duration  视频时长
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- * @property-read \App\Models\Category $category
- * @property-read \App\Models\GoodsDetail|null $detail
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsImage> $images
+ * @property int         $id
+ * @property int         $category_id     分类ID
+ * @property string      $no              商品编号
+ * @property string      $name            商品标题
+ * @property string|null $sub_name        商品副标题
+ * @property string|null $label           商品标签
+ * @property string      $image           商品主图
+ * @property string|null $unit            商品单位
+ * @property numeric     $price           商品价格
+ * @property int         $integral        积分
+ * @property int         $total           商品库存
+ * @property int         $sales_volume    销量
+ * @property int         $type            库存类型 1下单减库存 2付款减库存
+ * @property int         $status          上下架状态 1上架 0下架
+ * @property Carbon|null $status_datetime 上下架时间
+ * @property int         $can_quota       是否限购 1限购 0不限购
+ * @property int         $quota_number    限购数量
+ * @property int         $sort            排序，值越大越靠前
+ * @property string|null $video           视频地址
+ * @property int         $video_duration  视频时长
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read Category $category
+ * @property-read GoodsDetail|null $detail
+ * @property-read Collection<int, GoodsImage> $images
  * @property-read int|null $images_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsParameter> $parameters
+ * @property-read Collection<int, GoodsParameter> $parameters
  * @property-read int|null $parameters_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsSku> $skus
+ * @property-read Collection<int, GoodsSku> $skus
  * @property-read int|null $skus_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\GoodsSpecValue> $specValues
+ * @property-read Collection<int, GoodsSpecValue> $specValues
  * @property-read int|null $spec_values_count
  *
  * @method static Builder<static>|Goods newModelQuery()
@@ -81,12 +83,11 @@ use Laravel\Scout\Searchable;
  */
 class Goods extends Model
 {
-    use DatetimeTrait, SoftDeletes, Searchable;
+    use DatetimeTrait, Searchable, SoftDeletes;
     public const STATUS_ON_SALE = 1; // 上架
     public const STATUS_NOT_SALE = 0; // 下架
     public const QUOTA = 1; // 限购
     public const NOT_QUOTA = 0; // 不限购
-
     public const TYPE_DONE_ORDER = 1; // 下单减库存
     public const TYPE_PAY_ORDER = 2; // 支付订单减库存
 
@@ -137,5 +138,13 @@ class Goods extends Model
     public function scopeShow(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_ON_SALE);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'price' => 'decimal',
+            'status_datetime' => 'datetime',
+        ];
     }
 }
