@@ -4,6 +4,7 @@ import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { paymentMethodChangeField, paymentMethodEdit, paymentMethodIndex, paymentMethodUpdate } from '@/api/set';
 import { fileUpload } from '@/api/common';
+import Page from '@/components/common/Pagination.vue'
 import _ from 'lodash';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -24,13 +25,6 @@ const queryParams = reactive({
     is_enabled: null
 });
 
-// 添加分页相关状态
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
-
 // 搜索方法
 const handleSearch = () => {
     getData(1);
@@ -43,6 +37,13 @@ const resetSearch = () => {
     getData(1);
 };
 
+// 添加分页相关状态
+const pageInfo = reactive({
+    number: 10,
+    total: 0,
+    currentPage: 1,
+})
+
 // 页码改变
 const handleCurrentChange = (val) => {
     getData(val);
@@ -50,15 +51,22 @@ const handleCurrentChange = (val) => {
 
 // 每页条数改变
 const handleSizeChange = (val) => {
-    queryParams.number = val;
-    pageInfo.per_page = val;
+    pageInfo.number = val;
     getData(1);
+}
+
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.number = Number(meta.per_page);
+    pageInfo.currentPage = meta.current_page;
 }
 
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
+    queryParams.number = pageInfo.number;
     paymentMethodIndex(queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
@@ -73,18 +81,13 @@ const getData = (page = 1) => {
     })
 }
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
 
 // 表格修改字段
 const handleFieldChange = (itemId,field) => {
     paymentMethodChangeField({ id: itemId, field: field }).then(res => {
         if (res.code === 200) {
             cns.$message.success(res.message);
+            getData(pageInfo.currentPage)
         } else {
             cns.$message.error(res.message);
         }
@@ -272,17 +275,7 @@ onMounted(() => {
         </el-table-column>
     </el-table>
     <!-- 添加分页组件 -->
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 15, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
-    </div>
+    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
 
     <el-dialog
         v-model="detailDialogVisible"
@@ -367,12 +360,6 @@ onMounted(() => {
     :deep(.el-input) {
         width: 200px;
     }
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
 }
 
 .logo-uploader .logo {
