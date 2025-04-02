@@ -56,24 +56,14 @@
       "content": "<p> xxxxxxxxxxxxxxxxxxxxxx </p>",
       "recommend": [ ],
       "sku_params": {
-        "skus": [
-          {
+        "sku_item": {
             "id": 3,
             "unique": "13_14_15",
             "price": "10.06",
             "integral": "0.00",
             "number": 288,
             "has_number": true
-          },
-          {
-            "id": 4,
-            "unique": "13_14_16",
-            "price": "12.01",
-            "integral": "0.00",
-            "number": 299,
-            "has_number": true
-          }
-        ],
+        },
         "spec_values": [
           {
             "id": 1,
@@ -82,7 +72,8 @@
               {
                 "id": 13,
                 "name": "红色",
-                "thumb": "https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png"
+                "thumb": "https://xxxx.xxx.xxx/2025/03/26/xxxxxxxx.png",
+                "selected": true
               }
             ]
           },
@@ -93,7 +84,8 @@
               {
                 "id": 14,
                 "name": "L",
-                "thumb": ""
+                "thumb": "",
+                "selected": true
               }
             ]
           },
@@ -104,7 +96,8 @@
               {
                 "id": 15,
                 "name": "不送装",
-                "thumb": ""
+                "thumb": "",
+                "selected": true
               },
               {
                 "id": 16,
@@ -178,22 +171,23 @@ data.center.recommend 参数说明
 
 data.center.sku_params 参数说明
 
-| 字段                           | 字段类型    | 说明       |
-|------------------------------|---------|----------|
-| skus                         | Array   | 商品规格值数据  |
-| skus.*.id                    | Integer | 商品规格ID   |
-| skus.*.unique                | String  | 商品规格唯一标识 |
-| skus.*.price                 | String  | 商品规格价格   |
-| skus.*.integral              | String  | 商品规格积分   |
-| skus.*.number                | Integer | 商品规格库存   |
-| skus.*.has_number            | Boolean | 是否还有库存   |
-| spec_values                  | Array   | 商品规格数据   |
-| spec_values.*.id             | Integer | 商品规格ID   |
-| spec_values.*.name           | String  | 商品规格名    |
-| spec_values.*.values         | Array   | 商品规格值数据  |
-| spec_values.*.values.*.id    | Integer | 商品规格值ID  |
-| spec_values.*.values.*.name  | String  | 商品规格值名称  |
-| spec_values.*.values.*.thumb | String  | 商品规格值缩略图 |
+| 字段                              | 字段类型    | 说明       |
+|---------------------------------|---------|----------|
+| sku_item                        | Array   | 商品规格值数据  |
+| sku_item.id                     | Integer | 商品规格ID   |
+| sku_item.unique                 | String  | 商品规格唯一标识 |
+| sku_item.price                  | String  | 商品规格价格   |
+| sku_item.integral               | String  | 商品规格积分   |
+| sku_item.number                 | Integer | 商品规格库存   |
+| sku_item.has_number             | Boolean | 是否还有库存   |
+| spec_values                     | Array   | 商品规格数据   |
+| spec_values.*.id                | Integer | 商品规格ID   |
+| spec_values.*.name              | String  | 商品规格名    |
+| spec_values.*.values            | Array   | 商品规格值数据  |
+| spec_values.*.values.*.id       | Integer | 商品规格值ID  |
+| spec_values.*.values.*.name     | String  | 商品规格值名称  |
+| spec_values.*.values.*.thumb    | String  | 商品规格值缩略图 |
+| spec_values.*.values.*.selected | Boolean | 是否选中     |
 
 
 
