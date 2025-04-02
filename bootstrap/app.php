@@ -2,6 +2,7 @@
 
 use App\Enums\CustomCodeEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\CustomException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
 use App\Http\Middleware\Manage\AccessRecord as ManageAccessRecord;
@@ -43,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 不记录到日志的异常
         $exceptions->dontReport([
             BusinessException::class,
+            CustomException::class,
         ]);
         // 封装异常返回
         $exceptions->render(function (AuthenticationException $authentication_exception, $request) {

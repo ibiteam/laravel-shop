@@ -3,6 +3,7 @@
 namespace App\Services\Goods;
 
 use App\Exceptions\BusinessException;
+use App\Exceptions\CustomException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
@@ -277,6 +278,57 @@ class GoodsService
         }
 
         return $this->skuItemFormat($goods_sku);
+    }
+
+    /**
+     * 实时获取商品库存数量.
+     *
+     * @param Goods $goods          商品
+     * @param int   $request_sku_id SKU id
+     * @param int   $number         购买数量
+     *
+     * @throws BusinessException
+     * @throws CustomException
+     */
+    public function checkGoodsNumber(Goods $goods, int $request_sku_id, int $number): array
+    {
+        $res = [
+            'total' => 0,
+            'can_buy' => false,
+        ];
+        $sku_data = $goods->skus()->get();
+
+        if (! empty($sku_data) && $request_sku_id === 0) {
+            throw new BusinessException('多规格商品请先选择商品规格');
+        }
+
+        if ($request_sku_id > 0) {
+            $sku_item = $sku_data->where('id', $request_sku_id)->first();
+
+            if (! $sku_item instanceof GoodsSku) {
+                throw new BusinessException('商品规格不存在');
+            }
+            $res['total'] = $sku_item->number;
+
+            if ($sku_item->number < $number) {
+                $tmp_message = $sku_item->number.$goods->unit;
+
+                throw new customexception("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+            }
+            $res['can_buy'] = true;
+
+            return $res;
+        }
+        $res['total'] = $goods->number;
+
+        if ($goods->number < $number) {
+            $tmp_message = $goods->number.$goods->unit;
+
+            throw new customexception("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+        }
+        $res['can_buy'] = true;
+
+        return $res;
     }
 
     /**

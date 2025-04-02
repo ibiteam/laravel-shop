@@ -45,6 +45,7 @@ Route::prefix('goods')->group(function () {
         Route::post('unfollow', [GoodsCollectController::class, 'unfollow']); // 取消关注商品
     });
     Route::get('/{no}', [GoodsController::class, 'detail']);
+    Route::get('/{no}/check_number', [GoodsController::class, 'checkNumber']);
     Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
 });
 
