@@ -31,23 +31,6 @@ class UserService
     }
 
     /**
-     * 根据用户名+手机号注册用户.
-     */
-    public function registerByUserNameAndPhone(array $params, CommonEnum $source = CommonEnum::PC): User
-    {
-        return User::query()->create([
-            'user_name' => $params['account'],
-            'password' => $params['password'],
-            'nickname' => $params['account'],
-            'phone' => $params['phone'],
-            'avatar' => '',
-            'register_ip' => get_request_ip(),
-            'is_modify' => false,
-            'source' => $source->value,
-        ]);
-    }
-
-    /**
      * 检测用户是否登录.
      */
     public function checkIsLogin(?User $user, string $token): array
