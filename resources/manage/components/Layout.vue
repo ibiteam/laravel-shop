@@ -19,7 +19,7 @@
                               children: 'children',
                               label: 'label',
                             }"
-                        @node-click="(e,data,el) => openMenu(e,data,el,menuIndex)">
+                        @node-click="(e,data,el) => openMenu(e)">
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
                                 <el-icon v-if='data.icon'>
@@ -146,6 +146,8 @@
                         <el-tabs
                             v-model="routerActived"
                             closable
+                            @tab-remove="tabRemove"
+                            @tab-change="tabChange"
                         >
                             <el-tab-pane
                                 v-for="item in Array.from(tabsStore.visitedViews)"
@@ -185,7 +187,7 @@ watch(() => route.path,(to, from) => {
         var view = tabsStore.visitedViews[index]
         if (view.name === to.name && view.path !== to.path) {
             tabsStore.delVisitedViews(view).then((views) => {
-                cns.$router.push(to.path)
+                router.push(to.path)
             })
             break
         }
@@ -350,7 +352,7 @@ const getMenu = () => {
     });
 }
 
-const openMenu = (e,data,el,menuIndex) => {
+const openMenu = (e) => {
     if (typeof (e.children) === 'undefined' || e.children.length === 0) {
         router.push({name:e.name})
     } else {
@@ -372,8 +374,30 @@ const generateRoute = () => {
     }
     return false
 }
+const isActive = (view) => {
+    return view.path === route.path
+}
 const moveToCurrentTag = () => {
     routerActived.value = route.name
+}
+
+const tabChange = (name) =>{
+    const view = tabsStore.visitedViews.filter((ite) => ite.name == name)
+    router.push(view[0].path)
+}
+
+const tabRemove = (name) =>{
+    const view = tabsStore.visitedViews.filter((ite) => ite.name == name)
+    tabsStore.delVisitedViews(view[0]).then((views) => {
+        if (isActive(view[0])) {
+            const latestView = views.slice(-1)[0]
+            if (latestView) {
+                router.push(latestView.path)
+            } else {
+                router.push('/home')
+            }
+        }
+    })
 }
 
 onMounted(() => {

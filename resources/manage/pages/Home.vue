@@ -62,7 +62,7 @@
                     <div class="module-main" v-for="item in todo_list">
                         <div class="module-title">{{ item.group_name }}</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct" v-for="ite in item.list">
+                            <div class="module-model s-flex ai-ct jc-ct" v-for="ite in item.list" @click.stop="toPage(ite)">
                                 <el-icon v-if="ite.icon" :size="32">
                                     <component :is="ite.icon"/>
                                 </el-icon>
@@ -83,7 +83,7 @@
                                 </div>
                             </div>
                             <div class="more-opt s-flex flex-wrap" v-if="my_collect.length">
-                                <div class="opt-list" v-for="item in my_collect" :key="item.value">
+                                <div class="opt-list" v-for="item in my_collect" :key="item.value" @click.stop="toPage(item)">
                                     <div class="icon">
                                         <el-icon v-if="item.icon" :size="20">
                                             <component :is="item.icon"/>
@@ -106,7 +106,7 @@
                                 </div>
                             </div>
                             <div class="more-opt s-flex flex-wrap" v-if="access_record.length > 0">
-                                <div class="opt-list" v-for="item in access_record">
+                                <div class="opt-list" v-for="item in access_record" @click.stop="toPage(item)">
                                     <div class="icon">
                                         <el-icon v-if="item.icon" :size="20">
                                             <component :is="item.icon"/>
@@ -200,6 +200,9 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
 import {getMenuAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
+import { useRoute,useRouter } from 'vue-router';
+const route = useRoute()
+const router =  useRouter()
 
 
 
@@ -399,13 +402,21 @@ const getData = () => {
             access_statistic.value = res.data.access_statistic
             todo_list.value = res.data.todo_list
             nextTick(() => {
-                lineRef = echarts.init(document.getElementById('access-data'));
-                lineRef.setOption(getUvChartOption(access_statistic));
+                if (document.getElementById('access-data')){
+                    lineRef = echarts.init(document.getElementById('access-data'));
+                    lineRef.setOption(getUvChartOption(access_statistic));
+                }
             });
         } else {
             cns.$message.error(res.message);
         }
     });
+}
+
+const toPage = (item) => {
+    if (item.src){
+        router.push({name:item.name})
+    }
 }
 
 const clearCache = () => {

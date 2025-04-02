@@ -22,9 +22,8 @@ export const useTabsStore = defineStore('shop-tabs', {
                 this.visitedViews.push({
                     name: view.name,
                     path: view.path,
-                    title: view.name || 'no-name',
+                    title: view.meta.title || 'no-name',
                     query: view.query,
-                    platform: view.name
                 })
             }
 
@@ -36,7 +35,7 @@ export const useTabsStore = defineStore('shop-tabs', {
         },
         delVisitedViews(view) {
             return new Promise((resolve) => {
-                let path = view.path ? view.path : (view.page ? view.page : '')
+                let path = view.path ? view.path : ''
                 this.visitedViews.forEach((item, index) => {
                     if (item.path === path) {
                         this.visitedViews.splice(index, 1)
