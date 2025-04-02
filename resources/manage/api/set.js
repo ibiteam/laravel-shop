@@ -32,3 +32,17 @@ export function routerStore(data) {
 export function routerChangeShow(data) {
     return $http.doPost('manage/set/router/change_show', data)
 }
+
+// 支付方式
+export function paymentMethodIndex(data) {
+    return $http.doGet('manage/set/payment/method', data)
+}
+export function paymentMethodChangeField(data) {
+    return $http.doPost('manage/set/payment/method/change/field', data)
+}
+export function paymentMethodEdit(data) {
+    return $http.doGet('manage/set/payment/method/edit', data)
+}
+export function paymentMethodUpdate(data) {
+    return $http.doPost('manage/set/payment/method/update', data)
+}

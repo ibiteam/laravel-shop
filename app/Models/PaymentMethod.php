@@ -51,6 +51,7 @@ class PaymentMethod extends Model
     {
         return [
             'is_enabled' => 'boolean',
+            'is_recommend' => 'boolean',
             'config' => 'json',
         ];
     }

@@ -10,6 +10,7 @@ import SetRouterCategory from '@/pages/set/RouterCategory.vue';
 import SetRouter from '@/pages/set/Router.vue';
 import UserIndex from '@/pages/user/UserIndex.vue';
 import UserAddress from '@/pages/user/UserAddress.vue';
+import PaymentMethod from '@/pages/set/PaymentMethod.vue';
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
@@ -27,6 +28,7 @@ const router = createRouter({
                 { path: '/set/router_category', component: SetRouterCategory, name: 'SetRouterCategory' },
                 { path: '/set/router', component: SetRouter, name: 'SetRouter' },
                 { path: '/set/shop_config', component: SetShopConfig, name: 'SetShopConfig' },
+                { path: '/set/payment_method', component: PaymentMethod, name: 'PaymentMethod' },
                 { path: '/user/index', component: UserIndex , name: 'UserIndex' },
                 { path: '/user/address', component: UserAddress , name: 'UserAddress' },
             ]

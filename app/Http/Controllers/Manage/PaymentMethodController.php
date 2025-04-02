@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Requests\Manage\PaymentMethodRequest;
 use App\Http\Resources\CommonResource;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
@@ -28,7 +29,7 @@ class PaymentMethodController extends BaseController
             ->latest()
             ->when($name, fn (Builder $query) => $query->whereLike('name', "%{$name}%"))
             ->when(! is_null($is_enabled), fn (Builder $query) => $query->whereIsEnabled($is_enabled))
-            ->select(['id', 'name', 'alias', 'is_enabled', 'icon', 'description', 'limit', 'is_recommend', 'sort'])
+            ->select(['id', 'name', 'alias', 'is_enabled', 'icon', 'description', 'limit', 'is_recommend', 'sort', 'created_at', 'updated_at'])
             ->paginate($number);
 
         return $this->success(new CommonResourceCollection($list));
@@ -67,30 +68,10 @@ class PaymentMethodController extends BaseController
     /**
      * 支付方式更新.
      */
-    public function update(Request $request): JsonResponse
+    public function update(PaymentMethodRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'id' => 'required|integer',
-                'name' => 'required|string|max:50',
-                'is_enabled' => 'required|boolean',
-                'icon' => 'required|string|url',
-                'description' => 'nullable|string|max:255',
-                'config' => 'required|array',
-                'limit' => 'required|integer',
-                'is_recommend' => 'required|boolean',
-                'sort' => 'required|integer',
-            ], [], [
-                'id' => '支付方式ID',
-                'name' => '名称',
-                'is_enabled' => '是否启用',
-                'icon' => '图标',
-                'description' => '描述',
-                'config' => '配置',
-                'limit' => '限额',
-                'is_recommend' => '是否推荐',
-                'sort' => '排序',
-            ]);
+            $validated = $request->validated();
             $payment_method = PaymentMethod::query()->whereId($validated['id'])->first();
 
             if (! $payment_method instanceof PaymentMethod) {

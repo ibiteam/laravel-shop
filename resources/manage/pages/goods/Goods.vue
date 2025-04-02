@@ -47,7 +47,17 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const resetSearch = () => {
+    queryParams.goods_id = '';
     queryParams.name = '';
+    queryParams.no = '';
+    queryParams.status = '';
+    queryParams.category_id = '';
+    queryParams.created_start_time = '';
+    queryParams.created_end_time = '';
+    queryParams.updated_start_time = '';
+    queryParams.updated_end_time = '';
+    queryParams.page = 1;
+    queryParams.number = 10;
     getData(1);
 };
 
