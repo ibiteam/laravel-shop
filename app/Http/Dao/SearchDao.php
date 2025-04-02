@@ -15,8 +15,18 @@ class SearchDao
     /**
      * 执行搜索并返回分页结果.
      */
-    public function searchGoods(array $params, int $user_id)
+    public function searchGoods(array $params, int $user_id): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator
     {
+        $params['page'] = max(1, (int)($params['page'] ?? 1));
+        $params['number'] = max(1, (int)($params['number'] ?? 15));
+
+        if (!empty($params['min_price'])) {
+            $params['min_price'] = max(0, (float)$params['min_price']);
+        }
+        if (!empty($params['max_price'])) {
+            $params['max_price'] = max(0, (float)$params['max_price']);
+        }
+
         if (shop_config(ShopConfig::SEARCH_DRIVER) == 2) {
             // MeiliSearch搜索
             $options = [
@@ -45,6 +55,16 @@ class SearchDao
                     static::SALE_DESC => ['sales_volume:desc'],
                     default => ['sort:desc'],
                 };
+            }
+
+            // 确保默认排序生效
+            if (empty($options['sort'])) {
+                $options['sort'] = ['sort:desc'];
+            }
+
+            // 确保 attributesToRetrieve 生效
+            if (empty($options['attributesToRetrieve'])) {
+                $options['attributesToRetrieve'] = ['id', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume'];
             }
 
             $query = Goods::search($params['keywords'] ?? '')->options($options);
@@ -97,7 +117,7 @@ class SearchDao
             }
         }
 
-        $list = $query->paginate(perPage: $params['number'] ?? 15, page: $params['page'] ?? 1);
+        $list = $query->paginate(perPage: $params['number'], page: $params['page']);
 
         $add_keywords = '';  // 搜索关键词
 
