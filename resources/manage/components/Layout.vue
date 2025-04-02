@@ -18,7 +18,8 @@
                         :props="{
                               children: 'children',
                               label: 'label',
-                            }">
+                            }"
+                        @node-click="(e,data,el) => openMenu(e,data,el,menuIndex)">
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
                                 <el-icon v-if='data.icon'>
@@ -147,7 +148,7 @@
                             closable
                         >
                             <el-tab-pane
-                                v-for="item in editableTabs"
+                                v-for="item in Array.from(tabsStore.visitedViews)"
                                 :key="item.name"
                                 :label="item.title"
                                 :name="item.name"
@@ -167,25 +168,35 @@
 </template>
 
 <script setup>
-import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance} from 'vue';
+import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
+import { useRoute,useRouter } from 'vue-router';
 import $public from '@/utils/public'
 import { ArrowRight } from '@element-plus/icons-vue'
 import {getMenuAxios} from "../api/home.js";
+
+import { useTabsStore } from '@/store'
+const tabsStore = useTabsStore()
+
+const route = useRoute()
+const router =  useRouter()
+watch(() => route.path,(to, from) => {
+    for (var index in tabsStore.visitedViews) {
+        var view = tabsStore.visitedViews[index]
+        if (view.name === to.name && view.path !== to.path) {
+            tabsStore.delVisitedViews(view).then((views) => {
+                cns.$router.push(to.path)
+            })
+            break
+        }
+    }
+    addViewTags()
+    moveToCurrentTag()
+})
+
 const pageLoad = ref(false)
 const menus = ref([])
 const menuIndex = ref(0)
-
-const editableTabs = [
-    {
-        title: '首页',
-        name: '1',
-    },
-    {
-        title: '商品管理',
-        name: '2',
-    },
-]
 
 const leftShow = ref(true)
 
@@ -194,7 +205,7 @@ const searchShow = ref(false)
 const searchtools = ref('')
 const searchMenuArr = ref([])
 
-const routerActived = ref('1')
+const routerActived = ref('')
 
 
 const openSearchShow = () => {
@@ -339,8 +350,36 @@ const getMenu = () => {
     });
 }
 
+const openMenu = (e,data,el,menuIndex) => {
+    if (typeof (e.children) === 'undefined' || e.children.length === 0) {
+        router.push({name:e.name})
+    } else {
+        return false
+    }
+}
+
+const addViewTags = () => {
+    const add_route = generateRoute()
+    if (!add_route) {
+        return false
+    }
+    tabsStore.addVisitedViews(add_route)
+}
+
+const generateRoute = () => {
+    if (route.name) {
+        return route
+    }
+    return false
+}
+const moveToCurrentTag = () => {
+    routerActived.value = route.name
+}
+
 onMounted(() => {
     getMenu()
+    addViewTags()
+    routerActived.value = route.name
     document.addEventListener('keydown',getKeyCode)
 })
 
@@ -647,6 +686,7 @@ onUnmounted(() => {
             .router-tabs{
                 :deep(.el-tabs){
                     padding: 4px 77px 0 7px;
+                    height: 34px;
                     .el-tabs__header{
                         margin-bottom: 0;
                     }

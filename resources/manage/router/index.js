@@ -19,7 +19,7 @@ const router = createRouter({
             component: () => import('@/components/Layout.vue'),
             children:[
                 { path: 'home', component: Home, name: 'home' },
-                { path: '/goods/index', component: Goods , name: 'goods' },
+                { path: '/goods/index', component: Goods , name: 'manage.shop_config.index' },
                 { path: '/goods/form/:id', component: GoodsForm , name: 'goodsForm' },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'GoodsCategoryIndex' },
                 { path: '/material/index', component: MaterialIndex, name: 'MaterialIndex' },
