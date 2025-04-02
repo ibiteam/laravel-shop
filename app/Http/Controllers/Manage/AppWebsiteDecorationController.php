@@ -22,58 +22,21 @@ use Illuminate\Support\Facades\DB as DBFacade;
  */
 class AppWebsiteDecorationController extends BaseController
 {
-    /**
-     * app website decoration index(list).
-     *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse|null
-     */
     public function index(Request $request)
     {
-        // 1:底部菜单 2:一级菜单 3:二级菜单.
-        $type = $request->input('type');
-        $version = $request->input('version');
-        $query = AppWebsiteDecorationModel::query()->with('adminUser')->withCount('children')->orderBy('id');
-        $query->whereParentId(Constant::ZERO);
-        /* add type search */
-        $query->when($type > 0, function ($type_query) use ($type) {
-            $type_query->whereJsonContains('type', (int) $type);
-        });
-        /* add version search */
-        $query->when($version > 0, function ($version_query) use ($version) {
-            $version_query->where('version', $version);
-        });
+        $query = AppWebsiteDecorationModel::query()
+            ->with('adminUser')
+            ->withCount('children')
+            ->orderBy('id')
+            ->whereParentId(Constant::ZERO);
         $data = $query->paginate($request->input('number', 10));
         $data->getCollection()->transform(function (AppWebsiteDecorationModel $app_website_decoration) {
-            $type_message = array_map(function ($type_value) {
-                switch ($type_value) {
-                    case AppWebsiteDecorationModel::TYPE_BOTTOM_MENU:
-                        return '底部菜单';
-
-                    case AppWebsiteDecorationModel::TYPE_FIRST_LEVEL:
-                        return '一级页面';
-
-                    case AppWebsiteDecorationModel::TYPE_SECONDARY:
-                        return '二级页面';
-                }
-
-                return '';
-            }, $app_website_decoration->type);
-
             return [
-                'admin_user_name' => $app_website_decoration->adminUser->user_name ?? '--',
-                'type_message' => implode('/', $type_message),
-                'version' => $app_website_decoration->version,
-                'type' => $app_website_decoration->type,
+                'admin_user_name' => $app_website_decoration->adminUser?->user_name ?? '--',
                 'name' => $app_website_decoration->name,
                 'id' => $app_website_decoration->id,
                 'alias' => $app_website_decoration->alias,
-                'updated_at' => $app_website_decoration->updated_at->format('Y-m-d H:i:s'),
-                'is_show_bottom' => in_array($app_website_decoration->alias, AppWebsiteDecorationModel::$notShowBottomMapAlias) ? false : true,
-                'is_dir' => in_array($app_website_decoration->alias, AppWebsiteDecorationModel::$storeMapAlias, true) ? true : false, // 判断图标|是否允许装修（是否展示查看页面）
-                'is_allow_decoration' => true, // 判断是否允许装修
-                'children_count' => $app_website_decoration->children_count,
-                'is_show_edit' => in_array($app_website_decoration->alias, [AppWebsiteDecorationModel::ALIAS_HOME, AppWebsiteDecorationModel::ALIAS_SELLER_HOME, AppWebsiteDecorationModel::ALIAS_SELLER_WORKBENCH], true) ? true : false, // 判断是否允许装修
-                'url' => $app_website_decoration->url,
+                'updated_at' => $app_website_decoration->updated_at,
             ];
         });
 
