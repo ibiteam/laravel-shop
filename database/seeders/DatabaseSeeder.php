@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionTableSeeder::class);
         $this->call(RoleTableSeeder::class);
         $this->call(ShopConfigTableSeeder::class);
-        $this->call(AppWebsiteDecorationTableSeeder::class);
+        $this->call(AppDecorationTableSeeder::class);
         $this->call(RegionSeeder::class);
         $this->call(SensitiveWordSeeder::class);
         $this->call(PaymentMethodTableSeeder::class);

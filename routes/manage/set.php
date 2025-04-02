@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Manage\AppWebsiteDecorationController;
+use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
@@ -78,7 +78,7 @@ Route::prefix('material')->group(function () {
 // 移动端装修
 Route::prefix('app_decoration')->group(function () {
     Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
-        Route::get('/', [AppWebsiteDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
+        Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
     });
     Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
 
