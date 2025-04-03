@@ -4,6 +4,7 @@ use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
+use App\Http\Controllers\Manage\ShipCompanyController;
 use App\Http\Controllers\Manage\ShopConfigController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
@@ -54,6 +55,16 @@ Route::prefix('set')->group(function () {
             Route::get('edit', [PaymentMethodController::class, 'edit']);
             Route::post('update', [PaymentMethodController::class, 'update']);
             Route::post('change/field', [PaymentMethodController::class, 'changeField']);
+        });
+    });
+
+    // 配送管理-快递公司
+    Route::prefix('ship_company')->group(function () {
+        Route::get('/', [ShipCompanyController::class, 'index'])->name(Permission::MANAGE_SHIP_COMPANY_INDEX)->middleware('manage.permission');
+        Route::middleware('manage.permission:'.Permission::MANAGE_SHIP_COMPANY_UPDATE)->group(function () {
+            Route::get('edit', [ShipCompanyController::class, 'edit']);
+            Route::post('update', [ShipCompanyController::class, 'update']);
+            Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
         });
     });
 

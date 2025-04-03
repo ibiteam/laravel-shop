@@ -55,6 +55,10 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('访问地址新增|编辑', Permission::MANAGE_ROUTER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('访问地址删除', Permission::MANAGE_ROUTER_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
 
+        $this->addPermission('配送管理', Permission::MANAGE_BASIC_SET_DISTRIBUTION, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('快递公司', Permission::MANAGE_SHIP_COMPANY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
+        $this->addPermission('快递公司新增|编辑', Permission::MANAGE_SHIP_COMPANY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
+
         $this->addPermission('支付管理', Permission::BASIC_PAYMENT_MANAGE, 98, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
 
         $this->addPermission('支付方式', Permission::MANAGE_PAYMENT_METHOD_INDEX, 99, Permission::IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
