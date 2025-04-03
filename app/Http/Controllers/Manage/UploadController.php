@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Exceptions\BusinessException;
+use App\Services\UploadService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class UploadController extends BaseController
 {
-    public function upload(Request $request)
+    /**
+     * @throws BusinessException
+     */
+    public function upload(Request $request, UploadService $upload_service): JsonResponse
     {
         $file = $request->file('file');
 
         if (! $file || ! $file->isValid()) {
             return $this->error('文件上传失败');
         }
-        $storage = Storage::disk();
 
-        $file_path = $storage->put(config('app.manage_prefix') . '/' . date('Y/m/d'), $file);
-
-        if (! $file_path) {
-            return $this->error('文件上传失败~');
-        }
-        $url = $storage->url($file_path);
+        $url = $upload_service->uploadFile($file, config('app.manage_prefix').'/'.date('Y/m/d'));
 
         return $this->success(['url' => $url]);
     }

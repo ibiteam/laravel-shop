@@ -4,7 +4,7 @@
             <el-aside :class="{'left-hidden':!leftShow}">
                 <div class='layout-left-header s-flex ai-ct jc-bt'>
                     <div class='seller-picture s-flex ai-ct jc-ct'>
-                        <img src='https://fastly.jsdelivr.net/npm/@vant/assets/logo.png' alt=''>
+                        <img :src="commonStore.shopConfig.log?commonStore.shopConfig.log:'https://fastly.jsdelivr.net/npm/@vant/assets/logo.png'" alt=''>
                     </div>
                     <div class='s-flex jc-bt ai-ct' style="font-size: 20px;cursor: pointer;" @click="leftShow = false">
                         <Fold style="width: 1.5em; height: 1.5em;" />
@@ -110,10 +110,10 @@
 
                             <div class='more-func s-flex ai-ct'>
                                 <div class='circle s-flex ai-ct jc-ct'>
-                                    <el-icon :size="20"><Bell /></el-icon>
+                                    <el-icon :size="20" class='co-fff'><Bell /></el-icon>
                                 </div>
                                 <div class='circle s-flex ai-ct jc-ct'>
-                                    <el-icon :size="20"><Setting /></el-icon>
+                                    <el-icon :size="20" class='co-fff'><Setting /></el-icon>
                                 </div>
                             </div>
                             <div class='user-info'>
@@ -122,18 +122,16 @@
                                         <div class='user-picture'>
                                             <img src='https://fastly.jsdelivr.net/npm/@vant/assets/logo.png' alt=''>
                                         </div>
-                                        <span class='co-3D'>张三</span>
-                                        <el-icon class='el-icon--right'>
+                                        <span class='co-fff'>张三</span>
+                                        <el-icon class='el-icon--right co-fff'>
                                             <arrow-down />
                                         </el-icon>
                                     </div>
                                     <template #dropdown>
                                         <el-dropdown-menu>
-                                            <el-dropdown-item>Action 1</el-dropdown-item>
-                                            <el-dropdown-item>Action 2</el-dropdown-item>
-                                            <el-dropdown-item>Action 3</el-dropdown-item>
-                                            <el-dropdown-item disabled>Action 4</el-dropdown-item>
-                                            <el-dropdown-item divided>Action 5</el-dropdown-item>
+                                            <el-dropdown-item>账号设置</el-dropdown-item>
+                                            <el-dropdown-item>刷新</el-dropdown-item>
+                                            <el-dropdown-item>退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
                                 </el-dropdown>
@@ -380,6 +378,9 @@ const getMenu = () => {
         if (res.code === 200) {
             menus.value = res.data.menus
             commonStore.updateShopConfig(res.data.shop_config)
+            const root = document.documentElement;
+            root.style.setProperty('--manage-color', res.data.shop_config.manage_color);
+            root.style.setProperty('--manage-color-over', res.data.shop_config.mouse_move_color);
             pageLoad.value = true
         } else {
             cns.$message.error(res.message);
@@ -520,10 +521,14 @@ onUnmounted(() => {
         .layout-left-header{
             height: 60px;
             padding: 0 15px;
+            background: var(--manage-color);
             .seller-picture{
-                width: 91px;
-                height: 41px;
-                margin-right: 30px;
+                width: 120px;
+                height: 40px;
+                margin-right: 20px;
+            }
+            svg{
+                color: #ffffff;
             }
         }
         .menu-tree{
@@ -546,7 +551,18 @@ onUnmounted(() => {
                                 width: 20px;
                                 height: 20px;
                             }
-
+                        }
+                        .custom-tree-node span{
+                            font-weight: 600;
+                            font-size: 14px;
+                            color: #31373D;
+                        }
+                    }
+                    .el-tree-node__children{
+                        .custom-tree-node span{
+                            font-weight: 400;
+                            font-size: 14px;
+                            color: #333;
                         }
                     }
                     &.is-current{
@@ -554,6 +570,9 @@ onUnmounted(() => {
                             background: #F6FAFF;
                             .custom-tree-node{
                                 color: #077FFF;
+                                span{
+                                    color: #077FFF;
+                                }
                             }
                         }
                     }
@@ -569,14 +588,15 @@ onUnmounted(() => {
             box-shadow: 0px 1px 6px 0px rgba(16, 43, 76, 0.08);
             .seller-header{
                 height: 60px;
-                padding: 0 10px;
+                padding: 0 10px 0 0;
+                background: var(--manage-color);
                 .indentation{
                     opacity: 0;
                     width: 0;
                     transition: opacity 0.5s ease-in-out, width 0.5s ease-in-out;
+                    color: #ffffff;
                     &.indentation-show{
                         opacity: 1;
-                        //margin-right: 10px;
                         width: 30px;
                     }
                 }
@@ -588,25 +608,23 @@ onUnmounted(() => {
                         .menu-box{
                             user-select: none;
                             .menu-list{
-                                width: 100px;
-                                height: 32px;
+                                width: 120px;
+                                height: 60px;
                                 cursor: pointer;
                                 border-radius: 4px;
-                                margin-right: 16px;
-                                .icon-imgs{
-                                    i{
-                                        font-size: 18px;
-                                    }
+                                .el-icon{
+                                    color: #ffffff;
                                 }
                                 .menu-first-name{
-                                    margin-left: 8px;
+                                    margin-left: 5px;
                                     span{
                                         font-weight: normal;
                                         font-size: 18px;
+                                        color: #ffffff;
                                     }
                                 }
                                 &.actived , &:hover{
-                                    background: var(--main-color-10);
+                                    background: var(--manage-color-over);
                                 }
                             }
                         }
@@ -667,7 +685,7 @@ onUnmounted(() => {
                                 right: 5px; /* 图标始终贴靠右侧 */
                                 top: 50%;
                                 transform: translateY(-50%);
-                                color: #888;
+                                color: #ffffff;
                                 cursor: pointer;
                                 z-index: 10;
                             }
@@ -683,7 +701,6 @@ onUnmounted(() => {
                             border-bottom-right-radius: 20px;
                             border-bottom-left-radius: 20px;
                             box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
-                            border: 1px solid #F2F3F5;
                             border-top: none;
                             /*search样式*/
                             .search-list-box{
@@ -763,7 +780,7 @@ onUnmounted(() => {
                             height: 32px;
                             margin-right: 16px;
                             border-radius: 50%;
-                            border: 1px solid #F2F3F5;
+                            border: 1px solid #ffffff;
                             cursor: pointer;
 
                         }

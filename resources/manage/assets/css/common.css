@@ -8,6 +8,8 @@
     --color-text-desc: #999;
     --input-bg-color: #f5f5f5;
     --base-font-size: 14px;
+    --manage-color:#1050a9;
+    --manage-color-over:#FFFFFF26
 }
 
 body, html {
