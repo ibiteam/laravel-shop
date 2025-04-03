@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int                             $goods_id   商品ID
  * @property string                          $sku_value  属性值ID“|”分割
  * @property string                          $price      价格
- * @property string                          $integral   积分
+ * @property int                             $integral   积分
  * @property int                             $number     库存
  * @property int                             $is_show    是否展示 1展示 0不展示
  * @property int                             $sort       排序

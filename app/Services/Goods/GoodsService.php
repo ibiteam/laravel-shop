@@ -221,36 +221,36 @@ class GoodsService
         app(GoodsDao::class)->checkGoodsIsDestroy($goods);
 
         // 多规格商品处理
-        $tmp_sku_params_list = [
+        $sku_params_list = [
             'sku_item' => null,
             'spec_values' => [],
         ];
-        $tmp_sku_data = $goods->skus;
-        $tmp_spec_value_data = $goods->specValues;
+        $database_sku_list = $goods->skus()->where('is_show', GoodsSku::SHOW)->get();
+        $database_spec_values = $goods->specValues;
 
-        if (! empty($tmp_sku_data) && ! empty($tmp_spec_value_data)) {
-            $tmp_sku_item = null;
-            $tmp_sku_item_format = null;
+        if (! empty($database_sku_list) && ! empty($database_spec_values)) {
+            $sku_item = null;
+            $sku_item_format = null;
 
             if ($request_sku_id > 0) {
-                $tmp_sku_item = $tmp_sku_data->where('id', $request_sku_id)->first();
+                $sku_item = $database_sku_list->where('id', $request_sku_id)->first();
             }
 
-            if (! $tmp_sku_item instanceof GoodsSku) {
-                $tmp_sku_item = $tmp_sku_data->first();
+            if (! $sku_item instanceof GoodsSku) {
+                $sku_item = $database_sku_list->first();
             }
-            $tmp_selected_spec_value_ids = [];
+            $selected_spec_value_ids = [];
 
-            if ($tmp_sku_item instanceof GoodsSku) {
-                $tmp_sku_item_format = $this->skuItemFormat($tmp_sku_item);
-                $tmp_selected_spec_value_ids = explode('|', $tmp_sku_item->sku_value);
+            if ($sku_item instanceof GoodsSku) {
+                $sku_item_format = $this->skuItemFormat($sku_item);
+                $selected_spec_value_ids = explode('|', $sku_item->sku_value);
             }
-            $tmp_sku_params_list = [
-                'sku_item' => $tmp_sku_item_format,
-                'spec_values' => $this->reverseSpecData($tmp_spec_value_data, $tmp_selected_spec_value_ids),
+            $sku_params_list = [
+                'sku_item' => $sku_item_format,
+                'spec_values' => $this->reverseSpecData($database_spec_values, $selected_spec_value_ids),
             ];
         }
-        $goods->sku_params_list = $tmp_sku_params_list;
+        $goods->sku_params_list = $sku_params_list;
 
         // 商品评价处理
         [$evaluate_total, $evaluate_list] = app(OrderEvaluateDao::class)->getEvaluateByGoodsId($goods->id);
