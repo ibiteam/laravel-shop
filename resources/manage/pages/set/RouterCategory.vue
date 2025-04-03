@@ -2,7 +2,6 @@
 import { Plus, Search } from '@element-plus/icons-vue';
 import { routerCategoryIndex, routerCategoryInfo, routerCategoryStore, routerCategoryDestroy, routerCategoryChangeShow, routerCategoryGetPages } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import { isSuccess } from '@/utils/constants.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -44,7 +43,7 @@ const openStoreDialog = (categoryId = 0) => {
     detailFormLoading.value = true;
     routerCategoryInfo({ id: categoryId }).then(res => {
         detailFormLoading.value = false;
-        if (isSuccess(res.code)) {
+        if (cns.$constant.isSuccess(res.code)) {
             topCategories.value = res.data.top_categories;
             pagePermissions.value = res.data.page_permissions;
             if (categoryId > 0) {
@@ -89,7 +88,7 @@ const onSubmit = () => {
             submitLoading.value = true;
             routerCategoryStore(submitForm).then(res => {
                 submitLoading.value = false;
-                if (isSuccess(res.code)) {
+                if (cns.$constant.isSuccess(res.code)) {
                     closeStoreDialog();
                     getData();
                 } else {
@@ -112,7 +111,7 @@ const handleDestroy = (categoryId) => {
         center: true
     }).then(() => {
         routerCategoryDestroy({ id: categoryId }).then(res => {
-            if (isSuccess(res.code)) {
+            if (cns.$constant.isSuccess(res.code)) {
                 getData();
                 cns.$message.success(res.message);
             } else {
@@ -129,7 +128,7 @@ const changeShow = (row) => {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
-        if (isSuccess(res.code)) {
+        if (cns.$constant.isSuccess(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
@@ -142,7 +141,7 @@ const searchPages = (query) => {
         remoteLoading.value = true;
         routerCategoryGetPages({keywords: query}).then(res => {
             remoteLoading.value = false;
-            if (isSuccess(res.code)) {
+            if (cns.$constant.isSuccess(res.code)) {
                 pagePermissions.value = res.data;
             }
         });
@@ -158,7 +157,7 @@ const getData = () => {
     loading.value = true;
     routerCategoryIndex(searchForm).then(res => {
         loading.value = false;
-        if (isSuccess(res.code)) {
+        if (cns.$constant.isSuccess(res.code)) {
             tableData.value = res.data;
         } else {
             cns.$message.error(res.message);

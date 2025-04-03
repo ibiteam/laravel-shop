@@ -3,7 +3,6 @@ import { Plus, Delete } from '@element-plus/icons-vue'
 import { shopConfigIndex, shopConfigUpdate } from '@/api/set.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
-import { isSuccess } from '@/utils/constants.js';
 const cns = getCurrentInstance().appContext.config.globalProperties
 
 const firstActiveName = ref('site_setup')
@@ -48,7 +47,7 @@ const secondHandleClick = (tab, event) => {
 
 const setInfo = (group_name) => {
     shopConfigIndex({group_name:group_name}).then(res => {
-        if (isSuccess(res.code)) {
+        if (cns.$constant.isSuccess(res.code)) {
             Object.assign(inputFrom, res.data);
         } else {
             cns.$message.error(res.message);
@@ -59,7 +58,7 @@ const setInfo = (group_name) => {
 const uploadFile = async (request, type) => {
     try {
         const res = await fileUpload({ file: request.file });
-        if (isSuccess(res.code)) {
+        if (cns.$constant.isSuccess(res.code)) {
             inputFrom[type] = res.data.url;
         } else {
             cns.$message.error(res.message)
@@ -81,7 +80,7 @@ const submitForm = () => {
             inputFrom.tab_label = tab_label;
             loading.value = true;
             shopConfigUpdate(inputFrom).then(res => {
-                if (isSuccess(res.code)) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('提交成功');
                 } else {
                     cns.$message.error(res.message);
