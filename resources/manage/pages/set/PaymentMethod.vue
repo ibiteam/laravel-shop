@@ -151,6 +151,7 @@ const openDetailDialog = (itemId) => {
 const closeDetailDialog = () => {
     detailDialogVisible.value = false;
     detailFormLoading.value = false;
+    detailSubmitLoading.value = false
 
     detailForm.id = ''
     detailForm.name = ''
@@ -186,7 +187,7 @@ const submitDetailForm = _.throttle(() => {
                 detailSubmitLoading.value = false;
                 if (isSuccess(res.code)) {
                     closeDetailDialog();
-                    getData();
+                    getData(pageInfo.currentPage);
                 } else {
                     cns.$message.error(res.message);
                 }
