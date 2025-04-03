@@ -2,7 +2,7 @@
 
 namespace App\Http\Dao;
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Models\Goods;
 
@@ -33,7 +33,7 @@ class GoodsDao
     {
         // 判断商品是否删除
         if ($goods->deleted_at) {
-            throw new BusinessException('商品已删除', CustomCodeEnum::GOODS_DESTROY);
+            throw new BusinessException('商品已删除', ConstantEnum::GOODS_DESTROY);
         }
     }
 }

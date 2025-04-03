@@ -229,7 +229,7 @@ const handleConfirm = () => {
     dialogVisible.value = false
     emit('confirm', check_group.value)
 }
- 
+
 // 获取文件树
 const getFolderData = () => {
     folderList({dir_type: 1}).then(res => {
@@ -264,7 +264,7 @@ const getMaterialData = (params = {page: 1, number: 10}) => {
 }
 
 const routeTo = () => {
-    cns.$router.push({name: 'MaterialIndex'})
+    cns.$router.push({name: 'manage.material_center.index'})
 }
 
 watch(() => props, (newVal) => {

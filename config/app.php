@@ -22,6 +22,7 @@ return [
      */
 
     'manage_prefix' => env('VITE_MANAGE_PREFIX', 'manage'),
+    'foreground_prefix' => env('VITE_FOREGROUND_PREFIX', 'foreground'),
 
     /*
     |--------------------------------------------------------------------------

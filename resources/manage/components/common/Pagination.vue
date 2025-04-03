@@ -1,12 +1,13 @@
 <template>
-    <el-pagination 
+    <el-pagination
+        class="common-pagination"
         :current-page.sync="pageInfo.currentPage"
         :page-sizes="pageInfo.pageSizes ? pageInfo.pageSizes :[10, 20, 50, 100]"
         :page-size="pageInfo.number"
         :layout="pageInfo.layout ? pageInfo.layout : 'total, sizes, prev, pager, next, jumper'"
-        :total="pageInfo.total" 
+        :total="pageInfo.total"
         @size-change="(value) => $emit('sizeChange', value)"
-        @current-change="(value) => $emit('currentChange', value)" 
+        @current-change="(value) => $emit('currentChange', value)"
         />
 </template>
 
@@ -32,4 +33,10 @@ const emit = defineEmits(['sizeChange', 'currentChange'])
 </script>
 
 <style lang="scss" scoped>
+
+.common-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
 </style>

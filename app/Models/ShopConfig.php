@@ -35,6 +35,8 @@ class ShopConfig extends Model
     public const GROUP_SMTP_SERVICE = 'smtp_service'; // 邮件服务
     public const GROUP_MANAGE_SETTINGS = 'manage_settings'; // 后台设置
     public const GROUP_INTEGRAL = 'group_integral'; // 积分设置
+    public const GROUP_SEARCH = 'group_search';     // 搜索设置
+    public const GROUP_GOODS = 'group_goods'; // 商品设置
 
     // code值
     public const SHOP_NAME = 'shop_name'; // 商城名称
@@ -44,24 +46,25 @@ class ShopConfig extends Model
     public const SHOP_ADDRESS = 'shop_address'; // 商城线下地址
     public const SERVICE_MOBILE = 'service_mobile'; // 服务热线
     public const ICP_NUMBER = 'icp_number'; // ICP 备案号
-    public const SHOP_COLOR = 'shop_color'; // 主题色
+    public const SHOP_COLOR = 'shop_color'; // 站点主题色
+    public const MANAGE_COLOR = 'manage_color'; // 总后台主题色
+    public const MOUSE_MOVE_COLOR = 'mouse_move_color'; // 鼠标移入背景色
     public const IS_GRAY = 'is_gray'; // 网站首页是否置灰
-
     public const SHOP_ICON = 'shop_icon'; // 商城 ICON
     public const SHOP_LOGO = 'shop_logo'; // 商城 LOGO
     public const SHOP_MANAGE_LOGIN_IMAGE = 'shop_manage_login_image'; // 商城后台登录页面图片
-
     public const SMTP_HOST = 'smtp_host'; // 发送邮件服务器地址(SMTP)
     public const SMTP_PORT = 'smtp_port'; // 服务器端口
     public const SMTP_USER = 'smtp_user'; // 邮件发送账号
     public const SMTP_PASS = 'smtp_pass'; // 账号密码
-
     public const MANAGE_LOGIN_RSA_PUBLIC_KEY = 'manage_login_rsa_public_key'; // 后台登录RSA公钥
     public const MANAGE_LOGIN_RSA_PRIVATE_KEY = 'manage_login_rsa_private_key'; // 后台登录RSA私钥
     public const CURRENCY_FORMAT = 'currency_format'; // 对价格进行格式化
     public const PRICE_FORMAT = 'price_format'; // 保留几位小数
-
     public const IS_OPEN_INTEGRAL = 'is_open_integral'; // 是否开启积分
+    public const INTEGRAL_NAME = 'integral_name'; // 积分名称
+    public const SEARCH_DRIVER = 'search_driver';   // 搜索方式(1-数据库,2-MeiliSearch)
+    public const IS_SHOW_SALES_VOLUME = 'is_show_sales_volume'; // 是否显示销量
 
     protected $guarded = [];
 

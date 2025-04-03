@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
@@ -10,7 +10,6 @@ use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cache;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -66,8 +65,10 @@ if (! function_exists('get_request_ip')) {
         $ip = '';
 
         foreach ($ip_sources as $key) {
-            if (isset($_SERVER[$key]) && ! empty($_SERVER[$key]) && strcasecmp($_SERVER[$key], 'unknown') !== 0) {
-                $ip = $_SERVER[$key];
+            $tmp_ip = $_SERVER[$key] ?? '';
+
+            if (! empty($tmp_ip) && strcasecmp($tmp_ip, 'unknown') !== 0) {
+                $ip = $tmp_ip;
 
                 break;
             }
@@ -99,15 +100,9 @@ if (! function_exists('get_source')) {
     /**
      * 获取访问来源.
      */
-    function get_source(): CommonEnum
+    function get_source(): RefererEnum
     {
-        return match (request()->header('source')) {
-            'h5' => CommonEnum::H5,
-            'pc' => CommonEnum::PC,
-            'app' => CommonEnum::APP,
-            'wechat_mini' => CommonEnum::WECHAT_MINI,
-            default => CommonEnum::H5,
-        };
+        return RefererEnum::formSource(request()->header('source', ''));
     }
 }
 
@@ -121,36 +116,17 @@ if (! function_exists('is_md5')) {
     }
 }
 
-if (! function_exists('connectStr')) {
+if (! function_exists('get_url_joiner')) {
     /**
      * 获取路径地址连接符.
      */
-    function connectStr($url)
+    function get_url_joiner($url): string
     {
         if (strpos($url, '?')) {
             return '&';
         }
 
         return '?';
-    }
-}
-
-if (! function_exists('is_m_request')) {
-    /**
-     * 判断来源是否为H5.
-     */
-    function is_m_request(): bool
-    {
-        if (strtoupper(request()->header('Access-From', '')) == Constant::REFERER_H5) {
-            return true;
-        }
-        $m_host = shop_config(ShopConfig::M_URL);
-
-        if (! $m_host) {
-            return false;
-        }
-
-        return str_contains(request()->fullUrl(), $m_host);
     }
 }
 
@@ -161,34 +137,6 @@ if (! function_exists('is_app_request')) {
     function is_app_request(): bool
     {
         if (strtoupper(request()->header('Access-From', '')) === Constant::REFERER_APP) {
-            return true;
-        }
-
-        return false;
-    }
-}
-
-if (! function_exists('is_miniProgram_request')) {
-    /**
-     * 请求的来源是否是小程序.
-     */
-    function is_miniProgram_request(): bool
-    {
-        /* deleted start */
-        $needle = 'miniProgram';
-
-        // 原小程序接口
-        if (str_contains(request()->fullUrl(), $needle)) {
-            return true;
-        }
-
-        // 新小程序接口
-        if (request()->header('Platform-Type', '') === $needle) {
-            return true;
-        }
-
-        /* deleted end */
-        if (strtoupper(request()->header('Access-From', '')) === Constant::REFERER_MINI) {
             return true;
         }
 
@@ -235,11 +183,11 @@ if (! function_exists('is_ios_request')) {
     }
 }
 
-if (! function_exists('sourcePort')) {
+if (! function_exists('source_port')) {
     /**
      * 获取来源.
      */
-    function sourcePort()
+    function source_port(): string
     {
         if (is_miniProgram_request()) {
             return MobileRouterService::SOURCE_MINI;
@@ -263,100 +211,11 @@ if (! function_exists('admin_operation_log')) {
     }
 }
 
-if (! function_exists('format_number')) {
-    /**
-     * 格式化数量.
-     *
-     * @return float|int|mixed|string
-     */
-    function format_number($numb)
-    {
-        if (! is_numeric($numb)) {
-            return $numb;
-        }
-
-        if ($numb > 10000 && $numb < 100000000) {
-            $numb = round($numb / 10000, 2).'万';
-        } elseif ($numb >= 100000000) {
-            $numb = round($numb / 100000000, 2).'亿';
-        }
-
-        return $numb;
-    }
-}
-
-if (! function_exists('is_mobile_request')) {
-    /**
-     * 判断是否是手机访问.
-     */
-    function is_mobile_request()
-    {
-        $_SERVER['ALL_HTTP'] = isset($_SERVER['ALL_HTTP']) ? $_SERVER['ALL_HTTP'] : '';
-        $mobile_browser = '0';
-
-        if (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|iphone|ipad|ipod|android|xoom)/i', strtolower($_SERVER['HTTP_USER_AGENT'] ?? ''))) {
-            $mobile_browser++;
-        }
-
-        if ((isset($_SERVER['HTTP_ACCEPT'])) and (strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/vnd.wap.xhtml+xml') !== false)) {
-            $mobile_browser++;
-        }
-
-        if (isset($_SERVER['HTTP_X_WAP_PROFILE'])) {
-            $mobile_browser++;
-        }
-
-        if (isset($_SERVER['HTTP_PROFILE'])) {
-            $mobile_browser++;
-        }
-        $mobile_ua = strtolower(substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 4));
-        $mobile_agents = [
-            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
-            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
-            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
-            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
-            'newt', 'noki', 'oper', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox',
-            'qwap', 'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar',
-            'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
-            'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
-            'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-',
-        ];
-
-        if (in_array($mobile_ua, $mobile_agents)) {
-            $mobile_browser++;
-        }
-
-        if (strpos(strtolower($_SERVER['ALL_HTTP']), 'operamini') !== false) {
-            $mobile_browser++;
-        }
-
-        // Pre-final check to reset everything if the user is on Windows
-        if (strpos(strtolower($_SERVER['HTTP_USER_AGENT'] ?? ''), 'windows') !== false) {
-            $mobile_browser = 0;
-        }
-
-        // But WP7 is also Windows, with a slightly different characteristic
-        if (strpos(strtolower($_SERVER['HTTP_USER_AGENT'] ?? ''), 'windows phone') !== false) {
-            $mobile_browser++;
-        }
-
-        if (strpos(strtolower($_SERVER['USER_AGENT'] ?? ''), 'android') !== false) {
-            $mobile_browser++;
-        }
-
-        if ($mobile_browser > 0) {
-            return true;
-        }
-
-        return false;
-    }
-}
-
 if (! function_exists('phone_hidden')) {
     /**
      * 隐藏手机号中间4位.
      */
-    function phone_hidden($phone)
+    function phone_hidden($phone): string
     {
         if (! $phone) {
             return '';
@@ -385,60 +244,6 @@ if (! function_exists('get_sensitive_words')) {
     }
 }
 
-if (! function_exists('get_chat_url')) {
-    /**
-     * 获取聊天室链接.
-     * @param $source_url 来源地址
-     * @param $goods_id 商品id
-     * @param $user_id 用户id
-     * @param $user_name 用户名称
-     * @param $user_head_img 用户头像
-     * @param $mobile_phone 手机号
-     * @return string
-     */
-    function get_chat_url($source_url = '', $goods_id = 0, $user_id = '', $user_name = '', $user_head_img = '', $mobile_phone = '')
-    {
-        $url = '';
-        $suffix = '';
-        $platform_is_show = '是否显示平台客服';
-
-        if ($platform_is_show) {
-            $user = get_user();
-            $platform_id = '客服平台id';
-            $platform_platform_secret = '客服平台secret';
-            $server_platform_url = '客服平台地址';
-
-            if ($user || $user_id) {
-                $data = [
-                    'platform_id' => $platform_id,
-                    'user_id' => $user ? $user->user_id : $user_id,
-                    'user_name' => $user ? $user->user_name.$suffix : $user_name.$suffix,
-                    'user_phone' => $mobile_phone != '' ? $mobile_phone : ($user ? $user->mobile_phone : ''),
-                    'user_head_img' => $user_head_img != '' ? $user_head_img : ($user ? $user->portrait : ''),
-                    'source' => get_source(),
-                    'source_url' => $source_url,
-                ];
-            } else {
-                $data = [
-                    'platform_id' => $platform_id,
-                    'source' => get_source(),
-                    'source_url' => $source_url,
-                ];
-            }
-            if ($goods_id) {
-                $data['goods_id'] = $goods_id;
-            }
-            $sign_params = Md5Utils::sign($data, $platform_platform_secret);
-            $sign_params['seller_id'] = 0;
-
-            $url = $server_platform_url.'?'.http_build_query($sign_params);
-        }
-
-        return $url;
-    }
-}
-
-
 if (! function_exists('is_spider')) {
     /**
      * 是否是搜索引擎抓取.
@@ -446,33 +251,13 @@ if (! function_exists('is_spider')) {
     function is_spider(): bool
     {
         $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        //搜索引擎
+        // 搜索引擎
         $spiders = [
-            '/sogou/i',
-            '/bing/i',
-            '/baidu/i',
-            '/google/i',
-            '/360/i',
-            '/soso/i',
-            '/msn/i',
-            '/ask/i',
-            '/Bot/i',
-            '/yahoo/i',
-            '/youdao/i',
-            '/AhrefsBot/i',
-            '/YisouSpider/i',
-            '/SemrushBot/i',
-            '/DotBot/i',
-            '/Bytespider/i',
-            '/YexBot/i',
-            '/zoominfobot/i',
-            '/Applebot/i',
-            '/MJ12bot/i',
-            '/YexBot/i',
-            '/Daum/i',
-            '/Trident\/4.0/i',
-            '/Gecko\/20100101/i',
-            '/Barkrowler/i',
+            '/sogou/i', '/bing/i', '/baidu/i', '/google/i', '/360/i', '/soso/i',
+            '/msn/i', '/ask/i', '/Bot/i', '/yahoo/i', '/youdao/i', '/AhrefsBot/i',
+            '/YisouSpider/i', '/SemrushBot/i', '/DotBot/i', '/Bytespider/i', '/YexBot/i',
+            '/zoominfobot/i', '/Applebot/i', '/MJ12bot/i', '/YexBot/i', '/Daum/i', '/Trident\/4.0/i',
+            '/Gecko\/20100101/i', '/Barkrowler/i',
         ];
 
         return ! is_null(Arr::first($spiders, function ($spider) use ($agent) {
@@ -520,5 +305,34 @@ if (! function_exists('to_number_format')) {
         }
 
         return number_format($price, $config_price_format ?: 2, '.', $thousands_separator);
+    }
+}
+
+if (! function_exists('chinese_number_down_format')) {
+    /**
+     * 中文数字下标格式化.
+     */
+    function chinese_number_down_format(int $number): string
+    {
+        $unit = '';
+
+        if ($number == 0) {
+            return (string) $number;
+        }
+
+        if ($number >= 100000000) {
+            $fixed_number = 100000000;
+            $unit = '亿+';
+        } elseif ($number >= 10000) {
+            $fixed_number = 10000;
+            $unit = '万+';
+        } elseif ($number >= 1000) {
+            $fixed_number = 1;
+            $unit = '+';
+        } else {
+            $fixed_number = 1;
+        }
+
+        return (string) (floor($number / $fixed_number).$unit);
     }
 }

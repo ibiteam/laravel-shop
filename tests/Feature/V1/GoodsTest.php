@@ -30,3 +30,11 @@ it('test unfollow goods api interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test goods check number api interface', function () {
+    $goods_sn = 'eda482c3-df45-47a4-abc5-f795db6fefae';
+    $response = $this->doGet("api/v1/goods/{$goods_sn}/check_number", ['sku_id' => 3, 'number' => 299]);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

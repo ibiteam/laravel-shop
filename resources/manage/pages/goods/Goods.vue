@@ -3,6 +3,7 @@ import { Plus, Search, RefreshLeft } from '@element-plus/icons-vue'
 import { categoryIndex, goodsIndex, goodsChangeStatus } from '@/api/goods.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import Page from '@/components/common/Pagination.vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -33,13 +34,6 @@ const queryParams = reactive({
     updated_end_time: '',
 });
 
-// 添加分页相关状态
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
-
 // 搜索方法
 const handleSearch = () => {
     getData(1);
@@ -47,9 +41,26 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const resetSearch = () => {
+    queryParams.goods_id = '';
     queryParams.name = '';
+    queryParams.no = '';
+    queryParams.status = '';
+    queryParams.category_id = '';
+    queryParams.created_start_time = '';
+    queryParams.created_end_time = '';
+    queryParams.updated_start_time = '';
+    queryParams.updated_end_time = '';
+    queryParams.page = 1;
+    queryParams.number = 10;
     getData(1);
 };
+
+// 添加分页相关状态
+const pageInfo = reactive({
+    number: 10,
+    total: 0,
+    currentPage: 1,
+})
 
 // 页码改变
 const handleCurrentChange = (val) => {
@@ -58,9 +69,15 @@ const handleCurrentChange = (val) => {
 
 // 每页条数改变
 const handleSizeChange = (val) => {
-    queryParams.number = val;
-    pageInfo.per_page = val;
+    pageInfo.number = val;
     getData(1);
+}
+
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.number = Number(meta.per_page);
+    pageInfo.currentPage = meta.current_page;
 }
 
 /* 商品分类选择触发函数 */
@@ -76,6 +93,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
+    queryParams.number = pageInfo.number;
 
     goodsIndex(queryParams).then(res => {
         loading.value = false;
@@ -91,26 +109,19 @@ const getData = (page = 1) => {
     })
 }
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
-
 // 修改上架状态
 const handleStatusChange = (goodsId) => {
   goodsChangeStatus({ id: goodsId}).then(res => {
       if (res.code === 200) {
           cns.$message.success(res.message)
-          getData(pageInfo.current_page)
+          getData(pageInfo.currentPage)
       } else {
           cns.$message.error(res.message)
       }
     })
 }
 const openDetailView = (goodsId) => {
-    router.push({name:'goodsForm',params:{id:goodsId}})
+    router.push({name: 'manage.goods.form',params:{id:goodsId}})
 }
 
 onMounted( () => {
@@ -253,17 +264,7 @@ onMounted( () => {
         </el-table-column>
     </el-table>
     <!-- 添加分页组件 -->
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 15, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
-    </div>
+    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
 </template>
 
 <style scoped lang="scss">
@@ -279,11 +280,5 @@ onMounted( () => {
     :deep(.el-input) {
         width: 200px;
     }
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
 }
 </style>

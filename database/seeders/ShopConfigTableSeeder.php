@@ -17,6 +17,8 @@ class ShopConfigTableSeeder extends Seeder
         $this->addSmtpService();    // 邮件服务
         $this->addManageSettings(); // 后台设置
         $this->addIntegralSettings(); // 积分设置
+        $this->addSearchSettings(); // 搜索设置
+        $this->addGoodsSettings(); // 商品设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -40,6 +42,8 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::SERVICE_MOBILE, '');
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::ICP_NUMBER, '');
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::SHOP_COLOR, '#E48F34');
+        $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::MANAGE_COLOR, '#1050A9');
+        $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::MOUSE_MOVE_COLOR, '#FFFFFF');
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::IS_GRAY, 0);
     }
 
@@ -61,6 +65,12 @@ class ShopConfigTableSeeder extends Seeder
     private function addIntegralSettings(): void
     {
         $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::IS_OPEN_INTEGRAL, '0');
+        $this->addItem(ShopConfig::GROUP_INTEGRAL, ShopConfig::INTEGRAL_NAME, '积分');
+    }
+
+    private function addSearchSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_SEARCH, ShopConfig::SEARCH_DRIVER, '1');
     }
 
     private function addManageSettings(): void
@@ -68,6 +78,11 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
-        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, 2);
+        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, '2');
+    }
+
+    private function addGoodsSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_SALES_VOLUME, '0');
     }
 }

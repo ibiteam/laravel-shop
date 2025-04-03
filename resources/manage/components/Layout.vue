@@ -19,7 +19,7 @@
                               children: 'children',
                               label: 'label',
                             }"
-                        @node-click="(e,data,el) => openMenu(e,data,el,menuIndex)">
+                        @node-click="(e,data,el) => openMenu(e)">
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
                                 <el-icon v-if='data.icon'>
@@ -146,17 +146,40 @@
                         <el-tabs
                             v-model="routerActived"
                             closable
+                            @tab-remove="tabRemove"
+                            @tab-change="tabChange"
                         >
                             <el-tab-pane
-                                v-for="item in Array.from(tabsStore.visitedViews)"
+                                v-for="item in Array.from(commonStore.visitedViews)"
                                 :key="item.name"
                                 :label="item.title"
-                                :name="item.name"
-                            />
+                                :name="item.name">
+                                <template #label>
+                                    <div class="s-flex ai-ct jc-ct flex-1" style="height: 100%" @contextmenu.prevent.native="openTabMenu(item, $event)">{{ item.title }}</div>
+                                </template>
+                            </el-tab-pane>
                         </el-tabs>
+                        <ul
+                            class="contextmenu"
+                            v-show="visible"
+                            :style="{ left: left + 'px', top: top + 'px' }"
+                        >
+                            <li @click="refresh(selectedTag)">刷新</li>
+                            <li @click="closeSelectedTag(selectedTag)">关闭</li>
+                            <li @click="closeOthersTags(selectedTag)">关闭其他</li>
+                            <li @click="closeAllTags">关闭所有</li>
+                        </ul>
                     </div>
                     <div class='flex-1' style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
-                        <router-view></router-view>
+                        <router-view v-slot="{ Component }">
+                            <transition name="fade" mode="out-in">
+                                <keep-alive :include="cachedViews">
+                                    <div :key="route.path">
+                                        <component :is="Component"></component>
+                                    </div>
+                                </keep-alive>
+                            </transition>
+                        </router-view>
                     </div>
                 </el-main>
             </el-container>
@@ -168,31 +191,18 @@
 </template>
 
 <script setup>
-import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch} from 'vue';
+import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch,computed} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRoute,useRouter } from 'vue-router';
 import $public from '@/utils/public'
 import { ArrowRight } from '@element-plus/icons-vue'
-import {getMenuAxios} from "../api/home.js";
+import {getConfigAxios} from "../api/home.js";
 
-import { useTabsStore } from '@/store'
-const tabsStore = useTabsStore()
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 
 const route = useRoute()
 const router =  useRouter()
-watch(() => route.path,(to, from) => {
-    for (var index in tabsStore.visitedViews) {
-        var view = tabsStore.visitedViews[index]
-        if (view.name === to.name && view.path !== to.path) {
-            tabsStore.delVisitedViews(view).then((views) => {
-                cns.$router.push(to.path)
-            })
-            break
-        }
-    }
-    addViewTags()
-    moveToCurrentTag()
-})
 
 const pageLoad = ref(false)
 const menus = ref([])
@@ -207,6 +217,32 @@ const searchMenuArr = ref([])
 
 const routerActived = ref('')
 
+const visible =ref(false)
+const top = ref(0)
+const left = ref(0)
+const selectedTag = ref({})
+
+watch(() => route.path,(to, from) => {
+    for (var index in commonStore.visitedViews) {
+        var view = commonStore.visitedViews[index]
+        if (view.name === to.name && view.path !== to.path) {
+            commonStore.delVisitedViews(view).then((views) => {
+                router.push(to.path)
+            })
+            break
+        }
+    }
+    addViewTags()
+    moveToCurrentTag()
+})
+
+watch(() => visible.value,(value) => {
+    if (value) {
+        document.body.addEventListener('click', closeMenu)
+    } else {
+        document.body.removeEventListener('click', closeMenu)
+    }
+})
 
 const openSearchShow = () => {
     searchtools.value = ''
@@ -340,9 +376,10 @@ const getKeyCode = (event) => {
 }
 
 const getMenu = () => {
-    getMenuAxios().then(res => {
+    getConfigAxios().then(res => {
         if (res.code === 200) {
-            menus.value = res.data
+            menus.value = res.data.menus
+            commonStore.updateShopConfig(res.data.shop_config)
             pageLoad.value = true
         } else {
             cns.$message.error(res.message);
@@ -350,7 +387,7 @@ const getMenu = () => {
     });
 }
 
-const openMenu = (e,data,el,menuIndex) => {
+const openMenu = (e) => {
     if (typeof (e.children) === 'undefined' || e.children.length === 0) {
         router.push({name:e.name})
     } else {
@@ -363,7 +400,7 @@ const addViewTags = () => {
     if (!add_route) {
         return false
     }
-    tabsStore.addVisitedViews(add_route)
+    commonStore.addVisitedViews(add_route)
 }
 
 const generateRoute = () => {
@@ -372,8 +409,83 @@ const generateRoute = () => {
     }
     return false
 }
+const isActive = (view) => {
+    return view.path === route.path
+}
 const moveToCurrentTag = () => {
     routerActived.value = route.name
+}
+
+const tabChange = (name) =>{
+    const view = commonStore.visitedViews.filter((ite) => ite.name == name)
+    router.push(view[0].path)
+}
+
+const tabRemove = (name) =>{
+    const view = commonStore.visitedViews.filter((ite) => ite.name == name)
+    commonStore.delVisitedViews(view[0]).then((views) => {
+        if (isActive(view[0])) {
+            const latestView = views.slice(-1)[0]
+            if (latestView) {
+                router.push(latestView.path)
+            } else {
+                router.push({name: 'manage.home.index'})
+            }
+        }
+    })
+}
+
+let cachedViews = computed(() => {
+    if (route.meta && route.meta.keepAlive) {
+        commonStore.addCachedViews(route)
+    }
+    return commonStore.cachedViews
+})
+
+const openTabMenu = (tag, e) => {
+    visible.value = true
+    selectedTag.value = tag
+    left.value = e.clientX
+    top.value = e.clientY
+}
+
+const closeMenu = () =>{
+    visible.value = false
+}
+
+const refresh = (view) => {
+    commonStore.refreshQuery(view)
+    router.replace({
+        name: 'manage.refresh.index',
+    })
+}
+
+const closeSelectedTag = (view) => {
+    if (route.meta.keepAlive) {
+        route.meta.keepAlive = false
+    }
+    commonStore.delVisitedViews(view).then((views) => {
+        if (isActive(view)) {
+            const latestView = views.slice(-1)[0]
+            if (latestView) {
+                router.push(latestView.path)
+            } else {
+                router.push({name: 'manage.home.index'})
+            }
+        }
+    })
+}
+
+const closeOthersTags = (view) =>{
+    router.push(view.path)
+    commonStore.delOthersViews(view).then(() => {
+        moveToCurrentTag()
+    })
+}
+
+const closeAllTags = () => {
+    commonStore.delAllViews()
+    router.push({name: 'manage.home.index'})
 }
 
 onMounted(() => {
@@ -720,6 +832,32 @@ onUnmounted(() => {
                             background: #F6FAFF;
                             border: none;
                             color: #077FFF;
+                        }
+                        .el-icon{
+                            margin-right: 5px;
+                        }
+                    }
+                }
+                .contextmenu {
+                    margin: 0;
+                    background: #fff;
+                    z-index: 100;
+                    position: absolute;
+                    list-style-type: none;
+                    padding: 5px 0;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 400;
+                    color: #333;
+                    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+
+                    li {
+                        margin: 0;
+                        padding: 7px 16px;
+                        cursor: pointer;
+
+                        &:hover {
+                            background: #eee;
                         }
                     }
                 }

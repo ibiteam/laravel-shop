@@ -2,14 +2,14 @@
 
 namespace App\Messages;
 
-use App\Models\PhoneMsg;
+use App\Enums\PhoneMsgTypeEnum;
 use Overtrue\EasySms\Message;
 
 class BaseMessage extends Message
 {
     protected array $info;
 
-    protected int $send_type = PhoneMsg::PHONE_NOTICE;
+    protected PhoneMsgTypeEnum $enum;
 
     public function getInfo(): array
     {
@@ -21,13 +21,13 @@ class BaseMessage extends Message
         $this->info = $info;
     }
 
-    public function getSendType(): int
+    public function getEnum(): PhoneMsgTypeEnum
     {
-        return $this->send_type;
+        return $this->enum;
     }
 
-    public function setSendType(int $send_type): void
+    public function setEnum(PhoneMsgTypeEnum $enum): void
     {
-        $this->send_type = $send_type;
+        $this->enum = $enum;
     }
 }

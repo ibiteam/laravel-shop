@@ -3,9 +3,11 @@
 namespace App\Services\Goods;
 
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
+use App\Http\Dao\OrderEvaluateDao;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\Goods;
@@ -209,7 +211,7 @@ class GoodsService
      *
      * @throws BusinessException
      */
-    public function show(string $no, ?User $user): Goods
+    public function show(string $no, ?User $user, int $request_sku_id = 0): Goods
     {
         $goods = Goods::query()->with(['images', 'parameters', 'detail', 'specValues', 'specValues.spec'])->withTrashed()->whereNo($no)->first();
 
@@ -219,21 +221,51 @@ class GoodsService
         app(GoodsDao::class)->checkGoodsIsDestroy($goods);
 
         // 多规格商品处理
-        $tmp_sku_params_list = [
-            'skus' => [],
+        $sku_params_list = [
+            'sku_item' => null,
             'spec_values' => [],
         ];
-        $tmp_sku_data = $goods->skus;
-        $tmp_spec_value_data = $goods->specValues;
+        $database_sku_list = $goods->skus()->where('is_show', GoodsSku::SHOW)->get();
+        $database_spec_values = $goods->specValues;
 
-        if (! empty($tmp_sku_data) && ! empty($tmp_spec_value_data)) {
-            $tmp_sku_params_list = [
-                'skus' => $tmp_sku_data->map(fn (GoodsSku $sku) => $this->skuItemFormat($sku)),
-                'spec_values' => $this->reverseSpecData($tmp_spec_value_data),
+        if (! empty($database_sku_list) && ! empty($database_spec_values)) {
+            $sku_item = null;
+            $sku_item_format = null;
+
+            if ($request_sku_id > 0) {
+                $sku_item = $database_sku_list->where('id', $request_sku_id)->first();
+            }
+
+            if (! $sku_item instanceof GoodsSku) {
+                $sku_item = $database_sku_list->first();
+            }
+            $selected_spec_value_ids = [];
+
+            if ($sku_item instanceof GoodsSku) {
+                $sku_item_format = $this->skuItemFormat($sku_item);
+                $selected_spec_value_ids = explode('|', $sku_item->sku_value);
+            }
+            $sku_params_list = [
+                'sku_item' => $sku_item_format,
+                'spec_values' => $this->reverseSpecData($database_spec_values, $selected_spec_value_ids),
             ];
         }
-        $goods->sku_params_list = $tmp_sku_params_list;
+        $goods->sku_params_list = $sku_params_list;
 
+        // 商品评价处理
+        [$evaluate_total, $evaluate_list] = app(OrderEvaluateDao::class)->getEvaluateByGoodsId($goods->id);
+        $tmp_evaluate = [
+            'total' => $evaluate_total,
+            'tag_data' => [],
+            'items' => $evaluate_list,
+        ];
+
+        if ($evaluate_total > 0) {
+            $tmp_evaluate['tag_data'] = app(OrderEvaluateDao::class)->getTagListByGoodsId($goods->id);
+        }
+        $goods->evaluate = $tmp_evaluate;
+
+        // 购物车数量以及是否收藏处理
         if ($user instanceof User) {
             $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
 
@@ -243,6 +275,11 @@ class GoodsService
             $goods->cart_number = 0;
             $goods->can_collect = false;
         }
+
+        // 积分名称
+        $goods->integral_name = shop_config(ShopConfig::INTEGRAL_NAME);
+        // 是否展示销量
+        $goods->is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
 
         return $goods;
     }
@@ -261,6 +298,57 @@ class GoodsService
         }
 
         return $this->skuItemFormat($goods_sku);
+    }
+
+    /**
+     * 实时获取商品库存数量.
+     *
+     * @param Goods $goods          商品
+     * @param int   $request_sku_id SKU id
+     * @param int   $number         购买数量
+     *
+     * @throws BusinessException
+     * @throws ProcessDataException
+     */
+    public function checkGoodsNumber(Goods $goods, int $request_sku_id, int $number): array
+    {
+        $res = [
+            'total' => 0,
+            'can_buy' => false,
+        ];
+        $sku_data = $goods->skus()->get();
+
+        if (! empty($sku_data) && $request_sku_id === 0) {
+            throw new BusinessException('多规格商品请先选择商品规格');
+        }
+
+        if ($request_sku_id > 0) {
+            $sku_item = $sku_data->where('id', $request_sku_id)->first();
+
+            if (! $sku_item instanceof GoodsSku) {
+                throw new BusinessException('商品规格不存在');
+            }
+            $res['total'] = $sku_item->number;
+
+            if ($sku_item->number < $number) {
+                $tmp_message = $sku_item->number.$goods->unit;
+
+                throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+            }
+            $res['can_buy'] = true;
+
+            return $res;
+        }
+        $res['total'] = $goods->number;
+
+        if ($goods->number < $number) {
+            $tmp_message = $goods->number.$goods->unit;
+
+            throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+        }
+        $res['can_buy'] = true;
+
+        return $res;
     }
 
     /**
@@ -293,19 +381,20 @@ class GoodsService
     /**
      * @param Collection<int,GoodsSpecValue> $collection
      */
-    private function reverseSpecData(Collection $collection): EloquentCollection|Collection
+    private function reverseSpecData(Collection $collection, array $selected_ids = []): EloquentCollection|Collection
     {
         $group_collection = $collection->groupBy('goods_spec_id');
 
-        return GoodsSpec::query()->whereIn('id', $group_collection->keys())->get()->map(function (GoodsSpec $goods_spec) use ($group_collection) {
+        return GoodsSpec::query()->whereIn('id', $group_collection->keys())->get()->map(function (GoodsSpec $goods_spec) use ($group_collection, $selected_ids) {
             return [
                 'id' => $goods_spec->id,
                 'name' => $goods_spec->name,
-                'values' => $group_collection->get($goods_spec->id)->map(function (GoodsSpecValue $goods_spec_value) {
+                'values' => $group_collection->get($goods_spec->id)->map(function (GoodsSpecValue $goods_spec_value) use ($selected_ids) {
                     return [
                         'id' => $goods_spec_value->id,
                         'name' => $goods_spec_value->value,
                         'thumb' => $goods_spec_value->thumb,
+                        'selected' => in_array($goods_spec_value->id, $selected_ids),
                     ];
                 })->values(),
             ];

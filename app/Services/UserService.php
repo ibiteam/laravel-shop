@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
+use App\Exceptions\BusinessException;
 use App\Http\Dao\UserLogDao;
 use App\Models\User;
 use App\Models\UserLog;
@@ -14,7 +15,7 @@ class UserService
     /**
      * 根据手机号注册用户.
      */
-    public function registerByPhone(int $phone, CommonEnum $source = CommonEnum::H5): User
+    public function registerByPhone(int $phone, RefererEnum $source = RefererEnum::H5): User
     {
         $tmp_user_name = $this->generateUserName();
 
@@ -31,49 +32,44 @@ class UserService
     }
 
     /**
-     * 根据用户名+手机号注册用户.
-     */
-    public function registerByUserNameAndPhone(array $params, CommonEnum $source = CommonEnum::PC): User
-    {
-        return User::query()->create([
-            'user_name' => $params['account'],
-            'password' => $params['password'],
-            'nickname' => $params['account'],
-            'phone' => $params['phone'],
-            'avatar' => '',
-            'register_ip' => get_request_ip(),
-            'is_modify' => false,
-            'source' => $source->value,
-        ]);
-    }
-
-    /**
      * 检测用户是否登录.
      */
-    public function checkIsLogin(?User $user, string $token): array
+    public function checkIsLogin(?User $user, ?string $token): array
     {
         $res = [
             'is_login' => false,
             'token' => '',
             'expires_at' => 0,
         ];
-        $access_token = $user->currentAccessToken();
 
-        if (! $access_token instanceof PersonalAccessToken) {
+        try {
+            if (! $token) {
+                throw new BusinessException('用户未登录');
+            }
+
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录');
+            }
+            $access_token = $user->currentAccessToken();
+
+            if (! $access_token instanceof PersonalAccessToken) {
+                throw new BusinessException('用户未登录');
+            }
+
+            return array_merge($res, [
+                'is_login' => true,
+                'token' => $token,
+                'expires_at' => $access_token->expires_at->diffInSeconds(Carbon::now()),
+            ]);
+        } catch (\Throwable) {
             return $res;
         }
-
-        return array_merge($res, [
-            'is_login' => true,
-            'token' => $token,
-            'expires_at' => $access_token->expires_at->diffInSeconds(Carbon::now()),
-        ]);
     }
 
     /**
      * 登录成功处理token.
      */
-    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5): array
+    public function loginSuccess(User $user, RefererEnum $source = RefererEnum::H5): array
     {
         $now = Carbon::now();
         $future = $now->copy()->addDay();

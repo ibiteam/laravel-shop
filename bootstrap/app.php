@@ -1,7 +1,8 @@
 <?php
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
 use App\Http\Middleware\Manage\AccessRecord as ManageAccessRecord;
@@ -43,6 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // 不记录到日志的异常
         $exceptions->dontReport([
             BusinessException::class,
+            ProcessDataException::class,
         ]);
         // 封装异常返回
         $exceptions->render(function (AuthenticationException $authentication_exception, $request) {
@@ -55,14 +57,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 use ApiResponse;
             };
 
-            return $api_response->error('未登录，请先登录。', CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error('未登录，请先登录。', ConstantEnum::UNAUTHORIZED);
         })->render(function (UnauthorizedHttpException $exception) {
             $api_response = new class
             {
                 use ApiResponse;
             };
 
-            return $api_response->error('请重新登录', CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error('请重新登录', ConstantEnum::UNAUTHORIZED);
         })->render(function (ValidationException $validation_exception) {
             $api_response = new class
             {
@@ -76,7 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 use ApiResponse;
             };
 
-            return $api_response->error($exception->getMessage(), CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error($exception->getMessage(), ConstantEnum::UNAUTHORIZED);
         })->render(function (NotFoundHttpException $exception) {
             $api_response = new class
             {

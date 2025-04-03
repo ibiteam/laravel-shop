@@ -21,10 +21,10 @@ class SearchController extends BaseController
 
         try {
             $validated = $request->validate([
-                'keywords' => 'required|string',
-                'category_id' => 'nullable|int',
-                'min_price' => 'nullable|int',
-                'max_price' => 'nullable|int',
+                'keywords' => 'nullable|string|required_without:category_id',
+                'category_id' => 'nullable|int|required_without:keywords',
+                'min_price' => 'nullable|numeric',
+                'max_price' => 'nullable|numeric',
                 'sort_type' => 'nullable|string',
                 'page' => 'required|int|min:1',
                 'number' => 'required|int|min:1',

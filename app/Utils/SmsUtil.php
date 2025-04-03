@@ -43,17 +43,17 @@ class SmsUtil
         }
     }
 
-    private function toDatabase(int $phone, BaseMessage $message): PhoneMsg
+    private function toDatabase(int $phone, BaseMessage $message): void
     {
         $now_timestamp = Carbon::now()->getTimestamp();
         $info = [
             'phone' => $phone,
             'code' => '',
-            'type' => '',
+            'type' => $message->getEnum()->value,
             'start_time' => $now_timestamp,
             'end_time' => $now_timestamp,
             'ip' => get_request_ip(),
-            'info' => PhoneMsg::PHONE_NOTICE,
+            'info' => '',
             'status' => PhoneMsg::STATUS_NOT_USED,
         ];
 
@@ -62,7 +62,7 @@ class SmsUtil
             $info = array_merge($info, $tmp_info);
         }
 
-        return PhoneMsg::query()->create($info);
+        PhoneMsg::query()->create($info);
     }
 
     private function config(): array

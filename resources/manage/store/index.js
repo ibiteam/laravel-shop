@@ -3,4 +3,4 @@ import { createPinia } from 'pinia'
 const pinia = createPinia()
 export default pinia
 
-export * from './modules/tabs.js'
+export * from './modules/common.js'

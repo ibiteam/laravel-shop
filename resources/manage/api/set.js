@@ -8,18 +8,27 @@ export function shopConfigUpdate(data) {
     return $http.doPost('manage/set/shop_config/update', data)
 }
 
-// 路由分类
+// 访问地址分类
 export function routerCategoryIndex(data) {
     return $http.doGet('manage/set/router_category', data)
+}
+export function routerCategoryInfo(data) {
+    return $http.doGet('manage/set/router_category/info', data)
 }
 export function routerCategoryStore(data) {
     return $http.doPost('manage/set/router_category/store', data)
 }
+export function routerCategoryDestroy(data) {
+    return $http.doPost('manage/set/router_category/destroy', data)
+}
 export function routerCategoryChangeShow(data) {
     return $http.doPost('manage/set/router_category/change_show', data)
 }
+export function routerCategoryGetPages(data) {
+    return $http.doGet('manage/set/router_category/pages', data)
+}
 
-// 路由列表
+// 访问地址
 export function routerIndex(data) {
     return $http.doGet('manage/set/router', data)
 }
@@ -31,4 +40,18 @@ export function routerStore(data) {
 }
 export function routerChangeShow(data) {
     return $http.doPost('manage/set/router/change_show', data)
+}
+
+// 支付方式
+export function paymentMethodIndex(data) {
+    return $http.doGet('manage/set/payment/method', data)
+}
+export function paymentMethodChangeField(data) {
+    return $http.doPost('manage/set/payment/method/change/field', data)
+}
+export function paymentMethodEdit(data) {
+    return $http.doGet('manage/set/payment/method/edit', data)
+}
+export function paymentMethodUpdate(data) {
+    return $http.doPost('manage/set/payment/method/update', data)
 }

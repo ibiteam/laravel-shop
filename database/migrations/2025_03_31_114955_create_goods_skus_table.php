@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('goods_id')->comment('商品ID');
             $table->string('sku_value')->comment('属性值ID“|”分割');
             $table->decimal('price', 13)->comment('价格');
-            $table->decimal('integral', 13)->default(0.00)->comment('积分');
+            $table->integer('integral')->default(0)->comment('积分');
             $table->integer('number')->comment('库存');
             $table->boolean('is_show')->comment('是否展示 1展示 0不展示');
             $table->smallInteger('sort')->comment('排序');

@@ -150,7 +150,7 @@ class MobileRouterService
             return '';
         }
 
-        return connectStr($url);
+        return get_url_joiner($url);
     }
 
     public function getAliasValueDesc($alias,$is_void=false)

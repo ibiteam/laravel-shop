@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AccessRecordDao;
 use App\Http\Dao\PermissionDao;
+use App\Http\Dao\ShopConfigDao;
 use App\Models\AccessStatistic;
 use App\Models\Collect;
 use App\Models\Permission;
+use App\Models\ShopConfig;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -20,18 +22,22 @@ class HomeController extends BaseController
     private int $todoCount = 0;     // 代办数量
 
     /**
-     * 获取菜单.
+     * 初始化配置.
      */
-    public function menus(Request $request, PermissionDao $permission_dao)
+    public function config(Request $request, PermissionDao $permission_dao, ShopConfigDao $shop_config_dao)
     {
         $admin_user = $this->adminUser();
 
-        // 收藏的菜单ID
+        // 权限菜单
         $collect_permission_ids = Collect::query()->whereAdminUserId($admin_user->id)->select('permission_id')->get()->keyBy('permission_id')->toArray();
-
         $menus = $permission_dao->getTreePermissionByAdminUser($admin_user, $collect_permission_ids);
 
-        return $this->success($menus);
+        $shop_config = $shop_config_dao->multipleConfig(
+            ShopConfig::MANAGE_COLOR,
+            ShopConfig::MOUSE_MOVE_COLOR,
+        );
+
+        return $this->success(['menus' => $menus, 'shop_config' => $shop_config]);
     }
 
     /**
@@ -54,8 +60,8 @@ class HomeController extends BaseController
         if (count($access_statistics)) {
             array_multisort(array_column($access_statistics, 'statistic_date'), SORT_ASC, $access_statistics);
             $referer_group = collect($access_statistics)->groupBy('referer');
-            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', CommonEnum::PC->value);
-            $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', CommonEnum::H5->value);
+            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', RefererEnum::PC->value);
+            $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', RefererEnum::H5->value);
         }
 
         // 我的收藏
@@ -135,7 +141,10 @@ class HomeController extends BaseController
      */
     public function clearCache()
     {
+        $admin_user = $this->adminUser();
+
         Cache::forget('shop_config_all_code');
+        Cache::forget('permission_menus_'.$admin_user->id);
 
         return $this->success('清除成功');
     }

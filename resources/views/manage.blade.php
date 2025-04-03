@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
-        @vite(['resources/manage/app.js'])
+        @vite(['resources/manage/app.ts'])
     </head>
     <body>
     <div id="app"></div>

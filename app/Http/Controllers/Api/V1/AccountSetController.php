@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\PhoneMsgTypeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
-use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Rules\PhoneRule;
 use App\Rules\UserNameRule;
@@ -43,7 +43,7 @@ class AccountSetController extends BaseController
                 'user_name' => [
                     'required',
                     'string',
-                    new UserNameRule(),
+                    new UserNameRule,
                     Rule::unique((new User)
                         ->getTable(), 'user_name')
                         ->ignore($this->user->id),
@@ -54,14 +54,17 @@ class AccountSetController extends BaseController
                 'user_name' => '用户名',
             ]);
             $user_name = $validated['user_name'];
+
             if (get_sensitive_words($user_name)) {
                 return $this->error('抱歉，用户名中包含敏感词，请重新填写');
             }
+
             if ($this->user->is_modify == User::IS_MODIFY_YES) {
                 return $this->error('用户名仅支持修改一次哦');
             }
             $this->user->user_name = $user_name;
             $this->user->is_modify = User::IS_MODIFY_YES;
+
             if (! $this->user->save()) {
                 throw new BusinessException('保存失败');
             }
@@ -94,11 +97,13 @@ class AccountSetController extends BaseController
                 'nickname' => '昵称',
             ]);
             $nickname = $validated['nickname'];
+
             if (get_sensitive_words($nickname)) {
                 return $this->error('抱歉，昵称中包含敏感词，请重新填写');
             }
 
             $this->user->nickname = $nickname;
+
             if (! $this->user->save()) {
                 throw new BusinessException('保存失败');
             }
@@ -117,11 +122,13 @@ class AccountSetController extends BaseController
     public function setUserAvatar(Request $request)
     {
         $avatar = $request->get('avatar');
+
         if (! $avatar) {
             return $this->error('头像不能为空');
         }
         $this->user->avatar = $avatar;
-        if (!$this->user->save()) {
+
+        if (! $this->user->save()) {
             return $this->error('保存失败');
         }
 
@@ -149,14 +156,17 @@ class AccountSetController extends BaseController
                 'code' => '验证码',
             ]);
             $phone = $validated['phone'];
-            if (! $sms_service->verifyOtp($phone, $validated['code'], PhoneMsg::PHONE_LOGIN)) {
+
+            if (! $sms_service->verifyOtp($phone, $validated['code'], PhoneMsgTypeEnum::PHONE_EDIT)) {
                 throw new BusinessException('验证码输入错误');
             }
+
             if ($this->user->phone == $phone) {
                 throw new BusinessException('修改的手机号不能与原手机号一致，请修改成其他手机');
             }
 
             $this->user->phone = $phone;
+
             if (! $this->user->save()) {
                 throw new BusinessException('保存失败');
             }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
@@ -20,12 +21,18 @@ Route::prefix('set')->group(function () {
 
     // 访问地址分类
     Route::prefix('router_category')->group(function () {
+        Route::get('tree', [RouterCategoryController::class, 'getTreeList']);  // 访问地址弹窗 左侧树状数据
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
             Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
+            Route::get('info', [RouterCategoryController::class, 'info']);
+            Route::get('pages', [RouterCategoryController::class, 'getPages']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
             Route::post('store', [RouterCategoryController::class, 'store']);
             Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
+            Route::post('destroy', [RouterCategoryController::class, 'destroy']);
         });
     });
 
@@ -47,6 +54,19 @@ Route::prefix('set')->group(function () {
             Route::get('edit', [PaymentMethodController::class, 'edit']);
             Route::post('update', [PaymentMethodController::class, 'update']);
             Route::post('change/field', [PaymentMethodController::class, 'changeField']);
+        });
+    });
+
+    // 移动端装修
+    Route::prefix('app_decoration')->group(function () {
+        Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
+            Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
+        });
+        Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
+            Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
+        });
+        Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_DELETE])->group(function () {
+
         });
     });
 });
