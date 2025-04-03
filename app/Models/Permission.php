@@ -75,6 +75,9 @@ class Permission extends SpatiePermission
     public const BASIC_PAYMENT_MANAGE = 'basic.payment.manage'; // 支付管理
     public const MANAGE_PAYMENT_METHOD_INDEX = 'manage.payment_method.index'; // 支付方式列表
     public const MANAGE_PAYMENT_METHOD_UPDATE = 'manage.payment_method.update'; // 支付方式编辑
+    public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
+    public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
+    public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
 
     public const WEBSITE_MANAGE = 'website.manage'; // 网站管理
     public const MANAGE_APP_DECORATION = 'manage.app_decoration.index'; // 移动端装修

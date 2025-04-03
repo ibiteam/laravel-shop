@@ -13,6 +13,7 @@ import UserAddress from '@/pages/user/UserAddress.vue';
 import PaymentMethod from '@/pages/set/PaymentMethod.vue';
 import AppDecoration from '@/pages/decoration/app/Index.vue';
 import Refresh from '@/pages/refresh/refresh.vue';
+import ShipCompany from '@/pages/set/ShipCompany.vue';
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
@@ -28,6 +29,7 @@ const router = createRouter({
                 { path: '/set/router_category', component: SetRouterCategory, name: 'manage.router_category.index',meta:{title:'访问地址分类'} },
                 { path: '/set/router', component: SetRouter, name: 'manage.router.index',meta:{title:'访问地址'} },
                 { path: '/set/payment_method', component: PaymentMethod, name: 'manage.payment_method.index',meta:{title:'支付方式'} },
+                { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
                 { path: '/app/decoration', component: AppDecoration , name: 'manage.app_decoration.index', meta:{title:'移动端装修'} },
                 // 商品
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},

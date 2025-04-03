@@ -55,3 +55,16 @@ export function paymentMethodEdit(data) {
 export function paymentMethodUpdate(data) {
     return $http.doPost('manage/set/payment/method/update', data)
 }
+// 快递公司
+export function shipCompanyIndex(data) {
+    return $http.doGet('manage/set/ship_company', data)
+}
+export function shipCompanyEdit(data) {
+    return $http.doGet('manage/set/ship_company/edit', data)
+}
+export function shipCompanyUpdate(data) {
+    return $http.doPost('manage/set/ship_company/update', data)
+}
+export function shipCompanyChangeStatus(data) {
+    return $http.doPost('manage/set/ship_company/change_status', data)
+}

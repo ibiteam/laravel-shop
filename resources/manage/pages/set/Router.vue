@@ -2,6 +2,7 @@
 import { Plus, Search } from '@element-plus/icons-vue';
 import { routerIndex, routerStore, routerChangeShow, routerCategories } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { isSuccess } from '@/utils/constants.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -85,7 +86,7 @@ const onSubmit = () => {
             submitLoading.value = true;
             routerStore(submitForm).then(res => {
                 submitLoading.value = false;
-                if (res.code === 200) {
+                if (isSuccess(res.code)) {
                     closeStoreDialog();
                     getData();
                 } else {
@@ -104,7 +105,7 @@ const changeShow = (row) => {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
-        if (res.code === 200) {
+        if (isSuccess(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
@@ -115,7 +116,7 @@ const changeShow = (row) => {
 /* 获取分类 */
 const getCategories = () => {
     routerCategories().then(res => {
-        if (res.code === 200) {
+        if (isSuccess(res.code)) {
             categoriesData.value = res.data;
         }
     }).catch(() => {
@@ -127,7 +128,7 @@ const getData = (page = 1) => {
     searchForm.page = page;
     routerIndex(searchForm).then(res => {
         loading.value = false;
-        if (res.code === 200) {
+        if (isSuccess(res.code)) {
             tableData.value = res.data.list;
             setPageInfo(res.data.meta);
         } else {

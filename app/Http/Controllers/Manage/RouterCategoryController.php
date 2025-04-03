@@ -31,6 +31,36 @@ class RouterCategoryController extends BaseController
             ->orderByDesc('id')
             ->get();
 
+        // 批量获取权限名称以减少查询次数
+        $pageNames = $data->flatMap(function ($item) {
+            $names = [];
+
+            if ($item->page_name) {
+                $names[] = $item->page_name;
+            }
+
+            if ($item->allChildren) {
+                $names = array_merge($names, $item->allChildren->pluck('page_name')->filter()->toArray());
+            }
+
+            return $names;
+        })->filter()->unique()->values()->toArray();
+
+        $permissions = Permission::whereIn('name', $pageNames)->pluck('display_name', 'name');
+
+        // 处理数据并添加额外字段
+        $data->each(function ($item) use ($permissions) {
+            $item->routers_count = $item->routers->count();
+            $item->page_title = $item->page_name ? ($permissions[$item->page_name] ?? '') : '';
+
+            if ($item->allChildren) {
+                $item->allChildren->each(function ($child) use ($permissions) {
+                    $child->routers_count = $child->routers->count();
+                    $child->page_title = $child->page_name ? ($permissions[$child->page_name] ?? '') : '';
+                });
+            }
+        });
+
         return $this->success($data);
     }
 
@@ -175,8 +205,8 @@ class RouterCategoryController extends BaseController
 
             if ($validated['id']) {
                 $log = "编辑访问地址分类[id:{$router_category->id}]".implode(',', array_map(function ($k, $v) {
-                        return sprintf('%s=`%s`', $k, $v);
-                    }, array_keys($router_category->getChanges()), $router_category->getChanges()));
+                    return sprintf('%s=`%s`', $k, $v);
+                }, array_keys($router_category->getChanges()), $router_category->getChanges()));
                 admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增访问地址分类[id:{$router_category->id}]";
@@ -262,11 +292,11 @@ class RouterCategoryController extends BaseController
             }
 
             $log = "更改访问地址分类显示隐藏[id:{$validated['id']}]".implode(
-                    ',',
-                    array_map(function ($k, $v) {
-                        return sprintf('%s=`%s`', $k, $v);
-                    }, array_keys($router_category->getChanges()), $router_category->getChanges())
-                );
+                ',',
+                array_map(function ($k, $v) {
+                    return sprintf('%s=`%s`', $k, $v);
+                }, array_keys($router_category->getChanges()), $router_category->getChanges())
+            );
             admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
@@ -286,7 +316,6 @@ class RouterCategoryController extends BaseController
             $categoryTree = $router_category_dao->getTreeList();
 
             return $this->success($categoryTree);
-
         } catch (\Throwable $throwable) {
             return $this->error('获取访问地址分类异常');
         }
