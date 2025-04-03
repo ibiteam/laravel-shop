@@ -46,7 +46,9 @@ class ShopConfig extends Model
     public const SHOP_ADDRESS = 'shop_address'; // 商城线下地址
     public const SERVICE_MOBILE = 'service_mobile'; // 服务热线
     public const ICP_NUMBER = 'icp_number'; // ICP 备案号
-    public const SHOP_COLOR = 'shop_color'; // 主题色
+    public const SHOP_COLOR = 'shop_color'; // 站点主题色
+    public const MANAGE_COLOR = 'manage_color'; // 总后台主题色
+    public const MOUSE_MOVE_COLOR = 'mouse_move_color'; // 鼠标移入背景色
     public const IS_GRAY = 'is_gray'; // 网站首页是否置灰
     public const SHOP_ICON = 'shop_icon'; // 商城 ICON
     public const SHOP_LOGO = 'shop_logo'; // 商城 LOGO
