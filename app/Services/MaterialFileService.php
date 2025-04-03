@@ -109,17 +109,4 @@ class MaterialFileService
 
         return MaterialFile::create($data);
     }
-
-    public function getFileUrl($file): string
-    {
-        $storage = Storage::disk();
-
-        $file_path = $storage->put(config('app.manage_prefix').'/'.date('Y/m/d'), $file);
-
-        if (! $file_path) {
-            throw new BusinessException('文件上传失败~');
-        }
-
-        return $storage->url($file_path);
-    }
 }
