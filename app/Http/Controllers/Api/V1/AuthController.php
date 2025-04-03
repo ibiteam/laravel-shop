@@ -80,7 +80,6 @@ class AuthController extends BaseController
                     'required',
                     'integer',
                     new PhoneRule,
-                    Rule::exists((new User)->getTable(), 'phone'),
                 ],
                 'code' => 'required|string',
             ], [], [
