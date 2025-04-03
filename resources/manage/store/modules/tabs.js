@@ -3,7 +3,8 @@ export const useTabsStore = defineStore('shop-tabs', {
     state: () => {
         return {
             visitedViews: [],
-            cachedViews: []
+            cachedViews: [],
+            refreshView:{}
         }
     },
     actions: {
@@ -79,6 +80,9 @@ export const useTabsStore = defineStore('shop-tabs', {
                 this.cachedViews = [...new Set(this.cachedViews)]
                 resolve([...this.cachedViews])
             })
+        },
+        refreshQuery(view){
+            this.refreshView = view
         }
     }
 })

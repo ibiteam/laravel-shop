@@ -166,7 +166,7 @@
                         >
                             <li @click="refresh(selectedTag)">刷新</li>
                             <li @click="closeSelectedTag(selectedTag)">关闭</li>
-                            <li @click="closeOthersTags">关闭其他</li>
+                            <li @click="closeOthersTags(selectedTag)">关闭其他</li>
                             <li @click="closeAllTags">关闭所有</li>
                         </ul>
                     </div>
@@ -174,7 +174,9 @@
                         <router-view v-slot="{ Component }">
                             <transition name="fade" mode="out-in">
                                 <keep-alive :include="cachedViews">
-                                    <component :is="Component" />
+                                    <div :key="route.path">
+                                        <component :is="Component"></component>
+                                    </div>
                                 </keep-alive>
                             </transition>
                         </router-view>
@@ -451,10 +453,9 @@ const closeMenu = () =>{
 }
 
 const refresh = (view) => {
-    console.log(view)
+    tabsStore.refreshQuery(view)
     router.replace({
         name: 'manage.refresh.index',
-        query: view,
     })
 }
 
@@ -474,9 +475,9 @@ const closeSelectedTag = (view) => {
     })
 }
 
-const closeOthersTags = () =>{
-    router.push(selectedTag.path)
-    tabsStore.delOthersViews(selectedTag.value).then(() => {
+const closeOthersTags = (view) =>{
+    router.push(view.path)
+    tabsStore.delOthersViews(view).then(() => {
         moveToCurrentTag()
     })
 }

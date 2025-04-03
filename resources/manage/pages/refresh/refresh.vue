@@ -13,7 +13,7 @@ import { useTabsStore } from '@/store'
 const tabsStore = useTabsStore()
 onMounted(() => {
     // 取到路由带过来的参数
-    let routeValue = route.query;
+    let routeValue = tabsStore.refreshView;
     let view = {
         name: routeValue.name,
         title: "正在刷新",
@@ -28,6 +28,8 @@ onMounted(() => {
         })
         router.replace({
             name: routeValue.name,
+            query:routeValue.query,
+            params:routeValue.params
         });
     })
 });
