@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
@@ -100,15 +100,9 @@ if (! function_exists('get_source')) {
     /**
      * 获取访问来源.
      */
-    function get_source(): CommonEnum
+    function get_source(): RefererEnum
     {
-        return match (request()->header('source')) {
-            'h5' => CommonEnum::H5,
-            'pc' => CommonEnum::PC,
-            'app' => CommonEnum::APP,
-            'wechat_mini' => CommonEnum::WECHAT_MINI,
-            default => CommonEnum::H5,
-        };
+        return RefererEnum::formString(request()->header('source'));
     }
 }
 

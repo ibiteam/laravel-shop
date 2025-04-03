@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AccessRecordDao;
 use App\Http\Dao\PermissionDao;
@@ -54,8 +54,8 @@ class HomeController extends BaseController
         if (count($access_statistics)) {
             array_multisort(array_column($access_statistics, 'statistic_date'), SORT_ASC, $access_statistics);
             $referer_group = collect($access_statistics)->groupBy('referer');
-            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', CommonEnum::PC->value);
-            $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', CommonEnum::H5->value);
+            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', RefererEnum::PC->value);
+            $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', RefererEnum::H5->value);
         }
 
         // 我的收藏

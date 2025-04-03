@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\CommonEnum;
+use App\Enums\RefererEnum;
 use App\Http\Dao\UserLogDao;
 use App\Models\User;
 use App\Models\UserLog;
@@ -14,7 +14,7 @@ class UserService
     /**
      * 根据手机号注册用户.
      */
-    public function registerByPhone(int $phone, CommonEnum $source = CommonEnum::H5): User
+    public function registerByPhone(int $phone, RefererEnum $source = RefererEnum::H5): User
     {
         $tmp_user_name = $this->generateUserName();
 
@@ -56,7 +56,7 @@ class UserService
     /**
      * 登录成功处理token.
      */
-    public function loginSuccess(User $user, CommonEnum $source = CommonEnum::H5): array
+    public function loginSuccess(User $user, RefererEnum $source = RefererEnum::H5): array
     {
         $now = Carbon::now();
         $future = $now->copy()->addDay();
