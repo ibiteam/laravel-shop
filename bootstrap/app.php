@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\CustomException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
@@ -57,14 +57,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 use ApiResponse;
             };
 
-            return $api_response->error('未登录，请先登录。', CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error('未登录，请先登录。', ConstantEnum::UNAUTHORIZED);
         })->render(function (UnauthorizedHttpException $exception) {
             $api_response = new class
             {
                 use ApiResponse;
             };
 
-            return $api_response->error('请重新登录', CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error('请重新登录', ConstantEnum::UNAUTHORIZED);
         })->render(function (ValidationException $validation_exception) {
             $api_response = new class
             {
@@ -78,7 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 use ApiResponse;
             };
 
-            return $api_response->error($exception->getMessage(), CustomCodeEnum::UNAUTHORIZED);
+            return $api_response->error($exception->getMessage(), ConstantEnum::UNAUTHORIZED);
         })->render(function (NotFoundHttpException $exception) {
             $api_response = new class
             {

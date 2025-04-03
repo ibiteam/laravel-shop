@@ -2,7 +2,7 @@
 
 namespace App\Services\Goods;
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\GoodsCollectDao;
 use App\Models\Goods;
@@ -22,7 +22,7 @@ class GoodsCollectService
 
         if ($goods_collect instanceof GoodsCollect) {
             if ($goods_collect->is_attention == GoodsCollect::ATTENTION_YES) {
-                throw new BusinessException('您已经关注过该商品', CustomCodeEnum::SUCCESS);
+                throw new BusinessException('您已经关注过该商品', ConstantEnum::SUCCESS);
             }
 
             if (! $goods_collect->update(['is_attention' => GoodsCollect::ATTENTION_YES])) {
@@ -51,7 +51,7 @@ class GoodsCollectService
         }
 
         if ($goods_collect->is_attention == GoodsCollect::ATTENTION_NO) {
-            throw new BusinessException('您已取消关注该商品', CustomCodeEnum::SUCCESS);
+            throw new BusinessException('您已取消关注该商品', ConstantEnum::SUCCESS);
         }
 
         if (! $goods_collect->update(['is_attention' => GoodsCollect::ATTENTION_NO])) {

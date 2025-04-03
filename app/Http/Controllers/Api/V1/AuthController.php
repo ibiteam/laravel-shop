@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\UserDao;
@@ -191,7 +191,7 @@ class AuthController extends BaseController
             $user = $this->user();
 
             if (! $user instanceof User) {
-                throw new BusinessException('用户未登录', CustomCodeEnum::UNAUTHORIZED);
+                throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
             }
 
             if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsg::PHONE_EDIT_PASSWORD)) {

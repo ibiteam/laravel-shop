@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\PhoneMsgDao;
 use App\Http\Dao\UserDao;
@@ -39,7 +39,7 @@ class SmsService
     public function sendEditPasswordOtp(?User $user): bool
     {
         if (! $user instanceof User) {
-            throw new BusinessException('用户未登录', CustomCodeEnum::UNAUTHORIZED);
+            throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
         }
 
         $this->sendMessage($user->phone, new PhoneCodeMessage('修改密码短信', PhoneMsg::PHONE_EDIT_PASSWORD));
@@ -54,12 +54,6 @@ class SmsService
      */
     public function sendLoginOtp(int $phone): bool
     {
-        $user = app(UserDao::class)->getInfoByPhone($phone);
-
-        if (! $user instanceof User) {
-            throw new BusinessException('该手机号未注册');
-        }
-
         $this->sendMessage($phone, new PhoneCodeMessage('登录短信', PhoneMsg::PHONE_LOGIN));
 
         return true;

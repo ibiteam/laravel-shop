@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use App\Enums\CustomCodeEnum;
+use App\Enums\ConstantEnum;
 use App\Traits\ApiResponse;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,7 +14,7 @@ class CustomException extends Exception
     public function __construct(
         string $message = '',
         protected array $data = [],
-        protected CustomCodeEnum $custom_code_enum = CustomCodeEnum::ERROR
+        protected ConstantEnum $custom_code_enum = ConstantEnum::ERROR
     ) {
         parent::__construct($message, $this->custom_code_enum->value);
     }
@@ -29,7 +29,7 @@ class CustomException extends Exception
         return $this->failed($this->getData(), $this->message, $this->custom_code_enum);
     }
 
-    public function getCodeEnum(): CustomCodeEnum
+    public function getCodeEnum(): ConstantEnum
     {
         return $this->custom_code_enum;
     }
