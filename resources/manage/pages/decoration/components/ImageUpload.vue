@@ -69,7 +69,7 @@ const beforeUpload = (event) => {
 const uploadImage = async (file) => {
     fileUpload({file}).then((res) => {
         uploading.value = false
-        if (cns.$constant.isSuccess(res.code)) {
+        if (cns.$isSuccCode(res.code)) {
             emit('local', res.data?.url)
         }
     }).catch((err)=>{

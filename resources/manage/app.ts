@@ -16,7 +16,7 @@ import '@/assets/css/iconfont.css'
 import dialog from "@/utils/dialog";
 import http from "@/utils/http";
 import $public from "@/utils/public";
-import constants from '@/utils/constants';
+import { isSuccess, isForbidden, isUnauthorized } from '@/utils/constants';
 
 
 
@@ -31,7 +31,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.config.globalProperties.$http = http
 app.config.globalProperties.$dialog = dialog
 app.config.globalProperties.$public = $public;
-app.config.globalProperties.$constant = constants;
+app.config.globalProperties.$isSuccCode = isSuccess;
+app.config.globalProperties.$isForbCode = isForbidden;
+app.config.globalProperties.$isUnauthCode = isUnauthorized;
 app.config.globalProperties.$bus = mitt()
 app.use(VueCookies);
 app.mount('#app');

@@ -85,7 +85,7 @@ const getData = (page = 1) => {
 // 表格修改字段
 const handleFieldChange = (itemId,field) => {
     paymentMethodChangeField({ id: itemId, field: field }).then(res => {
-        if (cns.$constant.isSuccess(res.code)) {
+        if (cns.$isSuccCode(res.code)) {
             cns.$message.success(res.message);
             getData(pageInfo.currentPage)
         } else {
@@ -125,7 +125,7 @@ const openDetailDialog = (itemId) => {
     detailFormLoading.value = true;
     paymentMethodEdit({ id: itemId }).then(res => {
         detailFormLoading.value = false;
-        if (cns.$constant.isSuccess(res.code)) {
+        if (cns.$isSuccCode(res.code)) {
             detailForm.id = res.data.id
             detailForm.name = res.data.name
             detailForm.alias = res.data.alias
@@ -167,7 +167,7 @@ const closeDetailDialog = () => {
 const uploadFile = async (request) => {
     try {
         const res = await fileUpload({ file: request.file });
-        if (cns.$constant.isSuccess(res.code)) {
+        if (cns.$isSuccCode(res.code)) {
             detailForm.icon = res.data.url;
         } else {
             cns.$message.error(res.message);
@@ -184,7 +184,7 @@ const submitDetailForm = _.throttle(() => {
             detailSubmitLoading.value = true;
             paymentMethodUpdate(detailForm).then(res => {
                 detailSubmitLoading.value = false;
-                if (cns.$constant.isSuccess(res.code)) {
+                if (cns.$isSuccCode(res.code)) {
                     closeDetailDialog();
                     getData(pageInfo.currentPage);
                 } else {

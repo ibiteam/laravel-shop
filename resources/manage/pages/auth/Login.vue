@@ -103,7 +103,7 @@ const changePasswordShow = () => {
 const submitLogin = () => {
     accountLogin({user_name:loginForm.username,password:loginForm.password}).then(res=>{
         loading.value = false;
-        if (cns.$constant.isSuccess(res.code)) {
+        if (cns.$isSuccCode(res.code)) {
             cns.$cookies.set('manage-token', res.data.token, res.data.expires_at)
             router.push({name:'manage.home.index'})
         } else {
@@ -114,7 +114,7 @@ const submitLogin = () => {
 
 onMounted(() => {
     getLoginInfo().then(res => {
-        if(cns.$constant.isSuccess(res.code)){
+        if(cns.$isSuccCode(res.code)){
             pageData.value = res.data?.config;
             if (res.data?.is_login) {
                 router.push({name:'manage.home.index'})

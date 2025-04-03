@@ -6,9 +6,9 @@ export const STATUS_CODES = {
     NOT_FOUND: 404,
 };
 
-const isSuccess = (code) => code === STATUS_CODES.SUCCESS;
-const isUnauthorized = (code) => code === STATUS_CODES.UNAUTHORIZED;
-const isForbidden = (code) => code === STATUS_CODES.FORBIDDEN;
+export const isSuccess = (code) => code === STATUS_CODES.SUCCESS;
+export const isUnauthorized = (code) => code === STATUS_CODES.UNAUTHORIZED;
+export const isForbidden = (code) => code === STATUS_CODES.FORBIDDEN;
 
 export default {
     isSuccess,
