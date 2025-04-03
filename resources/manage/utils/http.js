@@ -2,6 +2,7 @@ import axios from 'axios'
 import router from '@/router'
 import dialog from "./dialog";
 import { useCookies } from 'vue3-cookies'
+import { isForbidden, isUnauthorized } from './constants.js';
 const { cookies } = useCookies()
 // 请求超时时间
 axios.defaults.timeout = 15000
@@ -51,7 +52,14 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     response => {
         if (response.status === 200) {
-            return Promise.resolve(response)
+            if (isUnauthorized(response.data.code)) {
+                // 未登录
+                router.push({ name: 'login' })
+            } else if (isForbidden(response.data.code)) {
+                // 无权限
+                dialog.error(response.data.message)
+            }
+            return Promise.resolve(response);
         } else {
             return Promise.reject(response)
         }

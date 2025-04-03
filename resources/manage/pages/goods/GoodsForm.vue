@@ -1252,7 +1252,7 @@ const submitGoods = () => {
                 if (res.code === 200) {
                     cns.$message.success('保存商品成功')
                     loading.value = false
-                    router.push({name: 'goods'})
+                    router.push({name: 'manage.goods.index'})
                 } else {
                     cns.$message.error(res.message)
                     loading.value = false
@@ -1278,7 +1278,7 @@ onMounted(() => {
             }
         } else {
             cns.$message.error(res.message)
-            router.push({name: 'goods'})
+            router.push({name: 'manage.goods.index'})
         }
     })
     getSkuTemplate()

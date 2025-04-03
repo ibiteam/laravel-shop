@@ -24,6 +24,8 @@ const tab_label = computed(() => {
             return '积分设置';
         case 'group_search':
             return '搜索设置';
+        case 'group_goods':
+            return '商品设置';
         default:
             return '';
     }
@@ -237,6 +239,10 @@ onMounted(() => {
                                             :active-value="'1'"
                                             :inactive-value="'0'"
                                         ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>商品添加时是否展示积分</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="积分名称：" prop="integral_name">
+                                        <el-input v-model="inputFrom.integral_name" placeholder="请输入积分名称" show-word-limit maxlength="10"></el-input>
                                     </el-form-item>
                                     <el-form-item>
                                         <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
@@ -257,6 +263,25 @@ onMounted(() => {
                                     <el-form-item label="请求密钥：" prop="search_key">
                                         <el-input v-model="inputFrom.search_key" placeholder="请求密钥"></el-input>
                                     </el-form-item>-->
+                                    <el-form-item>
+                                        <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                        <el-tab-pane label="商品设置" name="group_goods">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="240px" class="demo-compactForm">
+                                <div style="margin:0 auto 0 50px;width: 550px">
+                                    <el-form-item label="是否展示销量：" prop="is_show_sales_volume">
+                                        <el-switch
+                                            v-model="inputFrom.is_show_sales_volume"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>商品展示列表是否显示销量</small></span>
+                                    </el-form-item>
                                     <el-form-item>
                                         <el-button type="primary" @click="submitForm()" :class="{disable:loading}" :loading="loading">提交</el-button>
                                     </el-form-item>

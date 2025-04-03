@@ -96,7 +96,7 @@ class AppWebsiteDecorationController extends BaseController
                     foreach (json_decode($router->params) as $value) {
                         $h5Param .= $value->key.'='.$app_website_decoration->id;
                     }
-                    $h5_url = $router->h5_url ? $router->h5_url.connectStr($router->h5_url).$h5Param : '';
+                    $h5_url = $router->h5_url ? $router->h5_url.get_url_joiner($router->h5_url).$h5Param : '';
                 }
 
                 return [

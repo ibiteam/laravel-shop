@@ -35,12 +35,15 @@ class ApiGoodsDetailResource extends JsonResource
                 'sub_name' => $this->resource->sub_name,
                 'label' => $this->resource->label,
                 'price' => $this->resource->price,
+                'integral' => $this->resource->integral,
+                'integral_name' => $this->resource->integral_name,
+                'sales_volume' => $this->resource->is_show_sales_volume ? $this->resource->sales_volume : null,
                 'total' => $this->resource->total,
                 'status' => $this->resource->status,
                 'can_quota' => $this->resource->can_quota,
                 'quota_number' => $this->resource->quota_number,
                 'unit' => $this->resource->unit,
-                'evaluate' => [], // todo 待确定类型
+                'evaluate' => $this->resource->evaluate,
                 'parameters' => $this->resource->parameters->map(fn (GoodsParameter $goods_parameter) => ['name' => $goods_parameter->name, 'value' => $goods_parameter->value]),
                 'content' => $this->resource->detail?->content,
                 'recommend' => [], // todo 待确定数据

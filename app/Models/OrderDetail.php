@@ -59,8 +59,8 @@ class OrderDetail extends Model
     protected function casts(): array
     {
         return [
-            'goods_price' => 'decimal',
-            'goods_amount' => 'decimal',
+            'goods_price' => 'decimal:2',
+            'goods_amount' => 'decimal:2',
             'goods_sku_value' => 'json',
         ];
     }

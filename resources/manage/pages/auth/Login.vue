@@ -53,7 +53,7 @@ import _ from 'lodash'
 // 导入图片资源
 import logoImage from '@/assets/images/user/login-logo-sitting.png'
 import leftBgImage from '@/assets/images/user/login-left-bg-img.png'
-
+import { isSuccess } from '@/utils/constants'
 const loginForm = reactive({ username: '', password: '' });
 const passwordVisible = ref(false);
 const loading = ref(false);
@@ -104,9 +104,9 @@ const changePasswordShow = () => {
 const submitLogin = () => {
     accountLogin({user_name:loginForm.username,password:loginForm.password}).then(res=>{
         loading.value = false;
-        if (res.code == 200) {
+        if (isSuccess(res.code)) {
             cns.$cookies.set('manage-token', res.data.token, res.data.expires_at)
-            router.push({name:'home'})
+            router.push({name:'manage.home.index'})
         } else {
             cns.$message.error(res.message);
         }
@@ -115,10 +115,10 @@ const submitLogin = () => {
 
 onMounted(() => {
     getLoginInfo().then(res => {
-        if(res.code == 200){
+        if(isSuccess(res.code)){
             pageData.value = res.data?.config;
             if (res.data?.is_login) {
-                router.push({name:'home'})
+                router.push({name:'manage.home.index'})
             }
         } else {
             cns.$message.error(res.message);

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '@/pages/user/Login.vue'
+import Login from '@/pages/auth/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
 import MaterialIndex from '@/pages/material/Index.vue';
@@ -12,6 +12,7 @@ import UserIndex from '@/pages/user/UserIndex.vue';
 import UserAddress from '@/pages/user/UserAddress.vue';
 import PaymentMethod from '@/pages/set/PaymentMethod.vue';
 import AppDecoration from '@/pages/decoration/app/Index.vue';
+import Refresh from '@/pages/refresh/refresh.vue';
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
@@ -37,6 +38,8 @@ const router = createRouter({
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },
                 // 工具
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
+                //正在刷新
+                { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
             ]
         },
         {

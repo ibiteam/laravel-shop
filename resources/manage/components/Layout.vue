@@ -153,12 +153,31 @@
                                 v-for="item in Array.from(tabsStore.visitedViews)"
                                 :key="item.name"
                                 :label="item.title"
-                                :name="item.name"
-                            />
+                                :name="item.name">
+                                <template #label>
+                                    <div class="s-flex ai-ct jc-ct flex-1" style="height: 100%" @contextmenu.prevent.native="openTabMenu(item, $event)">{{ item.title }}</div>
+                                </template>
+                            </el-tab-pane>
                         </el-tabs>
+                        <ul
+                            class="contextmenu"
+                            v-show="visible"
+                            :style="{ left: left + 'px', top: top + 'px' }"
+                        >
+                            <li @click="refresh(selectedTag)">刷新</li>
+                            <li @click="closeSelectedTag(selectedTag)">关闭</li>
+                            <li @click="closeOthersTags">关闭其他</li>
+                            <li @click="closeAllTags">关闭所有</li>
+                        </ul>
                     </div>
                     <div class='flex-1' style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
-                        <router-view></router-view>
+                        <router-view v-slot="{ Component }">
+                            <transition name="fade" mode="out-in">
+                                <keep-alive :include="cachedViews">
+                                    <component :is="Component" />
+                                </keep-alive>
+                            </transition>
+                        </router-view>
                     </div>
                 </el-main>
             </el-container>
@@ -170,7 +189,7 @@
 </template>
 
 <script setup>
-import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch} from 'vue';
+import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch,computed} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRoute,useRouter } from 'vue-router';
 import $public from '@/utils/public'
@@ -182,19 +201,6 @@ const tabsStore = useTabsStore()
 
 const route = useRoute()
 const router =  useRouter()
-watch(() => route.path,(to, from) => {
-    for (var index in tabsStore.visitedViews) {
-        var view = tabsStore.visitedViews[index]
-        if (view.name === to.name && view.path !== to.path) {
-            tabsStore.delVisitedViews(view).then((views) => {
-                router.push(to.path)
-            })
-            break
-        }
-    }
-    addViewTags()
-    moveToCurrentTag()
-})
 
 const pageLoad = ref(false)
 const menus = ref([])
@@ -209,6 +215,32 @@ const searchMenuArr = ref([])
 
 const routerActived = ref('')
 
+const visible =ref(false)
+const top = ref(0)
+const left = ref(0)
+const selectedTag = ref({})
+
+watch(() => route.path,(to, from) => {
+    for (var index in tabsStore.visitedViews) {
+        var view = tabsStore.visitedViews[index]
+        if (view.name === to.name && view.path !== to.path) {
+            tabsStore.delVisitedViews(view).then((views) => {
+                router.push(to.path)
+            })
+            break
+        }
+    }
+    addViewTags()
+    moveToCurrentTag()
+})
+
+watch(() => visible.value,(value) => {
+    if (value) {
+        document.body.addEventListener('click', closeMenu)
+    } else {
+        document.body.removeEventListener('click', closeMenu)
+    }
+})
 
 const openSearchShow = () => {
     searchtools.value = ''
@@ -394,10 +426,64 @@ const tabRemove = (name) =>{
             if (latestView) {
                 router.push(latestView.path)
             } else {
-                router.push('/home')
+                router.push({name: 'manage.home.index'})
             }
         }
     })
+}
+
+let cachedViews = computed(() => {
+    if (route.meta && route.meta.keepAlive) {
+        tabsStore.addCachedViews(route)
+    }
+    return tabsStore.cachedViews
+})
+
+const openTabMenu = (tag, e) => {
+    visible.value = true
+    selectedTag.value = tag
+    left.value = e.clientX
+    top.value = e.clientY
+}
+
+const closeMenu = () =>{
+    visible.value = false
+}
+
+const refresh = (view) => {
+    console.log(view)
+    router.replace({
+        name: 'manage.refresh.index',
+        query: view,
+    })
+}
+
+const closeSelectedTag = (view) => {
+    if (route.meta.keepAlive) {
+        route.meta.keepAlive = false
+    }
+    tabsStore.delVisitedViews(view).then((views) => {
+        if (isActive(view)) {
+            const latestView = views.slice(-1)[0]
+            if (latestView) {
+                router.push(latestView.path)
+            } else {
+                router.push({name: 'manage.home.index'})
+            }
+        }
+    })
+}
+
+const closeOthersTags = () =>{
+    router.push(selectedTag.path)
+    tabsStore.delOthersViews(selectedTag.value).then(() => {
+        moveToCurrentTag()
+    })
+}
+
+const closeAllTags = () => {
+    tabsStore.delAllViews()
+    router.push({name: 'manage.home.index'})
 }
 
 onMounted(() => {
@@ -744,6 +830,32 @@ onUnmounted(() => {
                             background: #F6FAFF;
                             border: none;
                             color: #077FFF;
+                        }
+                        .el-icon{
+                            margin-right: 5px;
+                        }
+                    }
+                }
+                .contextmenu {
+                    margin: 0;
+                    background: #fff;
+                    z-index: 100;
+                    position: absolute;
+                    list-style-type: none;
+                    padding: 5px 0;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: 400;
+                    color: #333;
+                    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
+
+                    li {
+                        margin: 0;
+                        padding: 7px 16px;
+                        cursor: pointer;
+
+                        &:hover {
+                            background: #eee;
                         }
                     }
                 }

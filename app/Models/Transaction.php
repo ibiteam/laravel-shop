@@ -72,7 +72,7 @@ class Transaction extends Model
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal',
+            'amount' => 'decimal:2',
         ];
     }
 }
