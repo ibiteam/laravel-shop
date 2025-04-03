@@ -66,7 +66,7 @@ class AuthController extends BaseController
             return $this->error('登录失败');
         }
 
-        return $this->success($data);
+        return $this->success($data, '登录成功');
     }
 
     /**
@@ -109,7 +109,7 @@ class AuthController extends BaseController
             return $this->error('登录失败');
         }
 
-        return $this->success($data);
+        return $this->success($data, '登录成功');
     }
 
     /**

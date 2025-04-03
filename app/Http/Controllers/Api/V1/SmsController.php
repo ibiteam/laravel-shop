@@ -20,7 +20,6 @@ class SmsController extends BaseController
                     'string',
                     'in:'.implode(',', [
                         SmsService::ACTION_LOGIN,
-                        SmsService::ACTION_REGISTER,
                         SmsService::ACTION_FORGET_PASSWORD,
                         SmsService::ACTION_EDIT_PASSWORD,
                     ]),
@@ -28,7 +27,6 @@ class SmsController extends BaseController
                 'phone' => [
                     'required_if:action,'.implode(',', [
                         SmsService::ACTION_LOGIN,
-                        SmsService::ACTION_REGISTER,
                         SmsService::ACTION_FORGET_PASSWORD,
                     ]), 'integer', new PhoneRule,
                 ],

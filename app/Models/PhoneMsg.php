@@ -38,20 +38,17 @@ use Illuminate\Database\Eloquent\Model;
 class PhoneMsg extends Model
 {
     use DatetimeTrait;
-    public const PHONE_REGISTER = 1; //注册短信验证码
-    public const PHONE_LOGIN = 2; //登录短信验证码
+    public const PHONE_LOGIN = 2; // 登录短信验证码
     public const PHONE_FORGET_PASSWORD = 3; // 忘记密码短信验证码
-    public const PHONE_NOTICE = 4; //通知类短信
+    public const PHONE_NOTICE = 4; // 通知类短信
     public const PHONE_EDIT_PASSWORD = 5; // 修改密码
-
-    public const CODE_TIME = 5; //验证码有效时间 5分钟
+    public const CODE_TIME = 5; // 验证码有效时间 5分钟
     public const STATUS_NOT_USED = 0; // 未使用
     public const STATUS_USED = 1; // 已使用
 
     public static array $messageMap = [
         self::PHONE_LOGIN => '登录短信验证码',
         self::PHONE_NOTICE => '通知类短信',
-        self::PHONE_REGISTER => '注册短信验证码',
     ];
 
     protected $guarded = [];

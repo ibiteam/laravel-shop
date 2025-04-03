@@ -15,7 +15,6 @@ use App\Utils\SmsUtil;
 class SmsService
 {
     public const ACTION_LOGIN = 'login';
-    public const ACTION_REGISTER = 'register';
     public const ACTION_FORGET_PASSWORD = 'password-forget';
     public const ACTION_EDIT_PASSWORD = 'password-edit'; // 修改密码
 
@@ -28,7 +27,6 @@ class SmsService
     {
         return match ($action) {
             self::ACTION_LOGIN => $this->sendLoginOtp($phone),
-            self::ACTION_REGISTER => $this->sendRegisterOtp($phone),
             self::ACTION_FORGET_PASSWORD => $this->sendForgetPasswordOtp($phone),
             self::ACTION_EDIT_PASSWORD => $this->sendEditPasswordOtp($user),
             default => throw new BusinessException('发送失败~'),
@@ -81,24 +79,6 @@ class SmsService
         }
 
         $this->sendMessage($phone, new PhoneCodeMessage('忘记密码短信', PhoneMsg::PHONE_FORGET_PASSWORD));
-
-        return true;
-    }
-
-    /**
-     * 注册短信验证码
-     *
-     * @throws BusinessException
-     */
-    public function sendRegisterOtp(int $phone): bool
-    {
-        $user = app(UserDao::class)->getInfoByPhone($phone);
-
-        if ($user instanceof User) {
-            throw new BusinessException('该手机号已被注册');
-        }
-
-        $this->sendMessage($phone, new PhoneCodeMessage('注册短信', PhoneMsg::PHONE_REGISTER));
 
         return true;
     }
