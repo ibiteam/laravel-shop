@@ -59,14 +59,37 @@
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>
                     </div>
-                    <div class="module-main" v-for="item in todo_list">
-                        <div class="module-title">{{ item.group_name }}</div>
+                    <div class="module-main">
+                        <div class="module-title">会员</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct" v-for="ite in item.list" @click.stop="toPage(ite)">
-                                <el-icon v-if="ite.icon" :size="32">
-                                    <component :is="ite.icon"/>
-                                </el-icon>
-                                <div class="module-text">{{ ite.title }}</div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -180px;"></div>
+                                <div class="module-text">订单评论</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -240px;"></div>
+                                <div class="module-text">购买咨询</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="module-main">
+                        <div class="module-title">订单</div>
+                        <div class="module-content s-flex flex-wrap">
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -900px;"></div>
+                                <div class="module-text">待付款</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -480px;"></div>
+                                <div class="module-text">待发货</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -300px;"></div>
+                                <div class="module-text">待收货</div>
+                            </div>
+                            <div class="module-model s-flex ai-ct jc-ct">
+                                <div class="module-imgs" style="background-position: 0px -780px;"></div>
+                                <div class="module-text">退款申请</div>
                             </div>
                         </div>
                     </div>
@@ -85,8 +108,8 @@
                             <div class="more-opt s-flex flex-wrap" v-if="my_collect.length">
                                 <div class="opt-list" v-for="item in my_collect" :key="item.value" @click.stop="toPage(item)">
                                     <div class="icon">
-                                        <el-icon v-if="item.icon" :size="20">
-                                            <component :is="item.icon"/>
+                                        <el-icon :size="20">
+                                            <component :is="item.icon?item.icon:'Document'"/>
                                         </el-icon>
                                     </div>
                                     <div class="titles">
@@ -108,8 +131,8 @@
                             <div class="more-opt s-flex flex-wrap" v-if="access_record.length > 0">
                                 <div class="opt-list" v-for="item in access_record" @click.stop="toPage(item)">
                                     <div class="icon">
-                                        <el-icon v-if="item.icon" :size="20">
-                                            <component :is="item.icon"/>
+                                        <el-icon :size="20">
+                                            <component :is="item.icon?item.icon:'Document'"/>
                                         </el-icon>
                                     </div>
                                     <div class="titles">
@@ -215,7 +238,6 @@ const number_data = ref({})
 const access_record = ref([])
 const my_collect = ref([])
 const access_statistic = ref({})
-const todo_list = ref([])
 const collectionVisible = ref<boolean>(false)
 const menus = ref([])
 const searchMenus = ref([])
@@ -321,11 +343,18 @@ const closeCollect = () => {
     searchtools.value = ''
 }
 const openCollect = () => {
-    collectionVisible.value = true
-    searchMenus.value = menus.value
-    setTimeout(() => {
-        searchtoolsRef.value.focus()
-    },500)
+    getMenuAxios().then(res => {
+        if (res.code === 200) {
+            menus.value = res.data
+            searchMenus.value = res.data
+            collectionVisible.value = true
+            setTimeout(() => {
+                searchtoolsRef.value.focus()
+            },500)
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
 }
 const mapData = (arrs,newArr) => {
     for(let i=0;i<arrs.length;i++){
@@ -383,16 +412,6 @@ const collectionFnc = (itas,index,ids,idas) =>{
     });
 }
 
-const getMenu = () => {
-    getMenuAxios().then(res => {
-        if (res.code === 200) {
-            menus.value = res.data
-        } else {
-            cns.$message.error(res.message);
-        }
-    });
-}
-
 const getData = () => {
     getHomeDashboardAxios().then(res => {
         if (res.code === 200) {
@@ -400,7 +419,6 @@ const getData = () => {
             my_collect.value = res.data.my_collect
             access_record.value = res.data.access_record
             access_statistic.value = res.data.access_statistic
-            todo_list.value = res.data.todo_list
             nextTick(() => {
                 if (document.getElementById('access-data')){
                     lineRef = echarts.init(document.getElementById('access-data'));
@@ -430,7 +448,6 @@ const clearCache = () => {
 }
 
 onMounted(() => {
-    getMenu()
     getData()
     window.addEventListener('resize', debounceResize)
 });
@@ -569,10 +586,13 @@ onUnmounted(() => {
                 height: 70px;
                 border-radius: 10px;
                 border: 1px dashed rgba(0, 0, 0, 0.1);
+                cursor: pointer;
             }
-            .module-main .module-content .module-model>.el-icon svg{
-                width: 20px;
-                height: 20px;
+            .module-main .module-content .module-model>.module-imgs{
+                width: 40px;
+                height: 40px;
+                background: url('@/assets/images/home/home-menu.png');
+                background-repeat: no-repeat;
             }
             .module-main .module-content .module-model>.module-text{
                 margin-left: 10px;
