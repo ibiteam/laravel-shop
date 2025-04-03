@@ -21,9 +21,7 @@ Route::prefix('set')->group(function () {
 
     // 访问地址分类
     Route::prefix('router_category')->group(function () {
-
-        Route::get('tree', [RouterCategoryController::class, 'getTreeList']);
-
+        Route::get('tree', [RouterCategoryController::class, 'getTreeList']);  // 访问地址弹窗 左侧树状数据
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
             Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
             Route::get('info', [RouterCategoryController::class, 'info']);
@@ -34,7 +32,7 @@ Route::prefix('set')->group(function () {
             Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
-            Route::post('/destroy', [RouterCategoryController::class, 'destroy']);
+            Route::post('destroy', [RouterCategoryController::class, 'destroy']);
         });
     });
 

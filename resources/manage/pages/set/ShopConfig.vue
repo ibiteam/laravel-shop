@@ -129,6 +129,12 @@ onMounted(() => {
                                     <el-form-item label="站点主题色：" prop="shop_color">
                                         <el-color-picker v-model="inputFrom.shop_color"></el-color-picker>
                                     </el-form-item>
+                                    <el-form-item label="总后台主题色：" prop="manage_color">
+                                        <el-color-picker v-model="inputFrom.manage_color"></el-color-picker>
+                                    </el-form-item>
+                                    <el-form-item label="鼠标移入背景色：" prop="mouse_move_color">
+                                        <el-color-picker v-model="inputFrom.mouse_move_color"></el-color-picker>
+                                    </el-form-item>
                                     <el-form-item label="网站首页置灰：" prop="is_gray">
                                         <el-switch
                                             v-model="inputFrom.is_gray"
