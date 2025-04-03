@@ -17,18 +17,18 @@
         <aside class="setting-bar-wrapper s-flex">
             <div class="setting-bar-header s-flex ai-ct jc-bt">
                 <p class="fs16 fw-b">{{ name }}</p>
-                <el-radio-group v-model="formType" v-if="show_radio">
+                <!-- <el-radio-group v-model="formType" v-if="show_radio">
                     <el-radio-button label="内容" :value="0" />
                     <el-radio-button label="样式" :value="1" />
-                </el-radio-group>
+                </el-radio-group> -->
             </div>
             <div class="setting-bar-content">
                 <slot name="content" :type="formType"></slot>
             </div>
-            <div class="setting-bar-footer s-flex ai-ct jc-ct">
+            <!-- <div class="setting-bar-footer s-flex ai-ct jc-ct">
                 <el-button @click="handleCancle">取消</el-button>
-                <el-button type="primary">保存</el-button>
-            </div>
+                <el-button type="primary" @click="emit('submit')">保存</el-button>
+            </div> -->
         </aside>
     </el-drawer>
 </template>
@@ -50,7 +50,7 @@ const props = defineProps({
 
 const formType = ref(0)
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'submit'])
 const handleCancle = () => {
     emit('close')
     // cns.$bus.emit('chooseDragItem', {temp_index: ''})
@@ -74,11 +74,65 @@ const handleCancle = () => {
         align-items: center;
         justify-content: space-between;
         font-weight: bold;
+        margin-bottom: 12px;
     }
     .item-title-info {
         color: #999;
-        line-height: 30px;
+        line-height: 24px;
         font-size: 12px;
+        margin-bottom: 12px;
+    }
+    .form-group-item {
+        width: 100%;
+        padding: 16px 20px 16px 0;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        position: relative;
+        .icon-drag {
+            padding: 10px;
+            cursor: move;
+        }
+        .group-content {
+            width: calc(100% - 40px);
+            position: relative;
+        }
+        // 长期时间
+        .time-long {
+            .el-range-input{
+                display: none;
+                width: 30%;
+                margin: 0 4.5%;
+            }
+        }
+        // 范围时间
+        .time-range {
+            display: block!important;
+            width: 100%;
+            position: relative;
+            .el-range-input {
+                display: block;
+                height: 20px;
+                width: calc(100% - 40px);
+                margin: 0 10px 0 20px;
+            }
+            .el-range-separator {
+                display: none;
+            }
+            .el-range__close-icon {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 10px;
+                margin: auto 0;
+            }
+        }
+        .not-required{
+            .el-form-item__label:before {
+                display: none;
+            }
+        }
     }
 }
 .setting-drawer{

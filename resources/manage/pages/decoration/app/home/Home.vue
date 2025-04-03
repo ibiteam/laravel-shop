@@ -21,20 +21,19 @@
                     :group="{name: 'decoration', pull: true, put: true}"
                     :forceFallback="false"
                     @add="handleDragAdd">
-                    <div v-for="(temp, index) in decoration.data" :key="temp.id">
+                    <template v-for="(temp, index) in decoration.data">
                         <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
-                        <AdvertisingOne v-if="temp.component_name == 'advertising_one'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" @openUploadDialog="handleOpenUploadDialog"></AdvertisingOne>
-                        <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTwo>
-                        <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingThree>
-                        <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTheme>
-                        <HotZone v-else-if="temp.component_name == 'hot_zone'" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></HotZone>
-                        <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else>{{ temp.component_name }}{{ temp.name }}</div>
-                    </div>
+                        <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
+                        <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTwo>
+                        <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingThree>
+                        <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTheme>
+                        <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></HotZone>
+                        <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
+                    </template>
                 </VueDraggable>
                 <bottom-nav-bar v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}"></bottom-nav-bar>
             </div>
         </main>
-        <!-- <MaterialCenterDialog v-bind="{show: false, dir_type: 1, multiple: false}" @close="" @confirm=""/> -->
         <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
     </div>
 </template>
@@ -45,7 +44,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import ToolBar from './../../components/ToolBar.vue'
 import BottomNavBar from './components/BottomNavBar.vue'
 import Search from './components/Search.vue'
-import AdvertisingOne from './components/AdvertisingOne.vue'
+import HorizontalCarousel from './components/HorizontalCarousel.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
 import AdvertisingThree from './components/AdvertisingThree.vue'
 import AdvertisingTheme from './components/AdvertisingTheme.vue'
@@ -63,7 +62,7 @@ const decoration = reactive({
     // 组件原始数据
     component_value: DataExample.component_value,
     // 装修数据
-    data: DataExample.data,
+    data: [],
     // 不可拖拽的数据
     not_for_data: DataExample.not_for_data,
     // 当前选中拖拽的索引
@@ -71,7 +70,8 @@ const decoration = reactive({
 })
 // 拖拽占位 下标显示位置
 const dragPlaceholderIndex = ref(null)
-
+// 组件refs
+const tempRefs = ref([])
 const materialCenterDialogData = reactive({
     show: false,
     dir_type: 1,
@@ -119,15 +119,6 @@ const sortDecorationData = (id, direction) => {
     }
 }
 
-// 打开素材中心弹窗
-const handleOpenUploadDialog = (params = {show: false, dir_type: 1, multiple: false, temp_index: ''}) => {
-    console.log(params)
-    const { show, dir_type, multiple, temp_index } = params
-    materialCenterDialogData.show = show
-    materialCenterDialogData.dir_type = dir_type
-    materialCenterDialogData.multiple = multiple
-}
-
 // 关闭素材中心弹窗
 const handlematerialCenterDialogClose = () => {
     materialCenterDialogData.show = false
@@ -136,10 +127,9 @@ const handlematerialCenterDialogClose = () => {
 // 接收素材中心弹窗数据
 const handlematerialCenterDialogConfirm = (res) => {
     materialCenterDialogData.show = false
-    console.log(res)
+    const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
+    tempRefs.value[index].updateUploadComponentData({form_index: materialCenterDialogData.form_index, file: res})
 }
-
-
 
 onMounted(() => {
     decoration.data.unshift({
@@ -151,7 +141,10 @@ onMounted(() => {
                 y: 86,
                 width: 100,
                 height: 100,
-                url: 'https://h5.toodudu.com/'
+                url: {
+                    name: '',
+                    value: '',
+                }
             }]
         },
         data: {
@@ -168,6 +161,50 @@ onMounted(() => {
         id: 999,
         is_show: 1,
         name: '热区',
+    }, {
+        component_name: 'horizontal_carousel',
+        content: {
+            width: '710',
+            height: '200',
+            style: 2, // 1-平铺 2-过渡
+            interval: 3, // 默认3秒切换
+            data: [{
+                url: {
+                    name: '',
+                    value: '',
+                },
+                date_type: 1, // 0:自定义  1:长期
+                time: ['2025-10-10 00:00:00', '2025-10-10 23:59:59'],
+                image: '',
+                is_show: 1, // 是否显示
+            }]
+        },
+        data: {
+            component_name: 'horizontal_carousel',
+            width: '710',
+            height: '200',
+            style: 2,
+            interval: 3,
+            items: [{
+                image: 'https://cdn.toodudu.com/2024/12/25/S9T0mbYiJRkRFqKMZ7NeJnFDBHeeRkhLRx8tvgzC.jpg',
+                url: '',
+            },{
+                image: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
+                url: '',
+            },{
+                image: 'https://cdn.toodudu.com/2024/12/25/Q8DPTcVi9OJWtJLeLfQDfUvbanUR8IfjG2xlxhgU.jpg',
+                url: '',
+            },{
+                image: 'https://cdn.toodudu.com/2024/08/02/AjOkTg03f0JOBEnQuGgatRol1abaiAsYRWDWoe13.jpg',
+                url: '',
+            },{
+                image: 'https://cdn.toodudu.com/2024/10/17/GEEoTIAnkTSSDGAn5qNBN4sBgm2YXMkfjM6Zxkeb.jpg',
+                url: '',
+            },],
+        },
+        id: '',
+        is_show: 1,
+        name: '轮播图',
     })
     nextTick(() => {
         cns.$bus.on('chooseDragItem', (res) => {
@@ -196,12 +233,19 @@ onMounted(() => {
                 sortDecorationData(res.component.id, 'down')
             }
         })
+        // 打开素材中心弹窗
+        cns.$bus.on('openUploadDialog', (params = {show: false, dir_type: 1, multiple: false, temp_index: ''}) => {
+            Object.keys(params).forEach(key => {
+                materialCenterDialogData[key] = params[key]
+            })
+        })
     })
 })
 
 onUnmounted(() => {
     cns.$bus.off('chooseDragItem')
     cns.$bus.off('updateComponentData')
+    cns.$bus.off('openUploadDialog')
 })
 
 </script>
