@@ -222,7 +222,7 @@ import { nextTick, onMounted, ref, reactive, onUnmounted, computed,getCurrentIns
 const cns = getCurrentInstance().appContext.config.globalProperties
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
-import {getMenuAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
+import {getConfigAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
 import { useRoute,useRouter } from 'vue-router';
 const route = useRoute()
 const router =  useRouter()
@@ -343,10 +343,10 @@ const closeCollect = () => {
     searchtools.value = ''
 }
 const openCollect = () => {
-    getMenuAxios().then(res => {
+    getConfigAxios().then(res => {
         if (res.code === 200) {
-            menus.value = res.data
-            searchMenus.value = res.data
+            menus.value = res.data.menus
+            searchMenus.value = res.data.menus
             collectionVisible.value = true
             setTimeout(() => {
                 searchtoolsRef.value.focus()

@@ -1,7 +1,7 @@
 import $http from '../utils/http'
 
-export function getMenuAxios() {
-    return $http.doGet('manage/home/menus')
+export function getConfigAxios() {
+    return $http.doGet('manage/home/config')
 }
 
 export function getHomeDashboardAxios() {

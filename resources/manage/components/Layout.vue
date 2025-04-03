@@ -150,7 +150,7 @@
                             @tab-change="tabChange"
                         >
                             <el-tab-pane
-                                v-for="item in Array.from(tabsStore.visitedViews)"
+                                v-for="item in Array.from(commonStore.visitedViews)"
                                 :key="item.name"
                                 :label="item.title"
                                 :name="item.name">
@@ -196,10 +196,10 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRoute,useRouter } from 'vue-router';
 import $public from '@/utils/public'
 import { ArrowRight } from '@element-plus/icons-vue'
-import {getMenuAxios} from "../api/home.js";
+import {getConfigAxios} from "../api/home.js";
 
-import { useTabsStore } from '@/store'
-const tabsStore = useTabsStore()
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 
 const route = useRoute()
 const router =  useRouter()
@@ -223,10 +223,10 @@ const left = ref(0)
 const selectedTag = ref({})
 
 watch(() => route.path,(to, from) => {
-    for (var index in tabsStore.visitedViews) {
-        var view = tabsStore.visitedViews[index]
+    for (var index in commonStore.visitedViews) {
+        var view = commonStore.visitedViews[index]
         if (view.name === to.name && view.path !== to.path) {
-            tabsStore.delVisitedViews(view).then((views) => {
+            commonStore.delVisitedViews(view).then((views) => {
                 router.push(to.path)
             })
             break
@@ -376,9 +376,10 @@ const getKeyCode = (event) => {
 }
 
 const getMenu = () => {
-    getMenuAxios().then(res => {
+    getConfigAxios().then(res => {
         if (res.code === 200) {
-            menus.value = res.data
+            menus.value = res.data.menus
+            commonStore.updateShopConfig(res.data.shop_config)
             pageLoad.value = true
         } else {
             cns.$message.error(res.message);
@@ -399,7 +400,7 @@ const addViewTags = () => {
     if (!add_route) {
         return false
     }
-    tabsStore.addVisitedViews(add_route)
+    commonStore.addVisitedViews(add_route)
 }
 
 const generateRoute = () => {
@@ -416,13 +417,13 @@ const moveToCurrentTag = () => {
 }
 
 const tabChange = (name) =>{
-    const view = tabsStore.visitedViews.filter((ite) => ite.name == name)
+    const view = commonStore.visitedViews.filter((ite) => ite.name == name)
     router.push(view[0].path)
 }
 
 const tabRemove = (name) =>{
-    const view = tabsStore.visitedViews.filter((ite) => ite.name == name)
-    tabsStore.delVisitedViews(view[0]).then((views) => {
+    const view = commonStore.visitedViews.filter((ite) => ite.name == name)
+    commonStore.delVisitedViews(view[0]).then((views) => {
         if (isActive(view[0])) {
             const latestView = views.slice(-1)[0]
             if (latestView) {
@@ -436,9 +437,9 @@ const tabRemove = (name) =>{
 
 let cachedViews = computed(() => {
     if (route.meta && route.meta.keepAlive) {
-        tabsStore.addCachedViews(route)
+        commonStore.addCachedViews(route)
     }
-    return tabsStore.cachedViews
+    return commonStore.cachedViews
 })
 
 const openTabMenu = (tag, e) => {
@@ -453,7 +454,7 @@ const closeMenu = () =>{
 }
 
 const refresh = (view) => {
-    tabsStore.refreshQuery(view)
+    commonStore.refreshQuery(view)
     router.replace({
         name: 'manage.refresh.index',
     })
@@ -463,7 +464,7 @@ const closeSelectedTag = (view) => {
     if (route.meta.keepAlive) {
         route.meta.keepAlive = false
     }
-    tabsStore.delVisitedViews(view).then((views) => {
+    commonStore.delVisitedViews(view).then((views) => {
         if (isActive(view)) {
             const latestView = views.slice(-1)[0]
             if (latestView) {
@@ -477,13 +478,13 @@ const closeSelectedTag = (view) => {
 
 const closeOthersTags = (view) =>{
     router.push(view.path)
-    tabsStore.delOthersViews(view).then(() => {
+    commonStore.delOthersViews(view).then(() => {
         moveToCurrentTag()
     })
 }
 
 const closeAllTags = () => {
-    tabsStore.delAllViews()
+    commonStore.delAllViews()
     router.push({name: 'manage.home.index'})
 }
 

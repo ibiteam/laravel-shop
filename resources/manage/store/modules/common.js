@@ -1,13 +1,17 @@
 import { defineStore } from 'pinia'
-export const useTabsStore = defineStore('shop-tabs', {
+export const useCommonStore = defineStore('shop-common', {
     state: () => {
         return {
+            shopConfig:{},
             visitedViews: [],
             cachedViews: [],
             refreshView:{}
         }
     },
     actions: {
+        updateShopConfig(value){
+            this.shopConfig = value
+        },
         addVisitedViews(view) {
             if (this.visitedViews.some(item => item.path === view.path&&JSON.stringify(item.query) === JSON.stringify(view.query))) return
             let samePathIndex = -1
