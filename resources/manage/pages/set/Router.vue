@@ -85,7 +85,7 @@ const onSubmit = () => {
             submitLoading.value = true;
             routerStore(submitForm).then(res => {
                 submitLoading.value = false;
-                if (cns.$isSuccCode(res.code)) {
+                if (cns.$successCode(res.code)) {
                     closeStoreDialog();
                     getData();
                 } else {
@@ -104,7 +104,7 @@ const changeShow = (row) => {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
@@ -115,7 +115,7 @@ const changeShow = (row) => {
 /* 获取分类 */
 const getCategories = () => {
     routerCategories().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             categoriesData.value = res.data;
         }
     }).catch(() => {
@@ -127,7 +127,7 @@ const getData = (page = 1) => {
     searchForm.page = page;
     routerIndex(searchForm).then(res => {
         loading.value = false;
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             tableData.value = res.data.list;
             setPageInfo(res.data.meta);
         } else {

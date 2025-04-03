@@ -31,9 +31,9 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 app.config.globalProperties.$http = http
 app.config.globalProperties.$dialog = dialog
 app.config.globalProperties.$public = $public;
-app.config.globalProperties.$isSuccCode = isSuccess;
-app.config.globalProperties.$isForbCode = isForbidden;
-app.config.globalProperties.$isUnauthCode = isUnauthorized;
+app.config.globalProperties.$successCode = isSuccess;
+app.config.globalProperties.$forbiddenCode = isForbidden;
+app.config.globalProperties.$unauthCode = isUnauthorized;
 app.config.globalProperties.$bus = mitt()
 app.use(VueCookies);
 app.mount('#app');

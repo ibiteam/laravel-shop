@@ -216,7 +216,7 @@ watch(() => visible.value,(value) => {
 
 const getMenu = () => {
     getConfigAxios().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             menus.value = res.data.menus
             formatMenu()
             commonStore.updateShopConfig(res.data.shop_config)

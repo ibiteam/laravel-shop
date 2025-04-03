@@ -344,7 +344,7 @@ const closeCollect = () => {
 }
 const openCollect = () => {
     getConfigAxios().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             menus.value = res.data.menus
             searchMenus.value = res.data.menus
             collectionVisible.value = true
@@ -398,7 +398,7 @@ const searchMenusFnc = $public.debounce(() => {
 const collectionFnc = (itas,index,ids,idas) =>{
     let is_collect = itas.is_collection
     homeCollectMenuAxios(itas.index).then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             if(is_collect){
                 let collectIndex = my_collect.value.findIndex(a => a.name === itas.name)
                 my_collect.value.splice(collectIndex,1)
@@ -414,7 +414,7 @@ const collectionFnc = (itas,index,ids,idas) =>{
 
 const getData = () => {
     getHomeDashboardAxios().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             number_data.value = res.data.number_data
             my_collect.value = res.data.my_collect
             access_record.value = res.data.access_record
@@ -439,7 +439,7 @@ const toPage = (item) => {
 
 const clearCache = () => {
     clearCacheAxios().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);

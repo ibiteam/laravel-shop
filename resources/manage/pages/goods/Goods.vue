@@ -97,7 +97,7 @@ const getData = (page = 1) => {
 
     goodsIndex(queryParams).then(res => {
         loading.value = false;
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             tableData.value = res.data.list;
             // 更新分页信息
             setPageInfo(res.data.meta);
@@ -112,7 +112,7 @@ const getData = (page = 1) => {
 // 修改上架状态
 const handleStatusChange = (goodsId) => {
   goodsChangeStatus({ id: goodsId}).then(res => {
-      if (cns.$isSuccCode(res.code)) {
+      if (cns.$successCode(res.code)) {
           cns.$message.success(res.message)
           getData(pageInfo.currentPage)
       } else {
@@ -126,7 +126,7 @@ const openDetailView = (goodsId) => {
 
 onMounted( () => {
     categoryIndex().then(res => {
-        if (cns.$isSuccCode(res.code)) {
+        if (cns.$successCode(res.code)) {
             categoryOptions.value = res.data;
         }
     }),
