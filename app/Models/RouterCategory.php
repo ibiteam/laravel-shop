@@ -51,7 +51,7 @@ class RouterCategory extends Model
 
     // 类型
     public const TYPE_LINK = 1; // 链接
-    public const TYPE_PAGE = 2; // 页面
+    public const TYPE_MENU = 2; // 菜单
 
     protected $guarded = [];
 

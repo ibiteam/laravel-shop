@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Dao\RouterCategoryDao;
 use App\Models\AdminOperationLog;
 use App\Models\Permission;
 use App\Models\Router;
@@ -42,12 +43,12 @@ class RouterCategoryController extends BaseController
 
         // 分类（顶级+可以选下级的）
         $top_categories = RouterCategory::query()->whereParentId(0)
-            ->whereType(RouterCategory::TYPE_PAGE)  // 页面类型
+            ->whereType(RouterCategory::TYPE_MENU)  // 菜单类型
             ->selectRaw('id AS value,name AS label')
             ->get()->toArray();
         array_unshift($top_categories, ['value' => 0, 'label' => '顶级分类']);
 
-        // 获取页面权限
+        // 获取菜单权限
         $page_permissions = Permission::query()->where('parent_id', '>', 0)
             ->whereIsLeftNav(Permission::IS_LEFT_NAV)
             ->whereDoesntHave('childrens')
@@ -157,8 +158,8 @@ class RouterCategoryController extends BaseController
                 }
             }
 
-            if ($validated['type'] == RouterCategory::TYPE_PAGE && $validated['parent_id'] > 0 && ! $validated['page_name'] ?? '') {
-                throw new BusinessException('访问地址分类下级是页面时, 页面名称必须存在');
+            if ($validated['type'] == RouterCategory::TYPE_MENU && $validated['parent_id'] > 0 && ! $validated['page_name'] ?? '') {
+                throw new BusinessException('访问地址分类下级是菜单时, 页面名称必须存在');
             }
 
             $router_category->parent_id = $validated['parent_id'];
@@ -273,6 +274,21 @@ class RouterCategoryController extends BaseController
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('切换是否展示异常~');
+        }
+    }
+
+    /**
+     * 获取树状分类.
+     */
+    public function getTreeList(Request $request, RouterCategoryDao $router_category_dao)
+    {
+        try {
+            $categoryTree = $router_category_dao->getTreeList();
+
+            return $this->success($categoryTree);
+
+        } catch (\Throwable $throwable) {
+            return $this->error('获取访问地址分类异常');
         }
     }
 }

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
-use App\Http\Dao\RouterDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\Router;
+use App\Models\RouterCategory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-// 路由表
+// 访问地址
 class RouterController extends BaseController
 {
     /**
@@ -49,11 +49,16 @@ class RouterController extends BaseController
     }
 
     /**
-     * 路由分类.
+     * 访问地址分类.
      */
-    public function categories(Request $request, RouterDao $route_dao)
+    public function categories()
     {
-        return $this->success($route_dao->categories());
+        $link_categories = RouterCategory::query()
+            ->whereType(RouterCategory::TYPE_LINK)
+            ->whereIsShow(RouterCategory::IS_SHOW_YES)
+            ->orderByDesc('sort')
+            ->get(['id as value', "name as label"]);
+        return $this->success($link_categories);
     }
 
     /**
@@ -72,10 +77,10 @@ class RouterController extends BaseController
                 'sort' => 'nullable|integer',
                 'is_show' => 'required|boolean',
             ], [], [
-                'id' => '路由ID',
+                'id' => '访问地址ID',
                 'router_category_id' => '分类ID',
-                'name' => '路由名称',
-                'alias' => '路由别名',
+                'name' => '访问地址名称',
+                'alias' => '访问地址别名',
                 'h5_url' => 'H5地址',
                 'params' => '额外参数',
                 'is_show' => '是否显示',
@@ -88,25 +93,25 @@ class RouterController extends BaseController
                 $router = Router::whereId($validated['id'])->first();
 
                 if (! $router) {
-                    throw new BusinessException('路由不存在');
+                    throw new BusinessException('访问地址不存在');
                 }
 
                 if (Router::where('id', '!=', $validated['id'])->whereName($validated['name'])->first()) {
-                    throw new BusinessException('路由名称已存在');
+                    throw new BusinessException('访问地址名称已存在');
                 }
 
                 if (Router::where('id', '!=', $validated['id'])->whereAlias($validated['alias'])->first()) {
-                    throw new BusinessException('路由别名已存在');
+                    throw new BusinessException('访问地址别名已存在');
                 }
             } else {
                 $router = new Router;
 
                 if (Router::whereName($validated['name'])->first()) {
-                    throw new BusinessException('路由名称已存在');
+                    throw new BusinessException('访问地址名称已存在');
                 }
 
                 if (Router::whereAlias($validated['alias'])->first()) {
-                    throw new BusinessException('路由别名已存在');
+                    throw new BusinessException('访问地址别名已存在');
                 }
             }
 
@@ -122,10 +127,10 @@ class RouterController extends BaseController
                 throw new BusinessException('保存失败');
             }
 
-            $log = "新增路由[id:{$router->id}]";
+            $log = "新增访问地址[id:{$router->id}]";
 
             if ($validated['id']) {
-                $log = "编辑路由[id:{$router->id}]".implode(',', array_map(function ($k, $v) {
+                $log = "编辑访问地址[id:{$router->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($router->getChanges()), $router->getChanges()));
             }
@@ -137,7 +142,7 @@ class RouterController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('路由操作异常~'.$throwable->getMessage());
+            return $this->error('访问地址操作异常~'.$throwable->getMessage());
         }
     }
 
@@ -151,14 +156,14 @@ class RouterController extends BaseController
                 'id' => 'required|integer',
                 'is_show' => 'required|integer|in:0,1',
             ], [], [
-                'id' => '路由ID',
+                'id' => '访问地址ID',
                 'is_show' => '是否显示',
             ]);
 
             $router = Router::query()->whereId($validated['id'])->first();
 
             if (! $router) {
-                throw new BusinessException('路由不存在');
+                throw new BusinessException('访问地址不存在');
             }
             $router->is_show = $validated['is_show'];
 
@@ -166,7 +171,7 @@ class RouterController extends BaseController
                 throw new BusinessException('切换失败');
             }
 
-            $log = "更改路由显示隐藏[id:{$validated['id']}]".implode(
+            $log = "更改访问地址显示隐藏[id:{$validated['id']}]".implode(
                 ',',
                 array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);

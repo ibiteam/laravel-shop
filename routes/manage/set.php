@@ -21,6 +21,9 @@ Route::prefix('set')->group(function () {
 
     // 访问地址分类
     Route::prefix('router_category')->group(function () {
+
+        Route::get('tree', [RouterCategoryController::class, 'getTreeList']);
+
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
             Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
             Route::get('info', [RouterCategoryController::class, 'info']);

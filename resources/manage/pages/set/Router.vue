@@ -43,7 +43,7 @@ const submitFormRules = reactive({
 
 
 const openStoreDialog = (row = {}) => {
-    storeDialogTitle.value = row.id > 0 ? '添加' : '编辑';
+    storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
     if (row.id) {
         submitForm.id = row.id;
         submitForm.router_category_id = row.router_category_id;
@@ -201,7 +201,8 @@ onMounted(() => {
         <el-table-column label="别名" prop="alias"></el-table-column>
         <el-table-column label="H5地址" prop="h5_url"></el-table-column>
         <el-table-column label="排序" prop="sort"></el-table-column>
-        <el-table-column label="是否展示" prop="is_show">
+        <el-table-column label="额外参数" prop="params"></el-table-column>
+        <el-table-column label="是否显示" prop="is_show">
             <template #default="scope">
                 <el-switch
                     v-model="scope.row.is_show"
@@ -212,7 +213,6 @@ onMounted(() => {
             </template>
         </el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
@@ -232,10 +232,10 @@ onMounted(() => {
     </div>
 
     <el-dialog
-        width="700" center :close-on-click-modal="false" :close-on-press-escape="false"
-        v-model="storeDialogVisible"
-        :title="storeDialogTitle">
-        <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto">
+        width="700" center :before-close="closeStoreDialog"
+        v-model="storeDialogVisible" :title="storeDialogTitle">
+        <div class="s-flex jc-ct">
+            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
             <el-form-item label="所属分类" prop="router_category_id">
                 <el-select v-model="submitForm.router_category_id" clearable filterable placeholder="请选择">
                     <el-option v-for="item in categoriesData"
@@ -262,6 +262,7 @@ onMounted(() => {
                 <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
             </el-form-item>
         </el-form>
+        </div>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="closeStoreDialog()">取消</el-button>

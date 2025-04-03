@@ -32,10 +32,10 @@ const submitForm = reactive({
 });
 
 const submitFormRules = reactive({
-    parent_id: [{ required: true, message: '请选择上级分类', trigger: 'change' }],
+    parent_id: [{ required: true, message: '请选择分类', trigger: 'change' }],
     name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
     alias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
-    type: [{ required: true, message: '请选择类型', trigger: 'change' }]
+    type: [{ required: true, message: '请选择类型', trigger: 'change' }],
 });
 
 const openStoreDialog = (categoryId = 0) => {
@@ -148,6 +148,11 @@ const searchPages = (query) => {
     }
 };
 
+const changeCategory = (form) => {
+    submitForm.type = 0;
+    submitForm.page_name = '';
+};
+
 const getData = () => {
     loading.value = true;
     routerCategoryIndex(searchForm).then(res => {
@@ -196,7 +201,7 @@ onMounted(() => {
         style="width: 100%;"
         row-key="id"
         :tree-props="{ children: 'all_children' }">
-        <el-table-column label="分类" min-width="200">
+        <el-table-column label="分类" min-width="120">
             <template #default="scope">
                 <div class="s-flex ai-ct">
                     {{ scope.row.name }}【{{ scope.row.id }}】
@@ -207,7 +212,7 @@ onMounted(() => {
         <el-table-column label="类型" prop="type">
             <template #default="scope">
                 <template v-if="scope.row.type === 1">链接</template>
-                <template v-if="scope.row.type === 2">页面</template>
+                <template v-if="scope.row.type === 2">菜单</template>
             </template>
         </el-table-column>
         <el-table-column label="页面" prop="page_name"></el-table-column>
@@ -235,8 +240,8 @@ onMounted(() => {
         v-model="storeDialogVisible" :title="storeDialogTitle">
         <div v-loading="detailFormLoading" class="s-flex jc-ct">
             <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
-                <el-form-item label="上级分类" prop="parent_id">
-                    <el-select v-model="submitForm.parent_id" placeholder="请选择上级分类">
+                <el-form-item label="分类" prop="parent_id">
+                    <el-select v-model="submitForm.parent_id" placeholder="请选择分类" @change="changeCategory(submitForm)">
                         <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
@@ -248,9 +253,10 @@ onMounted(() => {
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
                     <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>
-                    <el-radio v-model="submitForm.type" label="2">页面</el-radio>
+                    <el-radio v-model="submitForm.type" label="2">菜单</el-radio>
                 </el-form-item>
-                <el-form-item label="页面" prop="page_name" v-if="submitForm.type === '2' && submitForm.parent_id > 0">
+                <el-form-item label="页面" prop="page_name" v-if="!(submitForm.parent_id === 0 && submitForm.type === '2')"
+                              :rules="{required: true, message: '请选择页面', trigger: 'change'}">
                     <el-select v-model="submitForm.page_name" placeholder="请选择"
                                filterable remote reserve-keyword :remote-method="searchPages" :loading="remoteLoading">
                         <el-option v-for="item in pagePermissions" :label="item.display_name" :value="item.name"></el-option>

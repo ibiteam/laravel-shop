@@ -8,7 +8,7 @@ export function shopConfigUpdate(data) {
     return $http.doPost('manage/set/shop_config/update', data)
 }
 
-// 路由分类
+// 访问地址分类
 export function routerCategoryIndex(data) {
     return $http.doGet('manage/set/router_category', data)
 }
@@ -28,7 +28,7 @@ export function routerCategoryGetPages(data) {
     return $http.doGet('manage/set/router_category/pages', data)
 }
 
-// 路由列表
+// 访问地址
 export function routerIndex(data) {
     return $http.doGet('manage/set/router', data)
 }
