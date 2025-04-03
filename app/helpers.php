@@ -102,7 +102,7 @@ if (! function_exists('get_source')) {
      */
     function get_source(): RefererEnum
     {
-        return RefererEnum::formString(request()->header('source', ''));
+        return RefererEnum::formSource(request()->header('source', ''));
     }
 }
 

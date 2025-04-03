@@ -7,25 +7,22 @@ enum RefererEnum: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::PC => 'pc',
-            self::H5 => 'h5',
-            self::APP => 'app',
+            self::PC => 'PC端',
+            self::H5 => 'H5端',
+            self::APP => 'APP端',
             self::WECHAT_MINI => '微信小程序'
         };
     }
 
-    public static function getValue(string $value): string
+    public static function getLabelBySource(string $source): string
     {
-        $enum = self::formString($value);
-
-        return $enum->getLabel();
+        return self::formSource($source)->getLabel();
     }
 
-    public static function formString(?string $value): self
+    public static function formSource(?string $source): self
     {
-        return match ($value) {
+        return match ($source) {
             'pc' => self::PC,
-            'h5' => self::H5,
             'app' => self::APP,
             'wechat_mini' => self::WECHAT_MINI,
             default => self::H5,
