@@ -3,7 +3,7 @@
 namespace App\Services\Goods;
 
 use App\Exceptions\BusinessException;
-use App\Exceptions\CustomException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
@@ -308,7 +308,7 @@ class GoodsService
      * @param int   $number         购买数量
      *
      * @throws BusinessException
-     * @throws CustomException
+     * @throws ProcessDataException
      */
     public function checkGoodsNumber(Goods $goods, int $request_sku_id, int $number): array
     {
@@ -333,7 +333,7 @@ class GoodsService
             if ($sku_item->number < $number) {
                 $tmp_message = $sku_item->number.$goods->unit;
 
-                throw new customexception("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+                throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
             }
             $res['can_buy'] = true;
 
@@ -344,7 +344,7 @@ class GoodsService
         if ($goods->number < $number) {
             $tmp_message = $goods->number.$goods->unit;
 
-            throw new customexception("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
+            throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
         }
         $res['can_buy'] = true;
 

@@ -13,18 +13,18 @@ class BusinessException extends Exception
 
     public function __construct(
         string $message = '',
-        protected ConstantEnum $custom_code_enum = ConstantEnum::ERROR,
+        protected ConstantEnum $constant_enum = ConstantEnum::ERROR,
     ) {
-        parent::__construct($message, $this->custom_code_enum->value);
+        parent::__construct($message, $this->constant_enum->value);
     }
 
     public function render($request): JsonResponse
     {
-        return $this->error($this->message, $this->custom_code_enum);
+        return $this->error($this->message, $this->constant_enum);
     }
 
     public function getCodeEnum(): ConstantEnum
     {
-        return $this->custom_code_enum;
+        return $this->constant_enum;
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Exceptions\BusinessException;
-use App\Exceptions\CustomException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\GoodsDao;
 use App\Http\Resources\ApiGoodsDetailResource;
@@ -82,7 +82,7 @@ class GoodsController extends BaseController
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (CustomException $custom_exception) {
+        } catch (ProcessDataException $custom_exception) {
             return $this->failed($custom_exception->getData(), $custom_exception->getMessage(), $custom_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
