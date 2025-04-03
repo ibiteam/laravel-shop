@@ -508,7 +508,7 @@ const updateParameterTemplate = (item,i,type) => {
     if(type == 'edit'){
         cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('修改产品参数模板成功')
                     getParameterTemplate()
                 } else {
@@ -520,7 +520,7 @@ const updateParameterTemplate = (item,i,type) => {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
             parameterTemplateArr.value.splice(i, 1);
             goodsParameterTemplateDestroy({id: item.id}).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('删除产品参数模板成功')
                     getParameterTemplate()
                 } else {
@@ -544,7 +544,7 @@ const ctrlParameterTemplate = (type) => {
     if(type == 'save'){
         cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     getParameterTemplate(res.data.id)
                     cns.$message.success('保存产品参数模板成功')
                 } else {
@@ -554,7 +554,7 @@ const ctrlParameterTemplate = (type) => {
         })
     }else if(type == 'update'){
         goodsParameterTemplateUpdate({ id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
-            if (res.code === 200) {
+            if (cns.$constant.isSuccess(res.code)) {
                 cns.$message.success('更新产品参数模板成功')
             } else {
                 cns.$message.error(res.message)
@@ -564,7 +564,7 @@ const ctrlParameterTemplate = (type) => {
 }
 const getParameterTemplate = (id) => {
     getGoodsParameterTemplate().then(res => {
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             parameterTemplateArr.value = [...res.data]
             currentParameterTemplate.value = id
         }
@@ -835,7 +835,7 @@ const moreIntegralPrice = (index) => {
 /* 获取规格模板 */
 const getSkuTemplate = () => {
     getGoodsSkuTemplate().then(res => {
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             specificationsArr.value = [...res.data]
         }
     })
@@ -1153,7 +1153,7 @@ const ctrlSkuTemplate = (type) => {
                 if (type === 'save') {
                     // 保存SKU模板
                     goodsSkuTemplateStore(goodsSkuTemplate.value).then(res => {
-                        if (res.code === 200) {
+                        if (cns.$constant.isSuccess(res.code)) {
                             cns.$message.success('保存模板成功')
                         } else {
                             cns.$message.error(res.message)
@@ -1164,7 +1164,7 @@ const ctrlSkuTemplate = (type) => {
                 } else if (type === 'update') {
                     // 更新SKU模板
                     goodsSkuTemplateUpdate(goodsSkuTemplate.value).then(res => {
-                        if (res.code === 200) {
+                        if (cns.$constant.isSuccess(res.code)) {
                             cns.$message.success('更新模板成功')
                         } else {
                             cns.$message.error(res.message)
@@ -1185,7 +1185,7 @@ const updateSkuTemplate = (item,i,type) => {
     if(type == 'update'){
         cns.$dialog.prompt({message: '修改商品规格模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsSkuTemplateUpdate({id: item.id, name: value}).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('修改商品规格模板成功')
                     getSkuTemplate()
                 } else {
@@ -1197,7 +1197,7 @@ const updateSkuTemplate = (item,i,type) => {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
             parameterTemplateArr.value.splice(i, 1);
             goodsSkuTemplateDestroy({id: item.id}).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('删除商品规格模板成功')
                     getSkuTemplate()
                 } else {
@@ -1226,7 +1226,7 @@ const submitGoods = () => {
     updateFormRef.value.validate((valid) => {
         if (valid) {
             goodsUpdate(updateForm.value).then(res => {
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     cns.$message.success('保存商品成功')
                     loading.value = false
                     router.push({name: 'manage.goods.index'})
@@ -1245,7 +1245,7 @@ const submitGoods = () => {
 
 onMounted(() => {
     goodsDetailInit({id:route.params.id}).then(res => {
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             updateForm.value = {...res.data.info}
             category.value = res.data.category
             settings.value = res.data.settings

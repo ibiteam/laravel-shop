@@ -45,7 +45,7 @@ const openDetailDialog = (goodsCategoryId = 0) => {
     detailFormLoading.value = true;
     categoryEdit({ id: goodsCategoryId }).then(res => {
         detailFormLoading.value = false;
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             topCategories.value = res.data.top_categories;
             if (goodsCategoryId > 0) {
                 detailForm.id = res.data.info.id;
@@ -86,7 +86,7 @@ const closeDetailDialog = () => {
 const uploadFile = async (request) => {
     try {
         const res = await fileUpload({ file: request.file });
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             detailForm.logo = res.data.url;
         } else {
             cns.$message.error(res.message);
@@ -102,7 +102,7 @@ const submitDetailForm = _.throttle(() => {
             detailSubmitLoading.value = true;
             categoryUpdate(detailForm).then(res => {
                 detailSubmitLoading.value = false;
-                if (res.code === 200) {
+                if (cns.$constant.isSuccess(res.code)) {
                     closeDetailDialog();
                     getData();
                 } else {
@@ -121,7 +121,7 @@ const handleDestroy = (goodsCategoryId) => {
         center: true
     }).then(() => {
         categoryDestroy({ id: goodsCategoryId }).then(res => {
-            if (res.code === 200) {
+            if (cns.$constant.isSuccess(res.code)) {
                 getData();
                 cns.$message.success(res.message);
             } else {
@@ -138,7 +138,7 @@ const changeShow = (row) => {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
@@ -148,7 +148,7 @@ const changeShow = (row) => {
 
 const getData = () => {
     categoryIndex().then(res => {
-        if (res.code === 200) {
+        if (cns.$constant.isSuccess(res.code)) {
             tableData.value = res.data;
         } else {
             cns.$message.error(res.message);
