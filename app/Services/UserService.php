@@ -34,7 +34,7 @@ class UserService
     /**
      * 检测用户是否登录.
      */
-    public function checkIsLogin(?User $user, string $token): array
+    public function checkIsLogin(?User $user, ?string $token): array
     {
         $res = [
             'is_login' => false,
@@ -43,6 +43,10 @@ class UserService
         ];
 
         try {
+            if (! $token) {
+                throw new BusinessException('用户未登录');
+            }
+
             if (! $user instanceof User) {
                 throw new BusinessException('用户未登录');
             }
