@@ -1,4 +1,4 @@
-
+import { ElMessage } from 'element-plus';
 /** 手机号校验 **/
 function isTelPhone (value) {
     let isPhone = /^(13|14|15|17|18|16|19)\d{9}$/
@@ -89,11 +89,41 @@ const debounce = (fnc,delay) => {
     }
 }
 
+const acceptsImg = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+const acceptsVideo = ['video/mp4']
+const verifyFile = (file, type= 'img') => {
+    if(type === 'video'){
+        if(acceptsVideo.indexOf(file.type) === -1){
+            ElMessage.error("仅支持mp4格式上传");
+            return false;
+        }
+        const isLt100M = file.size / 1024 / 1024 <= 100;
+        if (!isLt100M) {
+            ElMessage.error("仅支持mp4格式上传，单个视频不得超过100M!");
+            return false;
+        }
+        return true
+    } else if(type === 'img'){
+        if(acceptsImg.indexOf(file.type) === -1){
+            ElMessage.error("仅支持.png .jpg .jpeg .gif格式上传");
+            return false;
+        }
+        const isLt5M = file.size / 1024 / 1024 <= 5;
+        if (!isLt5M) {
+            ElMessage.error("支持 .png .jpg .jpeg .gif格式，单个图片不得超过5M!");
+            return false;
+        }
+        return true
+    }
+    return true
+}
+
 export default {
     isTelPhone,
     isPassWord,
     isEmail,
     getPrivacyPhone,
     throttle,
-    debounce
+    debounce,
+    verifyFile
 }

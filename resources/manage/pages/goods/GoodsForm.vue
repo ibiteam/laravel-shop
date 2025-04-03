@@ -997,34 +997,11 @@ const setMain = (index) => {
     }
 }
 const beforeUpload = (file) => {
-    let validateType = false;
-    if (file.type != "image/jpg" && file.type != "image/jpeg" && file.type != "image/png") {
-        if (file.type) {
-            validateType = true
-        }
-    }
-    const isLt2M = file.size / 1024 / 1024 <= 5;
-    if (validateType || !isLt2M) {
-        cns.$message.error("支持 .png .jpg .jpeg格式，单个附件不得超过5M!");
-        return false;
-    }else {
-        return true
-    }
+    return cns.$public.verifyFile(file, 'img')
 }
 
 const beforeUploadVideo = (file) => {
-    let validateType = false;
-
-    if (file.type != "video/mp4") {
-        if (file.type) {
-            validateType = true
-        }
-    }
-    const isLt100M = file.size / 1024 / 1024 <= 100;
-    if (validateType || !isLt100M) {
-        cns.$message.error("仅支持mp4格式上传，大小100M内");
-        return false;
-    }
+    return cns.$public.verifyFile(file, 'video')
 }
 const changeImages = (i , type) => {
     currentChangeImageIndex.value = i
