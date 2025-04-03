@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\RefererEnum;
+use App\Exceptions\BusinessException;
 use App\Http\Dao\UserLogDao;
 use App\Models\User;
 use App\Models\UserLog;
@@ -40,17 +41,25 @@ class UserService
             'token' => '',
             'expires_at' => 0,
         ];
-        $access_token = $user->currentAccessToken();
 
-        if (! $access_token instanceof PersonalAccessToken) {
+        try {
+            if (! $user instanceof User) {
+                throw new BusinessException('用户未登录');
+            }
+            $access_token = $user->currentAccessToken();
+
+            if (! $access_token instanceof PersonalAccessToken) {
+                throw new BusinessException('用户未登录');
+            }
+
+            return array_merge($res, [
+                'is_login' => true,
+                'token' => $token,
+                'expires_at' => $access_token->expires_at->diffInSeconds(Carbon::now()),
+            ]);
+        } catch (\Throwable) {
             return $res;
         }
-
-        return array_merge($res, [
-            'is_login' => true,
-            'token' => $token,
-            'expires_at' => $access_token->expires_at->diffInSeconds(Carbon::now()),
-        ]);
     }
 
     /**
