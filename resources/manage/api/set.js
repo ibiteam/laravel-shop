@@ -24,6 +24,9 @@ export function routerCategoryDestroy(data) {
 export function routerCategoryChangeShow(data) {
     return $http.doPost('manage/set/router_category/change_show', data)
 }
+export function routerCategoryGetPages(data) {
+    return $http.doGet('manage/set/router_category/pages', data)
+}
 
 // 路由列表
 export function routerIndex(data) {

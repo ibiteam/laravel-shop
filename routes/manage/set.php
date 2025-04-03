@@ -5,7 +5,6 @@ use App\Http\Controllers\Manage\PaymentMethodController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
 use App\Http\Controllers\Manage\ShopConfigController;
-use App\Http\Controllers\Manage\MaterialFileController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
@@ -25,12 +24,13 @@ Route::prefix('set')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
             Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
             Route::get('info', [RouterCategoryController::class, 'info']);
+            Route::get('pages', [RouterCategoryController::class, 'getPages']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
             Route::post('store', [RouterCategoryController::class, 'store']);
             Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
         });
-        Route::middleware(['manage.permission:' . Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
             Route::post('/destroy', [RouterCategoryController::class, 'destroy']);
         });
     });
@@ -58,14 +58,10 @@ Route::prefix('set')->group(function () {
 
     // 移动端装修
     Route::prefix('app_decoration')->group(function () {
-        Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_DECORATION])->group(function () {
             Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
         });
-        Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
-
-        });
-        Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_DELETE])->group(function () {
-
-        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {});
+        Route::middleware(['manage.permission:'.Permission::MANAGE_MATERIAL_CENTER_DELETE])->group(function () {});
     });
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
 use App\Models\AdminOperationLog;
+use App\Models\Permission;
 use App\Models\Router;
 use App\Models\RouterCategory;
 use Illuminate\Http\Request;
@@ -18,11 +19,15 @@ class RouterCategoryController extends BaseController
     public function index(Request $request)
     {
         $name = $request->get('name');
+        $alias = $request->get('alias');
+        $is_show = intval($request->get('is_show'));
 
         $data = RouterCategory::query()
             ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
+            ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
+            ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
             ->with('allChildren')->whereParentId(0)
-            ->orderByDesc('sort')->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->get();
 
         return $this->success($data);
@@ -33,27 +38,72 @@ class RouterCategoryController extends BaseController
      */
     public function info(Request $request)
     {
-        $top_categories = RouterCategory::query()
-            ->whereParentId(0)
-            ->whereType(RouterCategory::TYPE_PAGE)  // 页面类型 才有下级
+        $id = $request->get('id') ?? 0;
+
+        // 分类（顶级+可以选下级的）
+        $top_categories = RouterCategory::query()->whereParentId(0)
+            ->whereType(RouterCategory::TYPE_PAGE)  // 页面类型
             ->selectRaw('id AS value,name AS label')
             ->get()->toArray();
         array_unshift($top_categories, ['value' => 0, 'label' => '顶级分类']);
+
+        // 获取页面权限
+        $page_permissions = Permission::query()->where('parent_id', '>', 0)
+            ->whereIsLeftNav(Permission::IS_LEFT_NAV)
+            ->whereDoesntHave('childrens')
+            ->select(['id', 'name', 'display_name'])->limit(5)
+            ->get()->toArray();
+
         $info = null;
 
-        if ($id = $request->get('id')) {
+        if ($id) {
             $info = RouterCategory::query()->whereId($id)->first();
 
             if (! $info instanceof RouterCategory) {
                 return $this->error('数据不存在');
             }
             $info->type = strval($info->type);
+
+            if ($info->page_name) {
+                $page_perm = Permission::query()->whereName($info->page_name)->first();
+
+                if ($page_perm && ! in_array($page_perm->id, array_column($page_permissions, 'id'))) {
+                    array_unshift($page_permissions, ['id' => $page_perm->id, 'name' => $page_perm->name, 'display_name' => $page_perm->display_name]);
+                }
+            }
         }
 
         return $this->success([
             'top_categories' => $top_categories,
+            'page_permissions' => $page_permissions,
             'info' => $info,
         ]);
+    }
+
+    /**
+     * 获取权限页面.
+     */
+    public function getPages(Request $request)
+    {
+        $keywords = $request->get('keywords', '');
+
+        $query = Permission::query()->where('parent_id', '>', 0)
+            ->whereIsLeftNav(Permission::IS_LEFT_NAV)
+            ->whereDoesntHave('childrens')
+            ->select(['id', 'name', 'display_name'])
+            ->orderByDesc('id');
+
+        if ($keywords) {
+            $query->where(function ($query) use ($keywords) {
+                $query->where('name', 'like', '%'.$keywords.'%')->orWhere('display_name', 'like', '%'.$keywords.'%');
+            });
+        } else {
+            $query->limit(10);
+        }
+
+        $permissions = $query->get()->toArray();
+
+        return $this->success($permissions);
     }
 
     /**
@@ -70,7 +120,6 @@ class RouterCategoryController extends BaseController
                 'type' => 'required|in:1,2',
                 'page_name' => 'nullable|string',
                 'is_show' => 'required|boolean',
-                'sort' => 'nullable|integer',
             ], [], [
                 'id' => '分类ID',
                 'name' => '分类名称',
@@ -78,7 +127,6 @@ class RouterCategoryController extends BaseController
                 'type' => '类型',
                 'page_name' => '页面名称',
                 'is_show' => '是否显示',
-                'sort' => '排序',
             ]);
 
             $validated['id'] = $validated['id'] ?? 0;
@@ -119,7 +167,6 @@ class RouterCategoryController extends BaseController
             $router_category->type = $validated['type'];
             $router_category->page_name = $validated['page_name'] ?? '';
             $router_category->is_show = intval($validated['is_show']);
-            $router_category->sort = $validated['sort'] ?? 0;
 
             if (! $router_category->save()) {
                 throw new BusinessException('保存失败');
@@ -127,8 +174,8 @@ class RouterCategoryController extends BaseController
 
             if ($validated['id']) {
                 $log = "编辑访问地址分类[id:{$router_category->id}]".implode(',', array_map(function ($k, $v) {
-                    return sprintf('%s=`%s`', $k, $v);
-                }, array_keys($router_category->getChanges()), $router_category->getChanges()));
+                        return sprintf('%s=`%s`', $k, $v);
+                    }, array_keys($router_category->getChanges()), $router_category->getChanges()));
                 admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增访问地址分类[id:{$router_category->id}]";
@@ -214,11 +261,11 @@ class RouterCategoryController extends BaseController
             }
 
             $log = "更改访问地址分类显示隐藏[id:{$validated['id']}]".implode(
-                ',',
-                array_map(function ($k, $v) {
-                    return sprintf('%s=`%s`', $k, $v);
-                }, array_keys($router_category->getChanges()), $router_category->getChanges())
-            );
+                    ',',
+                    array_map(function ($k, $v) {
+                        return sprintf('%s=`%s`', $k, $v);
+                    }, array_keys($router_category->getChanges()), $router_category->getChanges())
+                );
             admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');

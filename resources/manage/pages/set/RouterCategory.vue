@@ -1,21 +1,26 @@
 <script setup>
 import { Plus, Search } from '@element-plus/icons-vue';
-import { routerCategoryIndex, routerCategoryInfo, routerCategoryStore, routerCategoryDestroy, routerCategoryChangeShow } from '@/api/set.js';
+import { routerCategoryIndex, routerCategoryInfo, routerCategoryStore, routerCategoryDestroy, routerCategoryChangeShow, routerCategoryGetPages } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
 const searchForm = reactive({
-    name: ''
+    name: '',
+    alias: '',
+    is_show: '-1',
 });
 
 const tableData = ref([]);
 const loading = ref(false);
+const detailFormLoading = ref(false);
+const remoteLoading = ref(false);
 const storeDialogVisible = ref(false);
 const storeDialogTitle = ref('');
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
 const topCategories = ref([]);
+const pagePermissions = ref([]);
 const submitForm = reactive({
     id: 0,
     parent_id: 0,
@@ -23,23 +28,24 @@ const submitForm = reactive({
     alias: '',
     type: 0,
     page_name: '',
-    sort: 0,
     is_show: 1
 });
+
 const submitFormRules = reactive({
-    parent_id: [{ required: true, message: '请选择父级分类', trigger: 'change' }],
+    parent_id: [{ required: true, message: '请选择上级分类', trigger: 'change' }],
     name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
     alias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
     type: [{ required: true, message: '请选择类型', trigger: 'change' }]
 });
 
-
 const openStoreDialog = (categoryId = 0) => {
-    storeDialogTitle.value = categoryId > 0 ? '添加' : '编辑';
-
+    storeDialogTitle.value = categoryId > 0 ? '编辑分类' : '添加分类';
+    detailFormLoading.value = true;
     routerCategoryInfo({ id: categoryId }).then(res => {
+        detailFormLoading.value = false;
         if (res.code === 200) {
             topCategories.value = res.data.top_categories;
+            pagePermissions.value = res.data.page_permissions;
             if (categoryId > 0) {
                 submitForm.id = res.data.info.id;
                 submitForm.parent_id = res.data.info.parent_id;
@@ -47,10 +53,10 @@ const openStoreDialog = (categoryId = 0) => {
                 submitForm.alias = res.data.info.alias;
                 submitForm.type = res.data.info.type;
                 submitForm.page_name = res.data.info.page_name;
-                submitForm.sort = res.data.info.sort;
                 submitForm.is_show = res.data.info.is_show;
             }
         } else {
+            detailFormLoading.value = false;
             cns.$message.error(res.message);
             closeStoreDialog();
         }
@@ -64,13 +70,13 @@ const openStoreDialog = (categoryId = 0) => {
 
 const closeStoreDialog = () => {
     storeDialogTitle.value = '';
+    detailFormLoading.value = false;
     submitForm.id = 0;
     submitForm.parent_id = 0;
     submitForm.name = '';
     submitForm.alias = '';
     submitForm.type = 0;
     submitForm.page_name = '';
-    submitForm.sort = 0;
     submitForm.is_show = 1;
     storeDialogVisible.value = false;
 };
@@ -90,6 +96,7 @@ const onSubmit = () => {
                 }
             });
         } else {
+            submitLoading.value = false;
             cns.$message.error('表单验证失败');
             return false;
         }
@@ -129,6 +136,18 @@ const changeShow = (row) => {
     });
 };
 
+const searchPages = (query) => {
+    if (query !== '') {
+        remoteLoading.value = true;
+        routerCategoryGetPages({keywords: query}).then(res => {
+            remoteLoading.value = false;
+            if (res.code === 200) {
+                pagePermissions.value = res.data;
+            }
+        });
+    }
+};
+
 const getData = () => {
     loading.value = true;
     routerCategoryIndex(searchForm).then(res => {
@@ -154,6 +173,16 @@ onMounted(() => {
             <el-form-item label="名称" prop="name">
                 <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
             </el-form-item>
+            <el-form-item label="别名" prop="alias">
+                <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
+            </el-form-item>
+            <el-form-item label="是否显示">
+                <el-select v-model="searchForm.is_show" placeholder="请选择">
+                    <el-option label="全部" value="-1"></el-option>
+                    <el-option label="显示" value="1"></el-option>
+                    <el-option label="隐藏" value="0"></el-option>
+                </el-select>
+            </el-form-item>
             <el-form-item>
                 <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
                 <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
@@ -167,7 +196,7 @@ onMounted(() => {
         style="width: 100%;"
         row-key="id"
         :tree-props="{ children: 'all_children' }">
-        <el-table-column label="分类名称" min-width="200">
+        <el-table-column label="分类" min-width="200">
             <template #default="scope">
                 <div class="s-flex ai-ct">
                     {{ scope.row.name }}【{{ scope.row.id }}】
@@ -182,8 +211,7 @@ onMounted(() => {
             </template>
         </el-table-column>
         <el-table-column label="页面" prop="page_name"></el-table-column>
-        <el-table-column label="排序" prop="sort"></el-table-column>
-        <el-table-column label="是否展示" prop="is_show">
+        <el-table-column label="是否显示" prop="is_show">
             <template #default="scope">
                 <el-switch
                     v-model="scope.row.is_show"
@@ -194,7 +222,6 @@ onMounted(() => {
             </template>
         </el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
@@ -204,34 +231,36 @@ onMounted(() => {
     </el-table>
 
     <el-dialog
-        width="700" center :close-on-click-modal="false" :close-on-press-escape="false"
+        width="700" center :before-close="closeStoreDialog"
         v-model="storeDialogVisible" :title="storeDialogTitle">
-        <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto">
-            <el-form-item label="上级分类" prop="parent_id">
-                <el-select v-model="submitForm.parent_id" placeholder="请选择上级分类">
-                    <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="submitForm.name" />
-            </el-form-item>
-            <el-form-item label="别名" prop="alias">
-                <el-input v-model="submitForm.alias" />
-            </el-form-item>
-            <el-form-item label="类型" prop="type">
-                <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>
-                <el-radio v-model="submitForm.type" label="2">页面</el-radio>
-            </el-form-item>
-            <el-form-item label="页面名称" prop="page_name" v-if="submitForm.type === '2' && submitForm.parent_id > 0">
-                <el-input v-model="submitForm.page_name" />
-            </el-form-item>
-            <el-form-item label="排序" prop="sort">
-                <el-input v-model="submitForm.sort" />
-            </el-form-item>
-            <el-form-item label="是否显示" prop="is_show">
-                <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
-            </el-form-item>
-        </el-form>
+        <div v-loading="detailFormLoading" class="s-flex jc-ct">
+            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
+                <el-form-item label="上级分类" prop="parent_id">
+                    <el-select v-model="submitForm.parent_id" placeholder="请选择上级分类">
+                        <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="submitForm.name" />
+                </el-form-item>
+                <el-form-item label="别名" prop="alias">
+                    <el-input v-model="submitForm.alias" />
+                </el-form-item>
+                <el-form-item label="类型" prop="type">
+                    <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>
+                    <el-radio v-model="submitForm.type" label="2">页面</el-radio>
+                </el-form-item>
+                <el-form-item label="页面" prop="page_name" v-if="submitForm.type === '2' && submitForm.parent_id > 0">
+                    <el-select v-model="submitForm.page_name" placeholder="请选择"
+                               filterable remote reserve-keyword :remote-method="searchPages" :loading="remoteLoading">
+                        <el-option v-for="item in pagePermissions" :label="item.display_name" :value="item.name"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否显示" prop="is_show">
+                    <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="closeStoreDialog()">取消</el-button>

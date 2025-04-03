@@ -131,4 +131,9 @@ class Permission extends SpatiePermission
             app(PermissionRegistrar::class)->pivotRole
         )->where(config('permission.table_names.roles').'.is_show', Role::SHOW);
     }
+
+    public function childrens()
+    {
+        return $this->hasMany(Permission::class, 'parent_id', 'id');
+    }
 }
