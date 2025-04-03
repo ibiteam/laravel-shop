@@ -9,10 +9,14 @@ use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
+use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
 
 /* 发送短信 */
 Route::post('sms-action', [SmsController::class, 'handleAction']);
+// 文件上传
+Route::post('upload', [UploadController::class, 'upload']);
+
 /* 授权相关路由 */
 Route::prefix('auth')->group(function () {
     Route::get('check_login', [AuthController::class, 'checkLogin']); // 检测是否登录

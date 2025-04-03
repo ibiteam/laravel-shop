@@ -68,7 +68,7 @@
                                 <el-button type="primary" @click="searchMaterial" style="margin-right: 10px;">查询</el-button>
                                 <el-upload
                                     class="logo-uploader"
-                                    :accept="tabValue === '1' ? 'image/jpeg,image/jpg,image/png' : 'video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb'"
+                                    :accept="tabValue === '1' ? 'image/jpeg,image/jpg,image/png,image/gif' : 'video/mp4,video/ogg,video/flv,video/avi,video/wmv,video/rmvb'"
                                     action=""
                                     :show-file-list="false"
                                     :http-request="(request) => uploadFile(request, 'shop_logo')"

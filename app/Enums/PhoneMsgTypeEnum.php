@@ -14,6 +14,8 @@ enum PhoneMsgTypeEnum: int
             self::PHONE_FORGET_PASSWORD => '忘记密码短信验证码',
             self::PHONE_NOTICE => '通知类短信',
             self::PHONE_EDIT_PASSWORD => '修改密码短信验证码',
+            self::PHONE_EDIT => '修改手机号',
+            self::ACTION_VERIFY_PHONE => '验证手机号',
             default => ''
         };
     }
@@ -36,6 +38,8 @@ enum PhoneMsgTypeEnum: int
             3 => self::PHONE_FORGET_PASSWORD,
             4 => self::PHONE_NOTICE,
             5 => self::PHONE_EDIT_PASSWORD,
+            6 => self::PHONE_EDIT,
+            7 => self::ACTION_VERIFY_PHONE,
             default => throw new BusinessException('Unexpected match value'),
         };
     }
@@ -47,4 +51,6 @@ enum PhoneMsgTypeEnum: int
     case PHONE_NOTICE = 4;
 
     case PHONE_EDIT_PASSWORD = 5;
+    case PHONE_EDIT = 6;
+    case ACTION_VERIFY_PHONE = 7;
 }

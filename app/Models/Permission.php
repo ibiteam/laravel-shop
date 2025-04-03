@@ -78,9 +78,8 @@ class Permission extends SpatiePermission
 
     public const WEBSITE_MANAGE = 'website.manage'; // 网站管理
     public const MANAGE_APP_DECORATION = 'manage.app_decoration.index'; // 移动端装修
-    public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心
-    public const MANAGE_MATERIAL_CENTER_UPDATE = 'manage.material_center.update'; // 素材中心 新增|编辑
-    public const MANAGE_MATERIAL_CENTER_DELETE = 'manage.material_center.delete'; // 素材中心 删除
+    public const MANAGE_APP_DECORATION_UPDATE = 'manage.app_decoration.update'; // 移动端保存装修
+
 
     // 二级 商品部分
     public const GOODS_MANAGE = 'goods.manage'; // 商品管理
@@ -95,6 +94,11 @@ class Permission extends SpatiePermission
     public const USER_MANAGE = 'user.manage'; // 会员管理
     public const MANAGE_USER_INDEX = 'manage.user.index'; // 会员列表
     public const MANAGE_USER_UPDATE = 'manage.user.update'; // 会员列表新增|编辑
+
+    // 二级 工具部分
+    public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心
+    public const MANAGE_MATERIAL_CENTER_UPDATE = 'manage.material_center.update'; // 素材中心 新增|编辑
+    public const MANAGE_MATERIAL_CENTER_DELETE = 'manage.material_center.delete'; // 素材中心 删除
 
     public function __construct(array $attributes = [])
     {

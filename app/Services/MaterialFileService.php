@@ -87,6 +87,10 @@ class MaterialFileService
         ];
 
         if (MaterialFile::DIR_TYPE_IMAGE == $dir_type) {
+            // 限制图片大小最大为5M
+            if ($fileSize > 5 * 1024 * 1024) {
+                throw new BusinessException('图片大小不能超过5M');
+            }
             if (strpos($mimeType, 'image/') !== 0) {
                 throw new BusinessException('文件类型不是图片 (MIME: ' . $mimeType . ')');
             }

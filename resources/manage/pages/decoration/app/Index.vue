@@ -44,14 +44,12 @@ const getData = (page = 1) => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data.list;
-            console.log(tableData.value);
             // 更新分页信息
             setPageInfo(res.data.meta);
         } else {
             cns.$message.error(res.message)
         }
-    }).catch((reason) => {
-        console.log(reason);
+    }).catch(() => {
         loading.value = false;
     })
 }
@@ -81,7 +79,10 @@ const goDecoration = (row) => {
         <el-table-column label="页面标题" prop="title"></el-table-column>
         <el-table-column label="访问地址">
             <template #default="scope" >
-                <span>预览</span>
+                <div style="display: flex;align-items: center;">
+                    <span style="margin-right: 15px;">预览</span>
+                    <el-icon><CopyDocument /></el-icon>
+                </div>
             </template>
         </el-table-column>
         <el-table-column label="装修人" prop="admin_user_name"></el-table-column>

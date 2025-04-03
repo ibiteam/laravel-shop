@@ -18,6 +18,8 @@ class SmsService
     public const ACTION_LOGIN = 'login';
     public const ACTION_FORGET_PASSWORD = 'password-forget';
     public const ACTION_EDIT_PASSWORD = 'password-edit'; // 修改密码
+    public const ACTION_EDIT_PHONE = 'phone-edit'; // 修改手机号
+    public const ACTION_VERIFY_PHONE = 'phone-verify'; // 验证手机号
 
     /**
      * 发送短信验证码
@@ -30,6 +32,8 @@ class SmsService
             self::ACTION_LOGIN => $this->sendLoginOtp($phone),
             self::ACTION_FORGET_PASSWORD => $this->sendForgetPasswordOtp($phone),
             self::ACTION_EDIT_PASSWORD => $this->sendEditPasswordOtp($user),
+            self::ACTION_EDIT_PHONE => $this->sendEditPhoneOtp($user),
+            self::ACTION_VERIFY_PHONE => $this->sendVerifyPhoneOtp($user),
             default => throw new BusinessException('发送失败~'),
         };
     }
@@ -44,6 +48,34 @@ class SmsService
         }
 
         $this->sendMessage($user->phone, new PhoneCodeMessage('修改密码短信', PhoneMsgTypeEnum::PHONE_EDIT_PASSWORD));
+
+        return true;
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function sendEditPhoneOtp(?User $user): bool
+    {
+        if (! $user instanceof User) {
+            throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
+        }
+
+        $this->sendMessage($user->phone, new PhoneCodeMessage('修改手机号', PhoneMsgTypeEnum::PHONE_EDIT));
+
+        return true;
+    }
+
+    /**
+     * @throws BusinessException
+     */
+    public function sendVerifyPhoneOtp(?User $user): bool
+    {
+        if (! $user instanceof User) {
+            throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
+        }
+
+        $this->sendMessage($user->phone, new PhoneCodeMessage('验证手机号', PhoneMsgTypeEnum::ACTION_VERIFY_PHONE));
 
         return true;
     }

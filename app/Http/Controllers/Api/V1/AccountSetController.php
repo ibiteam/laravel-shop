@@ -157,7 +157,7 @@ class AccountSetController extends BaseController
             ]);
             $phone = $validated['phone'];
 
-            if (! $sms_service->verifyOtp($phone, $validated['code'], PhoneMsgTypeEnum::PHONE_LOGIN)) {
+            if (! $sms_service->verifyOtp($phone, $validated['code'], PhoneMsgTypeEnum::PHONE_EDIT)) {
                 throw new BusinessException('验证码输入错误');
             }
 

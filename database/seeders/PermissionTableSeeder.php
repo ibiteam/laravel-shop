@@ -63,6 +63,7 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('网站管理', Permission::WEBSITE_MANAGE, 1, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
 
         $this->addPermission('移动端装修', Permission::MANAGE_APP_DECORATION, 1, Permission::IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);
+        $this->addPermission('移动端保存装修', Permission::MANAGE_APP_DECORATION_UPDATE, 1, Permission::NOT_IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);
     }
 
     private function addGoodsPermission(): void

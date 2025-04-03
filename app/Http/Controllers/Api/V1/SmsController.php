@@ -22,12 +22,14 @@ class SmsController extends BaseController
                         SmsService::ACTION_LOGIN,
                         SmsService::ACTION_FORGET_PASSWORD,
                         SmsService::ACTION_EDIT_PASSWORD,
+                        SmsService::ACTION_VERIFY_PHONE,
                     ]),
                 ],
                 'phone' => [
                     'required_if:action,'.implode(',', [
                         SmsService::ACTION_LOGIN,
                         SmsService::ACTION_FORGET_PASSWORD,
+                        SmsService::ACTION_EDIT_PHONE,
                     ]), 'integer', new PhoneRule,
                 ],
             ], [], [
