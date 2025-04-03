@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\ConstantEnum;
+use App\Enums\PhoneMsgTypeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\UserDao;
 use App\Http\Dao\UserLogDao;
-use App\Models\PhoneMsg;
 use App\Models\User;
 use App\Models\UserLog;
 use App\Rules\PasswordRule;
@@ -86,7 +86,7 @@ class AuthController extends BaseController
                 'code' => '验证码',
             ]);
 
-            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_LOGIN)) {
+            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsgTypeEnum::PHONE_LOGIN)) {
                 throw new BusinessException('验证码输入错误');
             }
 
@@ -154,7 +154,7 @@ class AuthController extends BaseController
                 throw new BusinessException('该手机号未注册');
             }
 
-            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsg::PHONE_FORGET_PASSWORD)) {
+            if (! $sms_service->verifyOtp($validated['phone'], $validated['code'], PhoneMsgTypeEnum::PHONE_FORGET_PASSWORD)) {
                 throw new BusinessException('验证码输入错误');
             }
 
@@ -194,7 +194,7 @@ class AuthController extends BaseController
                 throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
             }
 
-            if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsg::PHONE_EDIT_PASSWORD)) {
+            if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsgTypeEnum::PHONE_EDIT_PASSWORD)) {
                 throw new BusinessException('验证码输入错误');
             }
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ConstantEnum;
+use App\Enums\PhoneMsgTypeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\PhoneMsgDao;
 use App\Http\Dao\UserDao;
@@ -42,7 +43,7 @@ class SmsService
             throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
         }
 
-        $this->sendMessage($user->phone, new PhoneCodeMessage('修改密码短信', PhoneMsg::PHONE_EDIT_PASSWORD));
+        $this->sendMessage($user->phone, new PhoneCodeMessage('修改密码短信', PhoneMsgTypeEnum::PHONE_EDIT_PASSWORD));
 
         return true;
     }
@@ -54,7 +55,7 @@ class SmsService
      */
     public function sendLoginOtp(int $phone): bool
     {
-        $this->sendMessage($phone, new PhoneCodeMessage('登录短信', PhoneMsg::PHONE_LOGIN));
+        $this->sendMessage($phone, new PhoneCodeMessage('登录短信', PhoneMsgTypeEnum::PHONE_LOGIN));
 
         return true;
     }
@@ -72,7 +73,7 @@ class SmsService
             throw new BusinessException('该手机号未注册');
         }
 
-        $this->sendMessage($phone, new PhoneCodeMessage('忘记密码短信', PhoneMsg::PHONE_FORGET_PASSWORD));
+        $this->sendMessage($phone, new PhoneCodeMessage('忘记密码短信', PhoneMsgTypeEnum::PHONE_FORGET_PASSWORD));
 
         return true;
     }
@@ -80,19 +81,19 @@ class SmsService
     /**
      * 验证短信验证码
      *
-     * @param int    $phone     手机号
-     * @param string $otp       短信验证码
-     * @param int    $send_type 短信类型
+     * @param int              $phone 手机号
+     * @param string           $otp   短信验证码
+     * @param PhoneMsgTypeEnum $enum  短信类型
      *
      * @throws BusinessException
      */
-    public function verifyOtp(int $phone, string $otp, int $send_type = PhoneMsg::PHONE_NOTICE): bool
+    public function verifyOtp(int $phone, string $otp, PhoneMsgTypeEnum $enum): bool
     {
         if (! is_pro_env() && $otp === '000000') {
             return true;
         }
 
-        $message = app(PhoneMsgDao::class)->getInfoByCheckCode($phone, $otp, $send_type);
+        $message = app(PhoneMsgDao::class)->getInfoByCheckCode($phone, $otp, $enum);
 
         if (! $message instanceof PhoneMsg) {
             throw new BusinessException('短信验证码输入错误');
@@ -115,7 +116,7 @@ class SmsService
     private function sendMessage(int $phone, BaseMessage $message): void
     {
         // 检查是否在 60 秒内已发送未验证的验证码
-        $phone_msg = app(PhoneMsgDao::class)->getInfoByPhoneAndType($phone, $message->getSendType());
+        $phone_msg = app(PhoneMsgDao::class)->getInfoByPhoneAndType($phone, $message->getEnum());
 
         if ($phone_msg instanceof PhoneMsg) {
             $tmp_timestamp = time();
@@ -125,7 +126,7 @@ class SmsService
             }
         }
 
-        if (app(PhoneMsgDao::class)->getCountByDay($phone, $message->getSendType()) >= 5) {
+        if (app(PhoneMsgDao::class)->getCountByDay($phone, $message->getEnum()) >= 5) {
             throw new BusinessException('您今日发送短信验证码次数已超过限制。');
         }
 
