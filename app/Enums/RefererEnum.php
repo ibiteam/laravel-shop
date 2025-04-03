@@ -21,7 +21,7 @@ enum RefererEnum: string
         return $enum->getLabel();
     }
 
-    public static function formString(string $value): self
+    public static function formString(?string $value): self
     {
         return match ($value) {
             'pc' => self::PC,
