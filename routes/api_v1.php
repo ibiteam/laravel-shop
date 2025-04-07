@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 
 /* 发送短信 */
 Route::post('sms-action', [SmsController::class, 'handleAction']);
+Route::post('check/action/code', [SmsController::class, 'checkActionCode']);
 // 文件上传
 Route::post('upload', [UploadController::class, 'upload']);
 
