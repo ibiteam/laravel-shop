@@ -318,7 +318,7 @@ class GoodsService
         ];
         $sku_data = $goods->skus()->get();
 
-        if (! empty($sku_data) && $request_sku_id === 0) {
+        if ($sku_data->isNotEmpty() && $request_sku_id === 0) {
             throw new BusinessException('多规格商品请先选择商品规格');
         }
 
