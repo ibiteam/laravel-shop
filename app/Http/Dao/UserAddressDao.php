@@ -107,7 +107,7 @@ class UserAddressDao
     /**
      * 获取当前用户的用户地址
      */
-    private function getUserAddressById(int $user_id, int $id): ?UserAddress
+    public function getUserAddressById(int $user_id, int $id): ?UserAddress
     {
         return UserAddress::query()
             ->with(['regionProvince:id,name', 'regionCity:id,name', 'regionDistrict:id,name'])
