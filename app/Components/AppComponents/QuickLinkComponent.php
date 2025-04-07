@@ -141,19 +141,6 @@ class QuickLinkComponent extends PageComponent
 
             return null;
         })->filter()->values()->toArray();
-//        if (AppWebsiteDecorationItem::PLATE_HEIGHT_ZERO != $content['height']) {
-//            switch ($content['style']) {
-//                case AppWebsiteDecorationItem::HORIZONTAL_SCROLLING:
-//                    $items = array_chunk($items, $content['height']);
-//
-//                    break;
-//                case AppWebsiteDecorationItem::FULL_SCREEN_FLIPPING:
-//                    $number = AppWebsiteDecorationItem::$numbers_rows[$content['number']];
-//                    $items = array_chunk(array_chunk($items, $content['height']), $number);
-//
-//                    break;
-//            }
-//        }
 
         return [
             'component_name' => $data['component_name'],

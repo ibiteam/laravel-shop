@@ -38,4 +38,8 @@ class AppDecorationItemDraft extends Model
     use DatetimeTrait;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'content' => 'array',
+    ];
 }

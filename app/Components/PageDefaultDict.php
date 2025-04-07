@@ -2,8 +2,9 @@
 
 namespace App\Components;
 
+use App\Exceptions\BusinessException;
+use App\Models\AppDecorationItem;
 use App\Models\AppWebsiteDecoration;
-use App\Models\AppWebsiteDecorationItem;
 
 class PageDefaultDict
 {
@@ -12,7 +13,7 @@ class PageDefaultDict
      *
      * @return array
      */
-    public function commonMap(string $alias = '')
+    public function commonMap(string $alias = ''): array
     {
         list($component_icon, $component_value, $not_items_fixed_value) = $this->defaultAndFixedComponent($this->getComNameByAlias($alias));
 
@@ -24,70 +25,37 @@ class PageDefaultDict
      *
      * @return array[]
      */
-    private function getComNameByAlias(string $alias)
+    private function getComNameByAlias(string $alias): array
     {
         switch ($alias) {
             case AppWebsiteDecoration::ALIAS_HOME:
                 $data = [
+                    // 广告组件
                     'advertisement_name' => [
-                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_QUICK_LINK,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_CHANNEL_SQUARE
-                    ], // 广告组件
+                        AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_QUICK_LINK,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_CHANNEL_SQUARE
+                    ],
+                    // 数据组件
                     'data_name' => [
-                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_SELLER,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_THEME,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_HOT_SALE_GOOD,
-                    ], // 数据组件
-                    'fixed_name' => [
-                        AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-                        AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_SELLER,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_THEME,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_HOT_SALE_GOOD,
                     ], // 固定组件
+                    'fixed_name' => [
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
+//                        AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
+                    ]
                 ];
 
                 break;
-			case AppWebsiteDecoration::ALIAS_SELLER_HOME: //卖家版首页
-				$data = [
-					// 广告组件
-					'advertisement_name' => [
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_ADVERTISING_ONE, // 广告1
-
-					],
-					// 数据组件
-					'data_name' => [
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_GOODS_DATA, // 商品数据
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_ORDER_DATA, // 订单数据
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_BUSINESS_DATA,  // 经营数据
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_HELP_CENTER, // 帮助中心
-
-					],
-					// 固定组件
-					'fixed_name' => [
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_SHOP_INFO,//店铺信息
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_LABEL, //标签栏
-					],
-				];
-
-				break;
-			case AppWebsiteDecoration::ALIAS_SELLER_WORKBENCH: //卖家版工作台
-				$data = [
-					// 广告组件
-					'advertisement_name' => [],
-					// 数据组件
-					'data_name' => [],
-					// 固定组件
-					'fixed_name' => [
-						AppWebsiteDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV,//店铺导航
-					],
-				];
-
-				break;
             default:
                 $data = [
                     'advertisement_name' => [], // 广告组件
@@ -102,6 +70,7 @@ class PageDefaultDict
      * 首页默认组件以及固定组件.
      *
      * @return array
+     * @throws BusinessException
      */
     private function defaultAndFixedComponent($names)
     {
