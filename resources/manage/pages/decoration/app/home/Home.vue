@@ -26,10 +26,8 @@
                             <template v-for="(temp, index) in decoration.data">
                                 <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
-                                <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTwo>
-                                <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingThree>
-                                <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTheme>
                                 <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
+                                <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
                                 <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
                             </template>
                         </VueDraggable>
@@ -38,6 +36,7 @@
                 </main>
                 <HomeSetting v-if="decoration.app_website_data && pageSetting" :data="decoration.app_website_data"></HomeSetting>
                 <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
+                <LinkCenterDialog v-if="linkCenterDialogData.show" v-bind="{...linkCenterDialogData}" @close="handleLinkCenterDialogClose" @confirm="handleLinkCenterDialogConfirm"></LinkCenterDialog>
             </div>
         </template>
     </DecorationLayout>
@@ -51,11 +50,10 @@ import BottomNavBar from './components/BottomNavBar.vue'
 import HomeSetting from './components/HomeSetting.vue'
 import Search from './components/Search.vue'
 import HorizontalCarousel from './components/HorizontalCarousel.vue'
-import AdvertisingTwo from './components/AdvertisingTwo.vue'
-import AdvertisingThree from './components/AdvertisingThree.vue'
-import AdvertisingTheme from './components/AdvertisingTheme.vue'
 import HotZone from './components/HotZone.vue';
+import AdvertisingBanner from './components/AdvertisingBanner.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
+import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 // import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 import { appDecorationHome } from '@/api/decoration.js'
@@ -85,6 +83,9 @@ const materialCenterDialogData = reactive({
     show: false,
     dir_type: 1,
     multiple: false
+})
+const linkCenterDialogData = reactive({
+    show: false,
 })
 const pageSetting = ref(true)
 
@@ -138,7 +139,22 @@ const handlematerialCenterDialogClose = () => {
 const handlematerialCenterDialogConfirm = (res) => {
     materialCenterDialogData.show = false
     const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
-    tempRefs.value[index].updateUploadComponentData({form_index: materialCenterDialogData.form_index, file: res})
+    tempRefs.value[index].updateUploadComponentData({...materialCenterDialogData, file: res})
+}
+
+// 接收路由中心弹窗数据
+const handleLinkCenterDialogConfirm = (res) => {
+    linkCenterDialogData.show = false
+    const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
+    tempRefs.value[index].updateLinkComponentData({...linkCenterDialogData, link: {
+        name: res[0]?.name,
+        url: res[0]?.h5_url
+    }})
+}
+
+// 关闭路由中心弹窗
+const handleLinkCenterDialogClose = () => {
+    linkCenterDialogData.show = false
 }
 
 // 获取首页装修数据
@@ -148,7 +164,34 @@ const getDecorationHome = () => {
             decoration.app_website_data = res.data.app_website_data
             decoration.component_icon = res.data.component_icon
             decoration.component_value = res.data.component_value
-            decoration.data = res.data.data
+            decoration.data = [
+                ...res.data.data,
+                {
+                    component_name: 'advertising_banner', // 组件名
+                    content: { // 表单数据
+                        column: 2, // 每行显示： 2,3,4 默认显示2个
+                        background: 1, // 是否有背景色， 1-有 0-无 默认1
+                        background_color: '#ffffff', // 背景色，默认为白色:#ffffff
+                        width: 330, // 宽度：默认330 不可修改 2个330,3个220,4个160
+                        height: 240, // 高度：默认240（最高250）；2个240,3个150，4个150
+                        title: {
+                            image: '', // 标题小图标，默认空
+                            name: '', // 标题名称，默认空
+                            align: 'left', // 标题对齐，默认左对齐，left-左侧，center-居中
+                            suffix: '', // 标题右侧文案
+                            color: '#333333', // 标题颜色，默认#333333
+                            url: { // 标题右侧文案链接
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            }
+                        },
+                        data: []
+                    },
+                    id: '999', // 组件id
+                    is_show: 1, // 组件是否显示
+                    name: '广告图', // 组件名
+                }
+            ]
             decoration.not_for_data = res.data.not_for_data
         }
     })
@@ -195,6 +238,12 @@ onMounted(() => {
         cns.$bus.on('openUploadDialog', (params = {show: false, dir_type: 1, multiple: false, temp_index: ''}) => {
             Object.keys(params).forEach(key => {
                 materialCenterDialogData[key] = params[key]
+            })
+        })
+        // 打开路由中心弹窗
+        cns.$bus.on('openLinkDialog', (params = {show: false, temp_index: ''}) => {
+            Object.keys(params).forEach(key => {
+                linkCenterDialogData[key] = params[key]
             })
         })
     })

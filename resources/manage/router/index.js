@@ -43,7 +43,7 @@ const router = createRouter({
                 { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
                 // 移动端装修
                 { path: '/decoration/app', component: AppDecoration , name: 'manage.app_decoration.index', meta:{title:'移动端装修'} },
-                { path: '/decoration/app/home', component: import('@/pages/decoration/app/home/Home.vue'), name: 'decorationAppHome', meta:{title:'移动端装修 - 首页'} },
+                { path: '/decoration/app/home', component: () => import('@/pages/decoration/app/home/Home.vue'), name: 'decorationAppHome', meta:{title:'移动端装修 - 首页'} },
             ]
         },
     ],

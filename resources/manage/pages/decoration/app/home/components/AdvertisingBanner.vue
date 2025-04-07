@@ -3,55 +3,9 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="ad-wrapper" @click="handleChooseDragItem">
-                    <div class="ad-item"  v-if="!form.content.data || form.content.data.length == 0">
-                        <image-wrapper v-bind="{width: '100%', height: '100px', radius: '10px'}" />
-                    </div>
-                    <div class="ad-swiper">
-                        <swiper v-if="form.content.style == 2" v-bind="{
-                            slidesPerView: 3,
-                            spaceBetween: 0,
-                            centeredSlides: true,
-                            autoplay: {
-                                'delay': (form.content.interval || 3) * 1000,
-                                'disableOnInteraction': false,
-                                'waitForTransition': true,
-                            },
-                            loop: true,
-                            pagination: {
-                                'el': '.swiper-pagination',
-                                'clickable': false,
-                            },
-                            modules: swiperModules
-                        }" class="cards-swiper">
-                            <template v-if="form.content.data.length <= 3">
-                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in [...form.content.data, ...form.content.data, ...form.content.data, ...form.content.data]" :key="index">
-                                    <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
-                                </swiper-slide>
-                            </template>
-                            <swiper-slide v-else class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in form.content.data" :key="index">
-                                <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
-                            </swiper-slide>
-                        </swiper>
-                        <!-- 平铺 -->
-                        <swiper v-if="form.content.style == 1" v-bind="{
-                            slidesPerView: 1,
-                            autoplay: {
-                                'delay': (form.content.interval || 3) * 1000,
-                            },
-                            loop: true,
-                            pagination: {
-                                'el': '.swiper-pagination',
-                                'clickable': false,
-                            },
-                            modules: swiperModules
-                        }" class="scroll-wrapper">
-                            <swiper-slide class="scroll-item" v-for="(item, index) in form.content.data" :key="index" :style="{width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px'}">
-                                <image-wrapper
-                                    v-bind="{src: item.image, width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '10px'}" 
-                                />
-                            </swiper-slide>
-                        </swiper>
-                        <div class="swiper-pagination"></div>
+                    <div class="ad-item s-flex ai-ct jc-bt"  v-if="!form.content.data || form.content.data.length == 0">
+                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
+                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
                     </div>
                 </div>
             </template>
@@ -61,17 +15,29 @@
                 <el-form lable-width="auto" :model="form.content" ref="templateSetForm">
                     <div class="setting-bar-item">
                         <div class="item-title">显示设置</div>
-                        <el-form-item label="显示样式" label-position="top" :prop="'style'" required>
-                            <el-radio-group v-model="form.content.style" fill="var(--main-color)">
-                                <el-radio v-for="style in StyleOption" :value="style.value" :key="style.value">{{style.label}}</el-radio>
+                        <el-form-item label="每行显示" label-position="top" :prop="'column'" required>
+                            <el-radio-group v-model="form.content.column" fill="var(--main-color)">
+                                <el-radio v-for="column in ColumnOption" :value="column.value" :key="column.value">{{column.label}}</el-radio>
                             </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="背景色" label-position="top" :prop="'background'" required>
+                            <div>
+                                <div>
+                                    <el-radio-group v-model="form.content.background" fill="var(--main-color)">
+                                        <el-radio v-for="bg in BackgroundOption" :value="bg.value" :key="bg.value">{{bg.label}}</el-radio>
+                                    </el-radio-group>
+                                </div>
+                                <div>
+                                    <el-color-picker v-model="form.content.background_color" v-if="form.content.background" />
+                                </div>
+                            </div>
                         </el-form-item>
                         <el-form-item label="图片宽高" label-position="top" :prop="'height'" :rules="
                             [
                                 { required: true, message: '请输入图片高度', trigger: 'blur' },
                                 { validator: (rule, value, callback) => {
-                                    if (value < 200 || value > 350) {
-                                        callback(new Error('图片高度范围是200px~350px'));
+                                    if (value < ColumnWidthHeight[form.content.column].minHeight || value > ColumnWidthHeight[form.content.column].maxHeight) {
+                                        callback(new Error(`图片高度范围是${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px`));
                                     } else if (isNaN(value)) {
                                         callback(new Error('请输入数字'));
                                     } else if (!Number.isInteger(value * 1)) {
@@ -85,10 +51,62 @@
                                 <p style="margin: 0 10px;">~</p>
                                 <el-input v-model="form.content.height" style="width: 100px;"></el-input>&nbsp;&nbsp;
                             </div>
-                            <p class="item-title-info" style="margin-bottom: 0;">高度范围：200px~350px</p>
+                            <p class="item-title-info" style="margin-bottom: 0;">{{ `高度范围：${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px` }}</p>
                         </el-form-item>
-                        <el-form-item label="切换时间(秒)" label-position="top" :prop="'interval'">
-                            <el-input v-model="form.content.interval" style="width: 100px;"></el-input>
+                    </div>
+                    <div class="setting-bar-item">
+                        <div class="item-title">标题设置</div>
+                        <el-form-item label="小图标" label-position="top" :prop="['title', 'image']">
+                            <div>
+                                <ImageUpload 
+                                    :src="form.content.title.image"
+                                    @material="() => {
+                                        handleOpenUpload(['title', 'image'])
+                                    }"
+                                    @local="(image) => {
+                                        form.content.title.image = image
+                                    }"
+                                    @remove="() => {
+                                        form.content.title.image = ''
+                                    }" 
+                                />
+                                <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：32 * 32</p>
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="标题" label-position="top" :prop="['title', 'name']">
+                            <el-input v-model="form.content.title.name" style="width: 70%;"></el-input>
+                            <el-color-picker v-model="form.content.title.color" />
+                        </el-form-item>
+                        <el-form-item label="对齐方式" label-position="top" :prop="['title', 'align']">
+                            <el-radio-group v-model="form.content.title.align">
+                                <el-tooltip
+                                    v-for="align in TitleAlignOption"
+                                    :key="align.value"
+                                    effect="dark"
+                                    :content="align.label"
+                                    placement="bottom"
+                                >
+                                    <el-radio-button  :value="align.value" size="small">
+                                        <template #default>
+                                            <em :class="align.icon"></em>
+                                        </template>
+                                    </el-radio-button>
+                                </el-tooltip>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="链接" label-position="top" :prop="['title', 'url', 'value']">
+                            <LinkInput
+                                style="width: 70%;"
+                                :name="form.content.title.url.name"
+                                :value="form.content.title.url.value"
+                                @select="handleOpenLink(['title', 'url'])"
+                                @input="(res) => {
+                                    form.content.title.url = res
+                                }"
+                                @clear="(res) => {
+                                    form.content.title.url = res
+                                }"
+                            />
                         </el-form-item>
                     </div>
                     <div class="setting-bar-item">
@@ -107,7 +125,9 @@
                                     <el-form-item class="not-required" label="" :prop="['data', index, 'image']" :rules="{ required: true, message: '请上传图片', trigger: 'blur' }">
                                         <ImageUpload 
                                             :src="item.image"
-                                            @material="handleOpenUpload(index)"
+                                            @material="() => {
+                                                handleOpenUpload(['data', index, 'image'])
+                                            }"
                                             @local="(image) => {
                                                 item.image = image
                                             }"
@@ -121,7 +141,7 @@
                                             <LinkInput
                                                 :name="item.url.name"
                                                 :value="item.url.value"
-                                                @select="handleOpenLink(index)"
+                                                @select="handleOpenLink(['data', index, 'url'])"
                                                 @input="(res) => {
                                                     item.url = res
                                                 }"
@@ -177,12 +197,9 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { TempField, TempContentDataItemField, StyleOption, MaxItemLength } from '@/pages/decoration/app/dataField/HorizontalCarousel.js'
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay,Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
+import { Icon } from 'vant';
+import { TempField, TempContentDataItemField, ColumnOption, BackgroundOption, MaxItemLength, ColumnWidthHeight, TitleAlignOption } from '@/pages/decoration/app/dataField/AdvertisingBanner.js'
+import { updateNested } from '@/pages/decoration/utils/common.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -208,22 +225,16 @@ const props = defineProps({
 
 const form = reactive(TempField())
 const templateSetForm = ref(null)
-const swiperModules = [Autoplay, Pagination]
-const swiperSlideWidth = (style, width) => {
-    // return style == 1 ? width / 2 + 'px' : '233px'
-    return width / 2 + 'px'
-}
-
 const handleChooseDragItem = () => {
     cns.$bus.emit('chooseDragItem', {temp_index: form.id})
 }
 // 通知打开选择图片弹窗
-const handleOpenUpload = (index) => {
-    cns.$bus.emit('openUploadDialog', {temp_index: form.id, form_index: index, show: true, dir_type: 1, multiple: false})
+const handleOpenUpload = (keys) => {
+    cns.$bus.emit('openUploadDialog', {temp_index: form.id, keys, show: true, dir_type: 1, multiple: false})
 }
 // 更新上传图片数据
 const updateUploadComponentData = (res) => {
-    form.content.data[res.form_index].image = res.file[0].file_path
+    form.content = updateNested(form.content, res.keys, res.file[0].file_path)
 }
 
 // 添加图片数据
@@ -233,13 +244,13 @@ const handleClickAddImageData = () => {
 }
 
 // 通知打开选择路由弹窗
-const handleOpenLink = (index) => {
-    cns.$bus.emit('openLinkDialog', {temp_index: form.id, form_index: index, show: true})
+const handleOpenLink = (keys) => {
+    cns.$bus.emit('openLinkDialog', {temp_index: form.id, keys, show: true})
 }
 
 // 更新选择路由数据
 const updateLinkComponentData = (res) => {
-    form.content.data[res.form_index].url = res.link
+    form.content = updateNested(form.content, res.keys, res.link)
 }
 
 // 删除
@@ -286,40 +297,10 @@ watch([() => props.component], (newValue) => {
 .ad-wrapper{
     padding: 5px 10px 5px;
     .ad-item {
+        background: #fff;
         border-radius: 10px;
-    }
-    .ad-swiper {
-        width: 100%;
-        :deep(.swiper-pagination){
-            .swiper-pagination-bullet{
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-                background: rgba(255, 255, 255, 0.5);
-            }
-            .swiper-pagination-bullet-active {
-                width: 13px;
-                border-radius: 20px;
-                background-color: var(--main-color);
-            }
-        }
-    }
-    .cards-swiper {
-        width: 100%;
-        .swiper-slide {
-            transition: transform 0.3s ease;
-            overflow: hidden;
-        }
-        .swiper-slide-active {
-            transform: scale(2.5,1);
-            z-index: 1;
-        }
-        .swiper-slide-prev,
-        .swiper-slide-next {
-            transform: scale(0.9);
-            opacity: 0.3;
-        }
+        padding: 10px;
+        box-sizing: border-box;
     }
 }
 .remove-btn {

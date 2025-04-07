@@ -42,7 +42,7 @@ import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import { ref, reactive, watch, getCurrentInstance, defineExpose } from 'vue'
 import HotZoneDialog from './HotZoneDialog.vue'
-import { MaxItemLength } from '@/dataField/HotZone.js'
+import { MaxItemLength } from '@/pages/decoration/app/dataField/HotZone.js'
 
 
 const cns = getCurrentInstance().appContext.config.globalProperties
