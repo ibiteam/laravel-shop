@@ -25,7 +25,7 @@
                 @update="handleAreaUpdate"
             >
             </FreeZoneSelect>
-            <setting-bar v-bind="{name: '热区'}">
+            <setting-bar v-bind="{name: '热区'}" v-if="hotZoneDialog.drawer">
                 <template #content>
                     <div class="setting-bar-item">
                         <el-form :model="hotZoneDialog" label-width="auto" ref="formRef">
@@ -56,7 +56,6 @@ import { ref, reactive, watch, defineEmits, getCurrentInstance } from 'vue'
 import FreeZoneSelect from '@/pages/decoration/components/FreeZoneSelect.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
-import { Icon } from 'vant'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({

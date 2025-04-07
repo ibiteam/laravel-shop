@@ -142,11 +142,11 @@
                             <li @click="closeAllTags">关闭所有</li>
                         </ul>
                     </div>
-                    <div class='flex-1' style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
+                    <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }">
                             <transition name="fade" mode="out-in">
                                 <keep-alive :include="cachedViews">
-                                    <div :key="route.path">
+                                    <div :key="route.path" style="height: 100%;">
                                         <component :is="Component"></component>
                                     </div>
                                 </keep-alive>

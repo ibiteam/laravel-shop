@@ -20,13 +20,15 @@
                     <div class="placeholder s-flex ai-ct jc-ct" v-if="!form.content.image">
                         <span class="fs12">750*高度不限</span>
                     </div>
-                    <div class="placeholder s-flex ai-ct jc-ct" v-else>
+                    <ImageUpload v-else width="100%" height="100%" :src="form.content.image" @material="handleOpenUpload" @local="(image) => form.content.image = image" @remove="form.content.image = ''" />
+                    <!--<div class="placeholder s-flex ai-ct jc-ct">
                         <image-wrapper v-bind="{src: form.content.image, width: '100%', height: '100%'}" />
                         <div class="add-btn s-flex ai-ct jc-ct" @click="showDialog = true">
                             <Icon name="plus" size="24px" />
                             <p>添加热区</p>
                         </div>
-                    </div>
+                    </div>-->
+                    <el-button type="primary" style="width: 100%; margin-top: 20px;" :disabled="form.content.areas.length >= MaxItemLength" @click="showDialog = true">编辑热区({{form.content.areas.length}}/10)</el-button>
                 </div>
             </template>
         </setting-bar>
@@ -37,9 +39,11 @@
 import DragWrapper from '@/pages/decoration/components/app/DragWrapper.vue'
 import ImageWrapper from '@/pages/decoration/components/app/ImageWrapper.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
-import { ref, reactive, watch, getCurrentInstance } from 'vue'
+import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
+import { ref, reactive, watch, getCurrentInstance, defineExpose } from 'vue'
 import HotZoneDialog from './HotZoneDialog.vue'
-import { Icon } from 'vant';
+import { MaxItemLength } from '@/dataField/HotZone.js'
+
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -76,9 +80,25 @@ const form = reactive({
 
 const showDialog = ref(false)
 
+// 通知打开选择图片弹窗
+const handleOpenUpload = (index) => {
+    cns.$bus.emit('openUploadDialog', {temp_index: form.id, show: true, dir_type: 1, multiple: false})
+}
+// 更新上传图片数据
+const updateUploadComponentData = (res) => {
+    form.content.image = res.file[0].file_path
+}
+
 const handleChooseDragItem = () => {
     cns.$bus.emit('chooseDragItem', {temp_index: form.id})
 }
+
+defineExpose({
+    getComponentData() {
+        return form
+    },
+    updateUploadComponentData
+})
 
 watch([() => props.component], (newValue) => {
     if (newValue[0]) {
@@ -97,30 +117,30 @@ watch([() => props.component], (newValue) => {
     padding: 5px 10px 5px;
 }
 .setting-bar-item{
-    .placeholder{
-        width: 100%;
-        height: 170px;
-        background: #f2f2f2;
-        color: #999;
-        font-size: 12px;
-        position: relative;
-        img {
-            width: 100%;
-            height: auto;
-        }
-        .add-btn {
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0, .5);
-            color: #fff;
-            flex-direction: column;
-            font-weight: bold;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 2;
-            cursor: pointer;
-        }
-    }
+    // .placeholder{
+    //     width: 100%;
+    //     height: 170px;
+    //     background: #f2f2f2;
+    //     color: #999;
+    //     font-size: 12px;
+    //     position: relative;
+    //     img {
+    //         width: 100%;
+    //         height: auto;
+    //     }
+    //     .add-btn {
+    //         width: 100%;
+    //         height: 100%;
+    //         background-color: rgba(0,0,0, .5);
+    //         color: #fff;
+    //         flex-direction: column;
+    //         font-weight: bold;
+    //         position: absolute;
+    //         top: 0;
+    //         left: 0;
+    //         z-index: 2;
+    //         cursor: pointer;
+    //     }
+    // }
 }
 </style>

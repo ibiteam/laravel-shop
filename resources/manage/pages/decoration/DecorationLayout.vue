@@ -7,19 +7,20 @@
                 <span>当前页面：首页</span>
             </div>
             <div class="header-right">
+                <el-button plain @click="emit('pageSetting')">页面配置</el-button>
                 <el-button plain>预览</el-button>
                 <el-button plain>保存</el-button>
                 <el-button plain>保存并关闭</el-button>
             </div>
         </el-header>
         <el-main class="decoration-layout-main">
-            <router-view></router-view>
+            <slot name="main-content"></slot>
         </el-main>
     </el-container>
 </template>
 
 <script setup>
-
+const emit = defineEmits(['pageSetting'])
 </script>
 
 <style lang='scss' scoped>
@@ -36,6 +37,7 @@
     .decoration-layout-main{
         height: calc(100% - 50px);
         padding: 0;
+        position: relative;
     }
 }
 </style>

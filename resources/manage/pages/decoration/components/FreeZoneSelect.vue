@@ -7,7 +7,7 @@
         <img class="background-image" :src="backgroundImage" ondragstart="return false;" oncontextmenu="return false;" onselect="document.selection.empty();"  alt="热区">
         <div class="area" v-for="(area, index) in areas" :key="index" :style="getAreaStyle(area)" @mousedown.stop="startDrag(index, $event)">
             <div class="area-content" v-if="currentAreaIndex != index || (currentAreaIndex == index && !isSelecting)">
-                <span class="co-fff">热区{{ index+1 }}</span>
+                <span class="co-fff title">热区{{ index+1 }}</span>
                 <span :style="{color: area.url ? 'var(--main-color)' : 'var(--red-color)'}">{{ area.url ? '(已设置)' : '(未设置)' }}</span>
                 <Icon name="cross" class="remove" @click.stop="removeArea(index)" color="#fff" />
                 <Icon name="expand-o" class="resize" @mousedown.stop="startResize(index, $event)" color="#fff" />
@@ -20,6 +20,7 @@
 import { ref, getCurrentInstance, watch, defineEmits } from 'vue'
 import { Icon } from 'vant'
 
+const cns = getCurrentInstance().appContext.config.globalProperties;
 const props = defineProps({
     backgroundImage: {
         type: String,
@@ -42,6 +43,16 @@ let offsetX = ref(0); // 鼠标相对于区域左上角的X偏移量
 let offsetY = ref(0); // 鼠标相对于区域左上角的Y偏移量
 let currentAreaIndex = ref(-1);
 
+// 检测两个区域是否重叠
+const isOverlapping = (newArea, existingArea) => {
+    return (
+        newArea.x < existingArea.x + existingArea.width &&
+        newArea.x + newArea.width > existingArea.x &&
+        newArea.y < existingArea.y + existingArea.height &&
+        newArea.y + newArea.height > existingArea.y
+    )
+};
+/*************************************创建start************************************************/
 // 创建选区
 const startSelection = (e) => {
     if (e.target.classList.contains('zone')) return;
@@ -85,7 +96,17 @@ const updateSelection = (e) => {
 // 选区创建完成
 const endSelection = () => {
     let currentArea = areas.value[currentAreaIndex.value];
-    if (currentArea.width <= 10 && currentArea.height <= 10) {
+
+    // 检查是否与已有的选区重叠
+    let overlapping = false;
+    for (let i = 0; i < areas.value.length - 1; i++) {
+        if (isOverlapping(currentArea, areas.value[i])) {
+            overlapping = true;
+            break;
+        }
+    }
+
+    if ((currentArea.width <= 10 && currentArea.height <= 10) || overlapping) {
         areas.value.splice(currentAreaIndex.value, 1);
     }
     isSelecting.value = false;
@@ -93,6 +114,14 @@ const endSelection = () => {
     document.removeEventListener('mouseup', endSelection);
     emit('update', areas.value);
 };
+
+/***********************************创建end**************************************************/
+
+
+/***********************************移动start**************************************************/
+// 移动初始位置
+const initialX = ref(0);
+const initialY = ref(0);
 
 // 移动选区开始
 const startDrag = (index, e) => {
@@ -105,6 +134,10 @@ const startDrag = (index, e) => {
     const areaRect = e.target.getBoundingClientRect();
     offsetX.value = e.clientX - areaRect.left;
     offsetY.value = e.clientY - areaRect.top;
+
+    // 保存当前区域的初始位置
+    initialX.value = area.x;
+    initialY.value = area.y;
 
     document.addEventListener('mousemove', dragArea);
     document.addEventListener('mouseup', endDrag);
@@ -127,11 +160,40 @@ const dragArea = (e) => {
         const maxY = containerHeight - area.height;
 
         // 更新区域位置
-        areas.value[currentAreaIndex.value] = {
-            ...area,
-            x: Math.max(0, Math.min(newX, maxX)),
-            y: Math.max(0, Math.min(newY, maxY))
-        };
+        const updatedX = Math.max(0, Math.min(newX, maxX));
+        const updatedY = Math.max(0, Math.min(newY, maxY));
+
+        // 检查是否与其他选区重叠
+        let overlapping = false;
+        for (let i = 0; i < areas.value.length; i++) {
+            if (i !== currentAreaIndex.value) {
+                const updatedArea = { ...area, x: updatedX, y: updatedY };
+                if (isOverlapping(updatedArea, areas.value[i])) {
+                    overlapping = true;
+                    break;
+                }
+            }
+        }
+
+        if (!overlapping) {
+            areas.value[currentAreaIndex.value] = {
+                ...area,
+                x: updatedX,
+                y: updatedY
+            };
+            initialX.value = updatedX;
+            initialY.value = updatedY;
+        } else {
+            // 如果重叠，恢复到初始位置
+            areas.value[currentAreaIndex.value] = {
+                ...area,
+                x: initialX.value,
+                y: initialY.value
+            };
+            // 停止拖动
+            // endDrag()
+        }
+
     }
 };
 
@@ -140,13 +202,19 @@ const endDrag = () => {
     document.removeEventListener('mousemove', dragArea);
     document.removeEventListener('mouseup', endDrag);
     emit('update', areas.value);
+    currentAreaIndex.value = -1;
+    initialX.value = 0;
+    initialY.value = 0;
 };
+/***********************************移动end**************************************************/
 
 // 删除选区
 const removeArea = (index) => {
     areas.value.splice(index, 1);
     emit('update', areas.value);
 };
+
+/***********************************尺寸start**************************************************/
 
 let currentResizeIndex = ref(-1);
 let initialWidth = ref(0);
@@ -163,6 +231,7 @@ const startResize = (index, event) => {
     initialHeight.value = area.height;
     initialClientX.value = event.clientX;
     initialClientY.value = event.clientY;
+
 
     // 添加全局鼠标移动和释放事件
     document.addEventListener('mousemove', handleResize);
@@ -195,6 +264,8 @@ const stopResize = () => {
     currentResizeIndex.value = -1;
     emit('update', areas.value);
 };
+
+/***********************************尺寸end**************************************************/
 
 // 获取选区样式
 const getAreaStyle = (area) => {
@@ -247,6 +318,11 @@ watch(() => props, (newVal) => {
             align-items: center;
             position: relative;
             overflow: hidden;
+            .title {
+                position: absolute;
+                top: 0;
+                left: 1px;
+            }
             .remove {
                 background-color: var(--main-color);
                 cursor: pointer;

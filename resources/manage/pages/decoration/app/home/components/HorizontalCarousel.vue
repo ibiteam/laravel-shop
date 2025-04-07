@@ -85,7 +85,7 @@
                                 <p style="margin: 0 10px;">~</p>
                                 <el-input v-model="form.content.height" style="width: 100px;"></el-input>&nbsp;&nbsp;
                             </div>
-                            <p class="item-title-info">高度范围：200px~350px</p>
+                            <p class="item-title-info" style="margin-bottom: 0;">高度范围：200px~350px</p>
                         </el-form-item>
                         <el-form-item label="切换时间(秒)" label-position="top" :prop="'interval'">
                             <el-input v-model="form.content.interval" style="width: 100px;"></el-input>
@@ -114,7 +114,7 @@
                                                 :value="item.url.value"
                                                 @clear="(res) => form.content.data[index].url = res"
                                                 @select=""
-                                                @input="(res) => {item.url = res}"
+                                                @input="(res) => item.url = res"
                                             />
                                         </el-form-item>
                                         <el-form-item label="时间">
@@ -124,6 +124,7 @@
                                                 value-format="YYYY-MM-DD HH:mm:ss"
                                                 type="datetimerange"
                                                 size="large"
+                                                :teleported="false"
                                                 :editable="false"
                                                 :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
                                                 :range-separator="item.time.length == 0 ? '长期' : '~'"
@@ -142,7 +143,7 @@
                                             <el-form-item label="" style="margin-bottom: 0;">
                                                 <el-switch v-model="item.is_show" :active-value="1" :inactive-value="0" active-text="显示" inactive-text="隐藏"/>
                                             </el-form-item>
-                                            <Icon name="delete-o" class="remove-btn" size="20" @click.stop="handleClickDeleteData(index, `data`)"/>
+                                            <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
                                         </div>
                                     </div>
                                 </div>
@@ -297,5 +298,8 @@ watch([() => props.component], (newValue) => {
             opacity: 0.3;
         }
     }
+}
+.remove-btn {
+    cursor: pointer
 }
 </style>

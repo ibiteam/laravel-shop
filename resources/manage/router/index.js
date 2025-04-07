@@ -42,15 +42,17 @@ const router = createRouter({
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
                 //正在刷新
                 { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
+                // 移动端装修 - 首页
+                { path: '/decoration/app/home', component: import('@/pages/decoration/app/home/Home.vue'), name: 'decorationAppHome' },
             ]
         },
-        {
-            path: '/decoration',
-            component: () => import('@/pages/decoration/DecorationLayout.vue'),
-            children: [
-                { path: 'app/home', component: import('@/pages/decoration/app/home/Home.vue'), name: 'decorationApp' },
-            ]
-        }
+        // {
+        //     path: '/decoration',
+        //     component: () => import('@/pages/decoration/DecorationLayout.vue'),
+        //     children: [
+        //         { path: 'app/home', component: import('@/pages/decoration/app/home/Home.vue'), name: 'decorationApp' },
+        //     ]
+        // }
     ],
 });
 export default router
