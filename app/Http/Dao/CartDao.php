@@ -58,7 +58,7 @@ class CartDao
                         'id' => $cart->id,
                         'buy_number' => $cart->buy_number,
                         'goods' => [
-                            'id' => $cart->goods->id,
+                            'no' => $cart->goods->no,
                             'name' => $cart->goods->name,
                             'image' => $cart->goods->image,
                             'price' => $goods_price,
@@ -102,7 +102,7 @@ class CartDao
                         'is_check' => $cart->is_check,
                         'goods_sku_id' => $cart->goods_sku_id,
                         'goods' => [
-                            'id' => $cart->goods->id,
+                            'no' => $cart->goods->no,
                             'name' => $cart->goods->name,
                             'image' => $cart->goods->image,
                             'price' => $goods_price,

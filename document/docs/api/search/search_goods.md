@@ -10,15 +10,13 @@
 
 ### 请求参数
 
-| 字段          | 是否必填 | 字段类型    | 说明                                                            |
-|:------------|:-----|:--------|:--------------------------------------------------------------|
-| keywords    | Y    | string  | 搜索关键字                                                         |
-| category_id | N    | integer | 分类ID                                                          |
-| min_price   | N    | integer | 最小价格                                                          |
-| max_price   | N    | integer | 最大价格                                                          |
-| sort_type   | N    | string  | 排序类型(不传默认：sort；价格升序：price_asc；价格降序：price_desc；销量降序：sale_desc) |
-| page        | Y    | integer | 页码                                                            |
-| number      | Y    | integer | 每页数量                                                          |
+| 字段          | 是否必填 | 字段类型    | 说明                                                                         |
+|:------------|:-----|:--------|:---------------------------------------------------------------------------|
+| keywords    | Y    | string  | 搜索关键字                                                                      |
+| category_id | N    | integer | 分类ID                                                                       |
+| sort_type   | N    | string  | 排序类型(不传默认：sort；价格升序：price_asc；价格降序：price_desc；销量降序：sale_desc；最新：time_desc) |
+| page        | Y    | integer | 页码                                                                         |
+| number      | Y    | integer | 每页数量                                                                       |
 
 ### 返回示例
 
@@ -29,24 +27,26 @@
   "data": {
     "list": [
       {
-        "id": 3,
+        "no": "293df896-e63b-468c-b657-1b211618bd07",
         "name": "商品C",
         "sub_name": "副标题C",
         "label": "标签C",
         "price": "399.99",
         "unit": "盒",
         "image": "imageC.jpg",
-        "sales_volume": 100
+        "sales_volume": 100,
+        "cretaed_at": "2020-01-01 00:00:00"
       },
       {
-        "id": 2,
+        "no": "8757ac6a-a621-4a0b-8a43-322fc5275ee7",
         "name": "商品B",
         "sub_name": "副标题B",
         "label": "标签B",
         "price": "299.99",
         "unit": "个",
         "image": "imageB.jpg",
-        "sales_volume": 10
+        "sales_volume": 10,
+        "cretaed_at": "2020-01-01 00:00:00"
       }
     ],
     "meta": {

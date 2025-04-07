@@ -1,12 +1,15 @@
 # 获取购物车商品列表
 
 ### 请求路由
+
 * api/v1/cart/list
 
 ### 请求方式
+
 * get
 
 ### 返回示例
+
 ```
 {
   "code": 200,
@@ -19,7 +22,7 @@
         "is_check": 1,   // 是否选中 0-未选中 1-选中
         "goods_sku_id": 0, // 商品sku id
         "goods": {// 商品信息
-          "id": 3, // 商品goods id
+          "no": "cbda6ddf-0c08-4c82-a777-c73121b9698d", // 商品编号
           "name": "商品B",
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "299.99",
@@ -36,7 +39,7 @@
         "is_check": 0,
         "goods_sku_id": 1,
         "goods": {
-          "id": 1,
+          "no": "bbbfrcsf-0c08-4c82-a777-c73121b9698d", // 商品编号
           "name": "测试商品1",
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "10.06",
@@ -73,7 +76,7 @@
         "id": 2,
         "buy_number": 1,
         "goods": {
-          "id": 2,
+          "no": "werdcfrh-0c08-4c82-a777-c73121b9698d", // 商品编号
           "name": "商品A",
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "199.99",

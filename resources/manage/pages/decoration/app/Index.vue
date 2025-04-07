@@ -1,8 +1,10 @@
 <script setup>
 import { appDecoration } from '@/api/decoration.js';
+import { useRouter } from 'vue-router';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
+const router = useRouter()
 
 // 添加查询参数对象，增加搜索条件
 const queryParams = reactive({
@@ -62,7 +64,7 @@ const tableData = ref([]);
 const loading = ref(false);
 
 const goDecoration = (row) => {
-
+    router.push({ name: decorationApp , query: {id: row.id}})
 }
 
 </script>

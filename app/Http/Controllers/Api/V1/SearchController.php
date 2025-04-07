@@ -23,16 +23,12 @@ class SearchController extends BaseController
             $validated = $request->validate([
                 'keywords' => 'nullable|string|required_without:category_id',
                 'category_id' => 'nullable|int|required_without:keywords',
-                'min_price' => 'nullable|numeric',
-                'max_price' => 'nullable|numeric',
                 'sort_type' => 'nullable|string',
                 'page' => 'required|int|min:1',
                 'number' => 'required|int|min:1',
             ], [], [
                 'keywords' => '搜索关键字',
                 'category_id' => '分类ID',
-                'min_price' => '最小价格',
-                'max_price' => '最大价格',
                 'sort_type' => '排序类型',
                 'page' => '页码',
                 'number' => '每页数量',
