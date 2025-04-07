@@ -10,6 +10,7 @@ const searchForm = reactive({
     alias: '',
     router_category_id: '',
     is_show: '-1',
+    number: 1,
     page: 1
 });
 const pageInfo = reactive({

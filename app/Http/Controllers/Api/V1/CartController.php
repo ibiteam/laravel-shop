@@ -22,12 +22,10 @@ class CartController extends BaseController
     /**
      * 购物车商品列表.
      */
-    public function list(Request $request, CartDao $cart_dao)
+    public function list(CartDao $cart_dao)
     {
-        $user = $this->user();
-
         try {
-            $data = $cart_dao->cartGoodsList($user->id);
+            $data = $cart_dao->cartGoodsList($this->user());
 
             return $this->success($data);
         } catch (\Throwable $throwable) {
@@ -38,7 +36,7 @@ class CartController extends BaseController
     /**
      * 获取购物车数量.
      */
-    public function number(Request $request, CartDao $cart_dao)
+    public function number(CartDao $cart_dao)
     {
         $user = $this->user();
 
@@ -54,7 +52,7 @@ class CartController extends BaseController
     /**
      * 添加购物车.
      */
-    public function store(Request $request)
+    public function store(Request $request, CartDao $cart_dao)
     {
         $user = $this->user();
 
@@ -110,7 +108,10 @@ class CartController extends BaseController
                 throw new BusinessException('添加购物车失败');
             }
 
-            return $this->success('添加成功');
+            // 购物车数量
+            $data['number'] = $cart_dao->getValidCarNumber($user->id);
+
+            return $this->success($data);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -281,12 +282,12 @@ class CartController extends BaseController
     /**
      * 清空失效商品.
      */
-    public function emptyInvalid(Request $request, CartDao $cart_dao)
+    public function emptyInvalid(CartDao $cart_dao)
     {
         $user = $this->user();
 
         try {
-            $data = $cart_dao->cartGoodsList($user->id);
+            $data = $cart_dao->cartGoodsList($user);
             $invalid_carts = $data['invalid_carts'];
 
             if (! count($invalid_carts)) {

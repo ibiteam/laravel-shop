@@ -22,13 +22,14 @@ class RouterController extends BaseController
         $alias = $request->get('alias');
         $router_category_id = intval($request->get('router_category_id'));
         $is_show = intval($request->get('is_show'));
+        $number = (int) $request->get('number', 10);
 
         $data = Router::query()->with('routerCategory')
             ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
             ->when($router_category_id, fn ($query) => $query->where('router_category_id', '=', $router_category_id))
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
-            ->orderByDesc('created_at')->paginate();
+            ->orderByDesc('created_at')->paginate($number);
         $data->getCollection()->transform(function (Router $router) {
             return [
                 'id' => $router->id,

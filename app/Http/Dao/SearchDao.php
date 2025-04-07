@@ -27,7 +27,7 @@ class SearchDao
                 'attributesToSearchOn' => ['name'],
                 'filter' => ['status = '.Goods::STATUS_ON_SALE], // 上架商品
                 'sort' => ['sort:desc'], // 默认排序
-                'attributesToRetrieve' => ['no', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume', 'created_at'], // 指定返回的字段
+                'attributesToRetrieve' => ['no', 'name', 'sub_name', 'label', 'price', 'unit', 'integral', 'image', 'sales_volume', 'created_at'], // 指定返回的字段
             ];
 
             if (! empty($params['category_id'])) {
@@ -48,7 +48,7 @@ class SearchDao
         } else {
             // 数据库搜索
 
-            $query = Goods::query()->show()->select(['no', 'name', 'sub_name', 'label', 'price', 'unit', 'image', 'sales_volume', 'created_at']);
+            $query = Goods::query()->show()->select(['no', 'name', 'sub_name', 'label', 'price', 'unit', 'integral', 'image', 'sales_volume', 'created_at']);
 
             if (! empty($params['keywords'])) {
                 $query->where('name', 'like', '%'.$params['keywords'].'%');
