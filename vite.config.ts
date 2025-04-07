@@ -15,7 +15,7 @@ export default defineConfig({
     plugins: [
         vue(),   // 支持 Vue 文件
         laravel({
-            input: ['resources/manage/app.js'], // 入口文件
+            input: ['resources/manage/app.ts'], // 入口文件
             refresh: true,                  // 启用热更新
         }),
     ],
