@@ -80,7 +80,7 @@
                                                     <span style="color: #F41313" v-if="index < item.title.split(menuQuery).length - 1">{{menuQuery}}</span>
                                                 </template>
                                             </div>
-                                            <div class="s_flex" style="margin-top: 9px">
+                                            <div class="s_flex" style="margin-top: 9px" v-if="item.source">
                                                 <template v-for="(ite,index) in item.source.split(menuQuery)">
                                                     <span>{{ite}}</span>
                                                     <span style="color: #F41313" v-if="index < item.source.split(menuQuery).length - 1">{{menuQuery}}</span>
@@ -265,6 +265,10 @@ const addViewTags = () => {
     if (!add_route) {
         return false
     }
+    let routeFileter = commonStore.visitedViews.filter(item => item.name == add_route.name)
+    if (routeFileter.length>0){
+        return false
+    }
     commonStore.addVisitedViews(add_route)
 }
 
@@ -283,7 +287,7 @@ const moveToCurrentTag = () => {
 
 const tabChange = (name) =>{
     const view = commonStore.visitedViews.filter((ite) => ite.name == name)
-    router.push(view[0].path)
+    router.push({ name: view[0].name , query: view[0].query})
 }
 
 const tabRemove = (name) =>{
@@ -534,7 +538,7 @@ onUnmounted(() => {
                             left: 10px;
                         }
                         input::placeholder{
-                            color: #ffffff;
+                            color: #ffffff!important;
                         }
                     }
                     .user-info{
@@ -580,7 +584,7 @@ onUnmounted(() => {
                         visibility: hidden;
                     }
                     .el-tabs__item{
-                        width: 122px;
+                        width: 150px;
                         height: 30px;
                         border-radius: 8px 8px 0px 0px;
                         border: solid 1px #D8D8D8;
