@@ -165,4 +165,12 @@ class CartDao
     {
         return Cart::query()->with(['goods', 'goodsSku'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
     }
+
+    /**
+     * 清除购物车中当前用户指定ID的商品
+     */
+    public function clearDoneCartGoods(array $destroy_ids, int $user_id): void
+    {
+        Cart::query()->whereUserId($user_id)->whereIn('id', $destroy_ids)->delete();
+    }
 }

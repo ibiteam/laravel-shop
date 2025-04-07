@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DoneController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\SearchController;
@@ -58,6 +59,13 @@ Route::middleware('api.auth')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']); // 退出登录
         Route::post('edit/password', [AuthController::class, 'editPassword']); // 修改密码
+    });
+    // 订单相关路由
+    Route::prefix('order')->group(function () {
+        Route::get('direct/init', [DoneController::class, 'directInit']);
+        Route::post('direct/done', [DoneController::class, 'directDone']);
+        Route::get('cart/init', [DoneController::class, 'cartInit']);
+        Route::post('cart/done', [DoneController::class, 'cartDone']);
     });
 
     // 用户地址

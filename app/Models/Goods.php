@@ -148,6 +148,7 @@ class Goods extends Model
     public function decrementStock(int $buy_number): void
     {
         $this->decrement('total', $buy_number);
+        $this->increment('sales_volume', $buy_number);
     }
 
     protected function casts(): array

@@ -34,4 +34,9 @@ class GoodsSpecValueDao
             ];
         })->toArray();
     }
+
+    public function getInfoByIds(array $spec_value_ids, int $goods_id): EloquentCollection|Collection
+    {
+        return GoodsSpecValue::query()->with('spec')->whereIn('id', $spec_value_ids)->where('goods_id', $goods_id)->get();
+    }
 }
