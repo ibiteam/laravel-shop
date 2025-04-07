@@ -44,3 +44,10 @@
     "data": null
 }
 ```
+```
+{
+    "code": 401,
+    "message": "未登录",
+    "data": null
+}
+```

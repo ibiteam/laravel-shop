@@ -12,6 +12,12 @@
         "collapsed": true
     },
     {
+        "type": "file",
+        "name": "check_action_code",
+        "label": "校验短信验证码",
+        "collapsed": true
+    },
+    {
         "type": "dir",
         "name": "auth",
         "label": "授权",
