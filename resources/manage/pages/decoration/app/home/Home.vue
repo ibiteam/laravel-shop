@@ -1,5 +1,5 @@
 <template>
-    <DecorationLayout @pageSetting="openPageSetting">
+    <DecorationLayout :pageName="decoration.app_website_data?.name" @pageSetting="openPageSetting">
         <template #main-content>
             <div class="decoration-app-container">
                 <tool-bar
@@ -143,7 +143,7 @@ const handlematerialCenterDialogConfirm = (res) => {
 
 // 获取首页装修数据
 const getDecorationHome = () => {
-    appDecorationHome({id: 1}).then(res => {
+    appDecorationHome({id: cns.$route.query.id}).then(res => {
         if (cns.$successCode(res.code)) {
             decoration.app_website_data = res.data.app_website_data
             decoration.component_icon = res.data.component_icon

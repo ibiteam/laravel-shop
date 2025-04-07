@@ -64,7 +64,7 @@ const tableData = ref([]);
 const loading = ref(false);
 
 const goDecoration = (row) => {
-    router.push({ name: decorationApp , query: {id: row.id}})
+    router.push({ name: 'decorationAppHome' , query: {id: row.id}})
 }
 
 </script>

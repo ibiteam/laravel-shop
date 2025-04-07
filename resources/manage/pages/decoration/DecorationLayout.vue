@@ -4,7 +4,7 @@
             <div class="header-left s-flex ai-ct">
                 <el-link :underline="false" class="header-left-back"><em class="iconfont icon-to_left"></em>返回</el-link>
                 <el-divider direction="vertical" />
-                <span>当前页面：首页</span>
+                <span>当前页面：{{ pageName }}</span>
             </div>
             <div class="header-right">
                 <el-button plain @click="emit('pageSetting')">页面配置</el-button>
@@ -21,6 +21,13 @@
 
 <script setup>
 const emit = defineEmits(['pageSetting'])
+
+const props = defineProps({
+    pageName: {
+        type: String,
+        default: ''
+    }
+})
 </script>
 
 <style lang='scss' scoped>
