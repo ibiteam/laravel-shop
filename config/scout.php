@@ -145,7 +145,7 @@ return [
         'index-settings' => [
             \App\Models\Goods::class => [
                 'filterableAttributes' => ['id', 'name', 'category_id', 'price', 'status'], // 可过滤属性
-                'sortableAttributes' => ['id', 'price', 'sort', 'sales_volume'], // 可排序属性
+                'sortableAttributes' => ['id', 'price', 'sort', 'sales_volume', 'created_at'], // 可排序属性
             ],
         ],
     ],

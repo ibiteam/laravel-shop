@@ -21,7 +21,9 @@
 ```
 {
   "code": 200,
-  "message": "添加成功",
-  "data": null
+  "message": "success",
+  "data": {
+    "number":1    // 购物车数量
+  }
 }
 ```

@@ -5,6 +5,7 @@ namespace App\Http\Dao;
 use App\Exceptions\BusinessException;
 use App\Models\Cart;
 use App\Models\Goods;
+use App\Models\User;
 
 class CartDao
 {
@@ -13,10 +14,10 @@ class CartDao
      *
      * @throws BusinessException
      */
-    public function cartGoodsList(int $user_id): array
+    public function cartGoodsList(User $user): array
     {
         try {
-            $carts = Cart::query()->whereUserId($user_id)
+            $carts = Cart::query()->whereUserId($user->id)
                 ->with(['goods' => function ($query) {
                     $query->withTrashed();  // 包括已软删除的商品
                 }], 'goodsSku')
@@ -63,6 +64,7 @@ class CartDao
                             'image' => $cart->goods->image,
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
+                            'integral' => $cart->goods->integral,
                             'invalid_type' => $invalid_type,
                         ],
                     ];
@@ -108,6 +110,7 @@ class CartDao
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
                             'total' => $cart->goods->total,
+                            'integral' => $cart->goods->integral,
                             'can_quota' => $cart->goods->can_quota,
                             'quota_number' => $cart->goods->quota_number,
                             'skus' => $cart->goods->skus ?? [],
