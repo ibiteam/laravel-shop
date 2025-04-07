@@ -40,4 +40,14 @@ class GoodsSku extends Model
     public const NOT_SHOW = 0; // 不展示
 
     protected $guarded = [];
+
+    public function explodeSkuValue(): array
+    {
+        return explode('|', $this->sku_value);
+    }
+
+    public function implodeSkuValue(array $sku_value): string
+    {
+        return implode('|', $sku_value);
+    }
 }

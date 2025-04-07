@@ -1,5 +1,5 @@
 <template>
-    <el-drawer
+    <!-- <el-drawer
         class="setting-drawer"
         body-class="setting-drawer-body"
         modal-class="setting-drawer-modal"
@@ -13,9 +13,9 @@
         append-to=".decoration-layout-main"
         size="400px"
         :before-close="handleCancle"
-    >
-        <aside class="setting-bar-wrapper s-flex">
-            <div class="setting-bar-header s-flex ai-ct jc-bt">
+    > -->
+        <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 50)+ 'px', right: computedStyle.getPropertyValue('padding-right'), bottom: computedStyle.getPropertyValue('padding-bottom')}">
+            <div class="setting-bar-header s-flex ai-ct jc-bt" v-if="name">
                 <p class="fs16 fw-b">{{ name }}</p>
                 <!-- <el-radio-group v-model="formType" v-if="show_radio">
                     <el-radio-button label="内容" :value="0" />
@@ -30,11 +30,11 @@
                 <el-button type="primary" @click="emit('submit')">保存</el-button>
             </div> -->
         </aside>
-    </el-drawer>
+    <!-- </el-drawer> -->
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, defineEmits } from 'vue'
+import { ref, getCurrentInstance, defineEmits, onMounted, nextTick } from 'vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -49,12 +49,21 @@ const props = defineProps({
 })
 
 const formType = ref(0)
+const clientHeight = ref(0)
+const computedStyle = window.getComputedStyle(document.getElementById('shopLayoutView'))
 
 const emit = defineEmits(['close', 'submit'])
 const handleCancle = () => {
     emit('close')
     // cns.$bus.emit('chooseDragItem', {temp_index: ''})
 }
+
+onMounted(() => {
+    nextTick(() => {
+        const element = document.querySelector('.decoration-layout-container')
+        clientHeight.value = element.clientHeight
+    })
+})
 
 </script>
 <style lang="scss">
@@ -164,9 +173,9 @@ const handleCancle = () => {
     overflow: hidden;
     background-color: #fff;
     flex-direction: column;
-    position: absolute;
-    right: 0;
-    bottom: 0;
+    position: fixed;
+    // right: 16px;
+    // bottom: 16px;
     z-index: 3;
     .setting-bar-content{
         flex: 1;

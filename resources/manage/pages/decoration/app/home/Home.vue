@@ -1,48 +1,54 @@
 <template>
-    <div class="decoration-app-container">
-        <tool-bar
-            v-bind="{
-                component_icon: decoration.component_icon,
-                component_value: decoration.component_value,
-                component_data: decoration.data,
-            }"
-            @updateDragPlaceholder="updateDragPlaceholder"
-        ></tool-bar>
-        <main class="decoration-app-main">
-            <div class="app-wrapper">
-                <search v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}"></search>
-                <VueDraggable
-                    class="app-wrapper-content"
-                    v-model="decoration.data"
-                    :animation="1000"
-                    filter=".fixed.setting-bar-wrapper"
-                    handle=".drag-item"
-                    dragClass=".drag-item"
-                    :group="{name: 'decoration', pull: true, put: true}"
-                    :forceFallback="false"
-                    @add="handleDragAdd">
-                    <template v-for="(temp, index) in decoration.data">
-                        <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
-                        <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
-                        <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTwo>
-                        <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingThree>
-                        <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingTheme>
-                        <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></HotZone>
-                        <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
-                    </template>
-                </VueDraggable>
-                <bottom-nav-bar v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}"></bottom-nav-bar>
+    <DecorationLayout :pageName="decoration.app_website_data?.name" @pageSetting="openPageSetting">
+        <template #main-content>
+            <div class="decoration-app-container">
+                <tool-bar
+                    v-bind="{
+                        component_icon: decoration.component_icon,
+                        component_value: decoration.component_value,
+                        component_data: decoration.data,
+                    }"
+                    @updateDragPlaceholder="updateDragPlaceholder"
+                ></tool-bar>
+                <main class="decoration-app-main" id="decorationAppMain">
+                    <div class="app-wrapper">
+                        <search v-if="findNotForData('home_nav')" v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}" ></search>
+                        <VueDraggable
+                            class="app-wrapper-content"
+                            v-model="decoration.data"
+                            :animation="1000"
+                            filter=".fixed.setting-bar-wrapper"
+                            handle=".drag-item"
+                            dragClass=".drag-item"
+                            :group="{name: 'decoration', pull: true, put: true}"
+                            :forceFallback="false"
+                            @add="handleDragAdd">
+                            <template v-for="(temp, index) in decoration.data">
+                                <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
+                                <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
+                                <AdvertisingTwo v-else-if="temp.component_name == 'advertising_two'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTwo>
+                                <AdvertisingThree v-else-if="temp.component_name == 'advertising_three'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingThree>
+                                <AdvertisingTheme v-else-if="temp.component_name == 'theme_advertising'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></AdvertisingTheme>
+                                <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
+                                <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
+                            </template>
+                        </VueDraggable>
+                        <bottom-nav-bar v-if="findNotForData('label')" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
+                    </div>
+                </main>
+                <HomeSetting v-if="decoration.app_website_data && pageSetting" :data="decoration.app_website_data"></HomeSetting>
+                <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
             </div>
-        </main>
-        <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
-    </div>
+        </template>
+    </DecorationLayout>
 </template>
-
 <script setup>
 import 'vant/lib/index.css';
 import { VueDraggable } from 'vue-draggable-plus'
+import DecorationLayout from '@/pages/decoration/DecorationLayout.vue'; 
 import ToolBar from './../../components/ToolBar.vue'
 import BottomNavBar from './components/BottomNavBar.vue'
+import HomeSetting from './components/HomeSetting.vue'
 import Search from './components/Search.vue'
 import HorizontalCarousel from './components/HorizontalCarousel.vue'
 import AdvertisingTwo from './components/AdvertisingTwo.vue'
@@ -50,21 +56,24 @@ import AdvertisingThree from './components/AdvertisingThree.vue'
 import AdvertisingTheme from './components/AdvertisingTheme.vue'
 import HotZone from './components/HotZone.vue';
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
-import DataExample from './DataExample'
+// import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
+import { appDecorationHome } from '@/api/decoration.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
+    // 页面配置数据
+    app_website_data: null,
     // 组件拖拽数据
     // advertisement_component: 广告组件
     // data_component: 数据组件
-    component_icon: DataExample.component_icon,
+    component_icon: [],
     // 组件原始数据
-    component_value: DataExample.component_value,
+    component_value: [],
     // 装修数据
     data: [],
     // 不可拖拽的数据
-    not_for_data: DataExample.not_for_data,
+    not_for_data: [],
     // 当前选中拖拽的索引
     temp_index: ''
 })
@@ -77,18 +86,19 @@ const materialCenterDialogData = reactive({
     dir_type: 1,
     multiple: false
 })
+const pageSetting = ref(true)
 
 // 查找不可拖拽的数据
 const findNotForData = (component_name) => {
     return decoration.not_for_data.find(item => item.component_name === component_name)
 }
-console.log(DataExample)
 // 拖拽克隆完成
 const handleDragAdd = (e) => {
     console.log('handleDragAdd:')
     console.log(e)
     const { clonedData } = e
     decoration.temp_index = clonedData.id
+    pageSetting.value = false
 }
 // 拖拽过程中获取占位下标
 const updateDragPlaceholder = (index) => {
@@ -131,83 +141,31 @@ const handlematerialCenterDialogConfirm = (res) => {
     tempRefs.value[index].updateUploadComponentData({form_index: materialCenterDialogData.form_index, file: res})
 }
 
-onMounted(() => {
-    decoration.data.unshift({
-        component_name: 'hot_zone',
-        content: {
-            image: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg',
-            areas: [{
-                x: 89,
-                y: 86,
-                width: 100,
-                height: 100,
-                url: {
-                    name: '',
-                    value: '',
-                }
-            }]
-        },
-        data: {
-            component_name: 'hot_zone',
-            image: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg',
-            items: [{
-                x: 89,
-                y: 86,
-                width: 100,
-                height: 100,
-                url: 'https://h5.toodudu.com/'
-            }]
-        },
-        id: 999,
-        is_show: 1,
-        name: '热区',
-    }, {
-        component_name: 'horizontal_carousel',
-        content: {
-            width: '710',
-            height: '200',
-            style: 2, // 1-平铺 2-过渡
-            interval: 3, // 默认3秒切换
-            data: [{
-                url: {
-                    name: '',
-                    value: '',
-                },
-                date_type: 1, // 0:自定义  1:长期
-                time: ['2025-10-10 00:00:00', '2025-10-10 23:59:59'],
-                image: '',
-                is_show: 1, // 是否显示
-            }]
-        },
-        data: {
-            component_name: 'horizontal_carousel',
-            width: '710',
-            height: '200',
-            style: 2,
-            interval: 3,
-            items: [{
-                image: 'https://cdn.toodudu.com/2024/12/25/S9T0mbYiJRkRFqKMZ7NeJnFDBHeeRkhLRx8tvgzC.jpg',
-                url: '',
-            },{
-                image: 'https://cdn.toodudu.com/2024/11/18/VY9GiETCQxSrZTTAOF9169dwvXadL7erBYn7TxZ0.jpg',
-                url: '',
-            },{
-                image: 'https://cdn.toodudu.com/2024/12/25/Q8DPTcVi9OJWtJLeLfQDfUvbanUR8IfjG2xlxhgU.jpg',
-                url: '',
-            },{
-                image: 'https://cdn.toodudu.com/2024/08/02/AjOkTg03f0JOBEnQuGgatRol1abaiAsYRWDWoe13.jpg',
-                url: '',
-            },{
-                image: 'https://cdn.toodudu.com/2024/10/17/GEEoTIAnkTSSDGAn5qNBN4sBgm2YXMkfjM6Zxkeb.jpg',
-                url: '',
-            },],
-        },
-        id: '',
-        is_show: 1,
-        name: '轮播图',
+// 获取首页装修数据
+const getDecorationHome = () => {
+    appDecorationHome({id: cns.$route.query.id}).then(res => {
+        if (cns.$successCode(res.code)) {
+            decoration.app_website_data = res.data.app_website_data
+            decoration.component_icon = res.data.component_icon
+            decoration.component_value = res.data.component_value
+            decoration.data = res.data.data
+            decoration.not_for_data = res.data.not_for_data
+        }
     })
+}
+
+const openPageSetting = () => {
+    pageSetting.value = true
+    decoration.temp_index = ''
+    console.log('openPageSetting')
+}
+
+
+onMounted(() => {
+    getDecorationHome()
     nextTick(() => {
         cns.$bus.on('chooseDragItem', (res) => {
+            pageSetting.value = false
             decoration.temp_index = res.temp_index
         })
         // 更新组件状态
@@ -246,9 +204,22 @@ onUnmounted(() => {
     cns.$bus.off('chooseDragItem')
     cns.$bus.off('updateComponentData')
     cns.$bus.off('openUploadDialog')
+    cns.$bus.off('openPageSetting')
 })
 
 </script>
+
+<!-- <script>
+import vClickOutside from '@/utils/clickOutside.ts'; // 导入自定义指令
+// 局部注册自定义指令
+export default {
+    directives: {
+        'click-outside': vClickOutside,
+    },
+};
+</script> -->
+
+
 <style lang="scss">
 .drag-item {
     cursor: move;

@@ -53,3 +53,6 @@ export function TempDataItemField() {
         url: '',
     }
 }
+
+// 添加数据最大长度
+export const MaxItemLength = 10

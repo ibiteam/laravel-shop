@@ -1,6 +1,6 @@
 <template>
     <div class="uploader s-flex ai-ct jc-ct" :style="{width: width +'px', height: height + 'px', backgroundColor}" v-loading="uploading">
-        <el-image v-if="src" :src="src" :fit="fit" :style="{width: width +'px', height: height + 'px'}">
+        <el-image v-if="src" :src="src" :fit="fit" :style="{width: width +'px', height: height + 'px', minWidth: '64px', minHeight: '64px'}">
         </el-image>
         <em class="iconfont icon-jiahao1" v-else></em>
         <div class="upload-modal s-flex ai-ct jc-ct">
