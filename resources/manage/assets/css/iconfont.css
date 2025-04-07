@@ -1,5 +1,7 @@
-@font-face {
-  font-family: "iconfont"; /* Project id 4872836 */
+/* Project id 4872836 */
+@import url('//at.alicdn.com/t/c/font_4872836_m2zpftnaz6.css');
+/* @font-face {
+  font-family: "iconfont"; 
   src: url('iconfont.woff2?t=1743313211244') format('woff2'),
        url('iconfont.woff?t=1743313211244') format('woff'),
        url('iconfont.ttf?t=1743313211244') format('truetype');
@@ -71,5 +73,5 @@
 
 .icon-yanjing_xianshi:before {
   content: "\eb46";
-}
+} */
 
