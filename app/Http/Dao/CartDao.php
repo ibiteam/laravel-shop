@@ -91,6 +91,7 @@ class CartDao
 
                     // 商品规格描述
                     $sku_desc = '';
+
                     if ($cart->goods_sku_id && $cart->goodsSku) {
                         GoodsSpecValue::whereIn('id', explode('|', $cart->goodsSku->sku_value))->with('spec')->get()->map(function ($item) use (&$sku_desc) {
                             $sku_desc .= $item->spec->name.':'.$item->value.';';
@@ -99,14 +100,15 @@ class CartDao
 
                     // 限购数量校验
                     $buy_number = $cart->buy_number;
+
                     if ($cart->goods->can_quota && $cart->goods->quota_number > 0) {
                         if ($buy_number > $cart->goods->quota_number) {
                             $buy_number = $cart->goods->quota_number;
                         }
                     }
 
-                    if($cart->is_check == Cart::IS_CHECK_YES){
-                        $total['check_count'] ++;
+                    if ($cart->is_check == Cart::IS_CHECK_YES) {
+                        $total['check_count']++;
                         $total['total_price'] += $goods_price * $buy_number;
                         $total['total_integral'] += $cart->goods->integral;
                     }

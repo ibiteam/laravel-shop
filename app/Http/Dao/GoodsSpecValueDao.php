@@ -4,6 +4,7 @@ namespace App\Http\Dao;
 
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
 class GoodsSpecValueDao
