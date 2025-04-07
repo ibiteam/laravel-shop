@@ -12,7 +12,7 @@
 
 | 字段           | 是否必填 | 字段类型    | 说明          |
 |:-------------|:-----|:--------|:------------|
-| goods_id     | Y    | integer | 商品ID        |
+| goods_no     | Y    | string  | 商品编号        |
 | goods_sku_id | Y    | integer | 商品规格ID，没有传0 |
 | buy_number   | Y    | integer | 购买数量        |
 

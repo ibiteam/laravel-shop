@@ -31,7 +31,7 @@ class CartController extends BaseController
 
             return $this->success($data);
         } catch (\Throwable $throwable) {
-            return $this->error('获取购物车商品列表异常~' . $throwable->getMessage());
+            return $this->error('获取购物车商品列表异常~'.$throwable->getMessage());
         }
     }
 
@@ -60,31 +60,31 @@ class CartController extends BaseController
 
         try {
             $validated = $request->validate([
-                'goods_id' => 'required|int',
+                'goods_no' => 'required|string',
                 'goods_sku_id' => 'required|int',
                 'buy_number' => 'required|int',
             ], [], [
-                'goods_id' => '商品ID',
+                'goods_no' => '商品编号',
                 'goods_sku_id' => '商品规格ID',
                 'buy_number' => '购买数量',
             ]);
 
-            $goods_id = $validated['goods_id'];
+            $goods_no = $validated['goods_no'];
             $goods_sku_id = $validated['goods_sku_id'];
             $buy_number = ($validated['buy_number'] <= 0) ? 1 : $validated['buy_number'];
 
-            $goods = Goods::query()->withCount('skus')->whereId($goods_id)->show()->first();
+            $goods = Goods::query()->withCount('skus')->whereNo($goods_no)->show()->first();
 
-            if (!$goods) {
+            if (! $goods) {
                 throw new BusinessException('该商品已不能购买');
             }
 
             if ($goods_sku_id) {
-                if (!$goods->skus_count) {
+                if (! $goods->skus_count) {
                     throw new BusinessException('商品规格发生变更');
                 }
 
-                if (!GoodsSku::whereId($goods_sku_id)->whereGoodsId($goods_id)->first()) {
+                if (! GoodsSku::whereId($goods_sku_id)->whereGoodsId($goods->id)->first()) {
                     throw new BusinessException('商品规格错误');
                 }
             } else {
@@ -93,7 +93,7 @@ class CartController extends BaseController
                 }
             }
 
-            $cart = Cart::query()->whereUserId($user->id)->whereGoodsId($goods_id)->whereGoodsSkuId($goods_sku_id)->first();
+            $cart = Cart::query()->whereUserId($user->id)->whereGoodsId($goods->id)->whereGoodsSkuId($goods_sku_id)->first();
 
             if ($cart) {
                 $cart->buy_number = $buy_number + $cart->buy_number;
@@ -101,12 +101,12 @@ class CartController extends BaseController
                 // 添加
                 $cart = new Cart;
                 $cart->user_id = $user->id;
-                $cart->goods_id = $goods_id;
+                $cart->goods_id = $goods->id;
                 $cart->goods_sku_id = $goods_sku_id;
                 $cart->buy_number = $buy_number;
             }
 
-            if (!$cart->save()) {
+            if (! $cart->save()) {
                 throw new BusinessException('添加购物车失败');
             }
 
@@ -138,7 +138,7 @@ class CartController extends BaseController
 
             $flag = Cart::whereUserId($user->id)->whereIn('id', $ids)->delete();
 
-            if (!$flag) {
+            if (! $flag) {
                 throw new BusinessException('删除失败');
             }
 
@@ -162,47 +162,47 @@ class CartController extends BaseController
         try {
             $validated = $request->validate([
                 'id' => 'required|int',
-                'goods_id' => 'required|int',
+                'goods_no' => 'required|string',
                 'goods_sku_id' => 'required|int',
                 'buy_number' => 'required|int',
             ], [], [
                 'id' => '购物车ID',
-                'goods_id' => '商品ID',
+                'goods_no' => '商品编号',
                 'goods_sku_id' => '商品规格ID',
                 'buy_number' => '购买数量',
             ]);
 
             $id = $validated['id'];
-            $goods_id = $validated['goods_id'];
+            $goods_no = $validated['goods_no'];
             $goods_sku_id = $validated['goods_sku_id'];
             $buy_number = ($validated['buy_number'] <= 0) ? 1 : $validated['buy_number'];
 
-            $cart = Cart::query()->whereId($id)->whereUserId($user->id)->whereGoodsId($goods_id)
-                ->when($goods_sku_id > 0, fn(Builder $query) => $query->whereGoodsSkuId($goods_sku_id))
-                ->first();
+            $goods = Goods::query()->whereNo($goods_no)->show()->first();
 
-            if (!$cart) {
-                throw new BusinessException('购物车商品不存在');
-            }
-
-            $goods = Goods::query()->whereId($goods_id)->show()->first();
-
-            if (!$goods) {
+            if (! $goods) {
                 throw new BusinessException('商品无效');
             }
 
+            $cart = Cart::query()->whereId($id)->whereUserId($user->id)->whereGoodsId($goods->id)
+                ->when($goods_sku_id > 0, fn (Builder $query) => $query->whereGoodsSkuId($goods_sku_id))
+                ->first();
+
+            if (! $cart) {
+                throw new BusinessException('购物车商品不存在');
+            }
+
             if ($goods->total <= 0 || $goods->total < $buy_number) {
-                throw new BusinessException('【' . $goods->name . '】库存不足');
+                throw new BusinessException('【'.$goods->name.'】库存不足');
             }
 
             if ($goods->can_quota == Goods::QUOTA && $goods->quota_number < $buy_number) {
-                throw new BusinessException('【' . $goods->name . '】超出限购数量：' . $goods->quota_number);
+                throw new BusinessException('【'.$goods->name.'】超出限购数量：'.$goods->quota_number);
             }
 
             $cart->buy_number = $buy_number;
             $cart->is_check = Cart::IS_CHECK_YES;
 
-            if (!$cart->save()) {
+            if (! $cart->save()) {
                 throw new BusinessException('变更商品数量失败');
             }
 
@@ -225,39 +225,45 @@ class CartController extends BaseController
 
         try {
             $validated = $request->validate([
-                'goods_id' => 'required|int',
+                'goods_no' => 'required|string',
                 'goods_sku_id' => 'required|int',
                 'is_check' => 'required|int|in:0,1',
             ], [], [
-                'goods_id' => '商品ID',
+                'goods_no' => '商品编号',
                 'goods_sku_id' => '商品规格ID',
                 'is_check' => '是否选中结算',
             ]);
 
-            $goods_id = $validated['goods_id'];
+            $goods_no = $validated['goods_no'];
             $goods_sku_id = $validated['goods_sku_id'];
             $is_check = $validated['is_check'];
 
-            if ($goods_id == 0) {
-                // goods_id=0 代表：全选/全不选
+            if (! $goods_no) {
+                // goods_no不存在 代表：全选/全不选
                 $flag = Cart::query()->whereUserId($user->id)->update(['is_check' => $is_check]);
 
-                if (!$flag) {
+                if (! $flag) {
                     throw new BusinessException('变更选中失败');
                 }
             } else {
-                // goods_id>0 代表：单个商品
-                $cart = Cart::query()->whereUserId($user->id)->whereGoodsId($goods_id)
-                    ->when($goods_sku_id > 0, fn(Builder $query) => $query->whereGoodsSkuId($goods_sku_id))
+                // goods_no存在 代表：单个商品
+                $goods = Goods::query()->whereNo($goods_no)->show()->first();
+
+                if (! $goods) {
+                    throw new BusinessException('商品无效');
+                }
+
+                $cart = Cart::query()->whereUserId($user->id)->whereGoodsId($goods->id)
+                    ->when($goods_sku_id > 0, fn (Builder $query) => $query->whereGoodsSkuId($goods_sku_id))
                     ->first();
 
-                if (!$cart) {
+                if (! $cart) {
                     throw new BusinessException('购物车商品不存在');
                 }
 
                 $cart->is_check = $is_check;
 
-                if (!$cart->save()) {
+                if (! $cart->save()) {
                     throw new BusinessException('变更是否选中失败');
                 }
             }
@@ -283,11 +289,11 @@ class CartController extends BaseController
             $data = $cart_dao->cartGoodsList($user->id);
             $invalid_carts = $data['invalid_carts'];
 
-            if (!count($invalid_carts)) {
+            if (! count($invalid_carts)) {
                 throw new BusinessException('暂无失效商品');
             }
 
-            if (!Cart::whereUserId($user->id)->whereIn('id', collect($invalid_carts)->pluck('id'))->delete()) {
+            if (! Cart::whereUserId($user->id)->whereIn('id', collect($invalid_carts)->pluck('id'))->delete()) {
                 throw new BusinessException('清空失败');
             }
 
@@ -369,7 +375,7 @@ class CartController extends BaseController
                 ->orderByDesc('updated_at')->orderByDesc('id')
                 ->get();
 
-            if (!$carts->count()) {
+            if (! $carts->count()) {
                 throw new BusinessException('没有待结算有效商品');
             }
 
@@ -377,11 +383,11 @@ class CartController extends BaseController
                 $goods = $cart->goods;
 
                 if ($goods->total <= 0 || $goods->total < $cart->buy_number) {
-                    throw new BusinessException('【' . $goods->name . '】库存不足');
+                    throw new BusinessException('【'.$goods->name.'】库存不足');
                 }
 
                 if ($goods->can_quota == Goods::QUOTA && $goods->quota_number < $cart->buy_number) {
-                    throw new BusinessException('【' . $goods->name . '】超出限购数量：' . $goods->quota_number);
+                    throw new BusinessException('【'.$goods->name.'】超出限购数量：'.$goods->quota_number);
                 }
             }
 
@@ -394,5 +400,4 @@ class CartController extends BaseController
             return $this->error('去结算异常~');
         }
     }
-
 }

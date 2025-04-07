@@ -34,7 +34,6 @@ abstract class TestCase extends BaseTestCase
 
     public function getAccountToken()
     {
-        return '30|ejewCVlHuykpDOgzW3O3uao0UTEd0zUeTF0tZxAa7598e4a2';
         $token = '';
         $access_token_file = $this->access_token_file();
         if (! file_exists($access_token_file)) {
@@ -42,7 +41,7 @@ abstract class TestCase extends BaseTestCase
                 'account' => $this->account,
                 'password' => $this->password,
             ];
-            $res = $this->json('post', url('api/v1/auth/login-by-password'), $data, [
+            $res = $this->json('post', url('api/v1/auth/login/password'), $data, [
                 'X-Requested-With' => 'XMLHttpRequest',
             ])->json();
             if ($res && isset($res['code']) && (int) $res['code'] === JsonResponse::HTTP_OK) {
