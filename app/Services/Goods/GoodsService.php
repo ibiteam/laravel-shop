@@ -339,10 +339,10 @@ class GoodsService
 
             return $res;
         }
-        $res['total'] = $goods->number;
+        $res['total'] = $goods->total;
 
-        if ($goods->number < $number) {
-            $tmp_message = $goods->number.$goods->unit;
+        if ($goods->total < $number) {
+            $tmp_message = $goods->total.$goods->unit;
 
             throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
         }
