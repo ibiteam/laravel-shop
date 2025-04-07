@@ -377,7 +377,7 @@
                             </div>
                         </el-form-item>
                         <el-form-item label="库存" prop="total">
-                            <el-input-number v-model="updateForm.total" :disabled="!!updateForm.sku_data.length" :min="1" style="width: 160px;"></el-input-number>
+                            <el-input-number v-model="updateForm.total" :disabled="!!updateForm.sku_data.length" :min="0" style="width: 160px;"></el-input-number>
                             <div class="tips" v-if="goodsSkuTemplate.values.length" style="width: 100%;flex: none;">
                                 <span>多规格商品库存为所有SKU的库存总和</span>
                             </div>
