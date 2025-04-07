@@ -17,7 +17,6 @@ class UserAddressDao
         $query = UserAddress::query()
             ->with(['regionProvince:id,name', 'regionCity:id,name', 'regionDistrict:id,name'])
             ->whereUserId($user_id)
-            ->select(['id', 'user_id', 'recipient_name', 'recipient_phone', 'province', 'city', 'district', 'address_detail', 'is_default'])
             ->orderByDesc('is_default')
             ->orderByDesc('id');
 
@@ -47,7 +46,6 @@ class UserAddressDao
     {
         $item = UserAddress::query()
             ->with(['regionProvince:id,name', 'regionCity:id,name', 'regionDistrict:id,name'])
-            ->select(['id', 'user_id', 'recipient_name', 'recipient_phone', 'province', 'city', 'district', 'address_detail', 'is_default'])
             ->whereUserId($user_id)
             ->find($id);
 
