@@ -140,6 +140,16 @@ class Goods extends Model
         return $query->where('status', self::STATUS_ON_SALE);
     }
 
+    public function isDoneDecrementStock(): bool
+    {
+        return $this->type === self::TYPE_DONE_ORDER;
+    }
+
+    public function decrementStock(int $buy_number): void
+    {
+        $this->decrement('total', $buy_number);
+    }
+
     protected function casts(): array
     {
         return [

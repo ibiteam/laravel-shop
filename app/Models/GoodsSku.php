@@ -50,4 +50,9 @@ class GoodsSku extends Model
     {
         return implode('|', $sku_value);
     }
+
+    public function decrementStock(int $buy_number): void
+    {
+        $this->decrement('number', $buy_number);
+    }
 }

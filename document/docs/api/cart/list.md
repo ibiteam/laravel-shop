@@ -30,7 +30,7 @@
           "total": 100,  // 库存
           "can_quota": 1, // 是否限购 0-不限购 1-限购
           "quota_number": 10, // 限购数量
-          "skus": [ ]  // 商品sku信息
+          "sku_desc": "款式:雅丹黑;内存:12+256;"   // 商品sku信息, 没有“”
         }
       },
       {
@@ -44,30 +44,7 @@
           "image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
           "price": "10.06",
           "unit": "个",
-          "skus": [
-            {
-              "id": 1,
-              "goods_id": 1,
-              "sku_value": "1|2|3",
-              "price": "10.06",
-              "number": 288,
-              "is_show": 1,
-              "sort": 1,
-              "created_at": "2025-03-28 17:30:36",
-              "updated_at": "2025-03-28 17:30:36"
-            },
-            {
-              "id": 2,
-              "goods_id": 1,
-              "sku_value": "1|2|4",
-              "price": "12.01",
-              "number": 299,
-              "is_show": 1,
-              "sort": 1,
-              "created_at": "2025-03-28 17:30:36",
-              "updated_at": "2025-03-28 17:30:36"
-            }
-          ]
+          "sku_desc": ""
         }
       }
     ],
@@ -88,7 +65,8 @@
     "total": {// 选中结算数据
       "check_count": 1,  // 结算数量
       "total_price_format": "￥299.99",  // 有格式 ￥0.00
-      "total_price": "299.99" // 无格式 0.00
+      "total_price": "299.99", // 总金额 无格式 0.00
+      "total_integral":0  // 总积分
     }
   }
 }

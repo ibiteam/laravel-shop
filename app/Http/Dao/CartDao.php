@@ -5,7 +5,10 @@ namespace App\Http\Dao;
 use App\Exceptions\BusinessException;
 use App\Models\Cart;
 use App\Models\Goods;
+use App\Models\GoodsSpecValue;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 class CartDao
 {
@@ -29,7 +32,8 @@ class CartDao
             $total = [
                 'check_count' => 0,
                 'total_price_format' => 0, // 有格式
-                'total_price' => 0, // 无格式
+                'total_price' => 0, // 总价格 无格式
+                'total_integral' => 0, // 总积分
             ];
 
             foreach ($carts as $cart) {
@@ -85,6 +89,14 @@ class CartDao
                         }
                     }
 
+                    // 商品规格描述
+                    $sku_desc = '';
+                    if ($cart->goods_sku_id && $cart->goodsSku) {
+                        GoodsSpecValue::whereIn('id', explode('|', $cart->goodsSku->sku_value))->with('spec')->get()->map(function ($item) use (&$sku_desc) {
+                            $sku_desc .= $item->spec->name.':'.$item->value.';';
+                        });
+                    }
+
                     // 限购数量校验
                     $buy_number = $cart->buy_number;
                     if ($cart->goods->can_quota && $cart->goods->quota_number > 0) {
@@ -96,6 +108,7 @@ class CartDao
                     if($cart->is_check == Cart::IS_CHECK_YES){
                         $total['check_count'] ++;
                         $total['total_price'] += $goods_price * $buy_number;
+                        $total['total_integral'] += $cart->goods->integral;
                     }
 
                     $validCarts[] = [
@@ -113,7 +126,7 @@ class CartDao
                             'integral' => $cart->goods->integral,
                             'can_quota' => $cart->goods->can_quota,
                             'quota_number' => $cart->goods->quota_number,
-                            'skus' => $cart->goods->skus ?? [],
+                            'sku_desc' => $sku_desc,
                         ],
                     ];
                 }
@@ -141,5 +154,15 @@ class CartDao
             ->whereHas('goods', function ($query) {
                 $query->show();
             })->count();
+    }
+
+    /**
+     * 获取当前用户的下单商品
+     *
+     * @return EloquentCollection<int,Cart>|Collection<int,Cart>
+     */
+    public function getDoneCartGoods(int $user_id): EloquentCollection|Collection
+    {
+        return Cart::query()->with(['goods', 'goodsSku'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
     }
 }
