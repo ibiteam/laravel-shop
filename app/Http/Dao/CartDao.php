@@ -7,6 +7,8 @@ use App\Models\Cart;
 use App\Models\Goods;
 use App\Models\GoodsSpecValue;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 class CartDao
 {
@@ -152,5 +154,15 @@ class CartDao
             ->whereHas('goods', function ($query) {
                 $query->show();
             })->count();
+    }
+
+    /**
+     * 获取当前用户的下单商品
+     *
+     * @return EloquentCollection<int,Cart>|Collection<int,Cart>
+     */
+    public function getDoneCartGoods(int $user_id): EloquentCollection|Collection
+    {
+        return Cart::query()->with(['goods', 'goodsSku'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
     }
 }
