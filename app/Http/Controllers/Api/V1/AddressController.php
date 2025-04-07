@@ -18,9 +18,9 @@ class AddressController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index(Request $request)
+    public function index(Request $request, UserAddressDao $userAddressDao)
     {
-        $data = app(UserAddressDao::class)
+        $data = $userAddressDao
             ->getAddrListsForUser($request->user()?->id ?: 0)
             ->toArray();
 
@@ -32,9 +32,9 @@ class AddressController extends BaseController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function search(Request $request)
+    public function search(Request $request, UserAddressDao $userAddressDao)
     {
-        $data = app(UserAddressDao::class)
+        $data = $userAddressDao
             ->getAddrListsForUser($request->user()?->id ?: 0, $request->get('keywords'))
             ->toArray();
 
@@ -42,13 +42,13 @@ class AddressController extends BaseController
     }
 
     // 获取地址详情
-    public function show(Request $request)
+    public function show(Request $request, UserAddressDao $userAddressDao)
     {
         $user = $request->user();
 
         try {
             $id = $request->get('id');
-            $data = app(UserAddressDao::class)->show($user->id, $id);
+            $data = $userAddressDao->show($user->id, $id);
         } catch (BusinessException $exception) {
             return $this->error($exception->getMessage());
         }
@@ -134,8 +134,7 @@ class AddressController extends BaseController
         $address->district = $validated['district'];
         $address_detail = $validated['address_detail'];
         $is_default = $validated['is_default'];
-        $detail_address = app(UserAddressDao::class)
-            ->replaceAddressByRegionId($address->province, $address->city, $address->district, $address_detail);
+        $detail_address = $userAddressDao->replaceAddressByRegionId($address->province, $address->city, $address->district, $address_detail);
 
         if (! $detail_address) {
             return $this->error('详细地址中请勿重复填写省市区信息，请修改！');
@@ -156,9 +155,9 @@ class AddressController extends BaseController
     }
 
     // 获取地区数据
-    public function region()
+    public function region(RegionDao $regionDao)
     {
-        return $this->success(app(RegionDao::class)->getRegionTree());
+        return $this->success($regionDao->getRegionTree());
     }
 
     /**

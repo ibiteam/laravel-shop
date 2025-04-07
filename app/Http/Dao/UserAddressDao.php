@@ -88,7 +88,7 @@ class UserAddressDao
         UserAddress::whereUserId($user_id)->whereIsDefault(UserAddress::DEFAULT)->update(['is_default' => UserAddress::NOT_DEFAULT]);
     }
 
-    public function replaceAddressByRegionId($provinceId, $cityId, $districtId, $address): string
+    public function replaceAddressByRegionId(int $provinceId, int $cityId, int $districtId, string $address): string
     {
         [$province,$city,$district] = app(RegionDao::class)->getRegionName([$provinceId, $cityId, $districtId])->pluck('region_name');
 
