@@ -4,7 +4,7 @@
             <el-aside :class="{'left-hidden':!leftShow}">
                 <div class='layout-left-header s-flex ai-ct jc-bt'>
                     <div class='seller-picture s-flex ai-ct jc-ct'>
-                        <img :src="commonStore.shopConfig.log?commonStore.shopConfig.log:'https://fastly.jsdelivr.net/npm/@vant/assets/logo.png'" alt=''>
+                        <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
                     </div>
                     <div class='s-flex jc-bt ai-ct' style="font-size: 20px;cursor: pointer;" @click="leftShow = false">
                         <Fold style="width: 1.5em; height: 1.5em;" />
@@ -93,10 +93,7 @@
                             <div class='user-info'>
                                 <el-dropdown>
                                     <div class='el-dropdown-link s-flex ai-ct'>
-                                        <div class='user-picture'>
-                                            <img src='https://fastly.jsdelivr.net/npm/@vant/assets/logo.png' alt=''>
-                                        </div>
-                                        <span class='co-fff'>张三</span>
+                                        <span class='co-fff'>{{ commonStore.adminUser.user_name }}</span>
                                         <el-icon class='el-icon--right co-fff'>
                                             <arrow-down />
                                         </el-icon>
@@ -170,6 +167,7 @@ import {getConfigAxios} from "../api/home.js";
 
 import { useCommonStore } from '@/store'
 import * as echarts from "echarts";
+import {accountLogout} from "../api/user.js";
 const commonStore = useCommonStore()
 
 const route = useRoute()
@@ -217,12 +215,13 @@ watch(() => visible.value,(value) => {
     }
 })
 
-const getMenu = () => {
+const getConfig = () => {
     getConfigAxios().then(res => {
         if (cns.$successCode(res.code)) {
             menus.value = res.data.menus
             formatMenu()
             commonStore.updateShopConfig(res.data.shop_config)
+            commonStore.updateAdminUser(res.data.admin_user)
             const root = document.documentElement;
             root.style.setProperty('--manage-color', res.data.shop_config.manage_color);
             root.style.setProperty('--manage-color-over', res.data.shop_config.mouse_move_color);
@@ -401,13 +400,19 @@ const logOut = () =>{
         type: 'warning',
         center: true
     }).then(() => {
-        cns.$cookies.remove('manage-token')
-        router.push({name:'login'})
+        accountLogout().then(res => {
+            if(cns.$successCode(res.code)){
+                cns.$cookies.remove('manage-token')
+                router.push({name:'login'})
+            } else {
+                cns.$message.error(res.message);
+            }
+        })
     });
 }
 
 onMounted(() => {
-    getMenu()
+    getConfig()
     addViewTags()
     routerActived.value = route.name
 })
@@ -569,13 +574,6 @@ onUnmounted(() => {
                             cursor: pointer;
                             .el-dropdown-link:focus-visible{
                                 outline: none;
-                            }
-                            .user-picture{
-                                width: 32px;
-                                height: 32px;
-                                img {
-
-                                }
                             }
                             span{
                                 font-size: 16px;

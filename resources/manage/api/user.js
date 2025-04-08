@@ -8,6 +8,10 @@ export function getLoginInfo() {
     return $http.doGet('manage/login')
 }
 
+export function accountLogout() {
+    return $http.doGet('manage/logout')
+}
+
 export function getUserIndex(data) {
     return $http.doGet('manage/user/index', data)
 }
