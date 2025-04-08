@@ -95,6 +95,9 @@ class OrderService
      */
     private RefererEnum $source;
 
+    /**
+     * @throws BusinessException
+     */
     public function getInitData($user_address_id): array
     {
         if (
@@ -125,7 +128,11 @@ class OrderService
         ];
     }
 
-    public function store(string $remark)
+    /**
+     * @throws BusinessException
+     * @throws \Throwable
+     */
+    public function store(string $remark): array
     {
         if (
             ! $this->is_set_user
@@ -205,7 +212,8 @@ class OrderService
             DB::commit();
 
             return [
-                'order_sn' => $order->no,
+                'no' => $order->no,
+                'can_pay' => $order->order_amount > 0,
             ];
         } catch (BusinessException $business_exception) {
             DB::rollBack();
