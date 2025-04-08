@@ -181,11 +181,11 @@ class AdvertComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
+        $time = date('Y-m-d H:i:s');
+        // 不展示的数据和时间过期的 都 不展示
         if ($content['is_show'] == Constant::ZERO) {
             $content = [];
-        }
-        $time = date('Y-m-d H:i:s');
-        if ($content['date_type'] != $this->long_time_yes && $content['time'][0] > $time && $content['time'][1] < $time ) {
+        } else if ($content['date_type'] != $this->long_time_yes && $content['time'][0] > $time && $content['time'][1] < $time ) {
             $content = [];
         }
 
@@ -203,7 +203,6 @@ class AdvertComponent extends PageComponent
      */
     public function display($data): array
     {
-
         if (empty($data)) {
             return $this->display($this->parameter());
         }

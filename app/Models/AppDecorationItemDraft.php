@@ -40,9 +40,12 @@ class AppDecorationItemDraft extends Model
 
     protected $guarded = [];
 
-    protected $casts = [
-        'content' => 'array',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'content' => 'json'
+        ];
+    }
 
     public function app_decoration()
     {

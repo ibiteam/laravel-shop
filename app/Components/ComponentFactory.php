@@ -12,7 +12,6 @@ use App\Components\AppComponents\HotSaleGoodComponent;
 use App\Components\AppComponents\LabelColumnComponent;
 use App\Components\AppComponents\QuickLinkComponent;
 use App\Components\AppComponents\RecommendComponent;
-use App\Components\AppComponents\RecommendSellerComponent;
 use App\Components\AppComponents\ThemeAdvertisingComponent;
 use App\Exceptions\BusinessException;
 use App\Models\AppDecorationItem;

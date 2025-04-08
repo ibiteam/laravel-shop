@@ -19,7 +19,7 @@ class AppDecorationService
             return collect();
         }
 
-        return $app_decoration->itemDraft->whereIn('id', $latest_log->app_decoration_item_ids);
+        return $app_decoration->itemDraft()->whereIn('id', $latest_log->app_decoration_item_ids)->get();
     }
 
     // 发布装修
