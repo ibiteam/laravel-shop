@@ -158,7 +158,7 @@ class OrderService
                 'no' => $this->generateOrderSn(),
                 'user_id' => $current_user->id,
                 'type' => $this->getOrderTypeEnum()->value,
-                'order_status' => 0,
+                'order_status' => 1,
                 'pay_status' => 0,
                 'ship_status' => 0,
                 'province_id' => $user_address->province,
