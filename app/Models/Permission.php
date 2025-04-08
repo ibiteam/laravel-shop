@@ -72,6 +72,18 @@ class Permission extends SpatiePermission
     public const MANAGE_ROUTER_INDEX = 'manage.router.index'; // 访问地址
     public const MANAGE_ROUTER_UPDATE = 'manage.router.update'; // 访问地址新增|编辑
     public const MANAGE_ROUTER_DELETE = 'manage.router.delete'; // 访问地址删除
+
+    public const PERMISSION_MANAGE = 'permission.manage'; // 权限管理
+    public const MANAGE_ADMIN_USER_INDEX = 'manage.admin_user.index'; // 管理员列表
+    public const MANAGE_ADMIN_USER_UPDATE = 'manage.admin_user.update'; // 管理员新增|编辑
+    public const MANAGE_PERMISSION_INDEX = 'manage.permission.index'; // 权限菜单
+    public const MANAGE_PERMISSION_UPDATE = 'manage.permission.update'; // 权限菜单编辑
+    public const MANAGE_ROLE_INDEX = 'manage.role.index'; // 角色管理
+    public const MANAGE_ROLE_UPDATE = 'manage.role.update'; // 角色新增|编辑
+    public const MANAGE_ROLE_DELETE = 'manage.role.delete'; // 角色删除
+    public const MANAGE_ADMIN_OPERATION_LOG_INDEX = 'manage.admin_operation_log.index'; // 管理员日志
+
+
     public const BASIC_PAYMENT_MANAGE = 'basic.payment.manage'; // 支付管理
     public const MANAGE_PAYMENT_METHOD_INDEX = 'manage.payment_method.index'; // 支付方式列表
     public const MANAGE_PAYMENT_METHOD_UPDATE = 'manage.payment_method.update'; // 支付方式编辑

@@ -30,4 +30,9 @@ class AppDecorationLog extends Model
     use DatetimeTrait;
 
     protected $guarded = [];
+
+    public function getAppDecorationItemIdsAttribute($input)
+    {
+        return json_decode($input, true);
+    }
 }

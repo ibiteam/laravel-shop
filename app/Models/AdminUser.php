@@ -25,16 +25,18 @@ use Spatie\Permission\Traits\HasRoles;
  * @property int         $status     状态：1启用 0禁用
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read AdminUserLoginLog|null $lastLoginLog
- * @property-read Collection<int, AdminUserLoginLog> $loginLog
+ * @property-read \App\Models\AdminUserLoginLog|null $lastLoginLog
+ * @property-read Collection<int, \App\Models\AdminUserLoginLog> $loginLog
  * @property-read int|null $login_log_count
- * @property-read Collection<int, AdminOperationLog> $operationLog
+ * @property-read Collection<int, \App\Models\ModelHasRole> $modelHasRole
+ * @property-read int|null $model_has_role_count
+ * @property-read Collection<int, \App\Models\AdminOperationLog> $operationLog
  * @property-read int|null $operation_log_count
- * @property-read Collection<int, OrderLog> $orderLog
+ * @property-read Collection<int, \App\Models\OrderLog> $orderLog
  * @property-read int|null $order_log_count
- * @property-read Collection<int, Permission> $permissions
+ * @property-read Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
- * @property-read Collection<int, Role> $roles
+ * @property-read Collection<int, \App\Models\Role> $roles
  * @property-read int|null $roles_count
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
@@ -68,6 +70,11 @@ class AdminUser extends Authenticatable
     protected $guarded = [];
 
     protected $hidden = ['password'];
+
+    public function modelHasRole(): HasMany
+    {
+        return $this->hasMany(ModelHasRole::class, 'model_id', 'id');
+    }
 
     public function orderLog(): MorphMany
     {

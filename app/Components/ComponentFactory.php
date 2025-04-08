@@ -34,12 +34,11 @@ class ComponentFactory
         $components = [
 //            AppWebsiteDecorationItem::COMPONENT_NAME_LABEL => LabelColumnComponent::class, // 标签栏
             AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL => HorizontalCarouselComponent::class, // 轮播图
+            AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT => AdvertComponent::class, // 弹屏广告
+            AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT => AdvertComponent::class, // 悬浮广告
 //            AppWebsiteDecorationItem::COMPONENT_NAME_CHANNEL_SQUARE => ChannelSquareComponent::class, // 频道广场 -
 //            AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV => HomeNavColumnComponent::class, // 导航栏组件
 //            AppWebsiteDecorationItem::COMPONENT_NAME_QUICK_LINK => QuickLinkComponent::class, // 金刚区
-//            AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN => AdvertComponent::class, // 大屏广告
-//            AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING => AdvertComponent::class, // 侧边广告位
-//            AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT => AdvertComponent::class, // 二楼广告位
 //            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE => AdvertisingComponent::class, // 广告位1
 //            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO => AdvertisingComponent::class, // 广告位2
 //            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE => AdvertisingThreeComponent::class, // 广告位3

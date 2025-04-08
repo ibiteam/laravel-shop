@@ -4,7 +4,7 @@ namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
 use App\Exceptions\BusinessException;
-use App\Models\AppWebsiteDecorationItem;
+use App\Models\AppDecorationItem;
 use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -47,19 +47,13 @@ class AdvertComponent extends PageComponent
             'content' => [
                 'image' => '', // 图片地址
                 'url' => [
-                    'alias' => 'https', // 链接类型
+                    'name' => '', // 链接名称
                     'value' => '', // 链接
-                    'default_selection_data' => [], //选中的数据
                 ],
-                'is_show' => Constant::ZERO, // 是否显示 1展示 0隐藏
-                'date' => [
-                    'type' => $this->long_time_yes, // 时间类型： 1 长期  0：时间范围
-                    'value' => [
-                        'start_time' => '',
-                        'end_time' => '',
-                    ],
-                ],
-
+                'describe' => '', // 描述
+                'is_show' => Constant::ONE, // 是否显示 1展示 0隐藏
+                'date_type' => $this->long_time_yes, // 时间类型： 1 长期  0：时间范围
+                'time' => [],
             ],
         ];
     }
@@ -67,27 +61,17 @@ class AdvertComponent extends PageComponent
 
     private function getPublicData()
     {
-        $component_name = $this->getComponentName() ?: AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN;
+        $component_name = $this->getComponentName() ?: AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT;
         switch ($component_name) {
-            case AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN:
+            case AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT:
                 return [
                     'component_name' => $component_name,
-                    'name' => '大屏广告位'
+                    'name' => '弹屏广告'
                 ];
-            case AppWebsiteDecorationItem::COMPONENT_NAME_RED_ENVELOPE:
+            case AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT:
                 return [
                     'component_name' => $component_name,
-                    'name' => '签到送红包'
-                ];
-            case AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING:
-                return [
-                    'component_name' => $component_name,
-                    'name' => '侧边广告位'
-                ];
-            case AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT:
-                return [
-                    'component_name' => $component_name,
-                    'name' => '二楼广告位'
+                    'name' => '悬浮广告'
                 ];
         }
     }
@@ -101,34 +85,51 @@ class AdvertComponent extends PageComponent
     public function validate($data): array
     {
         $publicData = $this->getPublicData();
-        $start_time = 'sometimes';
-        $end_time = 'sometimes';
-        if (isset($data['content']['date']['type']) && $data['content']['date']['type'] == Constant::ZERO) {
-            $start_time = 'required_without:end_time';
-            $end_time = 'required_without:start_time';
-        }
-
         if (isset($data['content']['is_show']) && $data['content']['is_show'] == Constant::ONE) {
             $required = 'required';
         } else {
             $required = 'nullable';
         }
         $is_show_validate_string = Constant::ONE . ',' . Constant::ZERO;
-        $component_name_string = AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN . ',' . AppWebsiteDecorationItem::COMPONENT_NAME_RED_ENVELOPE . ',' . AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING . ',' . AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT;
+        $component_name_string = AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT . ',' . AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT;
         $validator = Validator::make($data, [
-            'id' => 'nullable|integer|exists:\App\Models\AppWebsiteDecorationItem,id',
+            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItemDraft,id',
             'name' => 'required|max:100',
             'component_name' => 'required|in:' . $component_name_string,
             'is_show' => 'required|integer|in:' . $is_show_validate_string,
             'content' => 'required|array',
             'content.image' => $required,
-            'content.url.alias' => 'present|nullable',
+            'content.describe' => 'nullable',
+            'content.url.name' => 'present|nullable',
             'content.url.value' => 'present|nullable',
-            'content.date' => 'array',
-            'content.date.type' => 'required|integer|in:' . $is_show_validate_string,
-            'content.is_show' => 'required|integer|in:' . $is_show_validate_string,
-            'content.date.value.start_time' => $start_time,
-            'content.date.value.end_time' => $end_time,
+            'content.is_show' => 'required|in:'.$is_show_validate_string,
+            'content.date_type' => 'present|in:'.$is_show_validate_string,
+            'content.time' => [
+                'array', // 确保 time 是数组
+                'size:2', // 确保数组长度为 2
+                function ($attribute, $value, $fail) {
+                    // 检查两个时间是否为有效日期时间格式
+                    if (! is_array($value) || count($value) !== 2) {
+                        return $fail('时间字段必须是一个包含两个时间的数组');
+                    }
+
+                    $start_time = $value[0] ?? null;
+                    $end_time = $value[1] ?? null;
+
+                    if (! $start_time || ! $end_time) {
+                        return $fail('时间字段不能为空');
+                    }
+
+                    if (! strtotime($start_time) || ! strtotime($end_time)) {
+                        return $fail('时间字段必须是有效的日期时间格式');
+                    }
+
+                    // 检查开始时间是否早于或等于结束时间
+                    if (strtotime($start_time) > strtotime($end_time)) {
+                        return $fail('开始时间不能晚于结束时间');
+                    }
+                },
+            ],
         ], $this->messages());
 
         if ($validator->fails()) {
@@ -136,21 +137,6 @@ class AdvertComponent extends PageComponent
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
-
-
-        // 显示的时候校验
-        if ($data['content']['is_show'] == Constant::ONE) {
-            //校验url链接的正确性
-            $mobile_router_service = new MobileRouterService();
-            try {
-                $mobile_router_service->viodData($data['content']['url']['alias'] ?? '', $data['content']['url']['value'] ?? '');
-            } catch (\Exception $exception) {
-                throw new BusinessException($publicData['name'] . '：' . '菜单数据，' . $exception->getMessage());
-            }
-        }
-
-
-
         $data['name'] = $publicData['name'];
         $data['component_name'] = $publicData['component_name'];
         $data['is_fixed_assembly'] = $this->fixed_assembly_yes;
@@ -176,11 +162,13 @@ class AdvertComponent extends PageComponent
             'content.required' => '请设置板块对应数据',
             'content.array' => '板块数据格式不正确',
             'content.image.required' => '请上传图片',
-            'content.url.alias.present' => 'url链接别名参数未设置',
+            'content.url.name.present' => 'url链接别名参数未设置',
             'content.url.value.present' => '请设置url链接别名值参数',
-            'content.date.array' => '板块数据格式不正确',
-            'content.date.value.start_time.required_without' => '请选择显示时间',
-            'content.date.value.end_time.required_without' => '请选择显示时间',
+            'content.date_type.present' => '时间类型参数未设置',
+            'content.date_type.in' => '时间类型板块参数格式不正确',
+            'content.time.array' => '时间字段必须是一个数组',
+            'content.time.size' => '时间字段必须包含两个时间值',
+            'content.time.custom' => '时间字段格式不正确或时间范围无效',
         ];
     }
 
@@ -193,38 +181,18 @@ class AdvertComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $source = $data['source'] ?? null;
-        $mobileRouterService = app(MobileRouterService::class);
-        $urls = '';
-        if (($content['url']['alias'] ?? '')) {
-            $urls = $mobileRouterService->handleUrl($content['url']['alias'], $content['url']['value'] ?? '', $source);
+        if ($content['is_show'] == Constant::ZERO) {
+            $content = [];
+        }
+        $time = date('Y-m-d H:i:s');
+        if ($content['date_type'] != $this->long_time_yes && $content['time'][0] > $time && $content['time'][1] < $time ) {
+            $content = [];
         }
 
-
-        // 数据重组
-        $new_data = [];
-        if ($content['is_show'] == Constant::ONE) {
-            $now_time = date('Y-m-d H:i:s');
-            if (isset($content['date']['type'])) {
-                if (
-                    ($content['date']['type'] == Constant::ONE)
-                    || (
-                        ($content['date']['type'] == Constant::ZERO)
-                        && ($now_time >= $content['date']['value']['start_time'])
-                        && ($now_time <= $content['date']['value']['end_time'])
-                    )
-                ) {
-                    $new_data['sort'] = $data['sort'] ?? 1;
-                    $new_data['component_name'] = $data['component_name'] ?? '';
-                    $new_data['icon'] = $content['image'] ?? '';
-                    $new_data['url'] = $urls;
-                    $new_data['url_alias'] = $content['url']['alias'] ?? '';
-
-                    return $new_data;
-                }
-            }
-        }
-        return $new_data;
+        return [
+            'component_name' => $data['component_name'],
+            'items' => $content,
+        ];
     }
 
 
@@ -235,13 +203,11 @@ class AdvertComponent extends PageComponent
      */
     public function display($data): array
     {
+
         if (empty($data)) {
             return $this->display($this->parameter());
         }
         $content = $data['content'] ?? [];
-        $mobile_router_service = new MobileRouterService();
-        $content['url']['default_selection_data'] = $mobile_router_service->getOption($content['url']['alias'] ?? '', $content['url']['value'] ?? '', true);
-
 
         return [
             'id' => $data['id'] ?? 0,// 组件自增id
@@ -254,6 +220,4 @@ class AdvertComponent extends PageComponent
             'data' => $this->getContent($data),
         ];
     }
-
-
 }

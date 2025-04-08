@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentMethodEnum;
 use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +14,7 @@ class PaymentMethodTableSeeder extends Seeder
     public function run(): void
     {
         $this->addPaymentMethod(
-            PaymentMethod::WECHAT,
+            PaymentMethodEnum::WECHAT,
             '微信支付',
             '此方式仅支持付款金额≤900元的订单',
             url('/images/icons/wechat_pay_logo.png'),
@@ -24,18 +25,18 @@ class PaymentMethodTableSeeder extends Seeder
     }
 
     /**
-     * @param string $alias        别名
-     * @param string $name         名称
-     * @param string $description  描述
-     * @param string $icon         图标
-     * @param array  $config       配置信息
-     * @param bool   $is_enabled   是否开启
-     * @param bool   $is_recommend 是否推荐
-     * @param int    $limit        是否限额 -1表示不限额
-     * @param int    $sort         排序
+     * @param PaymentMethodEnum $payment_method_enum 别名
+     * @param string            $name                名称
+     * @param string            $description         描述
+     * @param string            $icon                图标
+     * @param array             $config              配置信息
+     * @param bool              $is_enabled          是否开启
+     * @param bool              $is_recommend        是否推荐
+     * @param int               $limit               是否限额 -1表示不限额
+     * @param int               $sort                排序
      */
     public function addPaymentMethod(
-        string $alias,
+        PaymentMethodEnum $payment_method_enum,
         string $name,
         string $description,
         string $icon,
@@ -45,7 +46,7 @@ class PaymentMethodTableSeeder extends Seeder
         bool $is_recommend = false,
         int $sort = 0
     ): void {
-        $payment_method = PaymentMethod::query()->firstOrNew(['alias' => $alias]);
+        $payment_method = PaymentMethod::query()->firstOrNew(['alias' => $payment_method_enum->value]);
 
         if (! $payment_method->exists) {
             $payment_method->name = $name;

@@ -104,8 +104,8 @@
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item>账号设置</el-dropdown-item>
-                                            <el-dropdown-item>刷新</el-dropdown-item>
-                                            <el-dropdown-item>退出登录</el-dropdown-item>
+                                            <el-dropdown-item @click="dropRefresh">刷新</el-dropdown-item>
+                                            <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
                                 </el-dropdown>
@@ -143,7 +143,7 @@
                         </ul>
                     </div>
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
-                        <router-view v-slot="{ Component }">
+                        <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
                                 <keep-alive :include="cachedViews">
                                     <div :key="route.path" style="height: 100%;">
@@ -152,6 +152,7 @@
                                 </keep-alive>
                             </transition>
                         </router-view>
+                        <div v-else v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
                     </div>
                 </el-main>
             </el-container>
@@ -168,6 +169,7 @@ import { ArrowRight } from '@element-plus/icons-vue'
 import {getConfigAxios} from "../api/home.js";
 
 import { useCommonStore } from '@/store'
+import * as echarts from "echarts";
 const commonStore = useCommonStore()
 
 const route = useRoute()
@@ -191,6 +193,7 @@ const visible =ref(false)
 const top = ref(0)
 const left = ref(0)
 const selectedTag = ref({})
+const isRendered = ref(true)
 
 watch(() => route.path,(to, from) => {
     for (var index in commonStore.visitedViews) {
@@ -323,9 +326,12 @@ const closeMenu = () =>{
 }
 
 const refresh = (view) => {
-    commonStore.refreshQuery(view)
-    router.replace({
-        name: 'manage.refresh.index',
+    commonStore.refreshQuery(view).then(() => {
+        nextTick(() => {
+            router.replace({
+                name: 'manage.refresh.index',
+            })
+        });
     })
 }
 
@@ -381,6 +387,23 @@ const changeSelect = (event) => {
 const toOption = (item) => {
     menuValue.value = ''
     router.push({name:item.name})
+}
+const dropRefresh = () => {
+    isRendered.value = false;
+    setTimeout(() => {
+        isRendered.value = true;
+    }, 400);
+}
+const logOut = () =>{
+    cns.$confirm('确定要退出登录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+    }).then(() => {
+        cns.$cookies.remove('manage-token')
+        router.push({name:'login'})
+    });
 }
 
 onMounted(() => {

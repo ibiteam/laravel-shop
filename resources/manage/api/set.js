@@ -42,6 +42,37 @@ export function routerChangeShow(data) {
     return $http.doPost('manage/set/router/change_show', data)
 }
 
+// 管理员列表
+export function adminUserIndex(data) {
+    return $http.doGet('manage/set/admin_user', data)
+}
+export function adminUserRoles(data) {
+    return $http.doGet('manage/set/admin_user/roles', data)
+}
+export function adminUserStore(data) {
+    return $http.doPost('manage/set/admin_user/store', data)
+}
+export function adminUserChangeStatus(data) {
+    return $http.doPost('manage/set/admin_user/change_status', data)
+}
+
+// 角色管理
+export function roleIndex(data) {
+    return $http.doGet('manage/set/role', data)
+}
+export function roleInfo(data) {
+    return $http.doGet('manage/set/role/info', data)
+}
+export function roleStore(data) {
+    return $http.doPost('manage/set/role/store', data)
+}
+export function roleChangeShow(data) {
+    return $http.doPost('manage/set/role/change_show', data)
+}
+export function roleDestroy(data) {
+    return $http.doPost('manage/set/role/destroy', data)
+}
+
 // 支付方式
 export function paymentMethodIndex(data) {
     return $http.doGet('manage/set/payment/method', data)

@@ -37,6 +37,45 @@ class PermissionDao
     }
 
     /**
+     * 获取所有权限数据.
+     */
+    public function allData($keywords = ''): array
+    {
+        $query = Permission::orderByDesc('sort')->orderBy('id');
+
+        if ($keywords) {
+            $query->where('display_name', 'like', "%{$keywords}%");
+        }
+
+        $data = $query->get()->toArray();
+
+        // 没有进行搜索的话就显示菜单树
+        if (empty($keywords) && $data) {
+            $data = $this->get_tree($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * 获取自己权限数据.
+     */
+    public function selfData($permission_ids)
+    {
+        $data = Permission::whereIn('id', $permission_ids)
+            ->orderByDesc('sort')->orderBy('id')
+            ->select(['id', 'display_name', 'parent_id'])
+            ->get()->toArray();
+
+        if ($data) {
+            $data = $this->get_tree($data);
+            $data = $this->dataProcessing($data, []);
+        }
+
+        return $data;
+    }
+
+    /**
      * 查询并格式化权限数据.
      */
     private function fetchAndFormatPermissions(AdminUser $admin_user, string $guard_name, array $collect_permission_ids): array
@@ -81,5 +120,41 @@ class PermissionDao
         array_multisort($sort_key, SORT_DESC, $response);
 
         return $response;
+    }
+
+    private function dataProcessing($data, $permission_ids)
+    {
+        foreach ($data as $key => $v) {
+            if (isset($v['children']) && $v['children']) {
+                $permission_ids = $this->dataProcessing($v['children'], $permission_ids);
+            } else {
+                $permission_ids[] = $v['id'];
+            }
+        }
+
+        return $permission_ids;
+    }
+
+    private function get_tree($arr): array
+    {
+        $refer = $tree = [];
+
+        foreach ($arr as $k => $v) {
+            $refer[$v['id']] = &$arr[$k];  // 创建主键的数组引用
+        }
+
+        foreach ($arr as $k => $v) {
+            $pid = $v['parent_id'];   // 获取当前分类的父级id
+
+            if ($pid == 0) {
+                $tree[] = &$arr[$k];    // 顶级栏目
+            } else {
+                if (isset($refer[$pid])) {
+                    $refer[$pid]['children'][] = &$arr[$k];    // 如果存在父级栏目，则添加进父级栏目的子栏目数组中
+                }
+            }
+        }
+
+        return $tree;
     }
 }

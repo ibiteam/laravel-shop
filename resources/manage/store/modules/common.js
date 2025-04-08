@@ -86,7 +86,10 @@ export const useCommonStore = defineStore('shop-common', {
             })
         },
         refreshQuery(view){
-            this.refreshView = view
+            return new Promise((resolve) => {
+                this.refreshView = view
+                resolve()
+            })
         }
     }
 })
