@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Manage\AdminUserController;
 use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
+use App\Http\Controllers\Manage\RoleController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
 use App\Http\Controllers\Manage\ShipCompanyController;
@@ -13,7 +15,7 @@ Route::prefix('set')->group(function () {
     // 商店设置
     Route::prefix('shop_config')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_INDEX])->group(function () {
-            Route::get('', [ShopConfigController::class, 'index'])->name(Permission::MANAGE_SHOP_CONFIG_INDEX);
+            Route::get('/', [ShopConfigController::class, 'index'])->name(Permission::MANAGE_SHOP_CONFIG_INDEX);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_UPDATE])->group(function () {
             Route::post('update', [ShopConfigController::class, 'update']);
@@ -24,7 +26,7 @@ Route::prefix('set')->group(function () {
     Route::prefix('router_category')->group(function () {
         Route::get('tree', [RouterCategoryController::class, 'getTreeList']);  // 访问地址弹窗 左侧树状数据
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
-            Route::get('', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
+            Route::get('/', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
             Route::get('info', [RouterCategoryController::class, 'info']);
             Route::get('pages', [RouterCategoryController::class, 'getPages']);
         });
@@ -40,7 +42,7 @@ Route::prefix('set')->group(function () {
     // 访问地址
     Route::prefix('router')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_INDEX])->group(function () {
-            Route::get('', [RouterController::class, 'index'])->name(Permission::MANAGE_ROUTER_INDEX);
+            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_ROUTER_INDEX);
             Route::get('categories', [RouterController::class, 'categories']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_UPDATE])->group(function () {
@@ -48,6 +50,34 @@ Route::prefix('set')->group(function () {
             Route::post('change_show', [RouterController::class, 'changeShow']);
         });
     });
+
+    // 管理员列表
+    Route::prefix('admin_user')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_INDEX])->group(function () {
+            Route::get('/', [AdminUserController::class, 'index'])->name(Permission::MANAGE_ADMIN_USER_INDEX);
+            Route::get('roles', [AdminUserController::class, 'roles']);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
+            Route::post('store', [AdminUserController::class, 'store']);
+            Route::post('change_status', [AdminUserController::class, 'changeStatus']);
+        });
+    });
+
+    // 角色管理
+    Route::prefix('role')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_INDEX])->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name(Permission::MANAGE_ROLE_INDEX);
+            Route::get('info', [RoleController::class, 'info']);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_UPDATE])->group(function () {
+            Route::post('store', [RoleController::class, 'store']);
+            Route::post('change_show', [RoleController::class, 'changeShow']);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_DELETE])->group(function () {
+            Route::post('destroy', [RoleController::class, 'destroy']);
+        });
+    });
+
     // 支付方式
     Route::prefix('payment/method')->group(function () {
         Route::get('/', [PaymentMethodController::class, 'index'])->name(Permission::MANAGE_PAYMENT_METHOD_INDEX)->middleware('manage.permission');

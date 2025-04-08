@@ -4,12 +4,11 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\PermissionRegistrar;
 
 /**
- * 
- *
  * @property int                             $id
  * @property string                          $name          角色CODE
  * @property string                          $guard_name    分组名称
@@ -19,10 +18,13 @@ use Spatie\Permission\PermissionRegistrar;
  * @property string|null                     $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelHasRole> $modelHasRole
+ * @property-read int|null $model_has_role_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminUser> $users
  * @property-read int|null $users_count
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role permission($permissions, $without = false)
@@ -37,6 +39,7 @@ use Spatie\Permission\PermissionRegistrar;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role withoutPermission($permissions)
+ *
  * @mixin \Eloquent
  */
 class Role extends SpatieRole
@@ -55,6 +58,11 @@ class Role extends SpatieRole
     public function guardName()
     {
         return config('auth.manage.guard');
+    }
+
+    public function modelHasRole(): HasMany
+    {
+        return $this->hasMany(ModelHasRole::class, 'role_id', 'id');
     }
 
     public function users(): BelongsToMany
