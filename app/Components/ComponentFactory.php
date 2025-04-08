@@ -3,7 +3,7 @@
 namespace App\Components;
 
 use App\Components\AppComponents\AdvertComponent;
-use App\Components\AppComponents\AdvertisingComponent;
+use App\Components\AppComponents\AdvertisingBannerComponent;
 use App\Components\AppComponents\AdvertisingThreeComponent;
 use App\Components\AppComponents\ChannelSquareComponent;
 use App\Components\AppComponents\HomeNavColumnComponent;
@@ -39,8 +39,8 @@ class ComponentFactory
 //            AppWebsiteDecorationItem::COMPONENT_NAME_CHANNEL_SQUARE => ChannelSquareComponent::class, // 频道广场 -
 //            AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV => HomeNavColumnComponent::class, // 导航栏组件
 //            AppWebsiteDecorationItem::COMPONENT_NAME_QUICK_LINK => QuickLinkComponent::class, // 金刚区
-//            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE => AdvertisingComponent::class, // 广告位1
-//            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO => AdvertisingComponent::class, // 广告位2
+//            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE => AdvertisingBannerComponent::class, // 广告位1
+//            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO => AdvertisingBannerComponent::class, // 广告位2
 //            AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE => AdvertisingThreeComponent::class, // 广告位3
 //            AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING => ThemeAdvertisingComponent::class, // 主题广告
             //为您推荐

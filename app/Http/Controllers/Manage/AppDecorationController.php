@@ -90,7 +90,7 @@ class AppDecorationController extends BaseController
     }
 
     // 保存草稿
-    public function decorationStore(Request $request, AppDecorationLogService $app_decoration_log_service, AppDecorationService $app_decoration_service)
+    public function decorationSave(Request $request, AppDecorationLogService $app_decoration_log_service, AppDecorationService $app_decoration_service)
     {
         $admin_user_id = $this->adminUser()?->id ?: 0;
         try {

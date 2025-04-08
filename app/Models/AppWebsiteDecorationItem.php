@@ -174,9 +174,9 @@ class AppWebsiteDecorationItem extends Model
     public const PLATE_HEIGHT_ONE = '1'; // 板块高度一行
     public const PLATE_HEIGHT_TWO = '2'; // 板块高度二行
     public const PLATE_HEIGHT_THREE = '3'; // 板块高度三行
-    public const NUMBER_ROWS_THREE = '1'; // 每行个数3
-    public const NUMBER_ROWS_FOUR = '2'; // 每行个数4
-    public const NUMBER_ROWS_FIVE = '3'; // 每行个数5
+    public const NUMBER_ROWS_THREE = '3'; // 每行个数3
+    public const NUMBER_ROWS_FOUR = '4'; // 每行个数4
+    public const NUMBER_ROWS_FIVE = '5'; // 每行个数5
     public const MORE_DEFAULT_TYPE = '1'; // 默认样式
     public const MORE_CUSTOM_PAGE = '2'; // 自定义页面
     // 广告位展示样式
@@ -199,12 +199,6 @@ class AppWebsiteDecorationItem extends Model
         self::OS_UNRECEIVED => '待收货',
         self::OS_UNEVALUATE => '待评价',
         self::OS_AFTERSALES => '退款/售后',
-    ];
-
-    public static $numbers_rows = [
-        self::NUMBER_ROWS_THREE => '3',
-        self::NUMBER_ROWS_FOUR => '4',
-        self::NUMBER_ROWS_FIVE => '5',
     ];
 
     // 组件名称

@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\AppDecorationItem;
+use App\Utils\Constant;
+
 it('test set app_decoration', function () {
     $data = [
 
@@ -31,4 +34,12 @@ it('test set app_decoration decoration store', function () {
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
+});
+
+it('test diy', function () {
+    $arr = [
+
+    ];
+
+    dd(json_encode($arr), JSON_UNESCAPED_UNICODE);
 });

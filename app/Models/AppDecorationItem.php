@@ -46,6 +46,20 @@ class AppDecorationItem extends Model
     public const STYLE_TRANSITION = 2; // 显示样式 - 过渡
     public const COMPONENT_NAME_DANPING_ADVERTISEMENT = 'danping_advertisement'; // 弹屏广告
     public const COMPONENT_NAME_SUSPENDED_ADVERTISEMENT = 'suspended_advertisement'; // 悬浮广告
+    public const COMPONENT_NAME_QUICK_LINK = 'quick_link'; // 金刚区
+    public const PLATE_HEIGHT_ONE = 1; // 板块高度一行
+    public const PLATE_HEIGHT_TWO = 2; // 板块高度二行
+    public const PLATE_HEIGHT_THREE = 3; // 板块高度三行
+    public const NUMBER_ROWS_THREE = 3; // 每行个数3
+    public const NUMBER_ROWS_FOUR = 4; // 每行个数4
+    public const NUMBER_ROWS_FIVE = 5; // 每行个数5
+    public const COMPONENT_NAME_ADVERTISING_BANNER = 'advertising_banner'; // 广告位
+    public const NUMBER_COLUMN_TWO = 2; // 每行显示两个
+    public const NUMBER_COLUMN_THREE = 3; // 每行显示三个
+    public const NUMBER_COLUMN_FOUR = 4; // 每行显示四个
+    public const BACKGROUND_COLOR_SHOW = 1; // 展示背景色
+    public const BACKGROUND_COLOR_NOT_SHOW = 0; // 不展示背景色
+    public const COMPONENT_NAME_HOT_ZONE = 'hot_zone'; // 热区
 
     protected $casts = [
         'content' => 'array',

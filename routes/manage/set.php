@@ -124,7 +124,7 @@ Route::prefix('set')->group(function () {
             Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
-            Route::post('/decoration/store', [AppDecorationController::class, 'decorationStore']); // 移动端装修
+            Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_DELETE])->group(function () {
 
