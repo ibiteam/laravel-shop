@@ -183,7 +183,7 @@ onMounted( () => {
                         v-model="queryParams.created_start_time"
                         type="datetime"
                         placeholder="开始时间"
-                        value-format="YYYY-MM-DD hh:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
                     <span>&nbsp;至&nbsp;</span>
@@ -191,7 +191,7 @@ onMounted( () => {
                         v-model="queryParams.created_end_time"
                         type="datetime"
                         placeholder="结束时间"
-                        value-format="YYYY-MM-DD hh:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
             </el-form-item>
@@ -200,7 +200,7 @@ onMounted( () => {
                         v-model="queryParams.updated_start_time"
                         type="datetime"
                         placeholder="开始时间"
-                        value-format="YYYY-MM-DD hh:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
                     <span>&nbsp;至&nbsp;</span>
@@ -208,7 +208,7 @@ onMounted( () => {
                         v-model="queryParams.updated_end_time"
                         type="datetime"
                         placeholder="结束时间"
-                        value-format="YYYY-MM-DD hh:mm:ss"
+                        value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
             </el-form-item>

@@ -106,6 +106,8 @@ class PermissionTableSeeder extends Seeder
     private function addOrderPermission(): void
     {
         $this->addPermission('订单', Permission::MODULE_ORDER, 97, Permission::IS_LEFT_NAV, 'ShoppingBag');
+        $this->addPermission('订单管理', Permission::ORDER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
+        $this->addPermission('订单列表', Permission::MANAGE_ORDER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_MANAGE);
     }
 
     private function addArticlePermission(): void

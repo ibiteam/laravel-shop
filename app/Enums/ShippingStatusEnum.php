@@ -7,9 +7,9 @@ enum ShippingStatusEnum: int
     public function getLabel(): string
     {
         return match ($this) {
-            self::UNSHIPPED => '未确认',
-            self::SHIPPED => '已确认',
-            self::RECEIVED => '已取消',
+            self::UNSHIPPED => '未发货',
+            self::SHIPPED => '已发货',
+            self::RECEIVED => '已收货',
         };
     }
 

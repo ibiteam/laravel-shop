@@ -72,7 +72,6 @@ class Permission extends SpatiePermission
     public const MANAGE_ROUTER_INDEX = 'manage.router.index'; // 访问地址
     public const MANAGE_ROUTER_UPDATE = 'manage.router.update'; // 访问地址新增|编辑
     public const MANAGE_ROUTER_DELETE = 'manage.router.delete'; // 访问地址删除
-
     public const PERMISSION_MANAGE = 'permission.manage'; // 权限管理
     public const MANAGE_ADMIN_USER_INDEX = 'manage.admin_user.index'; // 管理员列表
     public const MANAGE_ADMIN_USER_UPDATE = 'manage.admin_user.update'; // 管理员新增|编辑
@@ -82,19 +81,15 @@ class Permission extends SpatiePermission
     public const MANAGE_ROLE_UPDATE = 'manage.role.update'; // 角色新增|编辑
     public const MANAGE_ROLE_DELETE = 'manage.role.delete'; // 角色删除
     public const MANAGE_ADMIN_OPERATION_LOG_INDEX = 'manage.admin_operation_log.index'; // 管理员日志
-
-
     public const BASIC_PAYMENT_MANAGE = 'basic.payment.manage'; // 支付管理
     public const MANAGE_PAYMENT_METHOD_INDEX = 'manage.payment_method.index'; // 支付方式列表
     public const MANAGE_PAYMENT_METHOD_UPDATE = 'manage.payment_method.update'; // 支付方式编辑
     public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
     public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
     public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
-
     public const WEBSITE_MANAGE = 'website.manage'; // 网站管理
     public const MANAGE_APP_DECORATION = 'manage.app_decoration.index'; // 移动端装修
     public const MANAGE_APP_DECORATION_UPDATE = 'manage.app_decoration.update'; // 移动端保存装修
-
 
     // 二级 商品部分
     public const GOODS_MANAGE = 'goods.manage'; // 商品管理
@@ -114,6 +109,10 @@ class Permission extends SpatiePermission
     public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心
     public const MANAGE_MATERIAL_CENTER_UPDATE = 'manage.material_center.update'; // 素材中心 新增|编辑
     public const MANAGE_MATERIAL_CENTER_DELETE = 'manage.material_center.delete'; // 素材中心 删除
+
+    // 二级 订单部分
+    public const ORDER_MANAGE = 'order.manage';
+    public const MANAGE_ORDER_INDEX = 'manage.order.index'; // 订单列表
 
     public function __construct(array $attributes = [])
     {

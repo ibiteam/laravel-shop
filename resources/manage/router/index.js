@@ -18,6 +18,7 @@ import PaymentMethod from '@/pages/set/PaymentMethod.vue';
 import AppDecoration from '@/pages/decoration/app/Index.vue';
 import Refresh from '@/pages/refresh/refresh.vue';
 import ShipCompany from '@/pages/set/ShipCompany.vue';
+import Order from '@/pages/order/Order.vue';
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
     routes: [
@@ -42,6 +43,8 @@ const router = createRouter({
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},
                 { path: '/goods/form/:id', component: GoodsForm , name: 'manage.goods.form',meta:{title:'编辑商品'} },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'manage.category.index',meta:{title:'商品分类'} },
+                // 订单
+                { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },
                 // 用户
                 { path: '/user/index', component: UserIndex , name: 'manage.user.index',meta:{title:'用户'} },
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },
