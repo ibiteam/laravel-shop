@@ -2,8 +2,10 @@
 import { Plus, Search } from '@element-plus/icons-vue';
 import { adminUserIndex, adminUserStore, adminUserChangeStatus, adminUserRoles } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
+const router = useRouter();
 
 const searchForm = reactive({
     user_name: '',
@@ -36,62 +38,57 @@ const submitForm = reactive({
     status: 1
 });
 
-const fag1 = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
-
 const validatorPassword = (rule, value, callback) => {
-    if(!submitForm.id){
-        if(!value){
-            callback(new Error('请输入密码'));
-            return false
+    const fag1 = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
+
+    if (!submitForm.id) {
+        if (!value) {
+            callback(new Error('请输入登录密码'));
+            return false;
         }
-        if(value.length < 6){
+        if (value.length < 6) {
             callback(new Error('密码不能小于6位'));
-            return false
+            return false;
         }
-        if(submitForm.confirm_password && value !== submitForm.confirm_password){
+        if (submitForm.confirm_password && value !== submitForm.confirm_password) {
             callback(new Error('两次密码不同'));
-            return false
+            return false;
         }
-        if(!fag1.test(value)){
+        if (!fag1.test(value)) {
             callback(new Error('密码必须包含大写字母，小写字母，数字，特殊字符`@#$%^&*`~()-+=`中的任意三种'));
-            return false
+            return false;
         }
     }
-    if(fag1.test(value) && value.length >= 6 && value === submitForm.confirm_password){
+    if (fag1.test(value) && value.length >= 6 && value === submitForm.confirm_password) {
         if (submitFormRef.value) {
-            submitFormRef.value.clearValidate(['confirm_password']);
+            submitFormRef.value.clearValidate(['password', 'confirm_password']);
         }
     }
-    callback()
-}
+    callback();
+};
 const validatorConfirmPassword = (rule, value, callback) => {
-    if(!submitForm.id) {
-        if(!value){
-            callback(new Error('请输入密码'));
-            return false
+    if (!submitForm.id) {
+        if (!value) {
+            callback(new Error('请输入确认密码'));
+            return false;
         }
         if (!submitForm.password) {
-            callback(new Error('请先填写登录密码'));
-            return false
+            callback(new Error('请先输入登录密码'));
+            return false;
         }
         if (value !== submitForm.password) {
             callback(new Error('两次密码不同'));
-            return false
+            return false;
         }
     }
-    if(fag1.test(value) && value.length >= 6 && value === submitForm.password){
-        if (submitFormRef.value) {
-            submitFormRef.value.clearValidate(['password']);
-        }
-    }
-    callback()
-}
+    callback();
+};
 const validatorPhone = (rule, value, callback) => {
     if (!value) {
         callback(new Error('请输入手机号码'));
         return;
     }
-    const isPhone = /^(13|14|15|17|18|16|19)\d{9}$/
+    const isPhone = /^(13|14|15|17|18|16|19)\d{9}$/;
     if (!isPhone.test(value)) {
         callback(new Error('请输入正确的手机号码格式'));
         return;
@@ -101,12 +98,10 @@ const validatorPhone = (rule, value, callback) => {
 
 const submitFormRules = reactive({
     user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-    phone: [{ required: true, validator:validatorPhone, trigger: 'blur' }],
-    // password: [{ validator:validatorPassword, trigger: 'blur' }],
-    // confirm_password: [{ validator:validatorConfirmPassword, trigger: 'blur' }],
-    role_ids: [{ required: true, message: '请选择所属角色', trigger: 'change' }]
+    phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }],
+    password: [{ validator:validatorPassword, trigger: 'blur' }],
+    confirm_password: [{ validator:validatorConfirmPassword, trigger: 'blur' }],
 });
-
 
 const openStoreDialog = (row = {}) => {
     storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
@@ -141,6 +136,9 @@ const closeStoreDialog = () => {
     submitForm.confirm_password = '';
     submitForm.role_ids = [];
     submitForm.status = 1;
+    if (submitFormRef.value) {
+        submitFormRef.value.clearValidate();
+    }
     storeDialogVisible.value = false;
 };
 
@@ -186,6 +184,11 @@ const changeStatus = (row) => {
             cns.$message.error(res.message);
         }
     });
+};
+
+// 跳转操作日志
+const openAdminOperationLog = (admin_user_name) => {
+    router.push({ name: 'manage.admin_operation_log.index', query: { admin_user_name: admin_user_name } });
 };
 
 /* 获取角色 */
@@ -285,6 +288,8 @@ onMounted(() => {
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
+                <el-button link type="primary" size="large" @click="openAdminOperationLog(scope.row.user_name)">操作日志
+                </el-button>
             </template>
         </el-table-column>
     </el-table>

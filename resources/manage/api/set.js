@@ -81,6 +81,11 @@ export function roleDestroy(data) {
     return $http.doPost('manage/set/role/destroy', data)
 }
 
+// 管理员日志
+export function adminOperationLogIndex(data) {
+    return $http.doGet('manage/set/admin_operation_log', data)
+}
+
 // 支付方式
 export function paymentMethodIndex(data) {
     return $http.doGet('manage/set/payment/method', data)
