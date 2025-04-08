@@ -39,7 +39,7 @@ abstract class TestCase extends BaseTestCase
         if (! file_exists($access_token_file)) {
             $data = [
                 'account' => $this->account,
-                'password' => $this->password,
+                'password' => md5($this->password),
             ];
             $res = $this->json('post', url('api/v1/auth/login/password'), $data, [
                 'X-Requested-With' => 'XMLHttpRequest',

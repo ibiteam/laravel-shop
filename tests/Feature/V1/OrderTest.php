@@ -52,7 +52,6 @@ it('test pay cash desk api interface', function () {
     $response = $this->doGet('api/v1/order/pay/cash_desk', [
         'no' => '2025040741365428',
     ]);
-    dump($response);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
@@ -63,6 +62,15 @@ it('test wechat pay api interface', function () {
     $response = $this->doPost('api/v1/order/cash/wechat/pay', [
         'no' => '2025040741365428',
         'pay_form' => 'h5',
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+
+it('test my order list interface', function () {
+    $response = $this->doGet('api/v1/order/my/index', [
     ]);
     dump($response);
     $this->assertIsArray($response);

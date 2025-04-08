@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
+use App\Http\Controllers\Api\V1\Order\IndexController as MyOrderIndexController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
@@ -70,6 +71,9 @@ Route::middleware('api.auth')->group(function () {
         Route::prefix('cash')->group(function () {
             Route::get('/', [PayController::class, 'index']);
             Route::post('wechat/pay', [PayController::class, 'wechatPay']);
+        });
+        Route::prefix('my')->group(function () {
+            Route::get('index', [MyOrderIndexController::class, 'index']);
         });
     });
 
