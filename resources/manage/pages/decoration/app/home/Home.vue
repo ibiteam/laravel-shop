@@ -217,7 +217,10 @@ onMounted(() => {
             if (res.type == 'show') {
                 decoration.data.forEach((item, index) => {
                     if (item.id == res.component.id) {
-                        decoration.data[index].is_show = !decoration.data[index].is_show ? 1 : 0
+                        decoration.data[index] = {
+                            ...tempRefs.value[index].getComponentData(),
+                            is_show: !decoration.data[index].is_show ? 1 : 0
+                        } 
                     }
                 })
             }

@@ -99,7 +99,7 @@ onMounted(() => {
         background-color: #f9f9f9;
         box-sizing: border-box;
         position: relative;
-        .icon-Bars {
+        .icon-bars {
             padding: 10px;
             cursor: move;
             font-size: 20px;

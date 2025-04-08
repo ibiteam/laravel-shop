@@ -85,22 +85,25 @@ export const BackgroundOption = [{
     label: '无'
 }]
 
-// 最大宽高
+// 默认宽，最大高度，最小高度，最大添加长度
 export const ColumnWidthHeight = {
     "2": {
         width: 330,
         maxHeight: 240,
         minHeight: 190,
+        maxItemLength: 8,
     },
     "3": {
         width: 220,
         maxHeight: 150,
         minHeight: 150,
+        maxItemLength: 12,
     },
     "4": {
         width: 160,
         maxHeight: 150,
         minHeight: 150,
+        maxItemLength: 16,
     },
 }
 
@@ -115,5 +118,3 @@ export const TitleAlignOption = [{
     icon: 'iconfont icon-juzhongduiqi'
 }]
 
-// 添加数据最大长度
-export const MaxItemLength = 10

@@ -3,9 +3,45 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="ad-wrapper" @click="handleChooseDragItem">
-                    <div class="ad-item s-flex ai-ct jc-bt"  v-if="!form.content.data || form.content.data.length == 0">
+                    <div class="ad-item s-flex ai-ct jc-bt" :style="{minHeight: ColumnWidthHeight['2'].maxHeight / 2 + 'px', backgroundColor: '#fff', padding: '10px', borderRadius: '10px'}"  v-if="!form.content.data || form.content.data.length == 0">
                         <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
                         <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
+                    </div>
+                    <div class="ad-item"
+                        v-else
+                        :style="{
+                            minHeight: ColumnWidthHeight[form.content.column].maxHeight / 2 + 'px', 
+                            backgroundColor: form.content.background && form.content.background_color ? form.content.background_color : '',
+                            padding: form.content.background ? '10px 10px 0 10px' : '',
+                            borderRadius: form.content.background ? '10px' : '',
+                        }"  
+                    >
+                        <div class="ad-title-wrapper s-flex" v-if="form.content.title.name" :class="form.content.title.align == 'center' ? 'jc-ct' : 'jc-fs'" style="margin-bottom: 10px;">
+                            <div class="ad-title s-flex ai-ct jc-ct" >
+                                <image-wrapper v-if="form.content.title.image" v-bind="{ src: form.content.title.image, width: '16px', height: '16px', radius: '0' }" style="margin-right: 6px;"/>
+                                <span class="fs14 fw-b" :style="{color: form.content.title.color}">{{form.content.title.name}}</span>
+                            </div>
+                            <div class="ad-title-link s-flex ai-ct fs12" v-if="form.content.title.url.value">
+                                更多<em class="iconfont icon-gengduo" style="font-size: 12px;"></em>
+                            </div>
+                        </div>
+                        <div class="ad-banner-wrapper s-flex ai-ct jc-bt flex-wrap">
+                            <div v-for="(item, index) in form.content.data" :key="index" 
+                                :style="{
+                                    width: (form.content.width / 2 - (form.content.background ? '5' : 0)) + 'px',
+                                    marginBottom: (form.content.background ? '10px' : 0)
+                                }"
+                            >
+                                <image-wrapper 
+                                    v-bind="{
+                                        src: item.image,
+                                        width: '100%',
+                                        height: (form.content.height ? form.content.height / 2 : 100) + 'px', 
+                                        radius: '0'
+                                    }" 
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -16,7 +52,16 @@
                     <div class="setting-bar-item">
                         <div class="item-title">显示设置</div>
                         <el-form-item label="每行显示" label-position="top" :prop="'column'" required>
-                            <el-radio-group v-model="form.content.column" fill="var(--main-color)">
+                            <el-radio-group v-model="form.content.column" fill="var(--main-color)" @change="() => {
+                                form.content.width = ColumnWidthHeight[form.content.column].width
+                                if (form.content.column == 2) {
+                                    form.content.height = ColumnWidthHeight['2'].maxHeight
+                                } else if (form.content.column == 3) {
+                                    form.content.height = ColumnWidthHeight['3'].maxHeight
+                                } else if (form.content.column == 4) {
+                                    form.content.height = ColumnWidthHeight['4'].maxHeight
+                                }
+                            }">
                                 <el-radio v-for="column in ColumnOption" :value="column.value" :key="column.value">{{column.label}}</el-radio>
                             </el-radio-group>
                         </el-form-item>
@@ -28,7 +73,11 @@
                                     </el-radio-group>
                                 </div>
                                 <div>
-                                    <el-color-picker v-model="form.content.background_color" v-if="form.content.background" />
+                                    <el-color-picker v-model="form.content.background_color" v-if="form.content.background" @change="() => {
+                                        if (!form.content.background_color) {
+                                            form.content.background_color = '#ffffff'
+                                        }
+                                    }"/>
                                 </div>
                             </div>
                         </el-form-item>
@@ -75,7 +124,11 @@
                         </el-form-item>
                         <el-form-item label="标题" label-position="top" :prop="['title', 'name']">
                             <el-input v-model="form.content.title.name" style="width: 70%;"></el-input>
-                            <el-color-picker v-model="form.content.title.color" />
+                            <el-color-picker v-model="form.content.title.color" @change="() => {
+                                if (!form.content.title.color) {
+                                    form.content.title.color = '#333333'
+                                }
+                            }"/>
                         </el-form-item>
                         <el-form-item label="对齐方式" label-position="top" :prop="['title', 'align']">
                             <el-radio-group v-model="form.content.title.align">
@@ -116,11 +169,11 @@
                             v-model="form.content.data"
                             :animation="1000"
                             :group="{name: form.id, pull: true, put: true}"
-                            handle=".icon-Bars"
+                            handle=".icon-bars"
                             >
 
                             <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
-                                <em class="iconfont icon-Bars" style="font-size:20px"></em>
+                                <em class="iconfont icon-bars" style="font-size:20px"></em>
                                 <div class="group-content s-flex ai-fs jc-bt">
                                     <el-form-item class="not-required" label="" :prop="['data', index, 'image']" :rules="{ required: true, message: '请上传图片', trigger: 'blur' }">
                                         <ImageUpload 
@@ -182,7 +235,7 @@
                                 </div>
                             </div>
                         </VueDraggable>
-                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= MaxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/10)</el-button>
+                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/10)</el-button>
                     </div>
                 </el-form>
             </template>
@@ -197,8 +250,7 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { Icon } from 'vant';
-import { TempField, TempContentDataItemField, ColumnOption, BackgroundOption, MaxItemLength, ColumnWidthHeight, TitleAlignOption } from '@/pages/decoration/app/dataField/AdvertisingBanner.js'
+import { TempField, TempContentDataItemField, ColumnOption, BackgroundOption, ColumnWidthHeight, TitleAlignOption } from '@/pages/decoration/app/dataField/AdvertisingBanner.js'
 import { updateNested } from '@/pages/decoration/utils/common.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -239,7 +291,7 @@ const updateUploadComponentData = (res) => {
 
 // 添加图片数据
 const handleClickAddImageData = () => {
-    if (form.content.data.length >= MaxItemLength) return
+    if (form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength) return
     form.content.data.push(TempContentDataItemField())
 }
 
@@ -297,10 +349,19 @@ watch([() => props.component], (newValue) => {
 .ad-wrapper{
     padding: 5px 10px 5px;
     .ad-item {
-        background: #fff;
-        border-radius: 10px;
-        padding: 10px;
+        // border-radius: 10px;
+        // padding: 10px;
         box-sizing: border-box;
+    }
+    .ad-title-wrapper {
+        position: relative;
+        .ad-title-link {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+        }
     }
 }
 .remove-btn {
