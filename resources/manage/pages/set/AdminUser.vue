@@ -34,6 +34,7 @@ const submitForm = reactive({
     password: '',
     confirm_password: '',
     phone: '',
+    job_no: '',
     role_ids: [],
     status: 1
 });
@@ -109,14 +110,16 @@ const openStoreDialog = (row = {}) => {
         submitForm.id = row.id;
         submitForm.user_name = row.user_name;
         submitForm.phone = row.phone;
+        submitForm.job_no = row.job_no;
         submitForm.role_ids = row.role_ids;
         submitForm.status = row.status;
     } else {
         submitForm.id = 0;
         submitForm.user_name = '';
-        submitForm.phone = '';
         submitForm.password = '';
         submitForm.confirm_password = '';
+        submitForm.phone = '';
+        submitForm.job_no = '';
         submitForm.role_ids = [];
         submitForm.status = 1;
     }
@@ -131,9 +134,10 @@ const closeStoreDialog = () => {
     storeDialogTitle.value = '';
     submitForm.id = 0;
     submitForm.user_name = '';
-    submitForm.phone = '';
     submitForm.password = '';
     submitForm.confirm_password = '';
+    submitForm.phone = '';
+    submitForm.job_no = '';
     submitForm.role_ids = [];
     submitForm.status = 1;
     if (submitFormRef.value) {
@@ -274,6 +278,7 @@ onMounted(() => {
         <el-table-column label="ID" prop="id"></el-table-column>
         <el-table-column label="用户名" prop="user_name"></el-table-column>
         <el-table-column label="所属角色" prop="role_name"></el-table-column>
+        <el-table-column label="工号" prop="job_no"></el-table-column>
         <el-table-column label="是否启用" prop="status">
             <template #default="scope">
                 <el-switch
@@ -284,6 +289,7 @@ onMounted(() => {
                 </el-switch>
             </template>
         </el-table-column>
+        <el-table-column label="最新登录时间" prop="latest_login_time"></el-table-column>
         <el-table-column label="创建时间" prop="created_at"></el-table-column>
         <el-table-column label="操作">
             <template #default="scope">
@@ -322,6 +328,9 @@ onMounted(() => {
                 </el-form-item>
                 <el-form-item label="手机号" prop="phone">
                     <el-input v-model="submitForm.phone" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="工号" prop="job_no">
+                    <el-input v-model="submitForm.job_no"></el-input>
                 </el-form-item>
                 <el-form-item label="所属角色" prop="role_ids">
                     <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">

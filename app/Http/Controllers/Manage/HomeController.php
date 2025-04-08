@@ -75,9 +75,9 @@ class HomeController extends BaseController
             ->limit(12)->get()->map(function (Collect $item) {
                 return [
                     'id' => $item->permission_id,
-                    'title' => $item->permission->display_name,
-                    'name' => $item->permission->name,
-                    'icon' => $item->permission->icon,
+                    'title' => $item->permission?->display_name,
+                    'name' => $item->permission?->name,
+                    'icon' => $item->permission?->icon,
                 ];
             });
 
@@ -149,7 +149,8 @@ class HomeController extends BaseController
         $admin_user = $this->adminUser();
 
         Cache::forget('shop_config_all_code');
-        Cache::forget('permission_menus_'.$admin_user->id);
+
+        Cache::tags(config('auth.manage.guard').'_permission_menus')->forget('permission_menus_'.$admin_user->id);
 
         return $this->success('清除成功');
     }

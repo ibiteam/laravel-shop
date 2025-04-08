@@ -22,8 +22,7 @@ class PermissionTableSeeder extends Seeder
         $this->addDataPermission();
 
         // 清除权限缓存 标签'manage_permission_menus'
-        $guard_name = config('auth.manage.guard') ?: 'manage';
-        Cache::tags($guard_name.'_permission_menus')->flush();
+        Cache::tags(config('auth.manage.guard').'_permission_menus')->flush();
     }
 
     private function addPermission(string $display_name, string $name, int $sort = 0, int $is_left_nav = Permission::NOT_IS_LEFT_NAV, string $icon = '', ?string $parent_name = null): void

@@ -26,7 +26,7 @@ class AdminUserController extends BaseController
         $status = $request->get('status', '1');
         $number = (int) $request->get('number', 10);
 
-        $data = AdminUser::with(['modelHasRole.role'])->orderByDesc('id')
+        $data = AdminUser::with(['modelHasRole.role', 'loginLog'])->orderByDesc('id')
             ->when($user_name, fn ($query) => $query->where('user_name', 'like', '%'.$user_name.'%'))
             ->when($status > -1, fn ($query) => $query->where('status', '=', $status))
             ->when($role_id, fn ($query) => $query->whereHas('modelHasRole', function ($query) use ($role_id) {
@@ -43,13 +43,19 @@ class AdminUserController extends BaseController
 
             $role_ids = $admin_user->modelHasRole->pluck('role_id')->toArray();
 
+            // 最新登录时间
+            $login_log = $admin_user->loginLog->last();
+            $latest_login_time = $login_log ? $login_log->created_at->format('Y-m-d H:i:s') : '';
+
             return [
                 'id' => $admin_user->id,
                 'user_name' => $admin_user->user_name,
                 'phone' => $admin_user->phone,
+                'job_no' => $admin_user->job_no,
                 'role_name' => $role_names,
                 'role_ids' => $role_ids,
                 'status' => $admin_user->status,
+                'latest_login_time' => $latest_login_time,
                 'created_at' => $admin_user->created_at->format('Y-m-d H:i:s'),
             ];
         });
@@ -84,6 +90,7 @@ class AdminUserController extends BaseController
                 'password' => 'nullable|string',
                 'confirm_password' => 'nullable|string',
                 'phone' => 'required|is_phone',
+                'job_no' => 'nullable|string',
                 'role_ids' => 'required|array',
                 'status' => 'required|boolean',
             ], [], [
@@ -92,11 +99,15 @@ class AdminUserController extends BaseController
                 'password' => '登录密码',
                 'confirm_password' => '确认密码',
                 'phone' => '手机号',
+                'job_no' => '工号',
                 'role_ids' => '所属角色',
                 'status' => '状态',
             ]);
 
             $validated['id'] = $validated['id'] ?? 0;
+            $password = $validated['password'] ?? '';
+            $confirm_password = $validated['confirm_password'] ?? '';
+            $job_no = $validated['job_no'] ?? '';
 
             if ($validated['id']) {
                 $admin_user = AdminUser::whereId($validated['id'])->first();
@@ -108,34 +119,35 @@ class AdminUserController extends BaseController
                 if (AdminUser::where('id', '!=', $validated['id'])->whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
+                if ($job_no && AdminUser::where('id', '!=', $validated['id'])->whereJobNo($job_no)->first()) {
+                    throw new BusinessException('管理员工号已存在');
+                }
             } else {
                 $admin_user = new AdminUser;
 
                 if (AdminUser::whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
+                if ($job_no && AdminUser::whereJobNo($job_no)->first()) {
+                    throw new BusinessException('管理员工号已存在');
+                }
             }
 
             // 密码处理
-            $password = $validated['password'] ?? '';
-            $confirm_password = $validated['confirm_password'] ?? '';
-
             if ($password) {
                 if ($password != $confirm_password) {
-                    throw new BusinessException('密码和确认密码不一致');
+                    throw new BusinessException('登录密码和确认密码不一致');
                 }
 
                 if (! preg_match('/^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/', $confirm_password)) {
                     throw new BusinessException('密码必须包含大写字母，小写字母，数字，特殊字符`@#$%^&*`~()-+=`中的任意三种');
                 }
 
-                // $tmp_password = shop_config(ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '') ? RsaUtil::getDecodeData($password) : $password;
                 $admin_user->password = $password;
             }
 
             $admin_user->user_name = $validated['user_name'];
-            $admin_user->nickname = '';
-            $admin_user->avatar = '';
+            $admin_user->job_no = $job_no;
             $admin_user->phone = $validated['phone'];
             $admin_user->status = intval($validated['status']);
 
@@ -144,10 +156,20 @@ class AdminUserController extends BaseController
             }
 
             // 角色处理
+            $old_roles = $admin_user->roles->pluck('id')->toArray();
             $role_info = Role::whereIn('id', $validated['role_ids'])->get();
-
             if ($role_info->isNotEmpty()) {
                 $admin_user->syncRoles($role_info);
+            }
+            $new_roles = $admin_user->roles->pluck('id')->toArray();
+
+            if ($old_roles && $old_roles != $new_roles) {
+                $role_names = $role_info->map(function (Role $item) {
+                    return $item->display_name;
+                })->toArray();
+
+                $role_log = "更新管理员[id:{$admin_user->id}]角色为[" . implode(',', $role_names) . "]";
+                admin_operation_log($this->adminUser(), $role_log, AdminOperationLog::TYPE_UPDATE);
             }
 
             if ($validated['id']) {

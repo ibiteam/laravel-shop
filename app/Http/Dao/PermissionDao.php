@@ -15,7 +15,7 @@ class PermissionDao
      */
     public function getTreePermissionByAdminUser(AdminUser $admin_user, array $collect_permission_ids = []): array
     {
-        $guard_name = config('auth.manage.guard') ?: 'manage';
+        $guard_name = config('auth.manage.guard');
         $cache_key = 'permission_menus_'.$admin_user->id;
 
         try {

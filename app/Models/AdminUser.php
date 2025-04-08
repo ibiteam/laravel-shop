@@ -18,10 +18,11 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @property int         $id
  * @property string      $user_name  登录用户名
- * @property string      $phone      手机号
- * @property string      $avatar     头像
  * @property string      $password   登录密码
- * @property string      $nickname   昵称
+ * @property string|null $nickname   昵称
+ * @property string|null $avatar     头像
+ * @property string      $phone      手机号
+ * @property string|null $job_no     工号
  * @property int         $status     状态：1启用 0禁用
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -49,6 +50,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|AdminUser whereAvatar($value)
  * @method static Builder<static>|AdminUser whereCreatedAt($value)
  * @method static Builder<static>|AdminUser whereId($value)
+ * @method static Builder<static>|AdminUser whereJobNo($value)
  * @method static Builder<static>|AdminUser whereNickname($value)
  * @method static Builder<static>|AdminUser wherePassword($value)
  * @method static Builder<static>|AdminUser wherePhone($value)
