@@ -13,7 +13,6 @@ use App\Utils\RsaUtil;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends BaseController
@@ -93,8 +92,20 @@ class LoginController extends BaseController
      */
     public function logout()
     {
-        Auth::guard(config('auth.manage.guard'))->logout();
+        try {
+            $admin_user = $this->adminUser();
 
-        return $this->success('退出登录成功');
+            if (! $admin_user instanceof AdminUser) {
+                throw new BusinessException('用户未登录');
+            }
+
+            $admin_user->currentAccessToken()->delete();
+
+            return $this->success('退出成功');
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('退出登录异常');
+        }
     }
 }
