@@ -14,6 +14,7 @@ const commonStore = useCommonStore()
 onMounted(() => {
     // 取到路由带过来的参数
     let routeValue = commonStore.refreshView;
+    console.log(routeValue)
     let view = {
         name: routeValue.name,
         title: "正在刷新",
@@ -26,11 +27,18 @@ onMounted(() => {
                 commonStore.visitedViews.splice(index, 1)
             }
         })
-        router.replace({
-            name: routeValue.name,
-            query:routeValue.query,
-            params:routeValue.params
-        });
+        if (routeValue.name && routeValue.name != 'manage.refresh.index'){
+            router.replace({
+                name: routeValue.name,
+                query:routeValue.query,
+                params:routeValue.params
+            });
+        }else{
+            router.replace({
+                name: 'manage.home.index'
+            });
+        }
+
     })
 });
 </script>

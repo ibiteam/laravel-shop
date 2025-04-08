@@ -23,7 +23,7 @@ const router = createRouter({
             component: () => import('@/components/Layout.vue'),
             children:[
                 // 首页
-                { path: 'home', component: Home, name: 'manage.home.index',meta:{title:'首页'}},
+                { path: '/home', component: Home, name: 'manage.home.index',meta:{title:'首页'}},
                 // 设置
                 { path: '/set/shop_config', component: SetShopConfig, name: 'manage.shop_config.index',meta:{title:'商店设置'} },
                 { path: '/set/router_category', component: SetRouterCategory, name: 'manage.router_category.index',meta:{title:'访问地址分类'} },

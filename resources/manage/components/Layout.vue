@@ -104,8 +104,7 @@
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item>账号设置</el-dropdown-item>
-                                            <el-dropdown-item>刷新</el-dropdown-item>
-                                            <el-dropdown-item>退出登录</el-dropdown-item>
+                                            <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
                                 </el-dropdown>
@@ -168,6 +167,7 @@ import { ArrowRight } from '@element-plus/icons-vue'
 import {getConfigAxios} from "../api/home.js";
 
 import { useCommonStore } from '@/store'
+import * as echarts from "echarts";
 const commonStore = useCommonStore()
 
 const route = useRoute()
@@ -191,8 +191,10 @@ const visible =ref(false)
 const top = ref(0)
 const left = ref(0)
 const selectedTag = ref({})
+const routeInfo = ref({})
 
 watch(() => route.path,(to, from) => {
+    routeInfo.value = route
     for (var index in commonStore.visitedViews) {
         var view = commonStore.visitedViews[index]
         if (view.name === to.name && view.path !== to.path) {
@@ -323,9 +325,12 @@ const closeMenu = () =>{
 }
 
 const refresh = (view) => {
-    commonStore.refreshQuery(view)
-    router.replace({
-        name: 'manage.refresh.index',
+    commonStore.refreshQuery(view).then(() => {
+        nextTick(() => {
+            router.replace({
+                name: 'manage.refresh.index',
+            })
+        });
     })
 }
 
@@ -381,6 +386,18 @@ const changeSelect = (event) => {
 const toOption = (item) => {
     menuValue.value = ''
     router.push({name:item.name})
+}
+
+const logOut = () =>{
+    cns.$confirm('确定要退出登录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+    }).then(() => {
+        cns.$cookies.remove('manage-token')
+        router.push({name:'login'})
+    });
 }
 
 onMounted(() => {
