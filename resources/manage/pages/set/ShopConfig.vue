@@ -3,7 +3,10 @@ import { Plus, Delete } from '@element-plus/icons-vue'
 import { shopConfigIndex, shopConfigUpdate } from '@/api/set.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
+import {getConfigAxios} from "../../api/home.js";
 const cns = getCurrentInstance().appContext.config.globalProperties
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 
 const firstActiveName = ref('site_setup')
 const secondActiveName = ref('site_info')
@@ -82,6 +85,17 @@ const submitForm = () => {
             shopConfigUpdate(inputFrom).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('提交成功');
+                    getConfigAxios().then(ret => {
+                        if (cns.$successCode(ret.code)) {
+                            commonStore.updateShopConfig(ret.data.shop_config)
+                            commonStore.updateAdminUser(ret.data.admin_user)
+                            const root = document.documentElement;
+                            root.style.setProperty('--manage-color', ret.data.shop_config.manage_color);
+                            root.style.setProperty('--manage-color-over', ret.data.shop_config.mouse_move_color);
+                        } else {
+                            cns.$message.error(ret.message);
+                        }
+                    });
                 } else {
                     cns.$message.error(res.message);
                 }

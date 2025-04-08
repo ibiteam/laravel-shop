@@ -2,11 +2,11 @@
     <div class='seller-layout' v-if="pageLoad">
         <el-container>
             <el-aside :class="{'left-hidden':!leftShow}">
-                <div class='layout-left-header s-flex ai-ct jc-bt'>
+                <div class='layout-left-header s-flex ai-ct jc-bt' @click="router.push({name:'manage.home.index'})">
                     <div class='seller-picture s-flex ai-ct jc-ct'>
                         <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
                     </div>
-                    <div class='s-flex jc-bt ai-ct' style="font-size: 20px;cursor: pointer;" @click="leftShow = false">
+                    <div class='s-flex jc-bt ai-ct' style="font-size: 20px;cursor: pointer;" @click.stop="leftShow = false">
                         <Fold style="width: 1.5em; height: 1.5em;" />
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                                     </div>
                                     <template #dropdown>
                                         <el-dropdown-menu>
-                                            <el-dropdown-item>账号设置</el-dropdown-item>
+                                            <el-dropdown-item @click="router.push({name:'manage.shop_config.index'})">设置</el-dropdown-item>
                                             <el-dropdown-item @click="dropRefresh">刷新</el-dropdown-item>
                                             <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
@@ -161,12 +161,10 @@
 import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch,computed} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRoute,useRouter } from 'vue-router';
-import $public from '@/utils/public'
 import { ArrowRight } from '@element-plus/icons-vue'
 import {getConfigAxios} from "../api/home.js";
 
 import { useCommonStore } from '@/store'
-import * as echarts from "echarts";
 import {accountLogout} from "../api/user.js";
 const commonStore = useCommonStore()
 
@@ -443,6 +441,7 @@ onUnmounted(() => {
             height: 60px;
             padding: 0 15px;
             background: var(--manage-color);
+            cursor: pointer;
             .seller-picture{
                 width: 120px;
                 height: 40px;
