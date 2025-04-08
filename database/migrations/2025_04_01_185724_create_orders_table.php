@@ -21,6 +21,7 @@ return new class extends Migration
             $table->tinyInteger('pay_status')->comment('支付状态')->index();
             $table->dateTime('paid_at')->nullable()->comment('最新支付时间');
             $table->tinyInteger('ship_status')->comment('发货状态')->index();
+            $table->boolean('is_edit_address')->default(0)->comment('是否修改过收货地址');
             $table->dateTime('shipped_at')->nullable()->comment('最新发货时间');
             $table->dateTime('received_at')->nullable()->comment('最新收货时间');
             $table->unsignedBigInteger('province_id')->comment('省份ID');
