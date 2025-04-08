@@ -48,9 +48,9 @@ Route::prefix('goods')->group(function () {
         Route::post('follow', [GoodsCollectController::class, 'follow']); // 关注商品
         Route::post('unfollow', [GoodsCollectController::class, 'unfollow']); // 取消关注商品
     });
-    Route::get('/{no}', [GoodsController::class, 'detail']);
-    Route::get('/{no}/check_number', [GoodsController::class, 'checkNumber']);
-    Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem']);
+    Route::get('/{no}', [GoodsController::class, 'detail'])->where('no', '^(?!follow$|unfollow$)');
+    Route::get('/{no}/check_number', [GoodsController::class, 'checkNumber'])->where('no', '^(?!follow$|unfollow$)');
+    Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem'])->where('no', '^(?!follow$|unfollow$)');
 });
 
 /**

@@ -45,7 +45,6 @@ class GoodsController extends BaseController
     {
         try {
             $goods = $goods_dao->getInfoByNo($no);
-            $goods_dao->checkGoodsIsDestroy($goods);
 
             $data = $goods_service->getSkuInfoByNo($goods, $unique);
 
@@ -73,7 +72,6 @@ class GoodsController extends BaseController
                 'number' => '数量',
             ]);
             $goods = $goods_dao->getInfoByNo($no);
-            $goods_dao->checkGoodsIsDestroy($goods);
 
             $data = $goods_service->checkGoodsNumber($goods, $validated['sku_id'] ?? 0, $validated['number']);
 

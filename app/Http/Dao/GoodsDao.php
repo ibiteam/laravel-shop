@@ -32,7 +32,7 @@ class GoodsDao
     public function checkGoodsIsDestroy(Goods $goods): void
     {
         // 判断商品是否删除
-        if ($goods->deleted_at) {
+        if ($goods->trashed()) {
             throw new BusinessException('商品已删除', ConstantEnum::GOODS_DESTROY);
         }
     }

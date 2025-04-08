@@ -25,7 +25,6 @@ class GoodsCollectController extends BaseController
             ]);
 
             $goods = $goods_dao->getInfoByNo($validated['no']);
-            $goods_dao->checkGoodsIsDestroy($goods);
 
             $goods_collect_service->follow($goods, $this->user());
 
@@ -35,7 +34,7 @@ class GoodsCollectController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败'.$throwable->getMessage());
+            return $this->error('操作失败');
         }
     }
 
@@ -51,7 +50,6 @@ class GoodsCollectController extends BaseController
                 'no' => '商品编号',
             ]);
             $goods = $goods_dao->getInfoByNo($validated['no']);
-            $goods_dao->checkGoodsIsDestroy($goods);
 
             $goods_collect_service->unfollow($goods, $this->user());
 
