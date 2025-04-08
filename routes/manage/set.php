@@ -3,6 +3,7 @@
 use App\Http\Controllers\Manage\AdminUserController;
 use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
+use App\Http\Controllers\Manage\PermissionController;
 use App\Http\Controllers\Manage\RoleController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
@@ -60,6 +61,16 @@ Route::prefix('set')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
             Route::post('store', [AdminUserController::class, 'store']);
             Route::post('change_status', [AdminUserController::class, 'changeStatus']);
+        });
+    });
+
+    // 权限菜单
+    Route::prefix('permission')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_INDEX])->group(function () {
+            Route::get('/', [PermissionController::class, 'index'])->name(Permission::MANAGE_PERMISSION_INDEX);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_UPDATE])->group(function () {
+            Route::post('store', [PermissionController::class, 'store']);
         });
     });
 

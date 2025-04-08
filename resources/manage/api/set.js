@@ -56,6 +56,14 @@ export function adminUserChangeStatus(data) {
     return $http.doPost('manage/set/admin_user/change_status', data)
 }
 
+// 权限菜单
+export function permissionIndex(data) {
+    return $http.doGet('manage/set/permission', data)
+}
+export function permissionStore(data) {
+    return $http.doPost('manage/set/permission/store', data)
+}
+
 // 角色管理
 export function roleIndex(data) {
     return $http.doGet('manage/set/role', data)

@@ -44,7 +44,7 @@ class PermissionDao
         $query = Permission::orderByDesc('sort')->orderBy('id');
 
         if ($keywords) {
-            $query->where('display_name', 'like', "%{$keywords}%");
+            $query->where('display_name', 'like', "%{$keywords}%")->orWhere('name', 'like', "%{$keywords}%");
         }
 
         $data = $query->get()->toArray();

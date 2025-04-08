@@ -46,7 +46,7 @@ class AdminUserController extends BaseController
             return [
                 'id' => $admin_user->id,
                 'user_name' => $admin_user->user_name,
-                'nickname' => $admin_user->nickname,
+                'phone' => $admin_user->phone,
                 'role_name' => $role_names,
                 'role_ids' => $role_ids,
                 'status' => $admin_user->status,
