@@ -53,6 +53,13 @@ class AppDecoration extends Model
 
     protected $guarded = [];
 
+    // 操作类型 - 发布
+    public const OPERATE_TYPE_RELEASE = 3;
+    // 操作类型 - 预览
+    public const OPERATE_TYPE_PREVIEW = 2;
+    // 操作类型 - 保存草稿
+    public const OPERATE_TYPE_SAVE_DRAFT = 1;
+
     public const ALIAS_HOME = 'home'; // 首页
 
     public function adminUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -47,6 +47,8 @@ class PageDefaultDict
 //                        AppWebsiteDecorationItem::COMPONENT_NAME_HOT_SALE_GOOD,
                     ], // 固定组件
                     'fixed_name' => [
+                        AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
+                        AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
 //                        AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
 //                        AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
 //                        AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
