@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
+use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use App\Http\Controllers\Api\V1\UploadController;
@@ -66,6 +67,10 @@ Route::middleware('api.auth')->group(function () {
         Route::post('direct/done', [DoneController::class, 'directDone']);
         Route::get('cart/init', [DoneController::class, 'cartInit']);
         Route::post('cart/done', [DoneController::class, 'cartDone']);
+        Route::prefix('cash')->group(function () {
+            Route::get('/', [PayController::class, 'index']);
+            Route::post('wechat/pay', [PayController::class, 'wechatPay']);
+        });
     });
 
     // 用户地址

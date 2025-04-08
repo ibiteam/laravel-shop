@@ -51,6 +51,11 @@ use Illuminate\Support\Carbon;
 class Transaction extends Model
 {
     use DatetimeTrait;
+    public const TRANSACTION_TYPE_PAY = 'pay'; // 支付
+    public const TRANSACTION_TYPE_REFUND = 'refund'; // 退款
+
+    public const STATUS_WAIT = 0; // 待处理
+    public const STATUS_SUCCESS = 1; // 处理成功
 
     protected $guarded = [];
 
