@@ -24,12 +24,11 @@
                             :forceFallback="false"
                             @add="handleDragAdd">
                             <template v-for="(temp, index) in decoration.data">
-                                <div class="drag-placeholder" v-if="dragPlaceholderIndex == index">释放鼠标将组件添加至此处</div>
+                                <div class="drag-placeholder" v-if="dragData.placeholderIndex == index">释放鼠标将组件添加至此处</div>
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
                                 <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
                                 <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
                                 <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
-                                <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
                             </template>
                         </VueDraggable>
                         <bottom-nav-bar v-if="findNotForData('label')" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
@@ -77,8 +76,13 @@ const decoration = reactive({
     // 当前选中拖拽的索引
     temp_index: ''
 })
-// 拖拽占位 下标显示位置
-const dragPlaceholderIndex = ref(null)
+// 拖拽过程 true-拖拽中 false-拖拽结束
+const dragMove = ref(false)
+const dragData = reactive({
+    placeholderIndex: null, // 拖拽占位 下标显示位置
+    move: false, // 拖拽过程 true-拖拽中 false-拖拽结束
+    temp_index: '', // 拖拽元素id
+})
 // 组件refs
 const tempRefs = ref([])
 const materialCenterDialogData = reactive({
@@ -105,7 +109,7 @@ const handleDragAdd = (e) => {
 }
 // 拖拽过程中获取占位下标
 const updateDragPlaceholder = (index) => {
-    dragPlaceholderIndex.value = index
+    dragData.placeholderIndex = index
 }
 const handleDragChoose = (e) => {
     console.log(e)   

@@ -12,26 +12,28 @@
                 </div>
             </template>
         </drag-wrapper>
-        <setting-bar v-bind="{name: form.name, show_radio: false,}" v-if="temp_index == form.id">
-            <template #content="slotProps">
-                <div class="setting-bar-item" v-if="slotProps.type == 0">
-                    <div class="item-title">内容设置 </div>
-                    <p class="item-title-info">建议：请先选择图片，图片宽度750px，高度不限</p>
-                    <div class="placeholder s-flex ai-ct jc-ct" v-if="!form.content.image">
-                        <span class="fs12">750*高度不限</span>
-                    </div>
-                    <ImageUpload v-else width="100%" height="100%" :src="form.content.image" @material="handleOpenUpload" @local="(image) => form.content.image = image" @remove="form.content.image = ''" />
-                    <!--<div class="placeholder s-flex ai-ct jc-ct">
-                        <image-wrapper v-bind="{src: form.content.image, width: '100%', height: '100%'}" />
-                        <div class="add-btn s-flex ai-ct jc-ct" @click="showDialog = true">
-                            <Icon name="plus" size="24px" />
-                            <p>添加热区</p>
+        <teleport to="#decorationAppMain">
+            <setting-bar v-bind="{name: form.name, show_radio: false,}" v-if="temp_index == form.id">
+                <template #content="slotProps">
+                    <div class="setting-bar-item" v-if="slotProps.type == 0">
+                        <div class="item-title">内容设置 </div>
+                        <p class="item-title-info">建议：请先选择图片，图片宽度750px，高度不限</p>
+                        <div class="placeholder s-flex ai-ct jc-ct" v-if="!form.content.image">
+                            <span class="fs12">750*高度不限</span>
                         </div>
-                    </div>-->
-                    <el-button type="primary" style="width: 100%; margin-top: 20px;" :disabled="form.content.areas.length >= MaxItemLength" @click="showDialog = true">编辑热区({{form.content.areas.length}}/10)</el-button>
-                </div>
-            </template>
-        </setting-bar>
+                        <ImageUpload v-else width="100%" height="100%" :src="form.content.image" @material="handleOpenUpload" @local="(image) => form.content.image = image" @remove="form.content.image = ''" />
+                        <!--<div class="placeholder s-flex ai-ct jc-ct">
+                            <image-wrapper v-bind="{src: form.content.image, width: '100%', height: '100%'}" />
+                            <div class="add-btn s-flex ai-ct jc-ct" @click="showDialog = true">
+                                <Icon name="plus" size="24px" />
+                                <p>添加热区</p>
+                            </div>
+                        </div>-->
+                        <el-button type="primary" style="width: 100%; margin-top: 20px;" :disabled="form.content.areas.length >= MaxItemLength" @click="showDialog = true">编辑热区({{form.content.areas.length}}/10)</el-button>
+                    </div>
+                </template>
+            </setting-bar>
+        </teleport>
         <HotZoneDialog v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas}" @close="showDialog = false" />
     </section>
 </template>

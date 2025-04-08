@@ -46,209 +46,211 @@
                 </div>
             </template>
         </drag-wrapper>
-        <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.id">
-            <template #content>
-                <el-form lable-width="auto" :model="form.content" ref="templateSetForm">
-                    <div class="setting-bar-item">
-                        <div class="item-title">显示设置</div>
-                        <el-form-item label="每行显示" label-position="top" :prop="'column'" required>
-                            <el-radio-group v-model="form.content.column" fill="var(--main-color)" @change="() => {
-                                form.content.width = ColumnWidthHeight[form.content.column].width
-                                if (form.content.column == 2) {
-                                    form.content.height = ColumnWidthHeight['2'].maxHeight
-                                } else if (form.content.column == 3) {
-                                    form.content.height = ColumnWidthHeight['3'].maxHeight
-                                } else if (form.content.column == 4) {
-                                    form.content.height = ColumnWidthHeight['4'].maxHeight
-                                }
-                            }">
-                                <el-radio v-for="column in ColumnOption" :value="column.value" :key="column.value">{{column.label}}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="背景色" label-position="top" :prop="'background'" required>
-                            <div>
+        <teleport to="#decorationAppMain">
+            <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.id">
+                <template #content>
+                    <el-form lable-width="auto" :model="form.content" ref="templateSetForm">
+                        <div class="setting-bar-item">
+                            <div class="item-title">显示设置</div>
+                            <el-form-item label="每行显示" label-position="top" :prop="'column'" required>
+                                <el-radio-group v-model="form.content.column" fill="var(--main-color)" @change="() => {
+                                    form.content.width = ColumnWidthHeight[form.content.column].width
+                                    if (form.content.column == 2) {
+                                        form.content.height = ColumnWidthHeight['2'].maxHeight
+                                    } else if (form.content.column == 3) {
+                                        form.content.height = ColumnWidthHeight['3'].maxHeight
+                                    } else if (form.content.column == 4) {
+                                        form.content.height = ColumnWidthHeight['4'].maxHeight
+                                    }
+                                }">
+                                    <el-radio v-for="column in ColumnOption" :value="column.value" :key="column.value">{{column.label}}</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="背景色" label-position="top" :prop="'background'" required>
                                 <div>
-                                    <el-radio-group v-model="form.content.background" fill="var(--main-color)">
-                                        <el-radio v-for="bg in BackgroundOption" :value="bg.value" :key="bg.value">{{bg.label}}</el-radio>
-                                    </el-radio-group>
+                                    <div>
+                                        <el-radio-group v-model="form.content.background" fill="var(--main-color)">
+                                            <el-radio v-for="bg in BackgroundOption" :value="bg.value" :key="bg.value">{{bg.label}}</el-radio>
+                                        </el-radio-group>
+                                    </div>
+                                    <div>
+                                        <el-color-picker v-model="form.content.background_color" v-if="form.content.background" @change="() => {
+                                            if (!form.content.background_color) {
+                                                form.content.background_color = '#ffffff'
+                                            }
+                                        }"/>
+                                    </div>
                                 </div>
+                            </el-form-item>
+                            <el-form-item label="图片宽高" label-position="top" :prop="'height'" :rules="
+                                [
+                                    { required: true, message: '请输入图片高度', trigger: 'blur' },
+                                    { validator: (rule, value, callback) => {
+                                        if (value < ColumnWidthHeight[form.content.column].minHeight || value > ColumnWidthHeight[form.content.column].maxHeight) {
+                                            callback(new Error(`图片高度范围是${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px`));
+                                        } else if (isNaN(value)) {
+                                            callback(new Error('请输入数字'));
+                                        } else if (!Number.isInteger(value * 1)) {
+                                            callback(new Error('请输入整数'));
+                                        } else { callback(); }
+                                    }, trigger: 'blur' },
+                                ]
+                            ">
+                                <div class="s-flex ai-ct" style="width: 100%;">
+                                    <el-input v-model="form.content.width" disabled style="width: 100px;"></el-input>&nbsp;&nbsp;
+                                    <p style="margin: 0 10px;">~</p>
+                                    <el-input v-model="form.content.height" style="width: 100px;"></el-input>&nbsp;&nbsp;
+                                </div>
+                                <p class="item-title-info" style="margin-bottom: 0;">{{ `高度范围：${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px` }}</p>
+                            </el-form-item>
+                        </div>
+                        <div class="setting-bar-item">
+                            <div class="item-title">标题设置</div>
+                            <el-form-item label="小图标" label-position="top" :prop="['title', 'image']">
                                 <div>
-                                    <el-color-picker v-model="form.content.background_color" v-if="form.content.background" @change="() => {
-                                        if (!form.content.background_color) {
-                                            form.content.background_color = '#ffffff'
-                                        }
-                                    }"/>
+                                    <ImageUpload 
+                                        :src="form.content.title.image"
+                                        @material="() => {
+                                            handleOpenUpload(['title', 'image'])
+                                        }"
+                                        @local="(image) => {
+                                            form.content.title.image = image
+                                        }"
+                                        @remove="() => {
+                                            form.content.title.image = ''
+                                        }" 
+                                    />
+                                    <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：32 * 32</p>
                                 </div>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="图片宽高" label-position="top" :prop="'height'" :rules="
-                            [
-                                { required: true, message: '请输入图片高度', trigger: 'blur' },
-                                { validator: (rule, value, callback) => {
-                                    if (value < ColumnWidthHeight[form.content.column].minHeight || value > ColumnWidthHeight[form.content.column].maxHeight) {
-                                        callback(new Error(`图片高度范围是${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px`));
-                                    } else if (isNaN(value)) {
-                                        callback(new Error('请输入数字'));
-                                    } else if (!Number.isInteger(value * 1)) {
-                                        callback(new Error('请输入整数'));
-                                    } else { callback(); }
-                                }, trigger: 'blur' },
-                            ]
-                        ">
-                            <div class="s-flex ai-ct" style="width: 100%;">
-                                <el-input v-model="form.content.width" disabled style="width: 100px;"></el-input>&nbsp;&nbsp;
-                                <p style="margin: 0 10px;">~</p>
-                                <el-input v-model="form.content.height" style="width: 100px;"></el-input>&nbsp;&nbsp;
-                            </div>
-                            <p class="item-title-info" style="margin-bottom: 0;">{{ `高度范围：${ColumnWidthHeight[form.content.column].minHeight}px~${ColumnWidthHeight[form.content.column].maxHeight}px` }}</p>
-                        </el-form-item>
-                    </div>
-                    <div class="setting-bar-item">
-                        <div class="item-title">标题设置</div>
-                        <el-form-item label="小图标" label-position="top" :prop="['title', 'image']">
-                            <div>
-                                <ImageUpload 
-                                    :src="form.content.title.image"
-                                    @material="() => {
-                                        handleOpenUpload(['title', 'image'])
+                            </el-form-item>
+                            <el-form-item label="标题" label-position="top" :prop="['title', 'name']">
+                                <el-input v-model="form.content.title.name" style="width: 70%;"></el-input>
+                                <el-color-picker v-model="form.content.title.color" @change="() => {
+                                    if (!form.content.title.color) {
+                                        form.content.title.color = '#333333'
+                                    }
+                                }"/>
+                            </el-form-item>
+                            <el-form-item label="对齐方式" label-position="top" :prop="['title', 'align']">
+                                <el-radio-group v-model="form.content.title.align">
+                                    <el-tooltip
+                                        v-for="align in TitleAlignOption"
+                                        :key="align.value"
+                                        effect="dark"
+                                        :content="align.label"
+                                        placement="bottom"
+                                    >
+                                        <el-radio-button  :value="align.value" size="small">
+                                            <template #default>
+                                                <em :class="align.icon"></em>
+                                            </template>
+                                        </el-radio-button>
+                                    </el-tooltip>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="链接" label-position="top" :prop="['title', 'url', 'value']">
+                                <LinkInput
+                                    style="width: 70%;"
+                                    :name="form.content.title.url.name"
+                                    :value="form.content.title.url.value"
+                                    @select="handleOpenLink(['title', 'url'])"
+                                    @input="(res) => {
+                                        form.content.title.url = res
                                     }"
-                                    @local="(image) => {
-                                        form.content.title.image = image
+                                    @clear="(res) => {
+                                        form.content.title.url = res
                                     }"
-                                    @remove="() => {
-                                        form.content.title.image = ''
-                                    }" 
                                 />
-                                <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：32 * 32</p>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="标题" label-position="top" :prop="['title', 'name']">
-                            <el-input v-model="form.content.title.name" style="width: 70%;"></el-input>
-                            <el-color-picker v-model="form.content.title.color" @change="() => {
-                                if (!form.content.title.color) {
-                                    form.content.title.color = '#333333'
-                                }
-                            }"/>
-                        </el-form-item>
-                        <el-form-item label="对齐方式" label-position="top" :prop="['title', 'align']">
-                            <el-radio-group v-model="form.content.title.align">
-                                <el-tooltip
-                                    v-for="align in TitleAlignOption"
-                                    :key="align.value"
-                                    effect="dark"
-                                    :content="align.label"
-                                    placement="bottom"
+                            </el-form-item>
+                        </div>
+                        <div class="setting-bar-item">
+                            <div class="item-title">内容设置</div>
+                            <VueDraggable
+                                class="group-dragable"
+                                v-model="form.content.data"
+                                :animation="1000"
+                                :group="{name: form.id, pull: true, put: true}"
+                                handle=".icon-bars"
                                 >
-                                    <el-radio-button  :value="align.value" size="small">
-                                        <template #default>
-                                            <em :class="align.icon"></em>
-                                        </template>
-                                    </el-radio-button>
-                                </el-tooltip>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="链接" label-position="top" :prop="['title', 'url', 'value']">
-                            <LinkInput
-                                style="width: 70%;"
-                                :name="form.content.title.url.name"
-                                :value="form.content.title.url.value"
-                                @select="handleOpenLink(['title', 'url'])"
-                                @input="(res) => {
-                                    form.content.title.url = res
-                                }"
-                                @clear="(res) => {
-                                    form.content.title.url = res
-                                }"
-                            />
-                        </el-form-item>
-                    </div>
-                    <div class="setting-bar-item">
-                        <div class="item-title">内容设置</div>
-                        <VueDraggable
-                            class="group-dragable"
-                            v-model="form.content.data"
-                            :animation="1000"
-                            :group="{name: form.id, pull: true, put: true}"
-                            handle=".icon-bars"
-                            >
-
-                            <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
-                                <em class="iconfont icon-bars" style="font-size:20px"></em>
-                                <div class="group-content s-flex ai-fs jc-bt">
-                                    <el-form-item class="not-required" label="" :prop="['data', index, 'image']" :rules="{ required: true, message: '请上传图片', trigger: 'blur' }">
-                                        <ImageUpload 
-                                            :src="item.image"
-                                            @material="() => {
-                                                handleOpenUpload(['data', index, 'image'])
-                                            }"
-                                            @local="(image) => {
-                                                item.image = image
-                                            }"
-                                            @remove="() => {
-                                                item.image = ''
-                                            }" 
-                                        />
-                                    </el-form-item>
-                                    <div style="width: calc(100% - 70px);">
-                                        <el-form-item label="链接">
-                                            <LinkInput
-                                                :name="item.url.name"
-                                                :value="item.url.value"
-                                                @select="handleOpenLink(['data', index, 'url'])"
-                                                @input="(res) => {
-                                                    item.url = res
+    
+                                <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
+                                    <em class="iconfont icon-bars" style="font-size:20px"></em>
+                                    <div class="group-content s-flex ai-fs jc-bt">
+                                        <el-form-item class="not-required" label="" :prop="['data', index, 'image']" :rules="{ required: true, message: '请上传图片', trigger: 'blur' }">
+                                            <ImageUpload 
+                                                :src="item.image"
+                                                @material="() => {
+                                                    handleOpenUpload(['data', index, 'image'])
                                                 }"
-                                                @clear="(res) => {
-                                                    item.url = res
+                                                @local="(image) => {
+                                                    item.image = image
                                                 }"
+                                                @remove="() => {
+                                                    item.image = ''
+                                                }" 
                                             />
                                         </el-form-item>
-                                        <el-form-item label="时间">
-                                            <el-date-picker
-                                                :class="item.time.length == 0 ? 'time-long' : 'time-range'"
-                                                v-model="item.time"
-                                                value-format="YYYY-MM-DD HH:mm:ss"
-                                                type="datetimerange"
-                                                size="large"
-                                                :editable="false"
-                                                :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
-                                                :range-separator="item.time.length == 0 ? '长期' : '~'"
-                                                :disabled-date="(time) => {
-                                                    const today = new Date();
-                                                    today.setHours(0, 0, 0, 0);
-                                                    return time.getTime() < today.getTime();
-                                                }"
-                                                @change="() => {
-                                                    if (item.time) {
-                                                        item.date_type = 0
-                                                    } else {
-                                                        item.date_type = 1;
-                                                        item.time = []
-                                                    }
-                                                    console.log(item.date_type, item.time)
-                                                }"
-                                                @clear="() => {
-                                                    item.date_type = 1;
-                                                    item.time = [];
-                                                }"
-                                            >
-                                            </el-date-picker>
-                                        </el-form-item>
-                                        <div class="s-flex ai-ct jc-bt">
-                                            <el-form-item label="" style="margin-bottom: 0;">
-                                                <el-switch v-model="item.is_show" :active-value="1" :inactive-value="0" active-text="显示" inactive-text="隐藏"/>
+                                        <div style="width: calc(100% - 70px);">
+                                            <el-form-item label="链接">
+                                                <LinkInput
+                                                    :name="item.url.name"
+                                                    :value="item.url.value"
+                                                    @select="handleOpenLink(['data', index, 'url'])"
+                                                    @input="(res) => {
+                                                        item.url = res
+                                                    }"
+                                                    @clear="(res) => {
+                                                        item.url = res
+                                                    }"
+                                                />
                                             </el-form-item>
-                                            <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
+                                            <el-form-item label="时间">
+                                                <el-date-picker
+                                                    :class="item.time.length == 0 ? 'time-long' : 'time-range'"
+                                                    v-model="item.time"
+                                                    value-format="YYYY-MM-DD HH:mm:ss"
+                                                    type="datetimerange"
+                                                    size="large"
+                                                    :editable="false"
+                                                    :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
+                                                    :range-separator="item.time.length == 0 ? '长期' : '~'"
+                                                    :disabled-date="(time) => {
+                                                        const today = new Date();
+                                                        today.setHours(0, 0, 0, 0);
+                                                        return time.getTime() < today.getTime();
+                                                    }"
+                                                    @change="() => {
+                                                        if (item.time) {
+                                                            item.date_type = 0
+                                                        } else {
+                                                            item.date_type = 1;
+                                                            item.time = []
+                                                        }
+                                                        console.log(item.date_type, item.time)
+                                                    }"
+                                                    @clear="() => {
+                                                        item.date_type = 1;
+                                                        item.time = [];
+                                                    }"
+                                                >
+                                                </el-date-picker>
+                                            </el-form-item>
+                                            <div class="s-flex ai-ct jc-bt">
+                                                <el-form-item label="" style="margin-bottom: 0;">
+                                                    <el-switch v-model="item.is_show" :active-value="1" :inactive-value="0" active-text="显示" inactive-text="隐藏"/>
+                                                </el-form-item>
+                                                <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </VueDraggable>
-                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ColumnWidthHeight[form.content.column].maxItemLength}})</el-button>
-                    </div>
-                </el-form>
-            </template>
-        </setting-bar>
+                            </VueDraggable>
+                            <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ColumnWidthHeight[form.content.column].maxItemLength}})</el-button>
+                        </div>
+                    </el-form>
+                </template>
+            </setting-bar>
+        </teleport>
     </section>
 </template>
 <script setup>
