@@ -3,6 +3,7 @@ export const useCommonStore = defineStore('shop-common', {
     state: () => {
         return {
             shopConfig:{},
+            adminUser:{},
             visitedViews: [],
             cachedViews: [],
             refreshView:{}
@@ -11,6 +12,9 @@ export const useCommonStore = defineStore('shop-common', {
     actions: {
         updateShopConfig(value){
             this.shopConfig = value
+        },
+        updateAdminUser(value){
+            this.adminUser = value
         },
         addVisitedViews(view) {
             if (this.visitedViews.some(item => item.path === view.path&&JSON.stringify(item.query) === JSON.stringify(view.query))) return
