@@ -54,7 +54,17 @@
                                 today.setHours(0, 0, 0, 0);
                                 return time.getTime() < today.getTime();
                             }"
+                            @change="() => {
+                                if (item.time) {
+                                    item.date_type = 0
+                                } else {
+                                    item.date_type = 1;
+                                    item.time = []
+                                }
+                                console.log(item.date_type, item.time)
+                            }"
                             @clear="() => {
+                                item.date_type = 1;
                                 item.time = [];
                             }"
                         >
@@ -101,7 +111,17 @@
                                 today.setHours(0, 0, 0, 0);
                                 return time.getTime() < today.getTime();
                             }"
+                            @change="() => {
+                                if (item.time) {
+                                    item.date_type = 0
+                                } else {
+                                    item.date_type = 1;
+                                    item.time = []
+                                }
+                                console.log(item.date_type, item.time)
+                            }"
                             @clear="() => {
+                                item.date_type = 1;
                                 item.time = [];
                             }"
                         >

@@ -18,7 +18,7 @@
                             },
                             loop: true,
                             pagination: {
-                                'el': '.swiper-pagination',
+                                'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,
                             },
                             modules: swiperModules
@@ -40,7 +40,7 @@
                             },
                             loop: true,
                             pagination: {
-                                'el': '.swiper-pagination',
+                                'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,
                             },
                             modules: swiperModules
@@ -51,7 +51,7 @@
                                 />
                             </swiper-slide>
                         </swiper>
-                        <div class="swiper-pagination"></div>
+                        <div class="swiper-pagination decoration-swiper-pagination"></div>
                     </div>
                 </div>
             </template>
@@ -137,7 +137,6 @@
                                                 value-format="YYYY-MM-DD HH:mm:ss"
                                                 type="datetimerange"
                                                 size="large"
-                                                :teleported="false"
                                                 :editable="false"
                                                 :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
                                                 :range-separator="item.time.length == 0 ? '长期' : '~'"
@@ -146,7 +145,17 @@
                                                     today.setHours(0, 0, 0, 0);
                                                     return time.getTime() < today.getTime();
                                                 }"
+                                                @change="() => {
+                                                    if (item.time) {
+                                                        item.date_type = 0
+                                                    } else {
+                                                        item.date_type = 1;
+                                                        item.time = []
+                                                    }
+                                                    console.log(item.date_type, item.time)
+                                                }"
                                                 @clear="() => {
+                                                    item.date_type = 1;
                                                     item.time = [];
                                                 }"
                                             >
@@ -162,7 +171,7 @@
                                 </div>
                             </div>
                         </VueDraggable>
-                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= MaxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/10)</el-button>
+                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= MaxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ MaxItemLength }})</el-button>
                     </div>
                 </el-form>
             </template>
@@ -290,20 +299,6 @@ watch([() => props.component], (newValue) => {
     }
     .ad-swiper {
         width: 100%;
-        :deep(.swiper-pagination){
-            .swiper-pagination-bullet{
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
-                background: rgba(255, 255, 255, 0.5);
-            }
-            .swiper-pagination-bullet-active {
-                width: 13px;
-                border-radius: 20px;
-                background-color: var(--main-color);
-            }
-        }
     }
     .cards-swiper {
         width: 100%;

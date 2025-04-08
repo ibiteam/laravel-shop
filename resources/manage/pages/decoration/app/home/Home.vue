@@ -28,6 +28,7 @@
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
                                 <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
                                 <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
+                                <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
                                 <div class="drag-item" style="height: 100px;margin: 0 auto;" v-else ref="tempRefs" :key="temp.id">{{ temp.component_name }}{{ temp.name }}</div>
                             </template>
                         </VueDraggable>
@@ -52,6 +53,7 @@ import Search from './components/Search.vue'
 import HorizontalCarousel from './components/HorizontalCarousel.vue'
 import HotZone from './components/HotZone.vue';
 import AdvertisingBanner from './components/AdvertisingBanner.vue'
+import QuickLink from './components/QuickLink.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 // import DataExample from './DataExample'
@@ -190,6 +192,57 @@ const getDecorationHome = () => {
                     id: '999', // 组件id
                     is_show: 1, // 组件是否显示
                     name: '广告图', // 组件名
+                },
+                {
+                    component_name: 'quick_link', // 组件名
+                    content: { // 表单数据
+                        row: 2, // 板块行数 1,2,3 默认2行
+                        column: 4, // 每行显示： 3,4,5 默认显示4个
+                        data: [{
+                            title: '', // 名称
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            date_type: 1, // 0:自定义  1:长期 默认长期
+                            time: [],
+                            image: '', // 图片链接
+                            is_show: 1, // 是否显示
+                        },{
+                            title: '', // 名称
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            date_type: 1, // 0:自定义  1:长期 默认长期
+                            time: [],
+                            image: '', // 图片链接
+                            is_show: 1, // 是否显示
+                        },{
+                            title: '', // 名称
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            date_type: 1, // 0:自定义  1:长期 默认长期
+                            time: [],
+                            image: '', // 图片链接
+                            is_show: 1, // 是否显示
+                        },{
+                            title: '', // 名称
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            date_type: 1, // 0:自定义  1:长期 默认长期
+                            time: [],
+                            image: '', // 图片链接
+                            is_show: 1, // 是否显示
+                        }]
+                    },
+                    id: '998', // 组件id
+                    is_show: 1, // 组件是否显示
+                    name: '金刚区', // 组件名
                 }
             ]
             decoration.not_for_data = res.data.not_for_data
@@ -226,7 +279,14 @@ onMounted(() => {
             }
             // 删除
             if (res.type == 'remove') {
-                decoration.data = decoration.data.filter(item => item.id != res.component.id)
+                cns.$confirm('确定删除吗？', '删除组件',{
+                    center: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(() => {
+                    cns.$message.success('删除成功')
+                    decoration.data = decoration.data.filter(item => item.id != res.component.id)
+                })
             }
             // 升序
             if (res.type == 'sort_up') {
@@ -304,6 +364,22 @@ export default {
         bottom: 0;
         right: 10px;
         margin: auto 0;
+    }
+}
+// 公用swiper分页样式
+.swiper-pagination.decoration-swiper-pagination{
+    .swiper-pagination-bullet{
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+        background: #E2E2E2;
+        opacity: 1;
+    }
+    .swiper-pagination-bullet-active {
+        width: 13px;
+        border-radius: 20px;
+        background-color: var(--main-color);
     }
 }
 </style>

@@ -210,7 +210,6 @@
                                                 value-format="YYYY-MM-DD HH:mm:ss"
                                                 type="datetimerange"
                                                 size="large"
-                                                :teleported="false"
                                                 :editable="false"
                                                 :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
                                                 :range-separator="item.time.length == 0 ? '长期' : '~'"
@@ -219,7 +218,17 @@
                                                     today.setHours(0, 0, 0, 0);
                                                     return time.getTime() < today.getTime();
                                                 }"
+                                                @change="() => {
+                                                    if (item.time) {
+                                                        item.date_type = 0
+                                                    } else {
+                                                        item.date_type = 1;
+                                                        item.time = []
+                                                    }
+                                                    console.log(item.date_type, item.time)
+                                                }"
                                                 @clear="() => {
+                                                    item.date_type = 1;
                                                     item.time = [];
                                                 }"
                                             >
@@ -235,7 +244,7 @@
                                 </div>
                             </div>
                         </VueDraggable>
-                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/10)</el-button>
+                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= ColumnWidthHeight[form.content.column].maxItemLength" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ColumnWidthHeight[form.content.column].maxItemLength}})</el-button>
                     </div>
                 </el-form>
             </template>
