@@ -152,7 +152,7 @@
                                 </keep-alive>
                             </transition>
                         </router-view>
-                        <div v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
+                        <div v-else v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
                     </div>
                 </el-main>
             </el-container>
@@ -392,7 +392,7 @@ const dropRefresh = () => {
     isRendered.value = false;
     setTimeout(() => {
         isRendered.value = true;
-    }, 500);
+    }, 400);
 }
 const logOut = () =>{
     cns.$confirm('确定要退出登录?', '提示', {
