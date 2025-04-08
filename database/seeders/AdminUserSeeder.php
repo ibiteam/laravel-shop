@@ -19,7 +19,7 @@ class AdminUserSeeder extends Seeder
             $admin_user->user_name = 'admin';
             $admin_user->phone = '13311112222';
             $admin_user->password = 'Aa123456';
-            $admin_user->nickname = '管理员';
+            $admin_user->nickname = '';
             $admin_user->avatar = '';
             $admin_user->save();
         }

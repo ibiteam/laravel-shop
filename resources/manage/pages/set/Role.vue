@@ -196,7 +196,7 @@ onMounted(() => {
         <el-table-column label="操作">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
-                <el-button link type="danger" size="large" @click="handleDestroy(scope.row.id)">删除</el-button>
+                <el-button link type="danger" size="large" v-if="!scope.row.role_number" @click="handleDestroy(scope.row.id)">删除</el-button>
             </template>
         </el-table-column>
     </el-table>

@@ -336,3 +336,19 @@ if (! function_exists('chinese_number_down_format')) {
         return (string) (floor($number / $fixed_number).$unit);
     }
 }
+if (! function_exists('get_flow_sn')) {
+    /**
+     * 获取流水号.
+     */
+    function get_flow_sn(): string
+    {
+        /* 选择一个随机的方案 */
+        mt_srand((int) ((float) microtime() * 1000000));
+        $del = mt_rand(1000, 9999);
+        $mul = mt_rand(10, 99);
+        $first = [6, 7, 8, 9];
+        $key = array_rand($first, 1);
+
+        return date('Ymd').$key.substr((string) ($del * $mul), 0, 6).$mul;
+    }
+}

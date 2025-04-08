@@ -286,12 +286,11 @@ onMounted(() => {
     <el-dialog
         v-model="detailDialogVisible"
         title="编辑支付方式"
-        width="700"
+        width="60%"
         center
         :before-close="closeDetailDialog">
         <div v-loading="detailFormLoading" class="s-flex jc-ct">
-            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto"
-                     style="width: 480px" size="default">
+            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="width: 100%;" size="default">
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="detailForm.name" />
                 </el-form-item>
@@ -326,8 +325,17 @@ onMounted(() => {
                     </el-upload>
                 </el-form-item>
                 <template v-if="detailForm.alias === 'wechat'">
-                    <el-form-item label="商户号" prop="config.mic_id" :rules="[{required: true, message: '商户号不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.mic_id" />
+                    <el-form-item label="微信支付服务号APP_ID" prop="config.service_wechat_pay_app_id">
+                        <el-input v-model="detailForm.config.service_wechat_pay_app_id" />
+                    </el-form-item>
+                    <el-form-item label="微信支付小程序APP_ID" prop="config.mini_wechat_pay_app_id">
+                        <el-input v-model="detailForm.config.mini_wechat_pay_app_id" />
+                    </el-form-item>
+                    <el-form-item label="微信支付应用程序(App)APP_ID" prop="config.app_wechat_pay_app_id">
+                        <el-input v-model="detailForm.config.app_wechat_pay_app_id" />
+                    </el-form-item>
+                    <el-form-item label="商户号" prop="config.mch_id" :rules="[{required: true, message: '商户号不能为空', trigger: 'blur'}]">
+                        <el-input v-model="detailForm.config.mch_id" />
                     </el-form-item>
                     <el-form-item label="商户密钥" prop="config.secret_key" :rules="[{required: true, message: '商户密钥不能为空', trigger: 'blur'}]">
                         <el-input v-model="detailForm.config.secret_key" />

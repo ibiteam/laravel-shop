@@ -20,7 +20,7 @@ class PermissionDao
 
         try {
             // 缓存逻辑
-            $menus = Cache::remember(
+            $menus = Cache::tags($guard_name.'_permission_menus')->remember(
                 $cache_key,
                 is_local_env() ? Carbon::now()->endOfDay() : null, // 本地环境缓存1天，其他环境永久缓存
                 function () use ($admin_user, $guard_name, $collect_permission_ids) {
@@ -44,7 +44,7 @@ class PermissionDao
         $query = Permission::orderByDesc('sort')->orderBy('id');
 
         if ($keywords) {
-            $query->where('display_name', 'like', "%{$keywords}%");
+            $query->where('display_name', 'like', "%{$keywords}%")->orWhere('name', 'like', "%{$keywords}%");
         }
 
         $data = $query->get()->toArray();

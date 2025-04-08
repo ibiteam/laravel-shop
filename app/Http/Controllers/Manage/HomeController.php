@@ -38,7 +38,11 @@ class HomeController extends BaseController
             ShopConfig::SHOP_LOGO,
         );
 
-        return $this->success(['admin_user' => $admin_user, 'menus' => $menus, 'shop_config' => $shop_config]);
+        $admin_data['id'] = $admin_user['id'];
+        $admin_data['user_name'] = $admin_user['user_name'];
+        $admin_data['avatar'] = $admin_user['avatar'];
+
+        return $this->success(['admin_user' => $admin_data, 'menus' => $menus, 'shop_config' => $shop_config]);
     }
 
     /**
