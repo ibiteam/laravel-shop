@@ -11,6 +11,7 @@ import SetRouter from '@/pages/set/Router.vue';
 import SetAdminUser from '@/pages/set/AdminUser.vue';
 import SetRole from '@/pages/set/Role.vue';
 import SetPermission from '@/pages/set/Permission.vue';
+import SetAdminOperationLog from '@/pages/set/AdminOperationLog.vue';
 import UserIndex from '@/pages/user/UserIndex.vue';
 import UserAddress from '@/pages/user/UserAddress.vue';
 import PaymentMethod from '@/pages/set/PaymentMethod.vue';
@@ -34,6 +35,7 @@ const router = createRouter({
                 { path: '/set/admin_user', component: SetAdminUser, name: 'manage.admin_user.index',meta:{title:'管理员列表'} },
                 { path: '/set/role', component: SetRole, name: 'manage.role.index',meta:{title:'角色管理'} },
                 { path: '/set/permission', component: SetPermission, name: 'manage.permission.index',meta:{title:'权限菜单'} },
+                { path: '/set/admin_operation_log', component: SetAdminOperationLog, name: 'manage.admin_operation_log.index',meta:{title:'管理员日志'} },
                 { path: '/set/payment_method', component: PaymentMethod, name: 'manage.payment_method.index',meta:{title:'支付方式'} },
                 { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
                 // 商品

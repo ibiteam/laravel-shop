@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int                             $id
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\AdminUser $adminUser
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ModelHasRole> $modelHasRole
+ * @property-read int|null $model_has_role_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminOperationLog newQuery()
@@ -32,7 +35,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AdminOperationLog extends Model
 {
     use DatetimeTrait;
-
     public const TYPE_STORE = 1; // 新增
     public const TYPE_UPDATE = 2; // 更新
     public const TYPE_DESTROY = 3; // 删除
@@ -42,5 +44,10 @@ class AdminOperationLog extends Model
     public function adminUser(): BelongsTo
     {
         return $this->belongsTo(AdminUser::class, 'admin_user_id', 'id');
+    }
+
+    public function modelHasRole(): HasMany
+    {
+        return $this->hasMany(ModelHasRole::class, 'model_id', 'admin_user_id');
     }
 }

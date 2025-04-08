@@ -51,7 +51,6 @@ class AdminUserController extends BaseController
                 'role_ids' => $role_ids,
                 'status' => $admin_user->status,
                 'created_at' => $admin_user->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $admin_user->updated_at->format('Y-m-d H:i:s'),
             ];
         });
 
@@ -90,7 +89,7 @@ class AdminUserController extends BaseController
             ], [], [
                 'id' => '管理员ID',
                 'user_name' => '用户名',
-                'password' => '密码',
+                'password' => '登录密码',
                 'confirm_password' => '确认密码',
                 'phone' => '手机号',
                 'role_ids' => '所属角色',

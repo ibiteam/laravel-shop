@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Manage\AdminOperationLogController;
 use App\Http\Controllers\Manage\AdminUserController;
 use App\Http\Controllers\Manage\AppDecorationController;
 use App\Http\Controllers\Manage\PaymentMethodController;
@@ -86,6 +87,13 @@ Route::prefix('set')->group(function () {
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_DELETE])->group(function () {
             Route::post('destroy', [RoleController::class, 'destroy']);
+        });
+    });
+
+    // 管理员日志
+    Route::prefix('admin_operation_log')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX])->group(function () {
+            Route::get('/', [AdminOperationLogController::class, 'index'])->name(Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX);
         });
     });
 
