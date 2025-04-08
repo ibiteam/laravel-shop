@@ -104,6 +104,7 @@
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item>账号设置</el-dropdown-item>
+                                            <el-dropdown-item @click="dropRefresh">刷新</el-dropdown-item>
                                             <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
@@ -142,7 +143,7 @@
                         </ul>
                     </div>
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
-                        <router-view v-slot="{ Component }">
+                        <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
                                 <keep-alive :include="cachedViews">
                                     <div :key="route.path" style="height: 100%;">
@@ -151,6 +152,7 @@
                                 </keep-alive>
                             </transition>
                         </router-view>
+                        <div v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
                     </div>
                 </el-main>
             </el-container>
@@ -191,10 +193,9 @@ const visible =ref(false)
 const top = ref(0)
 const left = ref(0)
 const selectedTag = ref({})
-const routeInfo = ref({})
+const isRendered = ref(true)
 
 watch(() => route.path,(to, from) => {
-    routeInfo.value = route
     for (var index in commonStore.visitedViews) {
         var view = commonStore.visitedViews[index]
         if (view.name === to.name && view.path !== to.path) {
@@ -387,7 +388,12 @@ const toOption = (item) => {
     menuValue.value = ''
     router.push({name:item.name})
 }
-
+const dropRefresh = () => {
+    isRendered.value = false;
+    setTimeout(() => {
+        isRendered.value = true;
+    }, 500);
+}
 const logOut = () =>{
     cns.$confirm('确定要退出登录?', '提示', {
         confirmButtonText: '确定',
