@@ -3,7 +3,7 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="ad-wrapper" @click="handleChooseDragItem">
-                    <div class="ad-item s-flex ai-ct jc-bt" :style="{minHeight: ColumnWidthHeight['2'].maxHeight / 2 + 'px', backgroundColor: '#fff', padding: '10px', borderRadius: '10px'}"  v-if="!form.content.data || form.content.data.length == 0">
+                    <!-- <div class="ad-item s-flex ai-ct jc-bt" :style="{minHeight: ColumnWidthHeight['2'].maxHeight / 2 + 'px', backgroundColor: '#fff', padding: '10px', borderRadius: '10px'}"  v-if="!form.content.data || form.content.data.length == 0">
                         <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
                         <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
                     </div>
@@ -42,7 +42,7 @@
                                 />
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </template>
         </drag-wrapper>

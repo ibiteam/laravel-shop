@@ -118,7 +118,7 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { TempField, TempContentDataItemField, ColumnOption, RowOption, MaxItemLength} from '@/pages/decoration/app/dataField/QuickLink.js'
+import { TempField, TempContentDataItemField, ColumnOption, RowOption, MaxItemLength} from '@/pages/decoration/app/home/dataField/QuickLink.js'
 import { updateNested } from '@/pages/decoration/utils/common.js'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Pagination, Grid } from 'swiper/modules';

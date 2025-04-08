@@ -1,15 +1,22 @@
 <template>
-    <DecorationLayout :pageName="decoration.app_website_data?.name" @pageSetting="openPageSetting">
+    <DecorationLayout 
+        :pageName="decoration.app_website_data?.name"
+        :time="decoration.app_website_data?.release_time"
+        @pageSetting="openPageSetting"
+        @pageSave="decorationSave"
+    >
+        <template #aside-content>
+            <tool-bar
+                v-bind="{
+                    component_icon: decoration.component_icon,
+                    component_value: decoration.component_value,
+                    component_data: decoration.data,
+                }"
+                @updateDragPlaceholder="updateDragPlaceholder"
+            ></tool-bar>
+        </template>
         <template #main-content>
             <div class="decoration-app-container">
-                <tool-bar
-                    v-bind="{
-                        component_icon: decoration.component_icon,
-                        component_value: decoration.component_value,
-                        component_data: decoration.data,
-                    }"
-                    @updateDragPlaceholder="updateDragPlaceholder"
-                ></tool-bar>
                 <main class="decoration-app-main" id="decorationAppMain">
                     <div class="app-wrapper">
                         <search v-if="findNotForData('home_nav')" v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}" ></search>
@@ -34,7 +41,7 @@
                         <bottom-nav-bar v-if="findNotForData('label')" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
                     </div>
                 </main>
-                <HomeSetting v-if="decoration.app_website_data && pageSetting" :data="decoration.app_website_data"></HomeSetting>
+                <HomeSetting v-show="decoration.app_website_data && pageSetting" ref="pageSettingRef" v-bind="{app_website_data: decoration.app_website_data, danping_advertisement: findNotForData('danping_advertisement'), suspended_advertisement: findNotForData('suspended_advertisement')}"></HomeSetting>
                 <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
                 <LinkCenterDialog v-if="linkCenterDialogData.show" v-bind="{...linkCenterDialogData}" @close="handleLinkCenterDialogClose" @confirm="handleLinkCenterDialogConfirm"></LinkCenterDialog>
             </div>
@@ -57,7 +64,7 @@ import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 // import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
-import { appDecorationHome } from '@/api/decoration.js'
+import { appDecorationInit, appDecorationSave } from '@/api/decoration.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -85,15 +92,19 @@ const dragData = reactive({
 })
 // 组件refs
 const tempRefs = ref([])
+// 素材中心弹窗
 const materialCenterDialogData = reactive({
     show: false,
     dir_type: 1,
     multiple: false
 })
+// 路由中心弹窗
 const linkCenterDialogData = reactive({
     show: false,
 })
+// 页面基础设置
 const pageSetting = ref(true)
+const pageSettingRef = ref(null)
 
 // 查找不可拖拽的数据
 const findNotForData = (component_name) => {
@@ -144,18 +155,40 @@ const handlematerialCenterDialogClose = () => {
 // 接收素材中心弹窗数据
 const handlematerialCenterDialogConfirm = (res) => {
     materialCenterDialogData.show = false
-    const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
-    tempRefs.value[index].updateUploadComponentData({...materialCenterDialogData, file: res})
+    const updateData = {...materialCenterDialogData, file: res}
+    if (materialCenterDialogData.temp_index) {
+        const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
+        tempRefs.value[index].updateUploadComponentData(updateData)
+        return
+    }
+    if (materialCenterDialogData.not_for_data) {
+        const not_for_data = materialCenterDialogData.not_for_data
+        if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
+            pageSettingRef.value.updateUploadComponentData(updateData)
+        }
+        return
+    }
 }
 
 // 接收路由中心弹窗数据
 const handleLinkCenterDialogConfirm = (res) => {
     linkCenterDialogData.show = false
-    const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
-    tempRefs.value[index].updateLinkComponentData({...linkCenterDialogData, link: {
+    const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
         url: res[0]?.h5_url
-    }})
+    }}
+    if (linkCenterDialogData.temp_index) {
+        const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
+        tempRefs.value[index].updateLinkComponentData(updateData)
+        return
+    }
+    if (linkCenterDialogData.not_for_data) {
+        const not_for_data = linkCenterDialogData.not_for_data
+        if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
+            pageSettingRef.value.updateLinkComponentData(updateData)
+        }
+        return
+    }
 }
 
 // 关闭路由中心弹窗
@@ -163,91 +196,130 @@ const handleLinkCenterDialogClose = () => {
     linkCenterDialogData.show = false
 }
 
+// 保存装修
+const decorationSave = (params) => {
+    try {
+        const { button_type } = params
+        const pageSettingData = pageSettingRef.value.getComponentData()
+        const { app_website_data, danping_advertisement, suspended_advertisement } = pageSettingData
+        let decoration_data = []
+        tempRefs.value.map(item => {
+            let temp_data = JSON.parse(JSON.stringify(item.getComponentData()))
+            if (temp_data.id.indexOf('-add') > -1) {
+                temp_data.id = ''
+            }
+            decoration_data.push(temp_data)
+        })
+        const saveData = {
+            button_type,
+            id: decoration.app_website_data.id,
+            title: app_website_data.title,
+            keywords: app_website_data.keywords,
+            description: app_website_data.description,
+            data: [
+                danping_advertisement,
+                suspended_advertisement,
+                ...decoration_data
+            ]
+        }
+        appDecorationSave(saveData).then(res => {
+            if (cns.$successCode(res.code)) {
+
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
 // 获取首页装修数据
 const getDecorationHome = () => {
-    appDecorationHome({id: cns.$route.query.id}).then(res => {
+    appDecorationInit({id: cns.$route.query.id}).then(res => {
         if (cns.$successCode(res.code)) {
             decoration.app_website_data = res.data.app_website_data
             decoration.component_icon = res.data.component_icon
             decoration.component_value = res.data.component_value
             decoration.data = [
                 ...res.data.data,
-                {
-                    component_name: 'advertising_banner', // 组件名
-                    content: { // 表单数据
-                        column: 2, // 每行显示： 2,3,4 默认显示2个
-                        background: 1, // 是否有背景色， 1-有 0-无 默认1
-                        background_color: '#ffffff', // 背景色，默认为白色:#ffffff
-                        width: 330, // 宽度：默认330 不可修改 2个330,3个220,4个160
-                        height: 240, // 高度：默认240（最高250）；2个240,3个150，4个150
-                        title: {
-                            image: '', // 标题小图标，默认空
-                            name: '', // 标题名称，默认空
-                            align: 'left', // 标题对齐，默认左对齐，left-左侧，center-居中
-                            suffix: '', // 标题右侧文案
-                            color: '#333333', // 标题颜色，默认#333333
-                            url: { // 标题右侧文案链接
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            }
-                        },
-                        data: []
-                    },
-                    id: '999', // 组件id
-                    is_show: 1, // 组件是否显示
-                    name: '广告图', // 组件名
-                },
-                {
-                    component_name: 'quick_link', // 组件名
-                    content: { // 表单数据
-                        row: 2, // 板块行数 1,2,3 默认2行
-                        column: 4, // 每行显示： 3,4,5 默认显示4个
-                        data: [{
-                            title: '', // 名称
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            date_type: 1, // 0:自定义  1:长期 默认长期
-                            time: [],
-                            image: '', // 图片链接
-                            is_show: 1, // 是否显示
-                        },{
-                            title: '', // 名称
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            date_type: 1, // 0:自定义  1:长期 默认长期
-                            time: [],
-                            image: '', // 图片链接
-                            is_show: 1, // 是否显示
-                        },{
-                            title: '', // 名称
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            date_type: 1, // 0:自定义  1:长期 默认长期
-                            time: [],
-                            image: '', // 图片链接
-                            is_show: 1, // 是否显示
-                        },{
-                            title: '', // 名称
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            date_type: 1, // 0:自定义  1:长期 默认长期
-                            time: [],
-                            image: '', // 图片链接
-                            is_show: 1, // 是否显示
-                        }]
-                    },
-                    id: '998', // 组件id
-                    is_show: 1, // 组件是否显示
-                    name: '金刚区', // 组件名
-                }
+                // {
+                //     component_name: 'advertising_banner', // 组件名
+                //     content: { // 表单数据
+                //         column: 2, // 每行显示： 2,3,4 默认显示2个
+                //         background: 1, // 是否有背景色， 1-有 0-无 默认1
+                //         background_color: '#ffffff', // 背景色，默认为白色:#ffffff
+                //         width: 330, // 宽度：默认330 不可修改 2个330,3个220,4个160
+                //         height: 240, // 高度：默认240（最高250）；2个240,3个150，4个150
+                //         title: {
+                //             image: '', // 标题小图标，默认空
+                //             name: '', // 标题名称，默认空
+                //             align: 'left', // 标题对齐，默认左对齐，left-左侧，center-居中
+                //             suffix: '', // 标题右侧文案
+                //             color: '#333333', // 标题颜色，默认#333333
+                //             url: { // 标题右侧文案链接
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             }
+                //         },
+                //         data: []
+                //     },
+                //     id: '999', // 组件id
+                //     is_show: 1, // 组件是否显示
+                //     name: '广告图', // 组件名
+                // },
+                // {
+                //     component_name: 'quick_link', // 组件名
+                //     content: { // 表单数据
+                //         row: 2, // 板块行数 1,2,3 默认2行
+                //         column: 4, // 每行显示： 3,4,5 默认显示4个
+                //         data: [{
+                //             title: '', // 名称
+                //             url: {
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             },
+                //             date_type: 1, // 0:自定义  1:长期 默认长期
+                //             time: [],
+                //             image: '', // 图片链接
+                //             is_show: 1, // 是否显示
+                //         },{
+                //             title: '', // 名称
+                //             url: {
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             },
+                //             date_type: 1, // 0:自定义  1:长期 默认长期
+                //             time: [],
+                //             image: '', // 图片链接
+                //             is_show: 1, // 是否显示
+                //         },{
+                //             title: '', // 名称
+                //             url: {
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             },
+                //             date_type: 1, // 0:自定义  1:长期 默认长期
+                //             time: [],
+                //             image: '', // 图片链接
+                //             is_show: 1, // 是否显示
+                //         },{
+                //             title: '', // 名称
+                //             url: {
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             },
+                //             date_type: 1, // 0:自定义  1:长期 默认长期
+                //             time: [],
+                //             image: '', // 图片链接
+                //             is_show: 1, // 是否显示
+                //         }]
+                //     },
+                //     id: '998', // 组件id
+                //     is_show: 1, // 组件是否显示
+                //     name: '金刚区', // 组件名
+                // }
             ]
             decoration.not_for_data = res.data.not_for_data
         }
@@ -257,7 +329,6 @@ const getDecorationHome = () => {
 const openPageSetting = () => {
     pageSetting.value = true
     decoration.temp_index = ''
-    console.log('openPageSetting')
 }
 
 
@@ -302,13 +373,13 @@ onMounted(() => {
             }
         })
         // 打开素材中心弹窗
-        cns.$bus.on('openUploadDialog', (params = {show: false, dir_type: 1, multiple: false, temp_index: ''}) => {
+        cns.$bus.on('openUploadDialog', (params = {show: false, dir_type: 1, multiple: false}) => {
             Object.keys(params).forEach(key => {
                 materialCenterDialogData[key] = params[key]
             })
         })
         // 打开路由中心弹窗
-        cns.$bus.on('openLinkDialog', (params = {show: false, temp_index: ''}) => {
+        cns.$bus.on('openLinkDialog', (params = {show: false}) => {
             Object.keys(params).forEach(key => {
                 linkCenterDialogData[key] = params[key]
             })
@@ -320,7 +391,7 @@ onUnmounted(() => {
     cns.$bus.off('chooseDragItem')
     cns.$bus.off('updateComponentData')
     cns.$bus.off('openUploadDialog')
-    cns.$bus.off('openPageSetting')
+    cns.$bus.off('openLinkDialog')
 })
 
 </script>
@@ -397,7 +468,7 @@ export default {
     .decoration-app-main{
         width: 100%;
         height: 100%;
-        padding: 20px 400px 20px 300px;
+        padding: 20px 400px 20px 20px;
         box-sizing: border-box;
         overflow: hidden;
         position: relative;

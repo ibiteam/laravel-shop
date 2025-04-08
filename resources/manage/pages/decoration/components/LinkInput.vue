@@ -13,7 +13,7 @@
 
 <script setup>
 import { ref, reactive, watch, defineEmits } from 'vue';
-import { LinkDataItemField } from '@/pages/decoration/app/dataField/Index.js'
+import { LinkDataItemField } from '@/pages/decoration/app/home/dataField/Index.js'
 const props = defineProps({
     name: '',
     value: '',

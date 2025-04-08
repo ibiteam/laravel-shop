@@ -88,21 +88,21 @@ export const BackgroundOption = [{
 // 默认宽，最大高度，最小高度，最大添加长度
 export const ColumnWidthHeight = {
     "2": {
-        width: 330,
-        maxHeight: 240,
+        width: 340,
+        maxHeight: 250,
         minHeight: 190,
         maxItemLength: 8,
     },
     "3": {
-        width: 220,
-        maxHeight: 150,
-        minHeight: 150,
+        width: 230,
+        maxHeight: 400,
+        minHeight: 280,
         maxItemLength: 12,
     },
     "4": {
-        width: 160,
-        maxHeight: 150,
-        minHeight: 150,
+        width: 170,
+        maxHeight: 350,
+        minHeight: 220,
         maxItemLength: 16,
     },
 }

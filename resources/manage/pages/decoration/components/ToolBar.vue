@@ -134,16 +134,16 @@ watch(() => props, (newVal) => {
 <style lang='scss' scoped>
 @import '@/assets/css/decoration-svg-icon.css';
 .toolbar-wrapper{
-    width: 300px;
-    height: inherit;
+    width: 100%;
+    height: 100%;
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden auto;
     background-color: #fff;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 2;
+    // position: absolute;
+    // left: 0;
+    // top: 0;
+    // z-index: 2;
     user-select: none;
     :deep(.el-collapse),
     :deep(.el-collapse-item__header),

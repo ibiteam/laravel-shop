@@ -36,9 +36,13 @@
                                     <LinkInput
                                         :name="area.url.name"
                                         :value="area.url.value"
-                                        @clear="(res) => hotZoneDialog.data[index].url = res"
-                                        @select=""
-                                        @input=""
+                                        @select="handleOpenLink(['areas', index, 'url'])"
+                                        @input="(res) => {
+                                            hotZoneDialog.data[index].url = res
+                                        }"
+                                        @clear="(res) => {
+                                            hotZoneDialog.data[index].url = res
+                                        }"
                                     />
                                     <em class="iconfont icon-shanchu" style="margin-left: 10px;" @click.stop="hotZoneDialog.data.splice(index, 1)" title="删除热区"></em>
                                 </div>
@@ -76,7 +80,11 @@ const props = defineProps({
             height: 100,
             url: ''
         }]
-    }
+    },
+    temp_index: {
+        type: [Number, String],
+        default: ''
+    },
 })
 
 const emit = defineEmits(['save', 'close'])
@@ -87,6 +95,11 @@ const hotZoneDialog = reactive({
     data: []
 })
 const formRef = ref(null)
+
+// 通知打开选择路由弹窗
+const handleOpenLink = (keys) => {
+    cns.$bus.emit('openLinkDialog', {temp_index: props.temp_index, keys, show: true})
+}
 
 
 // 获取选区数据

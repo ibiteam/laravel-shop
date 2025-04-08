@@ -34,7 +34,7 @@
                 </template>
             </setting-bar>
         </teleport>
-        <HotZoneDialog v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas}" @close="showDialog = false" />
+        <HotZoneDialog v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas, temp_index}" @close="showDialog = false" />
     </section>
 </template>
 <script setup>
@@ -44,7 +44,7 @@ import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import { ref, reactive, watch, getCurrentInstance, defineExpose } from 'vue'
 import HotZoneDialog from './HotZoneDialog.vue'
-import { MaxItemLength } from '@/pages/decoration/app/dataField/HotZone.js'
+import { MaxItemLength } from '@/pages/decoration/app/home/dataField/HotZone.js'
 
 
 const cns = getCurrentInstance().appContext.config.globalProperties

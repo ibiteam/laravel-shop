@@ -133,14 +133,14 @@
                                             </el-form-item>
                                             <el-form-item label="时间">
                                                 <el-date-picker
-                                                    :class="item.time.length == 0 ? 'time-long' : 'time-range'"
+                                                    :class="item.time?.length == 0 ? 'time-long' : 'time-range'"
                                                     v-model="item.time"
                                                     value-format="YYYY-MM-DD HH:mm:ss"
                                                     type="datetimerange"
                                                     size="large"
                                                     :editable="false"
                                                     :default-time="[new Date(2000, 1, 1, 0, 0, 0), new Date(2000, 2, 1, 23, 59, 59)]"
-                                                    :range-separator="item.time.length == 0 ? '长期' : '~'"
+                                                    :range-separator="item.time?.length == 0 ? '长期' : '~'"
                                                     :disabled-date="(time) => {
                                                         const today = new Date();
                                                         today.setHours(0, 0, 0, 0);
@@ -153,7 +153,6 @@
                                                             item.date_type = 1;
                                                             item.time = []
                                                         }
-                                                        console.log(item.date_type, item.time)
                                                     }"
                                                     @clear="() => {
                                                         item.date_type = 1;
@@ -188,7 +187,7 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { TempField, TempContentDataItemField, StyleOption, MaxItemLength } from '@/pages/decoration/app/dataField/HorizontalCarousel.js'
+import { TempField, TempContentDataItemField, StyleOption, MaxItemLength } from '@/pages/decoration/app/home/dataField/HorizontalCarousel.js'
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Autoplay,Pagination } from 'swiper/modules';
 import 'swiper/css';

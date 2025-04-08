@@ -1,5 +1,5 @@
 <template>
-    <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 50)+ 'px', right: computedStyle.getPropertyValue('padding-right'), bottom: computedStyle.getPropertyValue('padding-bottom')}">
+    <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 50)+ 'px', right: computedStyle?.getPropertyValue('padding-right'), bottom: computedStyle?.getPropertyValue('padding-bottom')}">
         <div class="setting-bar-header s-flex ai-ct jc-bt" v-if="name">
             <p class="fs16 fw-b">{{ name }}</p>
         </div>
@@ -62,7 +62,7 @@ const props = defineProps({
 
 const formType = ref(0)
 const clientHeight = ref(0)
-const computedStyle = window.getComputedStyle(document.getElementById('shopLayoutView'))
+const computedStyle = ref(null)
 
 const emit = defineEmits(['close', 'submit'])
 const handleCancle = () => {
@@ -74,6 +74,7 @@ onMounted(() => {
     nextTick(() => {
         const element = document.querySelector('.decoration-layout-container')
         clientHeight.value = element.clientHeight
+        computedStyle.value = window.getComputedStyle(document.getElementById('shopLayoutView'))
     })
 })
 
@@ -123,40 +124,40 @@ onMounted(() => {
             width: calc(100% - 40px);
             position: relative;
         }
-        // 长期时间
-        .time-long {
-            .el-range-input{
-                display: none;
-                width: 30%;
-                margin: 0 4.5%;
-            }
+    }
+    // 长期时间
+    .time-long {
+        .el-range-input{
+            display: none;
+            width: 30%;
+            margin: 0 4.5%;
         }
-        // 范围时间
-        .time-range {
-            display: block!important;
-            width: 100%;
-            position: relative;
-            .el-range-input {
-                display: block;
-                height: 20px;
-                width: calc(100% - 40px);
-                margin: 0 10px 0 20px;
-            }
-            .el-range-separator {
-                display: none;
-            }
-            .el-range__close-icon {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                right: 10px;
-                margin: auto 0;
-            }
+    }
+    // 范围时间
+    .time-range {
+        display: block!important;
+        width: 100%;
+        position: relative;
+        .el-range-input {
+            display: block;
+            height: 20px;
+            width: calc(100% - 40px);
+            margin: 0 10px 0 20px;
         }
-        .not-required{
-            .el-form-item__label:before {
-                display: none;
-            }
+        .el-range-separator {
+            display: none;
+        }
+        .el-range__close-icon {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 10px;
+            margin: auto 0;
+        }
+    }
+    .not-required{
+        .el-form-item__label:before {
+            display: none;
         }
     }
 }
