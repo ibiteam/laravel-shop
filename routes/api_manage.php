@@ -10,7 +10,7 @@ Route::post('login', [LoginController::class, 'login'])->name('manage.login.subm
 
 Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
     Route::post('upload', [UploadController::class, 'upload']);
-
+    Route::get('logout', [LoginController::class, 'logout']); // 退出登录
     Route::prefix('home')->group(function () {
         Route::get('config', [HomeController::class, 'config']);  // 初始化配置
         Route::get('dashboard', [HomeController::class, 'dashboard']);  // 首页数据

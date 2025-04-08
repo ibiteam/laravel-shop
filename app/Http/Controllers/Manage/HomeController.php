@@ -35,9 +35,10 @@ class HomeController extends BaseController
         $shop_config = $shop_config_dao->multipleConfig(
             ShopConfig::MANAGE_COLOR,
             ShopConfig::MOUSE_MOVE_COLOR,
+            ShopConfig::SHOP_LOGO,
         );
 
-        return $this->success(['menus' => $menus, 'shop_config' => $shop_config]);
+        return $this->success(['admin_user' => $admin_user, 'menus' => $menus, 'shop_config' => $shop_config]);
     }
 
     /**

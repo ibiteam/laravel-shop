@@ -13,6 +13,7 @@ use App\Utils\RsaUtil;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends BaseController
@@ -85,5 +86,15 @@ class LoginController extends BaseController
         } catch (\Throwable $throwable) {
             return $this->error('登录失败');
         }
+    }
+
+    /**
+     * 退出登录.
+     */
+    public function logout()
+    {
+        Auth::guard(config('auth.manage.guard'))->logout();
+
+        return $this->success('退出登录成功');
     }
 }
