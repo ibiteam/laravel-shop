@@ -100,7 +100,7 @@
                                     </div>
                                     <template #dropdown>
                                         <el-dropdown-menu>
-                                            <el-dropdown-item>账号设置</el-dropdown-item>
+                                            <el-dropdown-item @click="router.push({name:'manage.shop_config.index'})">设置</el-dropdown-item>
                                             <el-dropdown-item @click="dropRefresh">刷新</el-dropdown-item>
                                             <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
