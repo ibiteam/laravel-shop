@@ -43,8 +43,6 @@ class PaymentMethod extends Model
 {
     use DatetimeTrait;
 
-    public const WECHAT = 'wechat'; // 微信支付
-
     protected $guarded = [];
 
     protected function casts(): array
