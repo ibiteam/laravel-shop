@@ -89,7 +89,7 @@ class AdminUserController extends BaseController
                 'status' => 'required|boolean',
             ], [], [
                 'id' => '管理员ID',
-                'name' => '用户名',
+                'user_name' => '用户名',
                 'password' => '密码',
                 'confirm_password' => '确认密码',
                 'phone' => '手机号',
@@ -106,13 +106,13 @@ class AdminUserController extends BaseController
                     throw new BusinessException('管理员不存在');
                 }
 
-                if (AdminUser::where('id', '!=', $validated['id'])->whereName($validated['name'])->first()) {
+                if (AdminUser::where('id', '!=', $validated['id'])->whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
             } else {
                 $admin_user = new AdminUser;
 
-                if (AdminUser::whereName($validated['name'])->first()) {
+                if (AdminUser::whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
             }
@@ -135,6 +135,8 @@ class AdminUserController extends BaseController
             }
 
             $admin_user->user_name = $validated['user_name'];
+            $admin_user->nickname = '';
+            $admin_user->avatar = '';
             $admin_user->phone = $validated['phone'];
             $admin_user->status = intval($validated['status']);
 
@@ -165,7 +167,7 @@ class AdminUserController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('管理员操作异常~');
+            return $this->error('管理员操作异常~'.$throwable->getMessage());
         }
     }
 

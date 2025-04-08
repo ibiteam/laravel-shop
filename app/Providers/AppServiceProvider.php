@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,5 +22,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // 网站颜色
         view()->share('app_shop_color', shop_config('shop_color'));
+
+        Validator::extend('is_phone', function ($attribute, $value, $parameters, $validator) {
+            return is_phone($value);
+        });
     }
 }
