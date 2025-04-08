@@ -2,8 +2,11 @@
 
 namespace App\Services\Order;
 
+use App\Enums\OrderStatusEnum;
 use App\Enums\OrderTypeEnum;
+use App\Enums\PayStatusEnum;
 use App\Enums\RefererEnum;
+use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\PaymentMethodDao;
@@ -157,10 +160,10 @@ class OrderService
             $order = Order::query()->create([
                 'no' => $this->generateOrderSn(),
                 'user_id' => $current_user->id,
-                'type' => $this->getOrderTypeEnum()->value,
-                'order_status' => 1,
-                'pay_status' => 0,
-                'ship_status' => 0,
+                'type' => $this->getOrderTypeEnum(),
+                'order_status' => OrderStatusEnum::CONFIRMED,
+                'pay_status' => PayStatusEnum::PAY_WAIT,
+                'ship_status' => ShippingStatusEnum::UNSHIPPED,
                 'province_id' => $user_address->province,
                 'city_id' => $user_address->city,
                 'district_id' => $user_address->district,
@@ -202,9 +205,8 @@ class OrderService
             //
             // }
 
-            // todo 待支付金额为0时 支付状态直接调整为已支付
-            if ($order->money_paid === 0.00) {
-                $order->pay_status = 1;
+            if ($order->order_amount == 0) {
+                $order->pay_status = PayStatusEnum::PAYED;
                 $order->paid_at = now()->toDateTimeString();
                 $order->save();
             }
@@ -213,7 +215,7 @@ class OrderService
 
             return [
                 'no' => $order->no,
-                'can_pay' => $order->order_amount > 0,
+                'can_pay' => $order->pay_status === PayStatusEnum::PAY_WAIT,
             ];
         } catch (BusinessException $business_exception) {
             DB::rollBack();
