@@ -18,7 +18,16 @@ class PaymentMethodTableSeeder extends Seeder
             '微信支付',
             '此方式仅支持付款金额≤900元的订单',
             url('/images/icons/wechat_pay_logo.png'),
-            ['mch_id' => '', 'secret_key' => '', 'v2_secret_key' => '', 'private_key' => '', 'certificate' => ''],
+            [
+                'service_wechat_pay_app_id' => '',
+                'mini_wechat_pay_app_id' => '',
+                'app_wechat_pay_app_id' => '',
+                'mch_id' => '',
+                'secret_key' => '',
+                'v2_secret_key' => '',
+                'private_key' => '',
+                'certificate' => '',
+            ],
             false,
             99999
         );
