@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItemDraft whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItemDraft whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItemDraft whereUpdatedAt($value)
+ * @property-read \App\Models\AppWebsiteDecoration $app_website_decoration
  * @mixin \Eloquent
  */
 class AppDecorationItemDraft extends Model
@@ -42,4 +43,9 @@ class AppDecorationItemDraft extends Model
     protected $casts = [
         'content' => 'array',
     ];
+
+    public function app_decoration()
+    {
+        return $this->belongsTo(AppWebsiteDecoration::class, 'app_decoration_id', 'id');
+    }
 }

@@ -6,23 +6,28 @@ use App\Components\ComponentFactory;
 use App\Components\PageDefaultDict;
 use App\Exceptions\BusinessException;
 use App\Http\Resources\CommonResourceCollection;
-use App\Models\AppDecoration as AppDecorationModel;
+use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
+use App\Models\AppDecorationItemDraft;
+use App\Services\AppDecoration\AppDecorationLogService;
+use App\Services\AppDecoration\AppDecorationService;
 use App\Utils\Constant;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB as DBFacade;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class AppDecorationController extends BaseController
 {
     public function index(Request $request)
     {
-        $query = AppDecorationModel::query()
+        $query = AppDecoration::query()
             ->with('adminUser:id,user_name')
             ->withCount('children')
             ->orderBy('id')
             ->whereParentId(Constant::ZERO);
         $list = $query->paginate($request->input('number', 10));
-        $list->getCollection()->transform(function (AppDecorationModel $app_decoration) {
+        $list->getCollection()->transform(function (AppDecoration $app_decoration) {
             $app_decoration->admin_user_name = $app_decoration->adminUser?->user_name ?? '--';
 
             return $app_decoration;
@@ -31,56 +36,50 @@ class AppDecorationController extends BaseController
         return $this->success(new CommonResourceCollection($list));
     }
 
-    public function decoration(Request $request)
+    public function decoration(Request $request, AppDecorationService $app_decoration_service)
     {
         $id = $request->input('id');
-        $app_website_decoration = AppDecorationModel::query()->whereId($id)->first();
+        $app_decoration = AppDecoration::query()->whereId($id)->first();
 
-        if (! $app_website_decoration) {
+        if (! $app_decoration) {
             return $this->error('未找到网站装修信息');
         }
-        $app_website_data = $app_website_decoration->toArray();
-        $rely_on_data = collect();
-        $temp_component_rely_on = $component_rely_on[$app_website_decoration->alias] ?? [];
-
-        if (! empty($temp_component_rely_on)) {
-            $rely_on_data = AppDecorationItem::query()
-                ->whereIn('component_name', $component_rely_on[$app_website_decoration->alias] ?? [])
-                ->whereHas('app_website_decoration', function ($query) use ($app_website_decoration) {
-                    return $query->where('alias', AppDecorationModel::ALIAS_HOME);
-                })->get()->map(function (AppDecorationItem $item) {
-                    return ComponentFactory::getComponent($item->component_name)->display($item->toArray());
-                });
-
-            if ($rely_on_data->isEmpty()) {
-                return $this->error('当前页面的部分组件(导航栏或标签栏)依赖首页设置，请先前往首页设置后再进行装修');
-            }
-        }
-        $item_data = $app_website_decoration->item;
+        $app_website_data = $app_decoration->toArray();
+        // 查询历史记录中最新一条 对应的草稿数据
+        $item_data = $app_decoration_service->getLatestDraftItems($app_decoration);
         /* 不参与循环的组件 */
         $not_for_names = [
-            AppDecorationModel::ALIAS_HOME => [
-//                AppDecorationItem::COMPONENT_NAME_LABEL,
-//                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-//                AppDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-//                AppDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-//                AppDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
+            AppDecoration::ALIAS_HOME => [
+                AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
+                AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+                //                AppDecorationItem::COMPONENT_NAME_LABEL,
+                //                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+                //                AppDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
+                //                AppDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
+                //                AppDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
             ],
         ];
 
         try {
-            [$component_icon, $component_value, $not_items_fixed_value] = app(PageDefaultDict::class)->commonMap($app_website_decoration->alias);
+            [$component_icon, $component_value, $not_items_fixed_value] = app(PageDefaultDict::class)->commonMap($app_decoration->alias);
+
             if ($item_data->isEmpty()) {
+                // 无关联数据 取固定组件数据
                 $temp_data = $not_items_fixed_value;
             } else {
-                $temp_data = $item_data->map(function (AppDecorationItem $item) {
+                // 有关联数据 查询重组关联数据
+                $temp_data = $item_data->map(function (AppDecorationItemDraft $item) {
                     return ComponentFactory::getComponent($item->component_name)->display($item->toArray());
                 })->toArray();
             }
+            $temp_data = collect($temp_data)->values();
+            // 可多个组件的数据
+            $data = $temp_data->whereNotIn('component_name', $not_for_names[$app_decoration->alias] ?? [])->values()->toArray();
+            // 不可多个组件的数据
+            $not_for_data = $temp_data->whereIn('component_name', $not_for_names[$app_decoration->alias] ?? [])->values()->toArray();
 
-            $temp_data = collect($temp_data)->merge($rely_on_data)->values();
-            $data = $temp_data->whereNotIn('component_name', $not_for_names[$app_website_decoration->alias] ?? [])->values()->toArray();
-            $not_for_data = $temp_data->whereIn('component_name', $not_for_names[$app_website_decoration->alias] ?? [])->values()->toArray();
+            return $this->success(compact('component_icon', 'data', 'component_value', 'not_for_data', 'app_website_data'));
         } catch (\Exception $exception) {
             if ($exception instanceof BusinessException) {
                 return $this->error($exception->getMessage());
@@ -88,187 +87,137 @@ class AppDecorationController extends BaseController
 
             return $this->error('初始化失败');
         }
-
-        return $this->success([
-            'component_icon' => $component_icon,
-            'component_value' => $component_value,
-            'data' => $data,
-            'app_website_data' => $app_website_data,
-            'not_for_data' => $not_for_data,
-        ]);
     }
 
-    public function decorationStore(Request $request)
+    // 保存草稿
+    public function decorationStore(Request $request, AppDecorationLogService $app_decoration_log_service, AppDecorationService $app_decoration_service)
     {
-        $id = $request->input('id');
-        $data = $request->input('data');
-        $app_website_decoration = AppDecorationModel::query()->whereId($id)->first();
+        $admin_user_id = $this->adminUser()?->id ?: 0;
+        try {
+            // 获取请求参数
+            $validated = $request->validate([
+                'id' => 'required|integer|exists:\App\Models\AppDecoration,id',
+                'title' => 'required|string',
+                'keywords' => 'required|string',
+                'description' => 'required|string',
+                'button_type' => 'required|integer|in:' . AppDecoration::OPERATE_TYPE_RELEASE . ',' . AppDecoration::OPERATE_TYPE_PREVIEW . ',' . AppDecoration::OPERATE_TYPE_SAVE_DRAFT,
+            ], [], [
+                'id' => '装修页面ID',
+                'title' => '标题',
+                'keywords' => '关键词',
+                'description' => '描述',
+                'button_type' => '操作类型',
+            ]);
+            $button_type = $validated['button_type'];
+            // 获取装修信息
+            $app_decoration = $app_decoration_service->getAppDecoration($validated['id']);
 
-        if (! $app_website_decoration) {
+            $data = $request->get('data');
+            // 校验组件数据
+            $app_decoration_service->validateComponentData($app_decoration, $data);
+
+            // 处理新增和更新的数据
+            [$insert_data, $update_data] = $this->processComponentData($data, $button_type);
+
+            DB::beginTransaction();
+
+            // 插入新数据
+            $insertedIds = $this->handleInserts($app_decoration, $insert_data);
+            // 更新已有数据
+            $updatedIds = $this->handleUpdates($app_decoration, $update_data);
+            // 合并所有组件 ID
+            $item_ids = array_merge($insertedIds, $updatedIds);
+
+            // 更新装修信息
+            $app_decoration->admin_user_id = $admin_user_id;
+            $app_decoration->title = $validated['title'];
+            $app_decoration->keywords = $validated['keywords'];
+            $app_decoration->description = $validated['description'];
+            $app_decoration->save();
+            // 处理日志记录
+            $app_decoration_service->handleLog($app_decoration_log_service, $app_decoration, $item_ids, $button_type, $admin_user_id);
+
+            DB::commit();
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (ModelNotFoundException $e) {
             return $this->error('未找到网站装修信息');
-        }
-        // 组件针对页面唯一
-        $page_only_names = [
-            AppDecorationModel::ALIAS_HOME => [
-                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppDecorationItem::COMPONENT_NAME_LABEL,
-            ],
-            AppDecorationModel::ALIAS_SELLER_HOME => [
-                AppDecorationItem::COMPONENT_NAME_SELLER_LABEL,
-                AppDecorationItem::COMPONENT_NAME_SELLER_GOODS_DATA,
-                AppDecorationItem::COMPONENT_NAME_SELLER_ORDER_DATA,
-                AppDecorationItem::COMPONENT_NAME_SELLER_BUSINESS_DATA,
-                AppDecorationItem::COMPONENT_NAME_SELLER_HELP_CENTER,
-            ],
-            AppDecorationModel::ALIAS_SELLER_WORKBENCH => [
-                AppDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV,
-            ],
-        ];
-        $only_names = $page_only_names[$app_website_decoration->alias] ?? [];
-
-        if (! empty($only_names)) {
-            foreach ($only_names as $only_name) {
-                $temp_only_item = collect($data)->where('component_name', $only_name)->values();
-
-                if ($temp_only_item->count() > 1) {
-                    return $this->error(($temp_only_item->first()['name'] ?? '').'组件具备唯一特性，无法设置多次，请调整后进行修改');
-                }
-            }
-        }
-        // 固定组件中 某些页面是必须传的 如果不传异常提示
-        $fixed_component_must = [
-            AppDecorationModel::ALIAS_HOME => [
-                AppDecorationItem::COMPONENT_NAME_LABEL,
-                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-                AppDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-                AppDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-                AppDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
-            ],
-            AppDecorationModel::ALIAS_SELLER_HOME => [
-                AppDecorationItem::COMPONENT_NAME_SELLER_LABEL,
-                AppDecorationItem::COMPONENT_NAME_SELLER_SHOP_INFO,
-            ],
-            AppDecorationModel::ALIAS_SELLER_WORKBENCH => [
-                AppDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV,
-            ],
-        ];
-        /* 组件中文名称 */
-        $component_chinese_name = [
-            AppDecorationItem::COMPONENT_NAME_LABEL => '标签栏',
-            AppDecorationItem::COMPONENT_NAME_HOME_NAV => '导航栏',
-            AppDecorationItem::COMPONENT_NAME_LARGE_SCREEN => '大屏广告位',
-            AppDecorationItem::COMPONENT_NAME_RED_ENVELOPE => '签到送红包',
-            AppDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING => '侧边广告位',
-            AppDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT => '二楼广告位',
-            AppDecorationItem::COMPONENT_NAME_SELLER_LABEL => '标签栏',
-            AppDecorationItem::COMPONENT_NAME_SELLER_SHOP_INFO => '店铺信息',
-            AppDecorationItem::COMPONENT_NAME_SELLER_STORE_NAV => '店铺导航',
-            AppDecorationItem::COMPONENT_NAME_ZIXUN_LABEL => '标签栏',
-            AppDecorationItem::COMPONENT_NAME_TRY_LABEL => '标签栏',
-        ];
-        $temp_fixed_component_must = $fixed_component_must[$app_website_decoration->alias] ?? [];
-
-        if (! empty($temp_fixed_component_must)) {
-            foreach ($temp_fixed_component_must as $temp_fixed_component_item) {
-                $is_exists_request = collect($data)->where('component_name', $temp_fixed_component_item)->values()->count();
-
-                if (! $is_exists_request) {
-                    return $this->error(($component_chinese_name[$temp_fixed_component_item] ?? '').'组件必须设置，请调整后进行修改');
-                }
-            }
-        }
-
-        /* 全局唯一组件校验 只限 导航栏与标签栏 */
-        if ($app_website_decoration->alias !== AppDecorationModel::ALIAS_HOME) {
-            $temp_globally_unique = collect($data)->whereIn('component_name', [AppDecorationItem::COMPONENT_NAME_LABEL, AppDecorationItem::COMPONENT_NAME_HOME_NAV])->values();
-
-            if ($temp_globally_unique->count() > 0) {
-                return $this->error(($temp_globally_unique->first()['name'] ?? '').'组件具备全局唯一特性，无法设置多次，请前往首页进行设置');
-            }
-        }
-
-        if (in_array($app_website_decoration->alias, [AppDecorationModel::ALIAS_NOTICE, AppDecorationModel::ALIAS_CART, AppDecorationModel::ALIAS_DISTRIBUTION], true)) {
-            return $this->error("暂不支持对 {$app_website_decoration->name} 进行装修");
-        }
-
-        if (in_array($app_website_decoration->alias, AppDecorationModel::$storeMapAlias, true) && ! $app_website_decoration->parent_id) {
-            return $this->error("暂不支持对 {$app_website_decoration->name} 进行装修");
-        }
-
-        /* my order component is special check */
-        if (empty($data) && $app_website_decoration->alias !== AppDecorationModel::ALIAS_ORDER) {
-            return $this->error('非我的订单不支持所有组件设置为空');
-        }
-
-        $update_data = [];
-        $insert_data = [];
-
-        try {
-            foreach ($data as $key => $datum) {
-                if (! isset($datum['component_name'])) {
-                    continue;
-                }
-                $temp_item = ComponentFactory::getComponent($datum['component_name'], $datum['name'])->validate($datum);
-                $temp_item['sort'] = $key + 1;
-
-                if (isset($temp_item['id']) && $temp_item['id'] > 0) {
-                    $update_data[] = $temp_item;
-                } else {
-                    $insert_data[] = $temp_item;
-                }
-            }
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception);
         } catch (\Exception $exception) {
-            if ($exception instanceof BusinessException) {
-                return $this->error($exception->getMessage());
-            }
-
-            return $this->error('校验失败');
-        }
-
-        /* 拆分数据 */
-        $temp_update_item_ids = array_column($update_data, 'id');
-        $delete_item_ids = $app_website_decoration->item->filter(function (AppDecorationItem $item) use ($temp_update_item_ids) {
-            return ! in_array($item->id, $temp_update_item_ids);
-        })->pluck('id')->toArray();
-        DBFacade::beginTransaction();
-
-        try {
-            /* $data is empty clear decoration items data */
-            if (empty($data)) {
-                if ($app_website_decoration->alias === AppDecorationModel::ALIAS_ORDER) {
-                    $app_website_decoration->item()->delete();
-                }
-            } else {
-                /* 先删除掉需要删除的 */
-                if (! empty($delete_item_ids)) {
-                    $app_website_decoration->item()->whereIn('id', $delete_item_ids)->delete();
-                }
-
-                /* 处理新增的 */
-                if (! empty($insert_data)) {
-                    foreach ($insert_data as $insert_datum) {
-                        $app_website_decoration->item()->create($insert_datum);
-                    }
-                }
-
-                /* 处理更新的 */
-                if (! empty($update_data)) {
-                    foreach ($update_data as $update_datum) {
-                        $app_website_decoration->item()->where('id', $update_datum['id'])->update($update_datum);
-                    }
-                }
-            }
-            /* app website decoration table update */
-            $app_website_decoration->admin_user_id = $this->adminUser()->id;
-            $app_website_decoration->save();
-            DBFacade::commit();
-        } catch (\Exception $exception) {
-            DBFacade::rollBack();
+            DB::rollBack();
 
             return $this->error('装修失败，请稍后重试'.$exception->getMessage());
         }
-        $this->clearCache($app_website_decoration);
 
         return $this->success([]);
+    }
+
+    /**
+     * 处理组件数据，区分插入和更新
+     *
+     * @param array $data
+     * @return array
+     */
+    private function processComponentData(array $data, int $button_type): array
+    {
+        $insert_data = [];
+        $update_data = [];
+
+        foreach ($data as $key => $datum) {
+            if (!isset($datum['component_name'])) {
+                continue;
+            }
+
+            $temp_item = ComponentFactory::getComponent($datum['component_name'], $datum['name'])->validate($datum);
+            $temp_item['sort'] = $key + 1;
+
+            if (isset($temp_item['id']) && $temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
+                $update_data[] = $temp_item;
+            } else {
+                $temp_item['id'] = 0;
+                $insert_data[] = $temp_item;
+            }
+        }
+
+        return [$insert_data, $update_data];
+    }
+
+    /**
+     * 处理新增数据
+     *
+     * @param AppDecoration $app_decoration
+     * @param array $insert_data
+     * @return array
+     */
+    private function handleInserts(AppDecoration $app_decoration, array $insert_data): array
+    {
+        $insertedIds = [];
+
+        foreach ($insert_data as $insert_datum) {
+            $insertedModel = $app_decoration->itemDraft()->create($insert_datum);
+            $insertedIds[] = $insertedModel->id;
+        }
+
+        return $insertedIds;
+    }
+
+    /**
+     * 处理更新数据
+     *
+     * @param AppDecoration $app_decoration
+     * @param array $update_data
+     * @return array
+     */
+    private function handleUpdates(AppDecoration $app_decoration, array $update_data): array
+    {
+        $updatedIds = [];
+
+        foreach ($update_data as $update_datum) {
+            $app_decoration->itemDraft()->where('id', $update_datum['id'])->update($update_datum);
+            $updatedIds[] = $update_datum['id'];
+        }
+
+        return $updatedIds;
     }
 }

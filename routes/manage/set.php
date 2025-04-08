@@ -102,9 +102,10 @@ Route::prefix('set')->group(function () {
     Route::prefix('app_decoration')->group(function () {
         Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
             Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
+            Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
-            Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
+            Route::post('/decoration/store', [AppDecorationController::class, 'decorationStore']); // 移动端装修
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_DELETE])->group(function () {
 

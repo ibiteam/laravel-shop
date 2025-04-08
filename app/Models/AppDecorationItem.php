@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItem whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItem whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationItem whereUpdatedAt($value)
+ * @property-read \App\Models\AppWebsiteDecoration $app_website_decoration
  * @mixin \Eloquent
  */
 class AppDecorationItem extends Model
@@ -43,8 +44,15 @@ class AppDecorationItem extends Model
     public const COMPONENT_NAME_HORIZONTAL_CAROUSEL = 'horizontal_carousel'; // 组件名称
     public const STYLE_TILED = 1; // 显示样式 - 平铺
     public const STYLE_TRANSITION = 2; // 显示样式 - 过渡
+    public const COMPONENT_NAME_DANPING_ADVERTISEMENT = 'danping_advertisement'; // 弹屏广告
+    public const COMPONENT_NAME_SUSPENDED_ADVERTISEMENT = 'suspended_advertisement'; // 悬浮广告
 
     protected $casts = [
         'content' => 'array',
     ];
+
+    public function app_website_decoration()
+    {
+        return $this->belongsTo(AppWebsiteDecoration::class, 'app_decoration_id', 'id');
+    }
 }

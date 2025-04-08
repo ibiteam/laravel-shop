@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api\V1\Order;
 
 use App\Enums\OrderTypeEnum;
 use App\Exceptions\BusinessException;

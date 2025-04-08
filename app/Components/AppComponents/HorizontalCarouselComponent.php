@@ -84,7 +84,7 @@ class HorizontalCarouselComponent extends PageComponent
         $is_show_validate_string = Constant::ONE.','.Constant::ZERO;
         $publicData = $this->getPublicData();
         $validate_data = [
-            'id' => 'nullable|integer|exists:\App\Models\AppWebsiteDecorationItem,id',
+            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItemDraft,id',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
             'is_show' => 'required|integer|in:'.$is_show_validate_string,
@@ -152,6 +152,10 @@ class HorizontalCarouselComponent extends PageComponent
         $items = collect($content['data'])
             ->map(function ($item) {
                 if ($item['is_show'] == Constant::ZERO) {
+                    return null;
+                }
+                $time = date('Y-m-d H:i:s');
+                if ($item['date_type'] != $this->long_time_yes && $item['time'][0] > $time && $item['time'][1] < $time ) {
                     return null;
                 }
 
