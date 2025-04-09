@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AppDecorationTableSeeder::class);
         $this->call(RegionSeeder::class);
         $this->call(SensitiveWordSeeder::class);
-        $this->call(PaymentMethodTableSeeder::class);
+        $this->call(PaymentTableSeeder::class);
     }
 }

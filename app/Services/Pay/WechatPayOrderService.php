@@ -5,7 +5,7 @@ namespace App\Services\Pay;
 use App\Enums\PayFormEnum;
 use App\Http\Dao\TransactionDao;
 use App\Models\Order;
-use App\Models\PaymentMethod;
+use App\Models\Payment;
 use App\Models\ShopConfig;
 use App\Utils\Wechat\WechatPayUtil;
 
@@ -14,9 +14,9 @@ class WechatPayOrderService implements PayOrderInterface
     /**
      * @throws \Exception
      */
-    public function orderPay(Order $order, PaymentMethod $payment_method, PayFormEnum $pay_form_enum): array
+    public function orderPay(Order $order, Payment $payment, PayFormEnum $pay_form_enum): array
     {
-        $config = $payment_method->config;
+        $config = $payment->config;
 
         $init_config = [
             'app_id' => '',
@@ -29,7 +29,7 @@ class WechatPayOrderService implements PayOrderInterface
         ];
 
         // 创建支付流水记录
-        $transaction = app(TransactionDao::class)->storeByOrder($order, $payment_method, $pay_form_enum->getLabel());
+        $transaction = app(TransactionDao::class)->storeByOrder($order, $payment, $pay_form_enum->getLabel());
 
         switch ($pay_form_enum) {
             case PayFormEnum::PAY_FORM_APP:

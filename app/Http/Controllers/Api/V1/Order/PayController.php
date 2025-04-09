@@ -8,9 +8,9 @@ use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
-use App\Http\Dao\PaymentMethodDao;
+use App\Http\Dao\PaymentDao;
 use App\Models\Order;
-use App\Models\PaymentMethod;
+use App\Models\Payment;
 use App\Services\Pay\WechatPayOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ class PayController extends BaseController
     /**
      * 收银台.
      */
-    public function index(Request $request, OrderDao $order_dao, PaymentMethodDao $payment_method_dao): JsonResponse
+    public function index(Request $request, OrderDao $order_dao, PaymentDao $payment_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -40,20 +40,20 @@ class PayController extends BaseController
                 throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
-            $payment_methods = $payment_method_dao->getListByEnabled()->map(function (PaymentMethod $payment_method) use ($order) {
+            $payment_methods = $payment_dao->getListByEnabled()->map(function (Payment $payment) use ($order) {
                 $can_use = true;
 
-                if ($payment_method->limit >= 0 && $order->order_amount > $payment_method->limit) {
+                if ($payment->limit >= 0 && $order->order_amount > $payment->limit) {
                     $can_use = false;
                 }
 
                 return [
-                    'name' => $payment_method->name,
-                    'description' => $payment_method->description,
-                    'icon' => $payment_method->icon,
-                    'alias' => $payment_method->alias,
-                    'is_recommend' => $payment_method->is_recommend,
-                    'sort' => $payment_method->sort,
+                    'name' => $payment->name,
+                    'description' => $payment->description,
+                    'icon' => $payment->icon,
+                    'alias' => $payment->alias,
+                    'is_recommend' => $payment->is_recommend,
+                    'sort' => $payment->sort,
                     'can_use' => $can_use,
                 ];
             });
@@ -79,7 +79,7 @@ class PayController extends BaseController
         }
     }
 
-    public function wechatPay(Request $request, OrderDao $order_dao, PaymentMethodDao $payment_method_dao, WechatPayOrderService $wechat_pay_order_service): JsonResponse
+    public function wechatPay(Request $request, OrderDao $order_dao, PaymentDao $payment_dao, WechatPayOrderService $wechat_pay_order_service): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -101,12 +101,12 @@ class PayController extends BaseController
                 throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
-            $payment_method = $payment_method_dao->getInfoByAlias(PaymentMethodEnum::WECHAT);
+            $payment = $payment_dao->getInfoByAlias(PaymentMethodEnum::WECHAT);
 
-            if (! $payment_method instanceof PaymentMethod || ! $payment_method->is_enabled) {
+            if (! $payment instanceof Payment || ! $payment->is_enabled) {
                 throw new BusinessException('该支付方式暂不可用');
             }
-            $data = $wechat_pay_order_service->orderPay($order, $payment_method, $wechat_pay_form_enum);
+            $data = $wechat_pay_order_service->orderPay($order, $payment, $wechat_pay_form_enum);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {

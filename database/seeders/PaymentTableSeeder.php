@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Enums\PaymentMethodEnum;
-use App\Models\PaymentMethod;
+use App\Models\Payment;
 use Illuminate\Database\Seeder;
 
-class PaymentMethodTableSeeder extends Seeder
+class PaymentTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -55,18 +55,18 @@ class PaymentMethodTableSeeder extends Seeder
         bool $is_recommend = false,
         int $sort = 0
     ): void {
-        $payment_method = PaymentMethod::query()->firstOrNew(['alias' => $payment_method_enum->value]);
+        $payment = Payment::query()->firstOrNew(['alias' => $payment_method_enum->value]);
 
-        if (! $payment_method->exists) {
-            $payment_method->name = $name;
-            $payment_method->description = $description;
-            $payment_method->icon = $icon;
-            $payment_method->config = $config;
-            $payment_method->is_enabled = $is_enabled;
-            $payment_method->is_recommend = $is_recommend;
-            $payment_method->limit = $limit;
-            $payment_method->sort = $sort;
-            $payment_method->save();
+        if (! $payment->exists) {
+            $payment->name = $name;
+            $payment->description = $description;
+            $payment->icon = $icon;
+            $payment->config = $config;
+            $payment->is_enabled = $is_enabled;
+            $payment->is_recommend = $is_recommend;
+            $payment->limit = $limit;
+            $payment->sort = $sort;
+            $payment->save();
         }
     }
 }

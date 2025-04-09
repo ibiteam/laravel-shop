@@ -88,16 +88,16 @@ export function adminOperationLogIndex(data) {
 
 // 支付方式
 export function paymentMethodIndex(data) {
-    return $http.doGet('manage/set/payment/method', data)
+    return $http.doGet('manage/set/payment', data)
 }
 export function paymentMethodChangeField(data) {
-    return $http.doPost('manage/set/payment/method/change/field', data)
+    return $http.doPost('manage/set/payment/change/field', data)
 }
 export function paymentMethodEdit(data) {
-    return $http.doGet('manage/set/payment/method/edit', data)
+    return $http.doGet('manage/set/payment/edit', data)
 }
 export function paymentMethodUpdate(data) {
-    return $http.doPost('manage/set/payment/method/update', data)
+    return $http.doPost('manage/set/payment/update', data)
 }
 // 快递公司
 export function shipCompanyIndex(data) {

@@ -3,18 +3,18 @@
 namespace App\Http\Dao;
 
 use App\Enums\PaymentMethodEnum;
-use App\Models\PaymentMethod;
+use App\Models\Payment;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 
-class PaymentMethodDao
+class PaymentDao
 {
     /**
      * 获取有效支付方式列表.
      */
     public function getEffectiveList(): EloquentCollection|Collection
     {
-        return PaymentMethod::query()
+        return Payment::query()
             ->latest('is_recommend')
             ->latest('sort')
             ->whereIsEnabled(true)
@@ -24,7 +24,7 @@ class PaymentMethodDao
 
     public function getListByEnabled(bool $is_enabled = true): EloquentCollection|Collection
     {
-        return PaymentMethod::query()
+        return Payment::query()
             ->latest('is_recommend')
             ->latest('sort')
             ->whereIsEnabled($is_enabled)
@@ -32,8 +32,8 @@ class PaymentMethodDao
             ->get();
     }
 
-    public function getInfoByAlias(PaymentMethodEnum $payment_method_enum): ?PaymentMethod
+    public function getInfoByAlias(PaymentMethodEnum $payment_method_enum): ?Payment
     {
-        return PaymentMethod::query()->whereAlias($payment_method_enum->value)->first();
+        return Payment::query()->whereAlias($payment_method_enum->value)->first();
     }
 }

@@ -9,7 +9,7 @@ use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CartDao;
-use App\Http\Dao\PaymentMethodDao;
+use App\Http\Dao\PaymentDao;
 use App\Http\Dao\UserAddressDao;
 use App\Models\Order;
 use App\Models\User;
@@ -128,7 +128,7 @@ class OrderService
                 'total_amount' => $this->getAmount(),
                 'total_integral' => $this->getGoodsIntegral(),
             ],
-            'payment_methods' => app(PaymentMethodDao::class)->getEffectiveList(),
+            'payment_methods' => app(PaymentDao::class)->getEffectiveList(),
         ];
     }
 

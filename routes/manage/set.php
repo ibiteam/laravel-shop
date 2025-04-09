@@ -3,7 +3,7 @@
 use App\Http\Controllers\Manage\AdminOperationLogController;
 use App\Http\Controllers\Manage\AdminUserController;
 use App\Http\Controllers\Manage\AppDecorationController;
-use App\Http\Controllers\Manage\PaymentMethodController;
+use App\Http\Controllers\Manage\PaymentController;
 use App\Http\Controllers\Manage\PermissionController;
 use App\Http\Controllers\Manage\RoleController;
 use App\Http\Controllers\Manage\RouterCategoryController;
@@ -98,12 +98,12 @@ Route::prefix('set')->group(function () {
     });
 
     // 支付方式
-    Route::prefix('payment/method')->group(function () {
-        Route::get('/', [PaymentMethodController::class, 'index'])->name(Permission::MANAGE_PAYMENT_METHOD_INDEX)->middleware('manage.permission');
-        Route::middleware('manage.permission:'.Permission::MANAGE_PAYMENT_METHOD_UPDATE)->group(function () {
-            Route::get('edit', [PaymentMethodController::class, 'edit']);
-            Route::post('update', [PaymentMethodController::class, 'update']);
-            Route::post('change/field', [PaymentMethodController::class, 'changeField']);
+    Route::prefix('payment')->group(function () {
+        Route::get('/', [PaymentController::class, 'index'])->name(Permission::MANAGE_PAYMENT_INDEX)->middleware('manage.permission');
+        Route::middleware('manage.permission:'.Permission::MANAGE_PAYMENT_UPDATE)->group(function () {
+            Route::get('edit', [PaymentController::class, 'edit']);
+            Route::post('update', [PaymentController::class, 'update']);
+            Route::post('change/field', [PaymentController::class, 'changeField']);
         });
     });
 

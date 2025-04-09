@@ -3,7 +3,7 @@
 namespace App\Http\Dao;
 
 use App\Models\Order;
-use App\Models\PaymentMethod;
+use App\Models\Payment;
 use App\Models\Transaction;
 
 class TransactionDao
@@ -11,7 +11,7 @@ class TransactionDao
     /**
      * 支付订单生成流水.
      */
-    public function storeByOrder(Order $order, PaymentMethod $payment_method, string $remark = ''): Transaction
+    public function storeByOrder(Order $order, Payment $payment, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
             'transaction_no' => 'order_'.get_flow_sn(),
@@ -20,7 +20,7 @@ class TransactionDao
             'transaction_type' => Transaction::TRANSACTION_TYPE_PAY,
             'type' => $order::class,
             'type_id' => $order->id,
-            'payment_method_id' => $payment_method->id,
+            'payment_id' => $payment->id,
             'amount' => $order->order_amount,
             'status' => Transaction::STATUS_WAIT,
             'remark' => $remark,

@@ -59,7 +59,7 @@ it('test pay cash desk api interface', function () {
 
 it('test wechat pay api interface', function () {
     $response = $this->doPost('api/v1/order/cash/wechat/pay', [
-        'no' => '2025040741365428',
+        'no' => '2025040918889931',
         'pay_form' => 'h5',
     ]);
     $this->assertIsArray($response);

@@ -21,25 +21,25 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null             $created_at
  * @property Carbon|null             $updated_at
  *
- * @method static Builder<static>|PaymentMethod newModelQuery()
- * @method static Builder<static>|PaymentMethod newQuery()
- * @method static Builder<static>|PaymentMethod query()
- * @method static Builder<static>|PaymentMethod whereAlias($value)
- * @method static Builder<static>|PaymentMethod whereConfig($value)
- * @method static Builder<static>|PaymentMethod whereCreatedAt($value)
- * @method static Builder<static>|PaymentMethod whereDescription($value)
- * @method static Builder<static>|PaymentMethod whereIcon($value)
- * @method static Builder<static>|PaymentMethod whereId($value)
- * @method static Builder<static>|PaymentMethod whereIsEnabled($value)
- * @method static Builder<static>|PaymentMethod whereIsRecommend($value)
- * @method static Builder<static>|PaymentMethod whereLimit($value)
- * @method static Builder<static>|PaymentMethod whereName($value)
- * @method static Builder<static>|PaymentMethod whereSort($value)
- * @method static Builder<static>|PaymentMethod whereUpdatedAt($value)
+ * @method static Builder<static>|Payment newModelQuery()
+ * @method static Builder<static>|Payment newQuery()
+ * @method static Builder<static>|Payment query()
+ * @method static Builder<static>|Payment whereAlias($value)
+ * @method static Builder<static>|Payment whereConfig($value)
+ * @method static Builder<static>|Payment whereCreatedAt($value)
+ * @method static Builder<static>|Payment whereDescription($value)
+ * @method static Builder<static>|Payment whereIcon($value)
+ * @method static Builder<static>|Payment whereId($value)
+ * @method static Builder<static>|Payment whereIsEnabled($value)
+ * @method static Builder<static>|Payment whereIsRecommend($value)
+ * @method static Builder<static>|Payment whereLimit($value)
+ * @method static Builder<static>|Payment whereName($value)
+ * @method static Builder<static>|Payment whereSort($value)
+ * @method static Builder<static>|Payment whereUpdatedAt($value)
  *
  * @mixin \Eloquent
  */
-class PaymentMethod extends Model
+class Payment extends Model
 {
     use DatetimeTrait;
 

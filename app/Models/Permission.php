@@ -82,8 +82,8 @@ class Permission extends SpatiePermission
     public const MANAGE_ROLE_DELETE = 'manage.role.delete'; // 角色删除
     public const MANAGE_ADMIN_OPERATION_LOG_INDEX = 'manage.admin_operation_log.index'; // 管理员日志
     public const BASIC_PAYMENT_MANAGE = 'basic.payment.manage'; // 支付管理
-    public const MANAGE_PAYMENT_METHOD_INDEX = 'manage.payment_method.index'; // 支付方式列表
-    public const MANAGE_PAYMENT_METHOD_UPDATE = 'manage.payment_method.update'; // 支付方式编辑
+    public const MANAGE_PAYMENT_INDEX = 'manage.payment.index'; // 支付方式列表
+    public const MANAGE_PAYMENT_UPDATE = 'manage.payment.update'; // 支付方式编辑
     public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
     public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
     public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
