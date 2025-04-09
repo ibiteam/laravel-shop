@@ -99,7 +99,7 @@ class AdvertComponent extends PageComponent
             'content.url.value' => 'present|nullable',
             'content.is_show' => 'required|in:'.$is_show_validate_string,
             'content.date_type' => 'present|in:'.$is_show_validate_string,
-            'content.data.*.time' => 'array',
+            'content.time' => 'array',
         ], $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $data['id']]);
