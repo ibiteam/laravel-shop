@@ -2,7 +2,10 @@
     <div class="uploader s-flex ai-ct jc-ct" :style="{width: width +'px', height: height + 'px', backgroundColor}" v-loading="uploading">
         <el-image v-if="src" :src="src" :fit="fit" :style="{width: width +'px', height: height + 'px', minWidth: '64px', minHeight: '64px'}">
         </el-image>
-        <em class="iconfont icon-jiahao1" v-else></em>
+        <div class="s-flex ai-ct jc-ct flex-dir" v-else>
+            <em class="iconfont icon-jiahao1" ></em>
+            <slot name="upload-placeholder"></slot>
+        </div>
         <div class="upload-modal s-flex ai-ct jc-ct">
             <em class="iconfont icon-shangchuan1 icon-btn" @click="emit('material')" title="从素材库选择"></em>
             <em class="iconfont icon-shangchuan icon-btn" @click="handleLocalUpload" title="从本地上传图片"></em>

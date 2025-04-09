@@ -6,7 +6,7 @@
             </div>
         </template>
         <template #error>
-            <div class="image-item" :style="{ width, height, borderRadius: `${radius}`}">
+            <div class="image-item" :style="{ width, height, borderRadius: `${radius}`, border: '1px solid #f2f2f2' }">
                 <img src="@/assets/images/decoration/app-nopic.png" />
             </div>
         </template>
@@ -43,6 +43,7 @@ const props = defineProps({
 .image-item {
     text-align: center;
     background-color: #fff;
+    overflow: hidden;
     img {
         width: auto;
         height: 100%;

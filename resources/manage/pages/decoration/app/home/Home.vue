@@ -38,7 +38,7 @@
                                 <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
                             </template>
                         </VueDraggable>
-                        <bottom-nav-bar v-if="findNotForData('label')" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
+                        <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
                     </div>
                 </main>
                 <HomeSetting v-show="decoration.app_website_data && pageSetting" ref="pageSettingRef" v-bind="{app_website_data: decoration.app_website_data, danping_advertisement: findNotForData('danping_advertisement'), suspended_advertisement: findNotForData('suspended_advertisement')}"></HomeSetting>
@@ -62,9 +62,12 @@ import AdvertisingBanner from './components/AdvertisingBanner.vue'
 import QuickLink from './components/QuickLink.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
-// import DataExample from './DataExample'
+import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 import { appDecorationInit, appDecorationSave } from '@/api/decoration.js'
+
+
+console.log(DataExample)
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -94,6 +97,8 @@ const dragData = reactive({
 const tempRefs = ref([])
 // 固定头部搜索ref
 const homeSearchRef = ref(null)
+// 固定底部导航栏ref
+const homeLabelRef = ref(null)
 // 素材中心弹窗
 const materialCenterDialogData = reactive({
     show: false,
@@ -171,6 +176,9 @@ const handlematerialCenterDialogConfirm = (res) => {
         if (not_for_data == 'home_search') {
             homeSearchRef.value.updateUploadComponentData(updateData)
         }
+        if (not_for_data == 'label') {
+            homeLabelRef.value.updateUploadComponentData(updateData)
+        }
         return
     }
 }
@@ -194,6 +202,9 @@ const handleLinkCenterDialogConfirm = (res) => {
         }
         if (not_for_data == 'home_search') {
             homeSearchRef.value.updateLinkComponentData(updateData)
+        }
+        if (not_for_data == 'label') {
+            homeLabelRef.value.updateLinkComponentData(updateData)
         }
         return
     }
@@ -346,37 +357,7 @@ const getDecorationHome = () => {
             ]
             decoration.not_for_data = [
                 ...res.data.not_for_data,
-                // {
-                //     component_name: 'home_search', // 组件名
-                //     content: { // 表单数据
-                //         logo: '',
-                //         keywords: '', // 关键词
-                //         button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
-                //         interval: 3, // 关键词轮播时间，最大10 最小1
-                //         data: [{
-                //             url: {
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             },
-                //             title: '', // 搜索提示词
-                //         }]
-                //     },
-                //     data: { // 渲染数据
-                //         logo: '',
-                //         keywords: '', // 关键词
-                //         button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
-                //         interval: 3, // 关键词轮播时间，最大10 最小1
-                //         items: [{
-                //             image: '',
-                //             url: '',
-                //             title: '',
-                //         }],
-                //     },
-                //     id: '666', // 组件id
-                //     is_show: 1, // 组件是否显示
-                //     is_fixed_assembly: 1,
-                //     name: '搜索', // 组件名
-                // }
+                
             ]
         }
     })
