@@ -26,7 +26,8 @@ class IndexController extends BaseController
         $number = (int) $request->get('number', 10);
         $current_user = $this->user();
         $order = Order::query()
-            ->with(['detail'])
+            ->withCount('detail')
+            ->with(['detail', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
             ->latest()
             ->whereUserId($current_user->id)
             ->when(! is_null($keywords), fn (Builder $query) => $query->whereLike('no', "%$keywords%"))
