@@ -5,6 +5,7 @@ namespace App\Components\AppComponents;
 use App\Components\PageComponent;
 use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
+use App\Services\AppDecoration\AppDecorationItemService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,12 +15,6 @@ class HorizontalCarouselComponent extends PageComponent
      * 是否是固定组件 1是 0否.
      */
     private int $fixed_assembly_no = 0;
-
-    /**
-     * 时间类型： 1 长期  0：时间范围.
-     */
-    private int $long_time_yes = 1; // 长期
-    private int $custom_time_yes = 0; // 自定义时间
 
     /**
      * 图片 尺寸.
@@ -67,7 +62,7 @@ class HorizontalCarouselComponent extends PageComponent
                         'image' => '', // 图片地址
                         'sort' => Constant::ONE, // 排序 （1~100）
                         'is_show' => Constant::ONE, // 是否显示 1展示 0隐藏
-                        'date_type' => $this->long_time_yes, // 时间类型： 1 长期  0：时间范围
+                        'date_type' => AppDecorationItem::LONG_TIME, // 时间类型： 1 长期  0：时间范围
                         'time' => [],
                     ],
                 ],
@@ -101,43 +96,20 @@ class HorizontalCarouselComponent extends PageComponent
             'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.data.*.is_show' => 'required|in:'.$is_show_validate_string,
             'content.data.*.date_type' => 'present|in:'.$is_show_validate_string,
-            'content.data.*.time' => [
-                'required_if:content.data.*.date_type,'.$this->custom_time_yes,
-                'array', // 确保 time 是数组
-                function ($attribute, $value, $fail) use ($data) {
-                    // 获取对应的 date_type 值
-                    $index = str_replace('content.data.', '', explode('.', $attribute)[2]);
-                    $date_type = $data['content']['data'][$index]['date_type'] ?? null;
-
-                    if ($date_type == $this->custom_time_yes) {
-                        // 检查 time 是否为数组且长度为 2
-                        if (! is_array($value) || count($value) !== 2) {
-                            return $fail('时间字段必须是一个包含两个时间的数组');
-                        }
-
-                        $start_time = $value[0] ?? null;
-                        $end_time = $value[1] ?? null;
-
-                        if (! $start_time || ! $end_time) {
-                            return $fail('时间字段不能为空');
-                        }
-
-                        if (! strtotime($start_time) || ! strtotime($end_time)) {
-                            return $fail('时间字段必须是有效的日期时间格式');
-                        }
-
-                        // 检查开始时间是否早于或等于结束时间
-                        if (strtotime($start_time) > strtotime($end_time)) {
-                            return $fail('开始时间不能晚于结束时间');
-                        }
-                    }
-                },
-            ],
+            'content.data.*.time' => 'array',
         ];
 
         $validator = Validator::make($data, $validate_data, $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $data['id']]);
+        }
+        // 独立校验 time 字段
+        foreach ($data['content']['data'] as $index => $item) {
+            $date_type = $item['date_type'] ?? null;
+            $time = $item['time'] ?? null;
+            if (AppDecorationItem::CUSTOM_TIME == $date_type) {
+                app(AppDecorationItemService::class)->validateTimeFields($time, $data['id'], $index);
+            }
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
@@ -161,7 +133,7 @@ class HorizontalCarouselComponent extends PageComponent
                     return null;
                 }
                 $time = date('Y-m-d H:i:s');
-                if ($item['date_type'] != $this->long_time_yes && $item['time'][0] > $time && $item['time'][1] < $time ) {
+                if ($item['date_type'] != AppDecorationItem::LONG_TIME && $item['time'][0] > $time && $item['time'][1] < $time ) {
                     return null;
                 }
 
@@ -252,10 +224,7 @@ class HorizontalCarouselComponent extends PageComponent
             'content.data.*.sort.min' => '排序最小值是1',
             'content.data.*.date_type.present' => '时间类型参数未设置',
             'content.data.*.date_type.in' => '时间类型板块参数格式不正确',
-            'content.data.*.time.required_if' => '当时间类型为自定义时，时间字段是必需的',
             'content.data.*.time.array' => '时间字段必须是一个数组',
-            'content.data.*.time.size' => '时间字段必须包含两个时间值',
-            'content.data.*.time.custom' => '时间字段格式不正确或时间范围无效',
         ];
     }
 }

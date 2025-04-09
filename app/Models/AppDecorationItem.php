@@ -40,6 +40,9 @@ class AppDecorationItem extends Model
 
     protected $guarded = [];
 
+    public const LONG_TIME = 1; // 时间 - 长期
+    public const CUSTOM_TIME = 0; // 时间 - 自定义
+
     // 轮播图
     public const COMPONENT_NAME_HORIZONTAL_CAROUSEL = 'horizontal_carousel'; // 组件名称
     public const STYLE_TILED = 1; // 显示样式 - 平铺

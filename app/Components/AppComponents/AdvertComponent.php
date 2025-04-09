@@ -5,17 +5,12 @@ namespace App\Components\AppComponents;
 use App\Components\PageComponent;
 use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
+use App\Services\AppDecoration\AppDecorationItemService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
 
 class AdvertComponent extends PageComponent
 {
-    /**
-     * 时间类型： 1 长期  0：时间范围
-     */
-    private int $long_time_yes = 1; // 长期
-    private int $custom_time_yes = 0; // 自定义时间
-
 
     /**
      * 是否是固定组件 1是 0否
@@ -52,7 +47,7 @@ class AdvertComponent extends PageComponent
                 ],
                 'describe' => '', // 描述
                 'is_show' => Constant::ONE, // 是否显示 1展示 0隐藏
-                'date_type' => $this->long_time_yes, // 时间类型： 1 长期  0：时间范围
+                'date_type' => AppDecorationItem::LONG_TIME, // 时间类型： 1 长期  0：时间范围
                 'time' => [],
             ],
         ];
@@ -104,41 +99,14 @@ class AdvertComponent extends PageComponent
             'content.url.value' => 'present|nullable',
             'content.is_show' => 'required|in:'.$is_show_validate_string,
             'content.date_type' => 'present|in:'.$is_show_validate_string,
-            'content.time' => [
-                'required_if:content.data.*.date_type,'.$this->custom_time_yes,
-                'array', // 确保 time 是数组
-                function ($attribute, $value, $fail) use ($data) {
-                    // 获取对应的 date_type 值
-                    $index = str_replace('content.data.', '', explode('.', $attribute)[2]);
-                    $date_type = $data['content']['data'][$index]['date_type'] ?? null;
-
-                    if ($date_type == $this->custom_time_yes) {
-                        // 检查 time 是否为数组且长度为 2
-                        if (! is_array($value) || count($value) !== 2) {
-                            return $fail('时间字段必须是一个包含两个时间的数组');
-                        }
-
-                        $start_time = $value[0] ?? null;
-                        $end_time = $value[1] ?? null;
-
-                        if (! $start_time || ! $end_time) {
-                            return $fail('时间字段不能为空');
-                        }
-
-                        if (! strtotime($start_time) || ! strtotime($end_time)) {
-                            return $fail('时间字段必须是有效的日期时间格式');
-                        }
-
-                        // 检查开始时间是否早于或等于结束时间
-                        if (strtotime($start_time) > strtotime($end_time)) {
-                            return $fail('开始时间不能晚于结束时间');
-                        }
-                    }
-                },
-            ],
+            'content.data.*.time' => 'array',
         ], $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $data['id']]);
+        }
+        // 独立校验 time 字段
+        if ( AppDecorationItem::CUSTOM_TIME == $data['content']['date_type']) {
+            app(AppDecorationItemService::class)->validateTimeFields($data['content']['time'], $data['id']);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
@@ -172,8 +140,6 @@ class AdvertComponent extends PageComponent
             'content.date_type.present' => '时间类型参数未设置',
             'content.date_type.in' => '时间类型板块参数格式不正确',
             'content.time.array' => '时间字段必须是一个数组',
-            'content.time.size' => '时间字段必须包含两个时间值',
-            'content.time.custom' => '时间字段格式不正确或时间范围无效',
         ];
     }
 
@@ -190,7 +156,7 @@ class AdvertComponent extends PageComponent
         // 不展示的数据和时间过期的 都 不展示
         if ($content['is_show'] == Constant::ZERO) {
             $content = [];
-        } else if ($content['date_type'] != $this->long_time_yes && $content['time'][0] > $time && $content['time'][1] < $time ) {
+        } else if ($content['date_type'] != AppDecorationItem::LONG_TIME && $content['time'][0] > $time && $content['time'][1] < $time ) {
             $content = [];
         }
 
