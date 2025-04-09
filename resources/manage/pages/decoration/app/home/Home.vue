@@ -202,12 +202,18 @@ const decorationSave = (params) => {
         const { button_type } = params
         const pageSettingData = pageSettingRef.value.getComponentData()
         const { app_website_data, danping_advertisement, suspended_advertisement } = pageSettingData
+        if (!app_website_data.title || !app_website_data.keywords || !app_website_data.description) {
+            cns.$message.error('请设置TDK')
+            decoration.temp_index = ''
+            pageSetting.value = true
+            return
+        }
         let decoration_data = []
         tempRefs.value.map(item => {
             let temp_data = JSON.parse(JSON.stringify(item.getComponentData()))
-            if (temp_data.id.indexOf('-add') > -1) {
-                temp_data.id = ''
-            }
+            // if (String(temp_data.id).indexOf('-add') > -1) {
+            //     temp_data.id = ''
+            // }
             decoration_data.push(temp_data)
         })
         const saveData = {
@@ -225,6 +231,8 @@ const decorationSave = (params) => {
         appDecorationSave(saveData).then(res => {
             if (cns.$successCode(res.code)) {
 
+            } else if (res.code == 405) {
+                
             } else {
                 cns.$message.error(res.message)
             }
