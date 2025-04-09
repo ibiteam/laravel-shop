@@ -14,6 +14,7 @@ class AdvertComponent extends PageComponent
      * 时间类型： 1 长期  0：时间范围
      */
     private int $long_time_yes = 1; // 长期
+    private int $custom_time_yes = 0; // 自定义时间
 
 
     /**
@@ -104,6 +105,7 @@ class AdvertComponent extends PageComponent
             'content.is_show' => 'required|in:'.$is_show_validate_string,
             'content.date_type' => 'present|in:'.$is_show_validate_string,
             'content.time' => [
+                'required_if:content.data.*.date_type,'.$this->custom_time_yes,
                 'array', // 确保 time 是数组
                 'size:2', // 确保数组长度为 2
                 function ($attribute, $value, $fail) {

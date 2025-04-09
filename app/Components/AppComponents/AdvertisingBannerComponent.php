@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Validator;
 
 class AdvertisingBannerComponent extends PageComponent
 {
+
+    private int $long_time_yes = 1; // 长期
+    private int $custom_time_yes = 0; // 自定义时间
+
     public function icon(): array
     {
         return [
@@ -54,7 +58,7 @@ class AdvertisingBannerComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'date_type' => 1, // 1、长期 0、时间范围
+                        'date_type' => $this->long_time_yes, // 1、长期 0、时间范围
                         'time' => [], //
                         'image' => '', // 图片地址
                         'sort' => 1, // 排序
@@ -99,6 +103,7 @@ class AdvertisingBannerComponent extends PageComponent
             'content.data.*.is_show' => 'required|in:'.$is_show_validate_string,
             'content.data.*.date_type' => 'present|in:'.$is_show_validate_string,
             'content.data.*.time' => [
+                'required_if:content.data.*.date_type,'.$this->custom_time_yes,
                 'array', // 确保 time 是数组
                 'size:2', // 确保数组长度为 2
                 function ($attribute, $value, $fail) {
