@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Order;
 
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentMethodEnum;
+use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
@@ -33,6 +34,10 @@ class PayController extends BaseController
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
+            }
+
+            if ($order->pay_status === PayStatusEnum::PAYED->value) {
+                throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
             $payment_methods = $payment_method_dao->getListByEnabled()->map(function (PaymentMethod $payment_method) use ($order) {
@@ -90,6 +95,10 @@ class PayController extends BaseController
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
+            }
+
+            if ($order->pay_status === PayStatusEnum::PAYED->value) {
+                throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
             $payment_method = $payment_method_dao->getInfoByAlias(PaymentMethodEnum::WECHAT);

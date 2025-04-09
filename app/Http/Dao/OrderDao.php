@@ -2,6 +2,10 @@
 
 namespace App\Http\Dao;
 
+use App\Enums\OrderConstantEnum;
+use App\Enums\OrderStatusEnum;
+use App\Enums\PayStatusEnum;
+use App\Enums\ShippingStatusEnum;
 use App\Models\Order;
 
 class OrderDao
@@ -9,5 +13,33 @@ class OrderDao
     public function getInfoByNo(string $no, int $user_id): ?Order
     {
         return Order::query()->whereUserId($user_id)->whereNo($no)->first();
+    }
+
+    /**
+     * 获取订单状态
+     */
+    public function getStatusByOrder(Order $order): OrderConstantEnum
+    {
+        if ($order->order_status === OrderStatusEnum::UNCONFIRMED->value) {
+            return OrderConstantEnum::STATUS_NOT_CONFIRM;
+        }
+
+        if ($order->order_status === OrderStatusEnum::CANCELLED->value) {
+            return OrderConstantEnum::STATUS_CANCELLED;
+        }
+
+        if ($order->pay_status === PayStatusEnum::PAY_WAIT->value) {
+            return OrderConstantEnum::STATUS_WAIT_PAY;
+        }
+
+        if ($order->ship_status === ShippingStatusEnum::UNSHIPPED->value) {
+            return OrderConstantEnum::STATUS_WAIT_SHIP;
+        }
+
+        if ($order->ship_status === ShippingStatusEnum::SHIPPED->value) {
+            return OrderConstantEnum::STATUS_WAIT_RECEIVE;
+        }
+
+        return OrderConstantEnum::STATUS_SUCCESS;
     }
 }

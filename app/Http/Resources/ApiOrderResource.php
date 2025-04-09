@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OrderConstantEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
+use App\Http\Dao\OrderDao;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Models\OrderDetail;
@@ -14,13 +16,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ApiOrderResource extends JsonResource
 {
-    private const STATUS_NOT_CONFIRM = 1; // 待确认
-    private const STATUS_CANCELLED = 2; // 已取消
-    private const STATUS_WAIT_PAY = 3; // 待付款
-    private const STATUS_WAIT_SHIP = 4; // 待发货
-    private const STATUS_WAIT_RECEIVE = 5; // 待收货
-    private const STATUS_SUCCESS = 6; // 已完成
-
     /**
      * Transform the resource into an array.
      *
@@ -31,13 +26,13 @@ class ApiOrderResource extends JsonResource
         if (! $this->resource instanceof Order) {
             return [];
         }
-        $status = $this->getStatus();
+        $order_constant_enum = app(OrderDao::class)->getStatusByOrder($this->resource);
         $last_logistics = $this->getLastLogistics();
         $default_evaluate = $this->getEvaluate();
 
         return [
             'no' => $this->resource->no,
-            'status' => $status,
+            'status' => $order_constant_enum->value,
             'items' => $this->resource->detail->map(function (OrderDetail $item) {
                 return [
                     'goods_no' => $item->goods_no,
@@ -53,7 +48,7 @@ class ApiOrderResource extends JsonResource
             'logistics' => $last_logistics,
             'evaluate' => $default_evaluate,
             'buttons' => $this->getButtons(
-                $status,
+                $order_constant_enum,
                 is_array($last_logistics),
                 is_array($default_evaluate)
             ),
@@ -61,52 +56,24 @@ class ApiOrderResource extends JsonResource
     }
 
     /**
-     * 用于显示订单状态
+     * @param OrderConstantEnum $order_constant_enum 页面状态
+     * @param bool              $has_logistics       是否有物流
+     * @param bool              $not_evaluate        是否未评价
      */
-    private function getStatus(): int
-    {
-        if ($this->resource->order_status === OrderStatusEnum::UNCONFIRMED->value) {
-            return self::STATUS_NOT_CONFIRM;
-        }
-
-        if ($this->resource->order_status === OrderStatusEnum::CANCELLED->value) {
-            return self::STATUS_CANCELLED;
-        }
-
-        if ($this->resource->pay_status === PayStatusEnum::PAY_WAIT->value) {
-            return self::STATUS_WAIT_PAY;
-        }
-
-        if ($this->resource->ship_status === ShippingStatusEnum::UNSHIPPED->value) {
-            return self::STATUS_WAIT_SHIP;
-        }
-
-        if ($this->resource->ship_status === ShippingStatusEnum::SHIPPED->value) {
-            return self::STATUS_WAIT_RECEIVE;
-        }
-
-        return self::STATUS_SUCCESS;
-    }
-
-    /**
-     * @param int  $status        页面状态
-     * @param bool $has_logistics 是否有物流
-     * @param bool $not_evaluate  是否未评价
-     */
-    private function getButtons(int $status, bool $has_logistics = false, bool $not_evaluate = false): array
+    private function getButtons(OrderConstantEnum $order_constant_enum, bool $has_logistics = false, bool $not_evaluate = false): array
     {
         if (! $this->resource instanceof Order) {
             return [];
         }
         $buttons = [];
 
-        switch ($status) {
-            case self::STATUS_NOT_CONFIRM:
+        switch ($order_constant_enum) {
+            case OrderConstantEnum::STATUS_NOT_CONFIRM:
                 $buttons[] = ['text' => '取消订单', 'action' => 'cancel'];
 
                 break;
 
-            case self::STATUS_CANCELLED:
+            case OrderConstantEnum::STATUS_CANCELLED:
                 $buttons[] = ['text' => '删除订单', 'action' => 'delete'];
 
                 if ($this->resource->detail_count === 1) {
@@ -115,7 +82,7 @@ class ApiOrderResource extends JsonResource
 
                 break;
 
-            case self::STATUS_WAIT_PAY:
+            case OrderConstantEnum::STATUS_WAIT_PAY:
                 $buttons[] = ['text' => '取消订单', 'action' => 'cancel'];
 
                 if (! $this->resource->is_edit_address) {
@@ -126,7 +93,7 @@ class ApiOrderResource extends JsonResource
 
                 break;
 
-            case self::STATUS_WAIT_SHIP:
+            case OrderConstantEnum::STATUS_WAIT_SHIP:
                 $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
 
                 if (! $this->resource->is_edit_address) {
@@ -135,7 +102,7 @@ class ApiOrderResource extends JsonResource
 
                 break;
 
-            case self::STATUS_WAIT_RECEIVE:
+            case OrderConstantEnum::STATUS_WAIT_RECEIVE:
                 if ($has_logistics) {
                     $buttons[] = ['text' => '查看物流', 'action' => 'logistics'];
                 }
@@ -147,7 +114,7 @@ class ApiOrderResource extends JsonResource
 
                 break;
 
-            case self::STATUS_SUCCESS:
+            case OrderConstantEnum::STATUS_SUCCESS:
                 $buttons[] = ['text' => '删除订单', 'action' => 'delete'];
 
                 if ($not_evaluate) {
