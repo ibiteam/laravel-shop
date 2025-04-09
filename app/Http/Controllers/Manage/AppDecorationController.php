@@ -104,9 +104,9 @@ class AppDecorationController extends BaseController
                 'button_type' => 'required|integer|in:' . AppDecoration::OPERATE_TYPE_RELEASE . ',' . AppDecoration::OPERATE_TYPE_PREVIEW . ',' . AppDecoration::OPERATE_TYPE_SAVE_DRAFT,
             ], [], [
                 'id' => '装修页面ID',
-                'title' => '首页标题',
-                'keywords' => '首页关键词',
-                'description' => '首页描述',
+                'title' => 'TDK标题',
+                'keywords' => 'TDK关键词',
+                'description' => 'TDK描述',
                 'button_type' => '操作类型',
             ]);
             $button_type = $validated['button_type'];
