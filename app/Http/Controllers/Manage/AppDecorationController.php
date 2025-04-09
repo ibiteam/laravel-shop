@@ -48,10 +48,9 @@ class AppDecorationController extends BaseController
         // 查询历史记录中最新一条 对应的草稿数据
         $item_data = $app_decoration_service->getLatestDraftItems($app_decoration);
 
-        /* 不参与循环的组件 */
+        /* 不参与循环的组件 - 固定组件 */
         $not_for_names = [
             AppDecoration::ALIAS_HOME => [
-                AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
                 //                AppDecorationItem::COMPONENT_NAME_LABEL,
