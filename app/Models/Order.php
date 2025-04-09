@@ -45,6 +45,10 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, OrderDetail> $detail
  * @property-read int|null $detail_count
  * @property-read Region|null $district
+ * @property-read Collection<int, OrderEvaluate> $evaluate
+ * @property-read int|null $evaluate_count
+ * @property-read Collection<int, OrderDelivery> $orderDelivery
+ * @property-read int|null $order_delivery_count
  * @property-read Region|null $province
  * @property-read User $user
  *
@@ -113,6 +117,16 @@ class Order extends Model
     public function district(): BelongsTo
     {
         return $this->belongsTo(Region::class, 'district_id', 'id');
+    }
+
+    public function orderDelivery(): HasMany
+    {
+        return $this->hasMany(OrderDelivery::class, 'order_id', 'id');
+    }
+
+    public function evaluate(): HasMany
+    {
+        return $this->hasMany(OrderEvaluate::class, 'order_id', 'id');
     }
 
     protected function casts(): array
