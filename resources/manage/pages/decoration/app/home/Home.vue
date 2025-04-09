@@ -175,7 +175,7 @@ const handleLinkCenterDialogConfirm = (res) => {
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
-        url: res[0]?.h5_url
+        value: res[0]?.h5_url
     }}
     if (linkCenterDialogData.temp_index) {
         const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
@@ -222,17 +222,20 @@ const decorationSave = (params) => {
             title: app_website_data.title,
             keywords: app_website_data.keywords,
             description: app_website_data.description,
-            data: [
+            data: JSON.stringify([
                 danping_advertisement,
                 suspended_advertisement,
                 ...decoration_data
-            ]
+            ])
         }
-        appDecorationSave(saveData).then(res => {
+        console.log(saveData)
+        appDecorationSave((saveData)).then(res => {
             if (cns.$successCode(res.code)) {
 
-            } else if (res.code == 405) {
-                
+            } else if (res.code == 4006) {
+                decoration.temp_index = res.data.id
+                pageSetting.value = false
+                cns.$message.error(res.message)
             } else {
                 cns.$message.error(res.message)
             }

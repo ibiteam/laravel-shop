@@ -14,7 +14,7 @@
                     @end="handleDragEnd"
                 >
                     <div class="module-item s-flex ai-ct jc-ct" :class="{'disabled': computedTempIsExist({component_name: item.component_name, limit: item.limit})}" v-for="item in its" :key="item.component_name">
-                        <em :class="`decoration-svg ${active.svg[item.component_name]}`"></em>
+                        <em :class="`${active.svg[item.component_name].icon}`" style="font-size: 22px;"></em>
                         <p>{{ item.name }}</p>
                     </div>
                 </VueDraggable>
@@ -26,6 +26,7 @@
 <script setup>
 import { VueDraggable } from 'vue-draggable-plus'
 import { ref, reactive, watch, defineEmits, nextTick } from 'vue'
+import { DragTempItemField } from '@/pages/decoration/app/home/dataField/Index.js'
 
 const props = defineProps({
     // 组件拖拽数据
@@ -60,21 +61,7 @@ const active = reactive({
         data_component: '数据组件'
     },
     components: {},
-    svg: {
-        'advertising_one': 'advertising',
-        'advertising_two': 'advertising',
-        'advertising_three': 'advertising',
-        "theme_advertising": "theme-advertising", // 主题广告
-        "quick_link": "quick-link", // 金刚区
-        "brand_choice": "brand-choice", // 品牌精选
-        "channel_square": "channel-square", // 频道广场
-        "news": "news", // 新闻
-        "hot_list": "hot-list", // 热力榜
-        "flash_sale": "flash-sale", // 限时抢购
-        "recommend_seller": "recommend-seller", // 推荐商家
-        "recommend_theme": "recommend-theme", // 为您推荐
-        "hot_sale_good": "hot-sale-good", // 热销商品
-    }
+    svg: DragTempItemField()
 })
 
 
@@ -132,7 +119,6 @@ watch(() => props, (newVal) => {
 
 </script>
 <style lang='scss' scoped>
-@import '@/assets/css/decoration-svg-icon.css';
 .toolbar-wrapper{
     width: 100%;
     height: 100%;
