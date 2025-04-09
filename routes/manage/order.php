@@ -8,5 +8,8 @@ Route::prefix('order')->group(function () {
     // 订单列表相关
     Route::prefix('info')->group(function () {
         Route::get('/index', [OrderController::class, 'index'])->name(Permission::MANAGE_ORDER_INDEX)->middleware('manage.permission');
+        Route::get('/detail', [OrderController::class, 'detail']);
+        Route::get('ship/edit', [OrderController::class, 'shipEdit']);
+        Route::post('ship/update', [OrderController::class, 'shipUpdate']);
     });
 });
