@@ -179,85 +179,87 @@ const rules = reactive({
 </script>
 
 <template>
-    <el-header style="padding: 10px 0;">
-        <!-- 添加搜索表单 -->
-        <el-form :inline="true" :model="queryParams" class="search-form">
-            <el-form-item label="收货人" prop="recipient_name">
-                <el-input
-                    v-model="queryParams.recipient_name"
-                    placeholder="请输入收货人"
-                    clearable
-                    @keyup.enter="handleSearch"
-                />
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe
-        border
-        v-loading="loading"
-        style="width: 100%;">
-        <el-table-column label="地址ID" prop="id"></el-table-column>
-        <el-table-column label="收货人" prop="recipient_name"></el-table-column>
-        <el-table-column label="收货手机号" prop="recipient_phone"></el-table-column>
-        <el-table-column label="收货地址">
-            <template #default="scope">
-                {{ scope.row.province_name + scope.row.city_name + scope.row.district_name + scope.row.address_detail }}
+    <div class="common-wrap">
+        <el-header style="padding: 10px 0;">
+            <!-- 添加搜索表单 -->
+            <el-form :inline="true" :model="queryParams" class="search-form">
+                <el-form-item label="收货人" prop="recipient_name">
+                    <el-input
+                        v-model="queryParams.recipient_name"
+                        placeholder="请输入收货人"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
+                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe
+            border
+            v-loading="loading"
+            style="width: 100%;">
+            <el-table-column label="地址ID" prop="id"></el-table-column>
+            <el-table-column label="收货人" prop="recipient_name"></el-table-column>
+            <el-table-column label="收货手机号" prop="recipient_phone"></el-table-column>
+            <el-table-column label="收货地址">
+                <template #default="scope">
+                    {{ scope.row.province_name + scope.row.city_name + scope.row.district_name + scope.row.address_detail }}
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button type="primary" @click="modifyAddress(scope.row)">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加分页组件 -->
+        <div class="pagination-container" v-if="pageInfo.total > 0">
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageInfo.current_page"
+                :page-sizes="[10, 15, 30, 50, 100]"
+                :page-size="pageInfo.per_page"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageInfo.total">
+            </el-pagination>
+        </div>
+        <!--  添加用户  -->
+        <el-dialog v-model="dialogFormVisible"
+                   :close-on-click-modal="false"
+                   :close-on-press-escape="false"
+                   :title="updateTitle"
+                   center
+                   width="500">
+            <el-form :model="subForm" :rules="rules" ref="subFormRef">
+                <el-form-item label="收货人" prop="recipient_name">
+                    <el-input v-model="subForm.recipient_name" autocomplete="off" />
+                </el-form-item>
+                <el-form-item label="手机号" prop="recipient_phone">
+                    <el-input v-model="subForm.recipient_phone" autocomplete="off" />
+                </el-form-item>
+                <el-form-item label="省市区" prop="area">
+                    <el-cascader v-model="subForm.area" :options="areas" @change="handleChange" />
+                </el-form-item>
+                <el-form-item label="详细地址" prop="address_detail">
+                    <el-input v-model="subForm.address_detail" autocomplete="off" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closePasswordDialog('subForm')">关闭</el-button>
+                    <el-button type="primary" v-loading="updateLoading" @click="updateForm('subForm')">确认</el-button>
+                </div>
             </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button type="primary" @click="modifyAddress(scope.row)">编辑</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <!-- 添加分页组件 -->
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 15, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
+        </el-dialog>
     </div>
-    <!--  添加用户  -->
-    <el-dialog v-model="dialogFormVisible"
-               :close-on-click-modal="false"
-               :close-on-press-escape="false"
-               :title="updateTitle"
-               center
-               width="500">
-        <el-form :model="subForm" :rules="rules" ref="subFormRef">
-            <el-form-item label="收货人" prop="recipient_name">
-                <el-input v-model="subForm.recipient_name" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="手机号" prop="recipient_phone">
-                <el-input v-model="subForm.recipient_phone" autocomplete="off" />
-            </el-form-item>
-            <el-form-item label="省市区" prop="area">
-                <el-cascader v-model="subForm.area" :options="areas" @change="handleChange" />
-            </el-form-item>
-            <el-form-item label="详细地址" prop="address_detail">
-                <el-input v-model="subForm.address_detail" autocomplete="off" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="closePasswordDialog('subForm')">关闭</el-button>
-                <el-button type="primary" v-loading="updateLoading" @click="updateForm('subForm')">确认</el-button>
-            </div>
-        </template>
-    </el-dialog>
 </template>
 
 <style scoped lang="scss">

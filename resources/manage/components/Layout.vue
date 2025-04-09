@@ -3,11 +3,8 @@
         <el-container>
             <el-aside :class="{'left-hidden':!leftShow}">
                 <div class='layout-left-header s-flex ai-ct jc-bt' @click="router.push({name:'manage.home.index'})">
-                    <div class='seller-picture s-flex ai-ct jc-ct'>
+                    <div class='seller-picture s-flex ai-ct jc-ct flex-1'>
                         <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
-                    </div>
-                    <div class='s-flex jc-bt ai-ct' style="font-size: 20px;cursor: pointer;" @click.stop="leftShow = false">
-                        <Fold style="width: 1.5em; height: 1.5em;" />
                     </div>
                 </div>
                 <div class='menu-tree' v-if="menus.length>0">
@@ -34,9 +31,6 @@
             <el-container>
                 <el-header>
                     <div class='seller-header s-flex jc-bt ai-ct'>
-                        <div class='indentation s-flex jc-bt ai-ct' :class="{'indentation-show' : !leftShow}" style="font-size: 20px;cursor: pointer;" @click="leftShow = !leftShow">
-                            <Expand style="width: 1.5em; height: 1.5em;" />
-                        </div>
                         <div class='header-left s-flex ai-ct'>
                             <div class='flow-menu s-flex'>
                                 <div class='menu-box'>
@@ -153,6 +147,10 @@
                     </div>
                 </el-main>
             </el-container>
+            <div class="narrow-box" :class="{'narrow-launch' : !leftShow}">
+                <svg v-if="leftShow" @click="leftShow = !leftShow" t="1741575361343" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2301" width="16" height="16"><path d="M935.27 12.34H89.78c-41.38 0-75.23 33.85-75.23 75.23S48.4 162.8 89.78 162.8h845.49c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 295.17H496.64c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h438.63c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 578.27H496.64c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h438.63c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 861.64H89.78c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h845.49c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM26.95 544.85l235.2 176.67c25.2 18.93 61.19 0.95 61.19-30.57V332.96c0-31.74-36.44-49.65-61.57-30.28L26.57 484.01c-20.01 15.42-19.82 45.67 0.38 60.84z" fill="#2c2c2c" p-id="2302"></path></svg>
+                <svg v-else @click="leftShow = !leftShow" t="1741574477397" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2610" width="16" height="16"><path d="M51.2 819.2l921.601 0 0 102.4-921.601-1e-8 0-102.39999999z" p-id="2611"></path><path d="M358.4 563.199l614.39899999 0 1e-8 103.253-614.399 0 0-103.253z" p-id="2612"></path><path d="M358.4 358.4l614.39899999 0 1e-8 103.253-614.399 0 0-103.253z" p-id="2613"></path><path d="M51.2 102.40000001l921.601-1e-8 0 103.253-921.601-1e-8c0 0 0-103.253 0-103.25299998z" p-id="2614"></path><path d="M51.2 332.8l205.653 205.653-205.653 153.6 0-359.253z" p-id="2615"></path></svg>
+            </div>
         </el-container>
     </div>
 </template>
@@ -433,6 +431,9 @@ onUnmounted(() => {
         opacity: 1;
         transition: width 0.5s ease-in-out, opacity 0.5s ease-in-out;
         box-shadow: 0px 0px 3px 0px rgba(16, 43, 76, 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
         &.left-hidden{
             width: 0;
             opacity: 0;
@@ -443,60 +444,85 @@ onUnmounted(() => {
             background: var(--manage-color);
             cursor: pointer;
             .seller-picture{
-                width: 120px;
                 height: 40px;
-                margin-right: 20px;
-            }
-            svg{
-                color: #ffffff;
+                width: 100%;
             }
         }
         .menu-tree{
             width: 200px;
             padding: 20px 0;
+            user-select: none;
+            flex: 1;
+            overflow:auto;
+            &::-webkit-scrollbar {
+                display: none;
+            }
             :deep(.el-tree){
                 .el-tree-node{
                     .el-tree-node__content{
-                        width: 200px;
-                        height: 40px;
-                        padding-left: 18px !important;
-                        .el-tree-node__expand-icon{
-                            position: absolute;
-                            right: 10px;
-                            color: #31373D;
-                            font-size: 14px;
-                        }
+                        padding: 0 !important;
+                        height: 50px !important;
+                        width: 100%;
+                        position: relative;
+                        box-sizing: border-box;
                         .custom-tree-node{
-                            .icons{
-                                width: 20px;
-                                height: 20px;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            padding: 0 6px 0 6px;
+                            margin: 0 10px 0 8px;
+                            border-radius: 6px;
+                            &.custom-tree-node-select.actived{
+                                background-color: #F6FAFF;
+                                span{
+                                    color: #077FFF;
+                                }
+                            }
+                            &:hover{
+                                background-color: #F4F4F4 !important;
                             }
                         }
                         .custom-tree-node span{
                             font-weight: 600;
                             font-size: 14px;
-                            color: #31373D;
+                            color: #333333;
                         }
-                    }
-                    .el-tree-node__children{
-                        .custom-tree-node span{
+                        .custom-tree-node.custom-tree-node-select span {
                             font-weight: 400;
                             font-size: 14px;
                             color: #333;
                         }
+                        .el-tree-node__expand-icon{
+                            position: absolute;
+                            right: 8px;
+                            transform: rotate(270deg);
+                            color: #31373D;
+                        }
+
                     }
-                    &.is-current{
+                    .el-tree-node__children{
+                        padding-left: 5px;
+                        .custom-tree-node span{
+                            font-size: 14px;
+                            color: #333333;
+                            font-weight: 400;
+                        }
+                    }
+                    &:focus{
                         > .el-tree-node__content{
-                            background: #F6FAFF;
-                            .custom-tree-node{
-                                color: #077FFF;
+                            background-color: transparent;
+                            .custom-tree-node {
+                                background-color: #F6FAFF;
                                 span{
                                     color: #077FFF;
                                 }
                             }
                         }
                     }
-
+                    :hover{
+                        background: unset;
+                    }
                 }
             }
         }
@@ -510,16 +536,6 @@ onUnmounted(() => {
                 height: 60px;
                 padding: 0 10px 0 0;
                 background: var(--manage-color);
-                .indentation{
-                    opacity: 0;
-                    width: 0;
-                    transition: opacity 0.5s ease-in-out, width 0.5s ease-in-out;
-                    color: #ffffff;
-                    &.indentation-show{
-                        opacity: 1;
-                        width: 30px;
-                    }
-                }
                 .header-left{
                     flex: 1 1 0%;
                     width: 0px;
@@ -531,15 +547,18 @@ onUnmounted(() => {
                                 width: 120px;
                                 height: 60px;
                                 cursor: pointer;
-                                border-radius: 4px;
                                 .el-icon{
                                     color: #ffffff;
+                                    svg{
+                                        width: 20px;
+                                        height: 20px;
+                                    }
                                 }
                                 .menu-first-name{
                                     margin-left: 5px;
                                     span{
                                         font-weight: normal;
-                                        font-size: 18px;
+                                        font-size: 16px;
                                         color: #ffffff;
                                     }
                                 }
@@ -555,8 +574,10 @@ onUnmounted(() => {
                         background: var(--manage-color);
                         margin-right: 30px;
                         width: 210px;
+                        height:40px;
                         :deep(.el-select__wrapper){
                             background: var(--manage-color);
+                            height:40px;
                         }
                         :deep(.el-select__input){
                             color: #ffffff;
@@ -569,6 +590,7 @@ onUnmounted(() => {
                         }
                     }
                     .user-info{
+                        margin-right:20px;
                         :deep(.el-dropdown){
                             cursor: pointer;
                             .el-dropdown-link:focus-visible{
@@ -661,6 +683,19 @@ onUnmounted(() => {
 img{
     max-width: 100%;
     max-height: 100%;
+}
+.narrow-box {
+    position: fixed;
+    bottom: 33px;
+    left: 0;
+    transition: transform 0.3s ease;
+    transform: translateX(167px);
+}
+.narrow-box.narrow-launch{
+    transform: translateX(8px);
+}
+.narrow-box .icon{
+    cursor: pointer;
 }
 </style>
 <style>

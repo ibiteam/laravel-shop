@@ -161,104 +161,106 @@ onMounted(() => {
 });
 </script>
 <template>
-    <el-header style="padding-top: 10px;">
-        <el-button type="primary" @click="openDetailDialog()">添加分类</el-button>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe
-        border
-        v-loading="loading"
-        style="width: 100%;"
-        row-key="id"
-        :tree-props="{ children: 'all_children' }">
-        <el-table-column label="分类名称" min-width="200">
-            <template #default="scope">
-                <div class="s-flex ai-ct">
-                    <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo"
-                              style="margin-right: 10px;width: 40px;height: 40px;" :fit="cover"></el-image>
-                    {{ scope.row.name }}【{{ scope.row.id }}】
+    <div class="common-wrap">
+        <el-header style="padding-top: 10px;">
+            <el-button type="primary" @click="openDetailDialog()">添加分类</el-button>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe
+            border
+            v-loading="loading"
+            style="width: 100%;"
+            row-key="id"
+            :tree-props="{ children: 'all_children' }">
+            <el-table-column label="分类名称" min-width="200">
+                <template #default="scope">
+                    <div class="s-flex ai-ct">
+                        <el-image class="goods-category-logo" v-if="scope.row.logo" :src="scope.row.logo"
+                                  style="margin-right: 10px;width: 40px;height: 40px;" :fit="cover"></el-image>
+                        {{ scope.row.name }}【{{ scope.row.id }}】
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column label="分类标题" prop="title"></el-table-column>
+            <el-table-column label="关键词" prop="keywords"></el-table-column>
+            <el-table-column label="描述" prop="description"></el-table-column>
+            <el-table-column label="是否展示" prop="is_show">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.is_show"
+                        :active-value="1" :inactive-value="0"
+                        active-color="#13ce66" inactive-color="#ff4949"
+                        @click="changeShow(scope.row)">
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
+                    <el-button link type="danger" size="large" @click="handleDestroy(scope.row.id)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-dialog
+            v-model="detailDialogVisible"
+            :title="detailDialogTitle"
+            width="700"
+            center
+            :before-close="closeDetailDialog">
+            <div v-loading="detailFormLoading" class="s-flex jc-ct">
+                <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto"
+                         style="width: 480px" size="default">
+                    <el-form-item label="上级分类" prop="parent_id">
+                        <el-select v-model="detailForm.parent_id" placeholder="请选择上级分类">
+                            <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="商品分类" prop="name">
+                        <el-input v-model="detailForm.name" />
+                    </el-form-item>
+                    <el-form-item label="分类标题" prop="title">
+                        <el-input v-model="detailForm.title" />
+                    </el-form-item>
+                    <el-form-item label="分类关键词" prop="keywords">
+                        <el-input v-model="detailForm.keywords" />
+                    </el-form-item>
+                    <el-form-item label="分类描述" prop="description">
+                        <el-input v-model="detailForm.description" />
+                    </el-form-item>
+                    <el-form-item label="分类排序" prop="sort">
+                        <el-input v-model="detailForm.sort" />
+                    </el-form-item>
+                    <el-form-item label="是否显示" prop="is_show">
+                        <el-switch v-model="detailForm.is_show" :active-value="1" :inactive-value="0" />
+                    </el-form-item>
+                    <el-form-item label="分类图标" prop="logo">
+                        <el-upload
+                            class="logo-uploader"
+                            accept="image/jpeg,image/jpg,image/png"
+                            action=""
+                            :show-file-list="false"
+                            :http-request="(request) => uploadFile(request)"
+                            :with-credentials="true"
+                        >
+                            <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" />
+                            <el-icon v-else class="logo-uploader-icon">
+                                <Plus />
+                            </el-icon>
+                        </el-upload>
+                    </el-form-item>
+                </el-form>
+            </div>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeDetailDialog()">取消</el-button>
+                    <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交</el-button>
                 </div>
             </template>
-        </el-table-column>
-        <el-table-column label="分类标题" prop="title"></el-table-column>
-        <el-table-column label="关键词" prop="keywords"></el-table-column>
-        <el-table-column label="描述" prop="description"></el-table-column>
-        <el-table-column label="是否展示" prop="is_show">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.is_show"
-                    :active-value="1" :inactive-value="0"
-                    active-color="#13ce66" inactive-color="#ff4949"
-                    @click="changeShow(scope.row)">
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
-                <el-button link type="danger" size="large" @click="handleDestroy(scope.row.id)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <el-dialog
-        v-model="detailDialogVisible"
-        :title="detailDialogTitle"
-        width="700"
-        center
-        :before-close="closeDetailDialog">
-        <div v-loading="detailFormLoading" class="s-flex jc-ct">
-            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto"
-                     style="width: 480px" size="default">
-                <el-form-item label="上级分类" prop="parent_id">
-                    <el-select v-model="detailForm.parent_id" placeholder="请选择上级分类">
-                        <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="商品分类" prop="name">
-                    <el-input v-model="detailForm.name" />
-                </el-form-item>
-                <el-form-item label="分类标题" prop="title">
-                    <el-input v-model="detailForm.title" />
-                </el-form-item>
-                <el-form-item label="分类关键词" prop="keywords">
-                    <el-input v-model="detailForm.keywords" />
-                </el-form-item>
-                <el-form-item label="分类描述" prop="description">
-                    <el-input v-model="detailForm.description" />
-                </el-form-item>
-                <el-form-item label="分类排序" prop="sort">
-                    <el-input v-model="detailForm.sort" />
-                </el-form-item>
-                <el-form-item label="是否显示" prop="is_show">
-                    <el-switch v-model="detailForm.is_show" :active-value="1" :inactive-value="0" />
-                </el-form-item>
-                <el-form-item label="分类图标" prop="logo">
-                    <el-upload
-                        class="logo-uploader"
-                        accept="image/jpeg,image/jpg,image/png"
-                        action=""
-                        :show-file-list="false"
-                        :http-request="(request) => uploadFile(request)"
-                        :with-credentials="true"
-                    >
-                        <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" />
-                        <el-icon v-else class="logo-uploader-icon">
-                            <Plus />
-                        </el-icon>
-                    </el-upload>
-                </el-form-item>
-            </el-form>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="closeDetailDialog()">取消</el-button>
-                <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交</el-button>
-            </div>
-        </template>
-    </el-dialog>
+        </el-dialog>
+    </div>
 </template>
 
 <style scoped lang="scss">
