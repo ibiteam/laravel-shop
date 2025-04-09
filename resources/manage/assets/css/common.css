@@ -279,6 +279,10 @@ a:focus {
     color: #666;
 }
 
+.bg-fff {
+    background: #fff;
+}
+
 .mr-10 {
     margin-right: 10px;
 }
@@ -298,4 +302,8 @@ a {
 
 .fw-b{
     font-weight: bold;
+}
+
+.pd20{
+    padding: 20px;
 }
