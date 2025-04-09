@@ -1,3 +1,19 @@
+<template>
+    <div class="common-wrap">
+        <el-header style="padding-top: 10px;">
+            <el-form :inline="true" :model="searchForm" class="search-form">
+                <el-form-item label="名称/权限值" prop="keywords">
+                    <el-input v-model="searchForm.keywords" clearable placeholder="请输入" @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <!--todo: 权限-->
+    </div>
+</template>
+
 <script setup>
 import { Plus, Search } from '@element-plus/icons-vue';
 import { permissionIndex, permissionStore } from '@/api/set.js';
@@ -66,20 +82,6 @@ onMounted(() => {
     getData();
 });
 </script>
-<template>
-    <el-header style="padding-top: 10px;">
-        <el-form :inline="true" :model="searchForm" class="search-form">
-            <el-form-item label="名称/权限值" prop="keywords">
-                <el-input v-model="searchForm.keywords" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <!--todo: 权限-->
-
-</template>
 
 <style scoped lang="scss">
 

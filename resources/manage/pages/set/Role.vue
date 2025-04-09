@@ -90,7 +90,8 @@
 
 <script setup lang="ts">
 import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import {ref, reactive, getCurrentInstance, onMounted, nextTick} from 'vue';
+import * as echarts from "echarts";
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -160,9 +161,11 @@ const openStoreDialog = (id = 0) => {
                 submitForm.display_name = res.data.role_info.display_name;
                 submitForm.description = res.data.role_info.description;
                 submitForm.self_permissions = res.data.role_info.self_permissions;
-                if (submitForm.self_permissions.length == allPermissionsKey.value.length){
-                    checkPermission.value = true
-                }
+                nextTick(() => {
+                    if (treeRef.value.getCheckedKeys().length == allPermissionsKey.value.length){
+                        checkPermission.value = true
+                    }
+                });
             }
         } else {
             detailFormLoading.value = false;

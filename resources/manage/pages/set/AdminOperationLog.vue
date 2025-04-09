@@ -1,3 +1,71 @@
+<template>
+    <div class="common-wrap">
+        <el-header style="padding-top: 10px;">
+            <el-form :inline="true" :model="searchForm" class="search-form">
+                <el-form-item label="操作时间">
+                    <el-date-picker
+                        v-model="searchForm.start_time"
+                        type="datetime"
+                        placeholder="开始时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                    >
+                    </el-date-picker>
+                    <span>&nbsp;至&nbsp;</span>
+                    <el-date-picker
+                        v-model="searchForm.end_time"
+                        type="datetime"
+                        placeholder="结束时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                    >
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="操作人" prop="admin_user_name">
+                    <el-input v-model="searchForm.admin_user_name" clearable placeholder="请输入"
+                              @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item label="操作信息" prop="description">
+                    <el-input v-model="searchForm.description" clearable placeholder="请输入" @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item label="选择角色">
+                    <el-select v-model="searchForm.role_id" clearable filterable placeholder="请选择">
+                        <el-option v-for="item in rolesData"
+                                   :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="IP" prop="ip">
+                    <el-input v-model="searchForm.ip" clearable placeholder="请输入" @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe border
+            v-loading="loading"
+            style="width: 100%;">
+            <el-table-column label="操作时间" prop="created_at"></el-table-column>
+            <el-table-column label="操作人" prop="admin_user_name"></el-table-column>
+            <el-table-column label="所属角色" prop="role_name"></el-table-column>
+            <el-table-column label="操作信息" prop="description"></el-table-column>
+            <el-table-column label="IP" prop="ip"></el-table-column>
+        </el-table>
+        <div class="pagination-container" v-if="pageInfo.total > 0">
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageInfo.current_page"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                :page-size="pageInfo.per_page"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageInfo.total">
+            </el-pagination>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { Search } from '@element-plus/icons-vue';
 import { adminOperationLogIndex, adminUserRoles } from '@/api/set.js';
@@ -77,71 +145,6 @@ onMounted(() => {
     getRoles();
 });
 </script>
-<template>
-    <el-header style="padding-top: 10px;">
-        <el-form :inline="true" :model="searchForm" class="search-form">
-            <el-form-item label="操作时间">
-                <el-date-picker
-                    v-model="searchForm.start_time"
-                    type="datetime"
-                    placeholder="开始时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                >
-                </el-date-picker>
-                <span>&nbsp;至&nbsp;</span>
-                <el-date-picker
-                    v-model="searchForm.end_time"
-                    type="datetime"
-                    placeholder="结束时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                >
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="操作人" prop="admin_user_name">
-                <el-input v-model="searchForm.admin_user_name" clearable placeholder="请输入"
-                          @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="操作信息" prop="description">
-                <el-input v-model="searchForm.description" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="选择角色">
-                <el-select v-model="searchForm.role_id" clearable filterable placeholder="请选择">
-                    <el-option v-for="item in rolesData"
-                               :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="IP" prop="ip">
-                <el-input v-model="searchForm.ip" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe border
-        v-loading="loading"
-        style="width: 100%;">
-        <el-table-column label="操作时间" prop="created_at"></el-table-column>
-        <el-table-column label="操作人" prop="admin_user_name"></el-table-column>
-        <el-table-column label="所属角色" prop="role_name"></el-table-column>
-        <el-table-column label="操作信息" prop="description"></el-table-column>
-        <el-table-column label="IP" prop="ip"></el-table-column>
-    </el-table>
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 20, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
-    </div>
-</template>
 
 <style scoped lang="scss">
 .search-form {
