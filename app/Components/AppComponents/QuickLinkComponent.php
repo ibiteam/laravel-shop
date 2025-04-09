@@ -87,7 +87,7 @@ class QuickLinkComponent extends PageComponent
     public function validate($data): array
     {
         $validator = Validator::make($data, [
-            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItem,id',
+            'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_QUICK_LINK,
             'is_show' => 'required|integer|in:'. Constant::ONE.','.Constant::ZERO,
@@ -101,16 +101,16 @@ class QuickLinkComponent extends PageComponent
             'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.items.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
         ], $this->messages());
+        $data = $validator->validated();
         if ($validator->fails()) {
-            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $validator['id']]);
+            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         $title = array_column($data['content']['items'], 'title');
         $title_arr = $this->checkUnique($title);
         if ( $title_arr ) {
-            throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $validator['id']]);
+            throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
-        $data = $validator->validated();
         $data['name'] = '金刚区';
         $data['is_fixed_assembly'] = Constant::ZERO;
         $data['component_name'] = AppDecorationItem::COMPONENT_NAME_QUICK_LINK;

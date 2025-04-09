@@ -130,12 +130,11 @@ class AdvertComponent extends PageComponent
                 },
             ],
         ], $this->messages());
-
+        $data = $validator->validated();
         if ($validator->fails()) {
-            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $validator['id']]);
+            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
-        $data = $validator->validated();
         $data['name'] = $publicData['name'];
         $data['component_name'] = $publicData['component_name'];
         $data['is_fixed_assembly'] = $this->fixed_assembly_yes;

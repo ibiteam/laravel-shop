@@ -127,14 +127,13 @@ class HorizontalCarouselComponent extends PageComponent
                 },
             ],
         ];
-        $validator = Validator::make($data, $validate_data, $this->messages());
 
+        $validator = Validator::make($data, $validate_data, $this->messages());
+        $data = $validator->validated();
         if ($validator->fails()) {
-            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $validate_data['id']]);
+            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
-        $data = $validator->validated();
-
         $data['content']['data'] = collect($data['content']['data'])->sortByDesc('sort')->values()->toArray();
         $data['component_name'] = $publicData['component_name'];
         $data['is_fixed_assembly'] = $this->fixed_assembly_no;

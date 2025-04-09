@@ -125,14 +125,15 @@ class AdvertisingBannerComponent extends PageComponent
                 },
             ],
         ], $this->messages());
-
+        $data = $validator->validated();
         if ($validator->fails()) {
-            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $validator['id']]);
+            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
-        $this->checkColumn($data['content']);
+        if ($msg = $this->checkColumn($data['content'])) {
+            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
+        }
         $validator->excludeUnvalidatedArrayKeys = true;
-        $data = $validator->validated();
         $data['name'] = '广告图';
         $data['is_fixed_assembly'] = Constant::ZERO;
         $data['component_name'] = AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER;
@@ -206,64 +207,64 @@ class AdvertisingBannerComponent extends PageComponent
         switch ($column) {
             case AppDecorationItem::NUMBER_COLUMN_TWO:
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 340) {
-                    throw new BusinessException("每行显示 {$column}，有背景图的情况下，宽度只能是340");
+                    return "每行显示 {$column}，有背景图的情况下，宽度只能是340";
                 }
 
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 350) {
-                    throw new BusinessException("每行显示 {$column}，无背景图的情况下，款度只能是350");
+                    return "每行显示 {$column}，无背景图的情况下，款度只能是350";
                 }
 
                 if ($height < 190 || $height > 250) {
-                    throw new BusinessException("每行显示 {$column}，高度范围 190 - 250");
+                    return "每行显示 {$column}，高度范围 190 - 250";
                 }
 
                 // 如果数据的个数不是2的倍数
                 if ($data_count % 2 !== 0 || $data_count > 8) {
-                    throw new BusinessException("每行显示 {$column}，内容个数必须是 2 的倍数且最多为 8 个");
+                    return "每行显示 {$column}，内容个数必须是 2 的倍数且最多为 8 个";
                 }
 
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_THREE:
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 220) {
-                    throw new BusinessException("每行显示 {$column}，有背景图的情况下，宽度只能是220");
+                    return "每行显示 {$column}，有背景图的情况下，宽度只能是220";
                 }
 
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 230) {
-                    throw new BusinessException("每行显示 {$column}，无背景图的情况下，宽度只能是230");
+                    return "每行显示 {$column}，无背景图的情况下，宽度只能是230";
                 }
 
                 if ($height < 280 || $height > 400) {
-                    throw new BusinessException("每行显示 {$column}，高度范围 280 - 400");
+                    return "每行显示 {$column}，高度范围 280 - 400";
                 }
 
                 // 如果数据的个数不是2的倍数
                 if ($data_count % 3 !== 0 || $data_count > 12) {
-                    throw new BusinessException("每行显示 {$column}，容个数必须是3的倍数且最多为12个");
+                    return "每行显示 {$column}，容个数必须是3的倍数且最多为12个";
                 }
 
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_FOUR:
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
-                    throw new BusinessException("每行显示 {$column}，有背景图的情况下，宽度只能是160");
+                    return "每行显示 {$column}，有背景图的情况下，宽度只能是160";
                 }
 
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 170) {
-                    throw new BusinessException("每行显示 {$column}，无背景图的情况下，宽度只能是170");
+                    return "每行显示 {$column}，无背景图的情况下，宽度只能是170";
                 }
 
                 if ($height < 220 || $height > 350) {
-                    throw new BusinessException("每行显示 {$column}，高度范围 220 - 350");
+                    return "每行显示 {$column}，高度范围 220 - 350";
                 }
 
                 // 如果数据的个数不是4的倍数
                 if ($data_count % 4 !== 0 || $data_count > 16) {
-                    throw new BusinessException("每行显示 {$column}，内容个数必须是 4 的倍数且最多为 12 个");
+                    return "每行显示 {$column}，内容个数必须是 4 的倍数且最多为 12 个";
                 }
-
-                break;
         }
+
+        return false;
     }
 
     private function messages(): array
