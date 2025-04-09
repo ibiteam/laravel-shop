@@ -7,6 +7,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Models\Order;
+use App\Models\OrderDetail;
 
 class OrderDao
 {
@@ -41,5 +42,11 @@ class OrderDao
         }
 
         return OrderConstantEnum::STATUS_SUCCESS;
+    }
+
+    // todo
+    public function refundActionByOrderDetail(OrderDetail $order_detail): int
+    {
+        return 0;
     }
 }

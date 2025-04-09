@@ -5,11 +5,16 @@ namespace App\Http\Controllers\Api\V1\Order;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Dao\OrderDao;
+use App\Http\Resources\ApiOrderDetailResource;
 use App\Http\Resources\ApiOrderResourceCollection;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class IndexController extends BaseController
 {
@@ -19,7 +24,10 @@ class IndexController extends BaseController
     public const SEARCH_WAIT_RECEIVE = 'wait_receive'; // 待收货
     public const SEARCH_SUCCESS = 'success'; // 已完成
 
-    public function index(Request $request)
+    /**
+     * 我的订单列表.
+     */
+    public function index(Request $request): JsonResponse
     {
         $keywords = $request->get('keywords');
         $type = $request->get('type', self::SEARCH_ALL);
@@ -57,5 +65,39 @@ class IndexController extends BaseController
             ->paginate($number);
 
         return $this->success(new ApiOrderResourceCollection($order));
+    }
+
+    /**
+     * 订单详情.
+     */
+    public function detail(Request $request, OrderDao $order_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'no' => 'required|string',
+            ], [], [
+                'no' => '订单编号',
+            ]);
+            $current_user = $this->user();
+            $order = Order::query()
+                ->withCount('orderDelivery')
+                ->with(['detail', 'province', 'city', 'district'])
+                ->whereNo($validated['no'])
+                ->whereUserId($current_user->id)
+                ->first();
+
+            if (! $order) {
+                throw new BusinessException('订单不存在');
+            }
+            $order->custom_status = $order_dao->getStatusByOrder($order);
+
+            return $this->success(ApiOrderDetailResource::make($order));
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
     }
 }
