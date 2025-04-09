@@ -7,8 +7,8 @@ enum PayStatusEnum: int
     public function getLabel(): string
     {
         return match ($this) {
-            self::PAY_WAIT => '未支付',
-            self::PAYED => '已支付',
+            self::PAY_WAIT => '未付款',
+            self::PAYED => '已付款',
         };
     }
 

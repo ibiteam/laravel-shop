@@ -126,6 +126,12 @@ class OrderService
             $item_format[] = $goods_formatter->initFormat();
         }
 
+        $payment_methods = [];
+
+        foreach (Order::$paymentMethodMap as $alias => $name) {
+            $payment_methods[] = ['name' => $name, 'alias' => $alias];
+        }
+
         return [
             'user_address' => app(UserAddressDao::class)->showByIdOrDefault($this->getUser()->id, $user_address_id),
             'goods' => $item_format,
@@ -137,9 +143,7 @@ class OrderService
                 'total_amount' => $this->getAmount(),
                 'total_integral' => $this->getGoodsIntegral(),
             ],
-            'payment_methods' => [
-                ['name' => '在线支付', 'alias' => Order::PAYMENT_METHOD_ONLINE],
-            ],
+            'payment_methods' => $payment_methods,
         ];
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum PaymentMethodEnum: string
+enum PaymentEnum: string
 {
     public function getLabel(): string
     {

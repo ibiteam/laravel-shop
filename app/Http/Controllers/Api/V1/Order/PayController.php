@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Order;
 
 use App\Enums\PayFormEnum;
-use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentEnum;
 use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
@@ -40,7 +40,7 @@ class PayController extends BaseController
                 throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
-            $payment_methods = $payment_dao->getListByEnabled()->map(function (Payment $payment) use ($order) {
+            $payments = $payment_dao->getListByEnabled()->map(function (Payment $payment) use ($order) {
                 $can_use = true;
 
                 if ($payment->limit >= 0 && $order->order_amount > $payment->limit) {
@@ -58,7 +58,7 @@ class PayController extends BaseController
                 ];
             });
 
-            if ($payment_methods->isEmpty()) {
+            if ($payments->isEmpty()) {
                 throw new BusinessException('暂无可用的支付方式');
             }
 
@@ -68,7 +68,7 @@ class PayController extends BaseController
                     'order_amount' => $order->order_amount,
                     'created_at' => $order->created_at->toDateTimeString(),
                 ],
-                'payment_methods' => $payment_methods,
+                'payments' => $payments,
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
@@ -101,7 +101,7 @@ class PayController extends BaseController
                 throw new BusinessException('订单已支付');
             }
             // 获取可用的支付方式
-            $payment = $payment_dao->getInfoByAlias(PaymentMethodEnum::WECHAT);
+            $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
 
             if (! $payment instanceof Payment || ! $payment->is_enabled) {
                 throw new BusinessException('该支付方式暂不可用');
