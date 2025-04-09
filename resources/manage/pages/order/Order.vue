@@ -117,6 +117,10 @@ const getData = (page = 1) => {
     })
 }
 
+const openDetailTab = (order) => {
+  router.push({name:'manage.order.detail', query: {id: order.id},params:{no: order.no}})
+}
+
 onMounted( () => {
     getData()
 });
@@ -236,7 +240,7 @@ onMounted( () => {
             <el-table-column label="订单状态" prop="status"></el-table-column>
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="large">编辑</el-button>
+                    <el-button link type="primary" size="large" @click="openDetailTab(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
         </el-table>

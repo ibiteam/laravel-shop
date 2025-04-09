@@ -36,6 +36,7 @@ return new class extends Migration
             $table->integer('integral')->default(0)->comment('消耗积分数量');
             $table->decimal('coupon_amount', 15)->comment('优惠劵金额');
             $table->unsignedBigInteger('coupon_id')->default(0)->comment('优惠券ID');
+            $table->string('payment_method',30)->comment('支付方式');
             $table->decimal('money_paid', 15)->default(0)->comment('已支付金额');
             $table->string('remark')->comment('用户备注');
             $table->string('cancel_reason')->nullable()->comment('取消原因');

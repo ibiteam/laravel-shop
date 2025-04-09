@@ -29,7 +29,7 @@ class WechatPayOrderService implements PayOrderInterface
         ];
 
         // 创建支付流水记录
-        $transaction = app(TransactionDao::class)->storeByOrder($order, $payment_method);
+        $transaction = app(TransactionDao::class)->storeByOrder($order, $payment_method, $pay_form_enum->getLabel());
 
         switch ($pay_form_enum) {
             case PayFormEnum::PAY_FORM_APP:

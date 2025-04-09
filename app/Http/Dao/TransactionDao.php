@@ -11,7 +11,7 @@ class TransactionDao
     /**
      * 支付订单生成流水.
      */
-    public function storeByOrder(Order $order, PaymentMethod $payment_method): Transaction
+    public function storeByOrder(Order $order, PaymentMethod $payment_method, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
             'transaction_no' => 'order_'.get_flow_sn(),
@@ -23,6 +23,7 @@ class TransactionDao
             'payment_method_id' => $payment_method->id,
             'amount' => $order->order_amount,
             'status' => Transaction::STATUS_WAIT,
+            'remark' => $remark,
         ]);
     }
 }

@@ -17,11 +17,12 @@ return new class extends Migration
             $table->string('transaction_no')->comment('支付流水号')->unique();
             $table->unsignedBigInteger('user_id')->comment('用户ID');
             $table->unsignedBigInteger('parent_id')->default(0)->comment('父交易ID');
-            $table->string('transaction_type', 30)->comment('交易类型');
+            $table->string('transaction_type', 30)->comment('交易类型:pay:支付,refund:退款');
             $table->string('type')->comment('交易业务类型');
             $table->integer('type_id')->comment('交易业务ID');
             $table->unsignedBigInteger('payment_method_id')->comment('支付方式ID');
             $table->decimal('amount', 15)->comment('支付金额');
+            $table->string('remark')->comment('支付备注');
             $table->tinyInteger('status')->comment('状态:0待处理,1处理成功');
             $table->dateTime('paid_at')->nullable()->comment('支付完成时间');
             $table->timestamps();

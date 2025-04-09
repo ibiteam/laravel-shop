@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -34,6 +35,7 @@ use Illuminate\Support\Carbon;
  * @property int         $integral        消耗积分数量
  * @property numeric     $coupon_amount   优惠劵金额
  * @property int         $coupon_id       优惠券ID
+ * @property string      $payment_method  支付方式
  * @property numeric     $money_paid      已支付金额
  * @property string      $remark          用户备注
  * @property string|null $cancel_reason   取消原因
@@ -50,6 +52,8 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<int, OrderDelivery> $orderDelivery
  * @property-read int|null $order_delivery_count
  * @property-read Region|null $province
+ * @property-read Collection<int, Transaction> $transactions
+ * @property-read int|null $transactions_count
  * @property-read User $user
  *
  * @method static Builder<static>|Order newModelQuery()
@@ -74,6 +78,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereOrderStatus($value)
  * @method static Builder<static>|Order wherePaidAt($value)
  * @method static Builder<static>|Order wherePayStatus($value)
+ * @method static Builder<static>|Order wherePaymentMethod($value)
  * @method static Builder<static>|Order wherePhone($value)
  * @method static Builder<static>|Order whereProvinceId($value)
  * @method static Builder<static>|Order whereReceivedAt($value)
@@ -127,6 +132,11 @@ class Order extends Model
     public function evaluate(): HasMany
     {
         return $this->hasMany(OrderEvaluate::class, 'order_id', 'id');
+    }
+
+    public function transactions(): MorphMany
+    {
+        return $this->morphMany(Transaction::class, 'typeInfo', 'type', 'type_id');
     }
 
     protected function casts(): array
