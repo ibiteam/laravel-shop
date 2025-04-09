@@ -3,9 +3,8 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
-use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
 
@@ -93,7 +92,7 @@ class AdvertComponent extends PageComponent
         $is_show_validate_string = Constant::ONE . ',' . Constant::ZERO;
         $component_name_string = AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT . ',' . AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT;
         $validator = Validator::make($data, [
-            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItemDraft,id',
+            'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:' . $component_name_string,
             'is_show' => 'required|integer|in:' . $is_show_validate_string,
@@ -133,7 +132,7 @@ class AdvertComponent extends PageComponent
         ], $this->messages());
 
         if ($validator->fails()) {
-            throw new BusinessException($publicData['name'] . '：' . $validator->errors()->first());
+            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $validator['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();

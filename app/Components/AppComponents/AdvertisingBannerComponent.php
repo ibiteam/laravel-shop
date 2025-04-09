@@ -4,6 +4,7 @@ namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -73,7 +74,7 @@ class AdvertisingBannerComponent extends PageComponent
     {
         $is_show_validate_string = Constant::ONE.','.Constant::ZERO;
         $validator = Validator::make($data, [
-            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItem,id',
+            'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER,
             'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
@@ -126,7 +127,7 @@ class AdvertisingBannerComponent extends PageComponent
         ], $this->messages());
 
         if ($validator->fails()) {
-            throw new BusinessException($this->getName().$validator->errors()->first());
+            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $validator['id']]);
         }
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
         $this->checkColumn($data['content']);
@@ -244,7 +245,6 @@ class AdvertisingBannerComponent extends PageComponent
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_FOUR:
-
                 if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
                     throw new BusinessException("每行显示 {$column}，有背景图的情况下，宽度只能是160");
                 }

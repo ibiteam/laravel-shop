@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Manage;
 
 use App\Components\ComponentFactory;
 use App\Components\PageDefaultDict;
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
@@ -139,11 +141,15 @@ class AppDecorationController extends BaseController
 
             DB::commit();
         } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
+            return $this->failed([
+                'id' => 0,
+            ], $validation_exception->validator->errors()->first(), ConstantEnum::DECORATION_COMPONENT);
         } catch (ModelNotFoundException $e) {
             return $this->error('未找到网站装修信息');
+        } catch (ProcessDataException $process_data_exception) {
+            return $this->failed($process_data_exception->getData(), $process_data_exception->getMessage(), ConstantEnum::DECORATION_COMPONENT);
         } catch (BusinessException $business_exception) {
-            return $this->error($business_exception);
+            return $this->error($business_exception->getMessage());
         } catch (\Exception $exception) {
             DB::rollBack();
 

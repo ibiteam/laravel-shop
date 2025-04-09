@@ -3,7 +3,7 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -16,17 +16,17 @@ class HotZoneComponent extends PageComponent
             'name' => $this->getName() ?: '热区',
             'component_name' => $this->getComponentName(),
             'limit' => 0,
-            'icon' => "&#xe7ce;",
-            'sort' => "",
+            'icon' => '&#xe7ce;',
+            'sort' => '',
         ];
     }
 
     public function parameter(): array
     {
         return [
-            'id' => '', //组件自增id
+            'id' => '', // 组件自增id
             'name' => $this->getName() ?: '热区',
-            'component_name' => $this->getComponentName(),// 组件名称
+            'component_name' => $this->getComponentName(), // 组件名称
             'is_show' => Constant::ONE,
             'is_fixed_assembly' => Constant::ZERO, // 不是固定组件
             'sort' => Constant::ZERO,
@@ -43,15 +43,15 @@ class HotZoneComponent extends PageComponent
                             'value' => '',
                         ],
                         'sort' => 1, // 排序
-                    ]
+                    ],
                 ],
             ],
         ];
     }
 
     /**
-     * @param $data
      * @return array|\Illuminate\Contracts\Validation\Validator|\Illuminate\Validation\Validator
+     *
      * @throws \App\Exceptions\BusinessException
      */
     public function validate($data): array
@@ -60,7 +60,7 @@ class HotZoneComponent extends PageComponent
             'id' => 'nullable|integer|exists:\App\Models\AppDecorationItem,id',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_HOT_ZONE,
-            'is_show' => 'required|integer|in:'. Constant::ONE.','.Constant::ZERO,
+            'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
             'content.image' => 'required', // 图片地址
             'content.areas' => 'required|array|max:10',
             'content.areas.*.x' => 'required|int',
@@ -71,8 +71,9 @@ class HotZoneComponent extends PageComponent
             'content.items.*.url.value' => 'present|nullable',
             'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
         ], $this->messages());
+
         if ($validator->fails()) {
-            throw new BusinessException($this->getName() . $validator->errors()->first());
+            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $validator['id']]);
         }
         $data = $validator->validated();
         $data['name'] = '热区';
@@ -83,9 +84,7 @@ class HotZoneComponent extends PageComponent
     }
 
     /**
-     * 格式化组件数据
-     * @param $data
-     * @return array
+     * 格式化组件数据.
      */
     public function getContent($data): array
     {
@@ -94,6 +93,7 @@ class HotZoneComponent extends PageComponent
             $data['image'] = $item['image'] ?? '';
             $data['title'] = $item['title'] ?? '';
             $data['url'] = $item['url'];
+
             if ($item['is_show']) {
                 return $data;
             }
@@ -110,9 +110,7 @@ class HotZoneComponent extends PageComponent
     }
 
     /**
-     * 后台数据渲染
-     * @param $data
-     * @return array
+     * 后台数据渲染.
      */
     public function display($data): array
     {

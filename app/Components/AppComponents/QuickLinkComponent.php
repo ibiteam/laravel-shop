@@ -3,7 +3,7 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -102,12 +102,12 @@ class QuickLinkComponent extends PageComponent
             'content.items.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
         ], $this->messages());
         if ($validator->fails()) {
-            throw new BusinessException($this->getName() . $validator->errors()->first());
+            throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $validator['id']]);
         }
         $title = array_column($data['content']['items'], 'title');
         $title_arr = $this->checkUnique($title);
         if ( $title_arr ) {
-            throw new BusinessException( implode('，' ,$title_arr) .'，名称已存在，请修改！');
+            throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $validator['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();

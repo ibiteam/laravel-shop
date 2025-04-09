@@ -3,7 +3,7 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -77,14 +77,14 @@ class HorizontalCarouselComponent extends PageComponent
     /**
      * @return array|\Illuminate\Contracts\Validation\Validator|\Illuminate\Validation\Validator
      *
-     * @throws \App\Exceptions\BusinessException
+     * @throws \App\Exceptions\ProcessDataException
      */
     public function validate($data): array
     {
         $is_show_validate_string = Constant::ONE.','.Constant::ZERO;
         $publicData = $this->getPublicData();
         $validate_data = [
-            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItemDraft,id',
+            'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
             'is_show' => 'required|integer|in:'.$is_show_validate_string,
@@ -130,7 +130,7 @@ class HorizontalCarouselComponent extends PageComponent
         $validator = Validator::make($data, $validate_data, $this->messages());
 
         if ($validator->fails()) {
-            throw new BusinessException($publicData['name'].'：'.$validator->errors()->first());
+            throw new ProcessDataException($publicData['name'].'：'.$validator->errors()->first(), ['id' => $validate_data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
@@ -167,10 +167,10 @@ class HorizontalCarouselComponent extends PageComponent
         return [
             'component_name' => $data['component_name'],
             'sort' => $data['sort'] ?? 0,
-            'width' => $publicData['width'],
-            'height' => $publicData['height'],
-            'interval' => $publicData['interval'],
-            'style' => $publicData['style'],
+            'width' => (int)$publicData['width'],
+            'height' => (int)$publicData['height'],
+            'interval' => (int)$publicData['interval'],
+            'style' => (int)$publicData['style'],
             'items' => $items,
         ];
     }
