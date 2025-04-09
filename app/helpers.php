@@ -352,3 +352,21 @@ if (! function_exists('get_flow_sn')) {
         return date('Ymd').$key.substr((string) ($del * $mul), 0, 6).$mul;
     }
 }
+
+if (! function_exists('get_new_price')) {
+    /**
+     * 处理浮点数中的0 12.00 转为12  12.40 转为 12.4  12.04 不转  12.04.
+     */
+    function get_new_price($num): string
+    {
+        $arrayNum = explode('.', (string) $num);
+
+        if (isset($arrayNum[1]) && preg_match('/[1-9]/', $arrayNum[1])) {
+            $arrayNum[1] = rtrim($arrayNum[1], (string) 0);
+        } else {
+            unset($arrayNum[1]);
+        }
+
+        return implode('.', $arrayNum);
+    }
+}

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
+use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
 use App\Http\Controllers\Api\V1\Order\IndexController as MyOrderIndexController;
 use App\Http\Controllers\Api\V1\Order\PayController;
@@ -75,6 +76,16 @@ Route::middleware('api.auth')->group(function () {
         Route::prefix('my')->group(function () {
             Route::get('index', [MyOrderIndexController::class, 'index']);
             Route::get('detail', [MyOrderIndexController::class, 'detail']);
+        });
+
+        // 申请售后
+        Route::prefix('apply_refund')->group(function () {
+            Route::get('verify', [ApplyRefundController::class, 'verify']); // 检测是否允许申请售后
+            Route::get('init', [ApplyRefundController::class, 'init']); // 初始化申请售后
+            Route::get('show', [ApplyRefundController::class, 'getInfoByType']); // 根据售后类型回显数据
+            Route::post('store', [ApplyRefundController::class, 'store']); // 提交申请售后
+            Route::post('revoke', [ApplyRefundController::class, 'revoke']); // 撤销申请
+
         });
     });
 
