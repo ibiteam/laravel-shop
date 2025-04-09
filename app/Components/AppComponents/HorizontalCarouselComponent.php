@@ -108,7 +108,7 @@ class HorizontalCarouselComponent extends PageComponent
             $date_type = $item['date_type'] ?? null;
             $time = $item['time'] ?? null;
             if (AppDecorationItem::CUSTOM_TIME == $date_type) {
-                app(AppDecorationItemService::class)->validateTimeFields($time, $data['id'], $index);
+                app(AppDecorationItemService::class)->validateTimeFields($publicData['name'], $time, $data['id'], $index);
             }
         }
         $validator->excludeUnvalidatedArrayKeys = true;

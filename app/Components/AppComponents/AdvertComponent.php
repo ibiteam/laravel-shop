@@ -106,7 +106,7 @@ class AdvertComponent extends PageComponent
         }
         // 独立校验 time 字段
         if ( AppDecorationItem::CUSTOM_TIME == $data['content']['date_type']) {
-            app(AppDecorationItemService::class)->validateTimeFields($data['content']['time'], $data['id']);
+            app(AppDecorationItemService::class)->validateTimeFields($publicData['name'], $data['content']['time'] ?? [], $data['id']);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
