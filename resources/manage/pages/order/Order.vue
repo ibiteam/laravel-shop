@@ -219,28 +219,16 @@ onMounted( () => {
         <el-table-column label="收货人" prop="consignee"></el-table-column>
         <el-table-column label="总金额">
             <template #default="scope">
-                <span v-if="Number(scope.row.order_amount) > 0 && Number(scope.row.integral) > 0">
-                    {{ scope.row.order_amount }}元 + {{ scope.row.integral }}{{ scope.row.integral_name }}
-                </span>
-                <span v-else-if="Number(scope.row.order_amount) > 0 && Number(scope.row.integral) == 0">
-                    {{ scope.row.order_amount }}元
-                </span>
-                <span v-else-if="scope.row.order_amount == 0 && Number(scope.row.integral) > 0">
-                    {{ scope.row.integral }}{{ scope.row.integral_name }}
-                </span>
+                <span v-if="scope.row.order_amount > 0">{{ scope.row.order_amount }}元</span>
+                <span v-if="scope.row.order_amount > 0 && scope.row.integral > 0"> + </span>
+                <span v-if="scope.row.integral > 0">{{ scope.row.integral }}{{ scope.row.integral_name }}</span>
             </template>
         </el-table-column>
         <el-table-column label="已付款金额">
             <template #default="scope">
-                <span v-if="Number(scope.row.order_amount) > 0 && Number(scope.row.integral) > 0">
-                    {{ scope.row.money_paid }}元 + {{ scope.row.integral }}{{ scope.row.integral_name }}
-                </span>
-                <span v-else-if="Number(scope.row.order_amount) > 0 && Number(scope.row.integral) == 0">
-                    {{ scope.row.money_paid }}元
-                </span>
-                <span v-else-if="Number(scope.row.order_amount) == 0 && Number(scope.row.integral) > 0">
-                    {{ scope.row.integral }}{{ scope.row.integral_name }}
-                </span>
+                <span v-if="scope.row.money_paid > 0">{{ scope.row.money_paid }}元</span>
+                <span v-if="scope.row.money_paid > 0 && scope.row.integral > 0"> + </span>
+                <span v-if="scope.row.integral > 0">{{ scope.row.integral }}{{ scope.row.integral_name }}</span>
             </template>
         </el-table-column>
         <el-table-column label="来源" prop="source"></el-table-column>
