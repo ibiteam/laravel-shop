@@ -71,10 +71,10 @@ class HotZoneComponent extends PageComponent
             'content.items.*.url.value' => 'present|nullable',
             'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
         ], $this->messages());
-        $data = $validator->validated();
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
+        $data = $validator->validated();
         $data['name'] = '热区';
         $data['is_fixed_assembly'] = Constant::ZERO;
         $data['component_name'] = AppDecorationItem::COMPONENT_NAME_HOT_ZONE;

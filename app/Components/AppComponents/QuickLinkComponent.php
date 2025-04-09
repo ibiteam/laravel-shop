@@ -101,7 +101,6 @@ class QuickLinkComponent extends PageComponent
             'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.items.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
         ], $this->messages());
-        $data = $validator->validated();
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
@@ -111,6 +110,7 @@ class QuickLinkComponent extends PageComponent
             throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
+        $data = $validator->validated();
         $data['name'] = '金刚区';
         $data['is_fixed_assembly'] = Constant::ZERO;
         $data['component_name'] = AppDecorationItem::COMPONENT_NAME_QUICK_LINK;

@@ -125,7 +125,6 @@ class AdvertisingBannerComponent extends PageComponent
                 },
             ],
         ], $this->messages());
-        $data = $validator->validated();
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
@@ -134,6 +133,7 @@ class AdvertisingBannerComponent extends PageComponent
             throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
+        $data = $validator->validated();
         $data['name'] = '广告图';
         $data['is_fixed_assembly'] = Constant::ZERO;
         $data['component_name'] = AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER;
