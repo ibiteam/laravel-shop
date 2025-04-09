@@ -25,7 +25,7 @@ class DoneController extends BaseController
         try {
             $validated = $request->validate([
                 'no' => 'required|string',
-                'goods_sku_id' => 'nullable|integer|min:1',
+                'sku_id' => 'nullable|integer|min:1',
                 'buy_number' => 'required|integer',
                 'user_address_id' => 'nullable|integer',
             ], [], [
@@ -39,7 +39,7 @@ class DoneController extends BaseController
             $current_goods_format = $goods_formatter
                 ->setUser($current_user)
                 ->setGoodsNo($validated['no'])
-                ->setSkuId($validated['goods_sku_id'] ?? 0)
+                ->setSkuId($validated['sku_id'] ?? 0)
                 ->setBuyNumber($validated['buy_number'])
                 ->validate();
 
@@ -69,7 +69,7 @@ class DoneController extends BaseController
         try {
             $validated = $request->validate([
                 'no' => 'required|string',
-                'goods_sku_id' => 'nullable|integer|min:1',
+                'sku_id' => 'nullable|integer|min:1',
                 'buy_number' => 'required|integer',
                 'user_address_id' => 'required|integer',
                 'remark' => 'nullable|string',
@@ -88,7 +88,7 @@ class DoneController extends BaseController
                 throw new BusinessException('收货地址不存在');
             }
 
-            $current_goods_format = $goods_formatter->setUser($current_user)->setGoodsNo($validated['no'])->setSkuId($validated['goods_sku_id'] ?? 0)->setBuyNumber($validated['buy_number'])->validate();
+            $current_goods_format = $goods_formatter->setUser($current_user)->setGoodsNo($validated['no'])->setSkuId($validated['sku_id'] ?? 0)->setBuyNumber($validated['buy_number'])->validate();
 
             $data = $order_service
                 ->setUser($current_user)

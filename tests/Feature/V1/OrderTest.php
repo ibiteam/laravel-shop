@@ -3,10 +3,9 @@
 it('test direct init api interface', function () {
     $response = $this->doGet('api/v1/order/direct/init', [
         'no' => 'eda482c3-df45-47a4-abc5-f795db6fefae',
-        'goods_sku_id' => 3,
+        'sku_id' => 3,
         'buy_number' => 3,
         'user_address_id' => 1,
-        'coupon_id' => '',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -17,7 +16,7 @@ it('test direct init api interface', function () {
 it('test direct done api interface', function () {
     $response = $this->doPost('api/v1/order/direct/done', [
         'no' => 'eda482c3-df45-47a4-abc5-f795db6fefae',
-        'goods_sku_id' => 3,
+        'sku_id' => 3,
         'buy_number' => 3,
         'user_address_id' => 1,
         'coupon_id' => '',

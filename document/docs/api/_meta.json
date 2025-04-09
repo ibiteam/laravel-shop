@@ -58,5 +58,11 @@
         "name": "cart",
         "label": "购物车",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "order",
+        "label": "订单",
+        "collapsed": true
     }
 ]

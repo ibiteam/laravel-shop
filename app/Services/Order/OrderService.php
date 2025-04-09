@@ -124,8 +124,9 @@ class OrderService
                 'goods_amount' => $this->getGoodsAmount(),
                 'goods_integral' => $this->getGoodsIntegral(),
                 'shipping_fee' => $this->getShippingFee(),
-                'coupon' => null,
-                'total' => $this->getAmount(),
+                'coupon' => $this->getCouponAmount(),
+                'total_amount' => $this->getAmount(),
+                'total_integral' => $this->getGoodsIntegral(),
             ],
             'payment_methods' => app(PaymentMethodDao::class)->getEffectiveList(),
         ];
@@ -374,6 +375,11 @@ class OrderService
         $this->setGoodsIntegral($goods_integral);
 
         return $this;
+    }
+
+    private function getCouponAmount(): int|float
+    {
+        return 0;
     }
 
     /**
