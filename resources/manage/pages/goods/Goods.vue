@@ -135,50 +135,51 @@ onMounted( () => {
 </script>
 
 <template>
-    <el-header style="padding: 10px 0;height: auto;">
-        <!-- 添加搜索表单 -->
-        <el-form :inline="true" :model="queryParams" class="search-form" label-width="100px">
-            <el-form-item label="商品ID" prop="goods_id">
-                <el-input
-                    v-model="queryParams.goods_id"
-                    placeholder="请输入商品ID"
-                    clearable
-                    @keyup.enter="handleSearch"
-                />
-            </el-form-item>
-            <el-form-item label="商品货号" prop="no">
-                <el-input
-                    v-model="queryParams.no"
-                    placeholder="请输入商品货号"
-                    clearable
-                    @keyup.enter="handleSearch"
-                />
-            </el-form-item>
-            <el-form-item label="商品名称" prop="name">
-                <el-input
-                    v-model="queryParams.name"
-                    placeholder="请输入商品名称"
-                    clearable
-                    @keyup.enter="handleSearch"
-                />
-            </el-form-item>
-            <el-form-item label="上架状态" prop="status">
-                <el-select v-model="queryParams.status" placeholder="请选择上架状态">
-                    <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="商品分类" prop="category_id">
-                <el-cascader
-                    v-model="queryParams.category_id"
-                    filterable
-                    clearable
-                    :options="categoryOptions"
-                    :props="{label: 'name',value: 'id',children:'all_children',checkStrictly: true}"
-                    placeholder="请选择"
-                    @change="selectQueryParamsCategory"
-                ></el-cascader>
-            </el-form-item>
-            <el-form-item label="创建时间">
+    <div class="common-wrap">
+        <el-header style="padding: 10px 0;height: auto;">
+            <!-- 添加搜索表单 -->
+            <el-form :inline="true" :model="queryParams" class="search-form" label-width="100px">
+                <el-form-item label="商品ID" prop="goods_id">
+                    <el-input
+                        v-model="queryParams.goods_id"
+                        placeholder="请输入商品ID"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item label="商品货号" prop="no">
+                    <el-input
+                        v-model="queryParams.no"
+                        placeholder="请输入商品货号"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item label="商品名称" prop="name">
+                    <el-input
+                        v-model="queryParams.name"
+                        placeholder="请输入商品名称"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item label="上架状态" prop="status">
+                    <el-select v-model="queryParams.status" placeholder="请选择上架状态">
+                        <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商品分类" prop="category_id">
+                    <el-cascader
+                        v-model="queryParams.category_id"
+                        filterable
+                        clearable
+                        :options="categoryOptions"
+                        :props="{label: 'name',value: 'id',children:'all_children',checkStrictly: true}"
+                        placeholder="请选择"
+                        @change="selectQueryParamsCategory"
+                    ></el-cascader>
+                </el-form-item>
+                <el-form-item label="创建时间">
                     <el-date-picker
                         v-model="queryParams.created_start_time"
                         type="datetime"
@@ -194,8 +195,8 @@ onMounted( () => {
                         value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
-            </el-form-item>
-            <el-form-item label="更新时间">
+                </el-form-item>
+                <el-form-item label="更新时间">
                     <el-date-picker
                         v-model="queryParams.updated_start_time"
                         type="datetime"
@@ -211,60 +212,61 @@ onMounted( () => {
                         value-format="YYYY-MM-DD HH:mm:ss"
                     >
                     </el-date-picker>
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                <el-button :icon="Plus" type="warning" @click="openDetailView(0)">添加</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe
-        border
-        v-loading="loading"
-        style="width: 100%;">
-        <el-table-column label="商品ID" prop="id"></el-table-column>
-        <el-table-column label="分类" prop="category.name"></el-table-column>
-        <el-table-column label="商品" width="400px">
-            <template #default="scope">
-                <div style="display:flex;">
-                    <el-image style="width: 50px; height: 50px" :src="scope.row.image" :preview-src-list="[scope.row.image]"></el-image>
-                    <div style="padding-left: 20px;">
-                        <div>{{ scope.row.name }}</div>
-                        <div>{{ scope.row.no }}</div>
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
+                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
+                    <el-button :icon="Plus" type="warning" @click="openDetailView(0)">添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe
+            border
+            v-loading="loading"
+            style="width: 100%;">
+            <el-table-column label="商品ID" prop="id"></el-table-column>
+            <el-table-column label="分类" prop="category.name"></el-table-column>
+            <el-table-column label="商品" width="400px">
+                <template #default="scope">
+                    <div style="display:flex;">
+                        <el-image style="width: 50px; height: 50px" :src="scope.row.image" :preview-src-list="[scope.row.image]"></el-image>
+                        <div style="padding-left: 20px;">
+                            <div>{{ scope.row.name }}</div>
+                            <div>{{ scope.row.no }}</div>
+                        </div>
                     </div>
-                </div>
-            </template>
-        </el-table-column>
-        <el-table-column label="商品单价" prop="price"></el-table-column>
-        <el-table-column label="销量" prop="sales_volume"></el-table-column>
-        <el-table-column label="库存" prop="total"></el-table-column>
-        <el-table-column label="排序" prop="sort"></el-table-column>
-        <el-table-column label="上架" prop="status">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.status"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    :active-value="1"
-                    :inactive-value="0"
-                    @change="handleStatusChange(scope.row.id)"
-                >
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button link type="primary" size="large" @click="openDetailView(scope.row.id)">编辑</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <!-- 添加分页组件 -->
-    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+                </template>
+            </el-table-column>
+            <el-table-column label="商品单价" prop="price"></el-table-column>
+            <el-table-column label="销量" prop="sales_volume"></el-table-column>
+            <el-table-column label="库存" prop="total"></el-table-column>
+            <el-table-column label="排序" prop="sort"></el-table-column>
+            <el-table-column label="上架" prop="status">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.status"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        :active-value="1"
+                        :inactive-value="0"
+                        @change="handleStatusChange(scope.row.id)"
+                    >
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="openDetailView(scope.row.id)">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加分页组件 -->
+        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+    </div>
 </template>
 
 <style scoped lang="scss">

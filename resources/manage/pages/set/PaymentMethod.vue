@@ -202,163 +202,165 @@ onMounted(() => {
 </script>
 
 <template>
-    <el-header style="padding: 10px 0;height: auto;">
-        <!-- 添加搜索表单 -->
-        <el-form :inline="true" :model="queryParams" class="search-form">
-            <el-form-item label="名称" prop="name">
-                <el-input
-                    v-model="queryParams.name"
-                    placeholder="请输入支付方式名称"
-                    clearable
-                    @keyup.enter="handleSearch"
-                />
-            </el-form-item>
-            <el-form-item label="状态" prop="is_enabled">
-                <el-select v-model="queryParams.is_enabled" placeholder="请选择支付方式状态" clearable>
-                    <el-option v-for="item in enabledOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe
-        border
-        v-loading="loading"
-        style="width: 100%;">
-        <el-table-column label="ID" prop="id"></el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="支付码" prop="alias"></el-table-column>
-        <el-table-column label="ICON">
-            <template #default="scope">
-                <el-image class="payment-method-icon" :src="scope.row.icon"></el-image>
-            </template>
-        </el-table-column>
-        <el-table-column label="描述" prop="description" width="350px" show-overflow-tooltip></el-table-column>
-        <el-table-column label="排序" prop="sort"></el-table-column>
-        <el-table-column label="状态" prop="is_enabled">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.is_enabled"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    :active-value="true"
-                    :inactive-value="false"
-                    @change="handleFieldChange(scope.row.id, 'is_enabled')"
-                >
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="支付限制" prop="limit">
-            <template #default="scope">
-                <el-button disabled type="success" v-if="scope.row.limit < 0">不限制</el-button>
-                <el-button disabled type="danger" v-else>{{scope.row.limit}} 元</el-button>
-            </template>
-        </el-table-column>
-        <el-table-column label="是否推荐" prop="is_recommend">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.is_recommend"
-                    active-color="#13ce66"
-                    inactive-color="#ff4949"
-                    :active-value="true"
-                    :inactive-value="false"
-                    @change="handleFieldChange(scope.row.id, 'is_recommend')"
-                >
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <!-- 添加分页组件 -->
-    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
-
-    <el-dialog
-        v-model="detailDialogVisible"
-        title="编辑支付方式"
-        width="60%"
-        center
-        :before-close="closeDetailDialog">
-        <div v-loading="detailFormLoading" class="s-flex jc-ct">
-            <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="width: 100%;" size="default">
+    <div class="common-wrap">
+        <el-header style="padding: 10px 0;height: auto;">
+            <!-- 添加搜索表单 -->
+            <el-form :inline="true" :model="queryParams" class="search-form">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="detailForm.name" />
+                    <el-input
+                        v-model="queryParams.name"
+                        placeholder="请输入支付方式名称"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
                 </el-form-item>
                 <el-form-item label="状态" prop="is_enabled">
-                    <el-switch v-model="detailForm.is_enabled" :active-value="true" :inactive-value="false" />
+                    <el-select v-model="queryParams.is_enabled" placeholder="请选择支付方式状态" clearable>
+                        <el-option v-for="item in enabledOptions" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="是否推荐" prop="is_recommend">
-                    <el-switch v-model="detailForm.is_recommend" :active-value="true" :inactive-value="false" />
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
+                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
                 </el-form-item>
-                <el-form-item label="描述" prop="description">
-                    <el-input v-model="detailForm.description" type="textarea" rows="2" />
-                </el-form-item>
-                <el-form-item label="排序" prop="sort">
-                    <el-input v-model.number="detailForm.sort" />
-                </el-form-item>
-                <el-form-item label="支付限制" prop="limit">
-                    <el-input v-model.number="detailForm.limit" />
-                </el-form-item>
-                <el-form-item label="图标" prop="icon">
-                    <el-upload
-                        class="logo-uploader"
-                        accept="image/jpeg,image/jpg,image/png"
-                        action=""
-                        :show-file-list="false"
-                        :http-request="(request) => uploadFile(request)"
-                        :with-credentials="true"
-                    >
-                        <img v-if="detailForm.icon" :src="detailForm.icon" class="payment-method-icon" />
-                        <el-icon v-else class="logo-uploader-icon">
-                            <Plus />
-                        </el-icon>
-                    </el-upload>
-                </el-form-item>
-                <template v-if="detailForm.alias === 'wechat'">
-                    <el-form-item label="微信支付服务号APP_ID" prop="config.service_wechat_pay_app_id">
-                        <el-input v-model="detailForm.config.service_wechat_pay_app_id" />
-                    </el-form-item>
-                    <el-form-item label="微信支付小程序APP_ID" prop="config.mini_wechat_pay_app_id">
-                        <el-input v-model="detailForm.config.mini_wechat_pay_app_id" />
-                    </el-form-item>
-                    <el-form-item label="微信支付应用程序(App)APP_ID" prop="config.app_wechat_pay_app_id">
-                        <el-input v-model="detailForm.config.app_wechat_pay_app_id" />
-                    </el-form-item>
-                    <el-form-item label="商户号" prop="config.mch_id" :rules="[{required: true, message: '商户号不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.mch_id" />
-                    </el-form-item>
-                    <el-form-item label="商户密钥" prop="config.secret_key" :rules="[{required: true, message: '商户密钥不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.secret_key" />
-                    </el-form-item>
-                    <el-form-item label="商户密钥（V2）" prop="config.v2_secret_key" :rules="[{required: true, message: '商户密钥（V2）不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.v2_secret_key" />
-                    </el-form-item>
-                    <el-form-item label="商户私钥" prop="config.private_key" :rules="[{required: true, message: '商户私钥不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.private_key" type="textarea" rows="6" />
-                    </el-form-item>
-                    <el-form-item label="商户证书" prop="config.certificate" :rules="[{required: true, message: '商户证书不能为空', trigger: 'blur'}]">
-                        <el-input v-model="detailForm.config.certificate" type="textarea" rows="6" />
-                    </el-form-item>
-                </template>
             </el-form>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="closeDetailDialog()">取消</el-button>
-                <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交</el-button>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe
+            border
+            v-loading="loading"
+            style="width: 100%;">
+            <el-table-column label="ID" prop="id"></el-table-column>
+            <el-table-column label="名称" prop="name"></el-table-column>
+            <el-table-column label="支付码" prop="alias"></el-table-column>
+            <el-table-column label="ICON">
+                <template #default="scope">
+                    <el-image class="payment-method-icon" :src="scope.row.icon"></el-image>
+                </template>
+            </el-table-column>
+            <el-table-column label="描述" prop="description" width="350px" show-overflow-tooltip></el-table-column>
+            <el-table-column label="排序" prop="sort"></el-table-column>
+            <el-table-column label="状态" prop="is_enabled">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.is_enabled"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        :active-value="true"
+                        :inactive-value="false"
+                        @change="handleFieldChange(scope.row.id, 'is_enabled')"
+                    >
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="支付限制" prop="limit">
+                <template #default="scope">
+                    <el-button disabled type="success" v-if="scope.row.limit < 0">不限制</el-button>
+                    <el-button disabled type="danger" v-else>{{scope.row.limit}} 元</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column label="是否推荐" prop="is_recommend">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.is_recommend"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949"
+                        :active-value="true"
+                        :inactive-value="false"
+                        @change="handleFieldChange(scope.row.id, 'is_recommend')"
+                    >
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加分页组件 -->
+        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+
+        <el-dialog
+            v-model="detailDialogVisible"
+            title="编辑支付方式"
+            width="60%"
+            center
+            :before-close="closeDetailDialog">
+            <div v-loading="detailFormLoading" class="s-flex jc-ct">
+                <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto" style="width: 100%;" size="default">
+                    <el-form-item label="名称" prop="name">
+                        <el-input v-model="detailForm.name" />
+                    </el-form-item>
+                    <el-form-item label="状态" prop="is_enabled">
+                        <el-switch v-model="detailForm.is_enabled" :active-value="true" :inactive-value="false" />
+                    </el-form-item>
+                    <el-form-item label="是否推荐" prop="is_recommend">
+                        <el-switch v-model="detailForm.is_recommend" :active-value="true" :inactive-value="false" />
+                    </el-form-item>
+                    <el-form-item label="描述" prop="description">
+                        <el-input v-model="detailForm.description" type="textarea" rows="2" />
+                    </el-form-item>
+                    <el-form-item label="排序" prop="sort">
+                        <el-input v-model.number="detailForm.sort" />
+                    </el-form-item>
+                    <el-form-item label="支付限制" prop="limit">
+                        <el-input v-model.number="detailForm.limit" />
+                    </el-form-item>
+                    <el-form-item label="图标" prop="icon">
+                        <el-upload
+                            class="logo-uploader"
+                            accept="image/jpeg,image/jpg,image/png"
+                            action=""
+                            :show-file-list="false"
+                            :http-request="(request) => uploadFile(request)"
+                            :with-credentials="true"
+                        >
+                            <img v-if="detailForm.icon" :src="detailForm.icon" class="payment-method-icon" />
+                            <el-icon v-else class="logo-uploader-icon">
+                                <Plus />
+                            </el-icon>
+                        </el-upload>
+                    </el-form-item>
+                    <template v-if="detailForm.alias === 'wechat'">
+                        <el-form-item label="微信支付服务号APP_ID" prop="config.service_wechat_pay_app_id">
+                            <el-input v-model="detailForm.config.service_wechat_pay_app_id" />
+                        </el-form-item>
+                        <el-form-item label="微信支付小程序APP_ID" prop="config.mini_wechat_pay_app_id">
+                            <el-input v-model="detailForm.config.mini_wechat_pay_app_id" />
+                        </el-form-item>
+                        <el-form-item label="微信支付应用程序(App)APP_ID" prop="config.app_wechat_pay_app_id">
+                            <el-input v-model="detailForm.config.app_wechat_pay_app_id" />
+                        </el-form-item>
+                        <el-form-item label="商户号" prop="config.mch_id" :rules="[{required: true, message: '商户号不能为空', trigger: 'blur'}]">
+                            <el-input v-model="detailForm.config.mch_id" />
+                        </el-form-item>
+                        <el-form-item label="商户密钥" prop="config.secret_key" :rules="[{required: true, message: '商户密钥不能为空', trigger: 'blur'}]">
+                            <el-input v-model="detailForm.config.secret_key" />
+                        </el-form-item>
+                        <el-form-item label="商户密钥（V2）" prop="config.v2_secret_key" :rules="[{required: true, message: '商户密钥（V2）不能为空', trigger: 'blur'}]">
+                            <el-input v-model="detailForm.config.v2_secret_key" />
+                        </el-form-item>
+                        <el-form-item label="商户私钥" prop="config.private_key" :rules="[{required: true, message: '商户私钥不能为空', trigger: 'blur'}]">
+                            <el-input v-model="detailForm.config.private_key" type="textarea" rows="6" />
+                        </el-form-item>
+                        <el-form-item label="商户证书" prop="config.certificate" :rules="[{required: true, message: '商户证书不能为空', trigger: 'blur'}]">
+                            <el-input v-model="detailForm.config.certificate" type="textarea" rows="6" />
+                        </el-form-item>
+                    </template>
+                </el-form>
             </div>
-        </template>
-    </el-dialog>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeDetailDialog()">取消</el-button>
+                    <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交</el-button>
+                </div>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <style scoped lang="scss">
