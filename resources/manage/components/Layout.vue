@@ -626,26 +626,22 @@ onUnmounted(() => {
                         visibility: hidden;
                     }
                     .el-tabs__item{
-                        width: 150px;
-                        height: 30px;
-                        border-radius: 8px 8px 0px 0px;
-                        border: solid 1px #D8D8D8;
-                        border-bottom: none;
-                        padding: 0;
-                        margin-right: 4px;
-
-                        display: flex;
-                        justify-content: space-around;
-
+                        font-weight: 400;
                         font-size: 12px;
                         color: #888888;
+                        padding: 0 20px !important;
+                        margin-right: 4px;
+                        border: solid 1px #D8D8D8;
+                        border-radius: 8px 8px 0px 0px;
+                        border-bottom: none;
+                        height: 30px;
+                        line-height: 30px;
                         &:last-child{
                             margin-right: 0;
                         }
 
                         &.is-active{
                             background: #F6FAFF;
-                            border: none;
                             color: #077FFF;
                         }
                         .el-icon{

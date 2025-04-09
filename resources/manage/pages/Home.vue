@@ -480,7 +480,8 @@ onUnmounted(() => {
             .home-left {
                 width: 0;
                 flex: 1;
-                margin-right: 50px;
+                margin-right: 20px;
+                border-radius: 4px;
             }
 
             .home-left .information {
@@ -622,6 +623,7 @@ onUnmounted(() => {
 
             .home-right {
                 width: 280px;
+                border-radius: 4px;
             }
 
             .home-right .shortcut {
@@ -629,6 +631,7 @@ onUnmounted(() => {
                 background: #fff;
                 padding: 10px 20px;
                 box-sizing: border-box;
+                border-radius: 4px;
             }
 
             .home-right .shortcut .more-opt {
