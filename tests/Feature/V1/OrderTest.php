@@ -48,7 +48,7 @@ it('test cart done api interface', function () {
 });
 
 it('test pay cash desk api interface', function () {
-    $response = $this->doGet('api/v1/order/pay/cash_desk', [
+    $response = $this->doGet('api/v1/order/cash', [
         'no' => '2025040741365428',
     ]);
     $this->assertIsArray($response);
@@ -71,7 +71,6 @@ it('test wechat pay api interface', function () {
 it('test my order list interface', function () {
     $response = $this->doGet('api/v1/order/my/index', [
     ]);
-    dump($response);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);

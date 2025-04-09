@@ -64,5 +64,11 @@
         "name": "order",
         "label": "订单",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "pay",
+        "label": "支付",
+        "collapsed": true
     }
 ]

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
-use App\Enums\PaymentMethodEnum;
 use App\Enums\PayFormEnum;
+use App\Enums\PaymentMethodEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
@@ -36,8 +36,10 @@ class PayController extends BaseController
             }
             // 获取可用的支付方式
             $payment_methods = $payment_method_dao->getListByEnabled()->map(function (PaymentMethod $payment_method) use ($order) {
+                $can_use = true;
+
                 if ($payment_method->limit >= 0 && $order->order_amount > $payment_method->limit) {
-                    return null;
+                    $can_use = false;
                 }
 
                 return [
@@ -47,6 +49,7 @@ class PayController extends BaseController
                     'alias' => $payment_method->alias,
                     'is_recommend' => $payment_method->is_recommend,
                     'sort' => $payment_method->sort,
+                    'can_use' => $can_use,
                 ];
             });
 
