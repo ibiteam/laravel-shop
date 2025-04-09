@@ -65,9 +65,8 @@
         },
         "payment_methods": [
             {
-                "name": "微信支付",
-                "alias": "wechat",
-                "is_recommend": true
+                "name": "在线支付",
+                "alias": "online"
             }
         ]
     }
@@ -125,4 +124,3 @@ data.payment_methods 参数说明
 |--------------|---------|------------|
 | name         | String  | 支付方式名称     |
 | alias        | String  | 支付方式别名     |
-| is_recommend | Integer | 是否推荐 1是 0否 |

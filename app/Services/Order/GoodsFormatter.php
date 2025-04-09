@@ -30,7 +30,7 @@ class GoodsFormatter
     private string $goods_no;
 
     /**
-     * @var Goods 商品实例
+     * @var Goods|null 商品实例
      */
     private ?Goods $goods = null;
 

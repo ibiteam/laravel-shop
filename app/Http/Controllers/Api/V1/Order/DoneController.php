@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\UserAddressDao;
 use App\Models\Cart;
+use App\Models\Order;
 use App\Models\UserAddress;
 use App\Services\Order\GoodsFormatter;
 use App\Services\Order\OrderService;
@@ -69,12 +70,14 @@ class DoneController extends BaseController
         try {
             $validated = $request->validate([
                 'no' => 'required|string',
+                'payment_method' => 'required|string|in:'.implode(',', [Order::PAYMENT_METHOD_ONLINE]),
                 'sku_id' => 'nullable|integer|min:1',
                 'buy_number' => 'required|integer',
                 'user_address_id' => 'required|integer',
                 'remark' => 'nullable|string',
             ], [], [
                 'no' => '商品编号',
+                'payment_method' => '支付方式',
                 'buy_number' => '购买数量',
                 'user_address_id' => '用户地址ID',
                 'remark' => '备注',
@@ -97,6 +100,7 @@ class DoneController extends BaseController
                 ->setIp(get_request_ip())
                 ->setUserAddress($user_address)
                 ->setGoodsFormatters([$current_goods_format])
+                ->setPaymentMethod($validated['payment_method'])
                 ->calculatePrice()
                 ->setShippingFee(0)
                 ->store($validated['remark'] ?? '');
@@ -165,9 +169,11 @@ class DoneController extends BaseController
         try {
             $validated = $request->validate([
                 'user_address_id' => 'required|integer',
+                'payment_method' => 'required|string|in:'.implode(',', [Order::PAYMENT_METHOD_ONLINE]),
                 'remark' => 'nullable|string',
             ], [], [
                 'user_address_id' => '用户地址ID',
+                'payment_method' => '支付方式',
                 'remark' => '备注',
             ]);
 
@@ -200,6 +206,7 @@ class DoneController extends BaseController
                 ->setIp(get_request_ip())
                 ->setUserAddress($user_address)
                 ->setGoodsFormatters($goods_formatters->toArray())
+                ->setPaymentMethod($validated['payment_method'])
                 ->calculatePrice()
                 ->setShippingFee(0)
                 ->store($validated['remark'] ?? '');
