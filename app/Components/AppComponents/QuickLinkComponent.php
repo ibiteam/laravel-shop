@@ -33,7 +33,7 @@ class QuickLinkComponent extends PageComponent
             'content' => [
                 'row' => AppDecorationItem::PLATE_HEIGHT_ONE, // 板块行数
                 'column' => AppDecorationItem::NUMBER_ROWS_THREE, // 每行显示
-                'items' => [
+                'data' => [
                     [
                         'image' => '', // 图片地址
                         'title' => '', // 名称
@@ -93,18 +93,18 @@ class QuickLinkComponent extends PageComponent
             'is_show' => 'required|integer|in:'. Constant::ONE.','.Constant::ZERO,
             'content.row' => 'required|in:'. AppDecorationItem::PLATE_HEIGHT_ONE.','.AppDecorationItem::PLATE_HEIGHT_TWO.','.AppDecorationItem::PLATE_HEIGHT_THREE, // 每行展示 1行 2行 3行
             'content.column' => 'required|in:'. AppDecorationItem::NUMBER_ROWS_THREE.','.AppDecorationItem::NUMBER_ROWS_FOUR.','.AppDecorationItem::NUMBER_ROWS_FIVE, // 每行个数 3个 4个 5个
-            'content.items' => 'required|array',
-            'content.items.*.image' => 'required',
-            'content.items.*.title' => 'max:6',
-            'content.items.*.url.name' => 'present|nullable',
-            'content.items.*.url.value' => 'present|nullable',
-            'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
-            'content.items.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
+            'content.data' => 'required|array',
+            'content.data.*.image' => 'required',
+            'content.data.*.title' => 'max:6',
+            'content.data.*.url.name' => 'present|nullable',
+            'content.data.*.url.value' => 'present|nullable',
+            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+            'content.data.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
         ], $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
-        $title = array_column($data['content']['items'], 'title');
+        $title = array_column($data['content']['data'], 'title');
         $title_arr = $this->checkUnique($title);
         if ( $title_arr ) {
             throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $data['id']]);
@@ -126,7 +126,7 @@ class QuickLinkComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['items'])->sortByDesc('sort')->map(function ($item) use (&$items) {
+        $items = collect($content['data'])->sortByDesc('sort')->map(function ($item) use (&$items) {
             $data['image'] = $item['image'] ?? '';
             $data['title'] = $item['title'] ?? '';
             $data['url'] = $item['url'];
@@ -184,15 +184,15 @@ class QuickLinkComponent extends PageComponent
             'content.row.in' => '每行展示数据格式不正确',
             'content.column.required' => '请选择每行个数',
             'content.column.in' => '每行个数数据格式不正确',
-            'content.items.required' => '请设置板块对应数据',
-            'content.items.*.image.required' => '请上传图片',
-            'content.items.*.title.max' => '名称不能超过6个字符',
-            'content.items.*.url.name.present' => 'url链接别名参数未设置',
-            'content.items.*.url.value.present' => '请设置url链接别名值参数',
-            'content.items.*.sort.integer' => '排序必须为整数',
-            'content.items.*.sort.min' => '排序最小值是1',
-            'content.items.*.sort.max' => '排序最大值是100',
-            'content.items.*.is_show.required' => '是否显示不能为空',
+            'content.data.required' => '请设置板块对应数据',
+            'content.data.*.image.required' => '请上传图片',
+            'content.data.*.title.max' => '名称不能超过6个字符',
+            'content.data.*.url.name.present' => 'url链接别名参数未设置',
+            'content.data.*.url.value.present' => '请设置url链接别名值参数',
+            'content.data.*.sort.integer' => '排序必须为整数',
+            'content.data.*.sort.min' => '排序最小值是1',
+            'content.data.*.sort.max' => '排序最大值是100',
+            'content.data.*.is_show.required' => '是否显示不能为空',
         ];
     }
 

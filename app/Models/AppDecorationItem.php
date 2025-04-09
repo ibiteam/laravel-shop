@@ -63,6 +63,22 @@ class AppDecorationItem extends Model
     public const BACKGROUND_COLOR_SHOW = 1; // 展示背景色
     public const BACKGROUND_COLOR_NOT_SHOW = 0; // 不展示背景色
     public const COMPONENT_NAME_HOT_ZONE = 'hot_zone'; // 热区
+    public const COMPONENT_NAME_HOME_NAV = 'home_nav'; // 搜索
+    public const COMPONENT_NAME_LABEL = 'label'; // 底部标签栏
+    public const COMPONENT_NAME_GOODS_RECOMMEND = 'goods_recommend'; // 商品推荐
+    public const LAYOUT_ONE = 1; // 单列布局
+    public const LAYOUT_TWO = 2; // 双列布局
+    public const LAYOUT_THREE = 3; // 三列布局
+    public const ALIGN_LEFT = 'left'; // 左对齐
+    public const ALIGN_CENTER = 'center'; // 居中对齐
+    // 推荐规则
+    public const RULE_INTELLIGENT = 1; // 智能推荐
+    public const RULE_MANUAL = 2; // 手动推荐
+    // 排序类型
+    public const SORT_SALES = 1; // 销量优先
+    public const SORT_HIGH_PRAISE = 2; // 好评优先
+    public const SORT_LOW_PRICE = 3; // 低价优先
+    public const SORT_NEW_PRODUCT = 4; // 新品优先
 
     protected $casts = [
         'content' => 'array',

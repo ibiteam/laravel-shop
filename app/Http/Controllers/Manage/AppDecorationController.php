@@ -55,11 +55,7 @@ class AppDecorationController extends BaseController
             AppDecoration::ALIAS_HOME => [
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
-                //                AppDecorationItem::COMPONENT_NAME_LABEL,
-                //                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-                //                AppDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-                //                AppDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-                //                AppDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
             ],
         ];
 

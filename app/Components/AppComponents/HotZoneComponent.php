@@ -89,15 +89,11 @@ class HotZoneComponent extends PageComponent
     {
         $content = $data['content'];
         $items = collect($content['items'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            $data['image'] = $item['image'] ?? '';
-            $data['title'] = $item['title'] ?? '';
-            $data['url'] = $item['url'];
-
-            if ($item['is_show']) {
-                return $data;
+            if (!$item['is_show']) {
+                return null;
             }
 
-            return null;
+            return $item;
         })->filter()->values()->toArray();
 
         return [
