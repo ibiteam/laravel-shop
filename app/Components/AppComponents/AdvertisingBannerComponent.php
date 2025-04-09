@@ -105,27 +105,32 @@ class AdvertisingBannerComponent extends PageComponent
             'content.data.*.time' => [
                 'required_if:content.data.*.date_type,'.$this->custom_time_yes,
                 'array', // 确保 time 是数组
-                'size:2', // 确保数组长度为 2
-                function ($attribute, $value, $fail) {
-                    // 检查两个时间是否为有效日期时间格式
-                    if (! is_array($value) || count($value) !== 2) {
-                        return $fail('时间字段必须是一个包含两个时间的数组');
-                    }
+                function ($attribute, $value, $fail) use ($data) {
+                    // 获取对应的 date_type 值
+                    $index = str_replace('content.data.', '', explode('.', $attribute)[2]);
+                    $date_type = $data['content']['data'][$index]['date_type'] ?? null;
 
-                    $start_time = $value[0] ?? null;
-                    $end_time = $value[1] ?? null;
+                    if ($date_type == $this->custom_time_yes) {
+                        // 检查 time 是否为数组且长度为 2
+                        if (! is_array($value) || count($value) !== 2) {
+                            return $fail('时间字段必须是一个包含两个时间的数组');
+                        }
 
-                    if (! $start_time || ! $end_time) {
-                        return $fail('时间字段不能为空');
-                    }
+                        $start_time = $value[0] ?? null;
+                        $end_time = $value[1] ?? null;
 
-                    if (! strtotime($start_time) || ! strtotime($end_time)) {
-                        return $fail('时间字段必须是有效的日期时间格式');
-                    }
+                        if (! $start_time || ! $end_time) {
+                            return $fail('时间字段不能为空');
+                        }
 
-                    // 检查开始时间是否早于或等于结束时间
-                    if (strtotime($start_time) > strtotime($end_time)) {
-                        return $fail('开始时间不能晚于结束时间');
+                        if (! strtotime($start_time) || ! strtotime($end_time)) {
+                            return $fail('时间字段必须是有效的日期时间格式');
+                        }
+
+                        // 检查开始时间是否早于或等于结束时间
+                        if (strtotime($start_time) > strtotime($end_time)) {
+                            return $fail('开始时间不能晚于结束时间');
+                        }
                     }
                 },
             ],
