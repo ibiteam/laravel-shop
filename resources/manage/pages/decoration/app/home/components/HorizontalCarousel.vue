@@ -88,7 +88,19 @@
                                 </div>
                                 <p class="item-title-info" style="margin-bottom: 0;">高度范围：200px~350px</p>
                             </el-form-item>
-                            <el-form-item label="切换时间(秒)" label-position="top" :prop="'interval'">
+                            <el-form-item label="切换时间(秒)" label-position="top" :prop="'interval'" :rules="
+                                [
+                                    { validator: (rule, value, callback) => {
+                                        if (isNaN(value)) {
+                                            callback(new Error('请输入数字'));
+                                        } else if (!Number.isInteger(value * 1)) {
+                                            callback(new Error('请输入整数'));
+                                        } else if (value < 1 || value > 10) {
+                                            callback('切换时间为1-10秒')
+                                        } else { callback(); }
+                                    }, trigger: 'blur' },
+                                ]
+                            ">
                                 <el-input v-model="form.content.interval" style="width: 100px;"></el-input>
                             </el-form-item>
                         </div>

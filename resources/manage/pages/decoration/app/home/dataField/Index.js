@@ -29,3 +29,15 @@ export function DragTempItemField() {
         // 商品推荐
     }
 }
+
+// 固定组件相关数据定义
+
+export const TempFixedField = {
+    'home_search': {
+        MaxItemLength: 10,
+        TempContentDataItemField: {
+            title: '',
+            url: LinkDataItemField()
+        }
+    }
+}

@@ -19,7 +19,7 @@
             <div class="decoration-app-container">
                 <main class="decoration-app-main" id="decorationAppMain">
                     <div class="app-wrapper">
-                        <search v-if="findNotForData('home_nav')" v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}" ></search>
+                        <search v-if="findNotForData('home_search')" ref="homeSearchRef" v-bind="{component: findNotForData('home_search'), temp_index: decoration.temp_index}" ></search>
                         <VueDraggable
                             class="app-wrapper-content"
                             v-model="decoration.data"
@@ -92,6 +92,8 @@ const dragData = reactive({
 })
 // 组件refs
 const tempRefs = ref([])
+// 固定头部搜索ref
+const homeSearchRef = ref(null)
 // 素材中心弹窗
 const materialCenterDialogData = reactive({
     show: false,
@@ -166,6 +168,9 @@ const handlematerialCenterDialogConfirm = (res) => {
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateUploadComponentData(updateData)
         }
+        if (not_for_data == 'home_search') {
+            homeSearchRef.value.updateUploadComponentData(updateData)
+        }
         return
     }
 }
@@ -186,6 +191,9 @@ const handleLinkCenterDialogConfirm = (res) => {
         const not_for_data = linkCenterDialogData.not_for_data
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateLinkComponentData(updateData)
+        }
+        if (not_for_data == 'home_search') {
+            homeSearchRef.value.updateLinkComponentData(updateData)
         }
         return
     }
@@ -211,30 +219,34 @@ const decorationSave = (params) => {
         let decoration_data = []
         tempRefs.value.map(item => {
             let temp_data = JSON.parse(JSON.stringify(item.getComponentData()))
-            // if (String(temp_data.id).indexOf('-add') > -1) {
-            //     temp_data.id = ''
-            // }
             decoration_data.push(temp_data)
         })
+        const save_decoration_data = [
+            danping_advertisement,
+            suspended_advertisement,
+            ...decoration_data
+        ]
         const saveData = {
             button_type,
             id: decoration.app_website_data.id,
             title: app_website_data.title,
             keywords: app_website_data.keywords,
             description: app_website_data.description,
-            data: JSON.stringify([
-                danping_advertisement,
-                suspended_advertisement,
-                ...decoration_data
-            ])
+            data: JSON.stringify(save_decoration_data)
         }
+        console.log(save_decoration_data)
         console.log(saveData)
         appDecorationSave((saveData)).then(res => {
             if (cns.$successCode(res.code)) {
-
+                cns.$message.success('保存成功')
             } else if (res.code == 4006) {
-                decoration.temp_index = res.data.id
-                pageSetting.value = false
+                if (res.data.id) {
+                    decoration.temp_index = res.data.id
+                    pageSetting.value = false
+                } else {
+                    decoration.temp_index = ''
+                    pageSetting.value = true
+                }
                 cns.$message.error(res.message)
             } else {
                 cns.$message.error(res.message)
@@ -332,7 +344,40 @@ const getDecorationHome = () => {
                 //     name: '金刚区', // 组件名
                 // }
             ]
-            decoration.not_for_data = res.data.not_for_data
+            decoration.not_for_data = [
+                ...res.data.not_for_data,
+                // {
+                //     component_name: 'home_search', // 组件名
+                //     content: { // 表单数据
+                //         logo: '',
+                //         keywords: '', // 关键词
+                //         button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
+                //         interval: 3, // 关键词轮播时间，最大10 最小1
+                //         data: [{
+                //             url: {
+                //                 name: '', // 路由名称
+                //                 value: '', // 路由链接
+                //             },
+                //             title: '', // 搜索提示词
+                //         }]
+                //     },
+                //     data: { // 渲染数据
+                //         logo: '',
+                //         keywords: '', // 关键词
+                //         button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
+                //         interval: 3, // 关键词轮播时间，最大10 最小1
+                //         items: [{
+                //             image: '',
+                //             url: '',
+                //             title: '',
+                //         }],
+                //     },
+                //     id: '666', // 组件id
+                //     is_show: 1, // 组件是否显示
+                //     is_fixed_assembly: 1,
+                //     name: '搜索', // 组件名
+                // }
+            ]
         }
     })
 }
