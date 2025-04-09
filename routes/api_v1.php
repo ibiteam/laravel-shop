@@ -74,6 +74,7 @@ Route::middleware('api.auth')->group(function () {
         });
         Route::prefix('my')->group(function () {
             Route::get('index', [MyOrderIndexController::class, 'index']);
+            Route::get('detail', [MyOrderIndexController::class, 'detail']);
         });
     });
 

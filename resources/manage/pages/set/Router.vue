@@ -163,114 +163,116 @@ onMounted(() => {
 });
 </script>
 <template>
-    <el-header style="padding-top: 10px;">
-        <el-form :inline="true" :model="searchForm" class="search-form">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="别名" prop="alias">
-                <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="所属分类">
-                <el-select v-model="searchForm.router_category_id" clearable filterable placeholder="请选择">
-                    <el-option v-for="item in categoriesData"
-                        :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="是否显示">
-                <el-select v-model="searchForm.is_show" placeholder="请选择">
-                    <el-option label="全部" value="-1"></el-option>
-                    <el-option label="显示" value="1"></el-option>
-                    <el-option label="隐藏" value="0"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe border
-        v-loading="loading"
-        style="width: 100%;">
-        <el-table-column label="ID" prop="id"></el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="所属分类" prop="category_name"></el-table-column>
-        <el-table-column label="别名" prop="alias"></el-table-column>
-        <el-table-column label="H5地址" prop="h5_url"></el-table-column>
-        <el-table-column label="排序" prop="sort"></el-table-column>
-        <el-table-column label="额外参数" prop="params"></el-table-column>
-        <el-table-column label="是否显示" prop="is_show">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.is_show"
-                    :active-value="1" :inactive-value="0"
-                    active-color="#13ce66" inactive-color="#ff4949"
-                    @click="changeShow(scope.row)">
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 20, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
-    </div>
-
-    <el-dialog
-        width="700" center :before-close="closeStoreDialog"
-        v-model="storeDialogVisible" :title="storeDialogTitle">
-        <div class="s-flex jc-ct">
-            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
-            <el-form-item label="所属分类" prop="router_category_id">
-                <el-select v-model="submitForm.router_category_id" clearable filterable placeholder="请选择">
-                    <el-option v-for="item in categoriesData"
-                        :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="submitForm.name" />
-            </el-form-item>
-            <el-form-item label="别名" prop="alias">
-                <el-input v-model="submitForm.alias" />
-            </el-form-item>
-            <el-form-item label="H5地址" prop="h5_url">
-                <el-input v-model="submitForm.h5_url" />
-            </el-form-item>
-            <el-form-item label="额外参数" prop="params">
-                <el-input v-model="submitForm.params" placeholder="json格式" />
-            </el-form-item>
-            <el-form-item label="排序" prop="sort">
-                <el-input v-model="submitForm.sort" />
-            </el-form-item>
-            <el-form-item label="是否显示" prop="is_show">
-                <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
-            </el-form-item>
-        </el-form>
+    <div class="common-wrap">
+        <el-header style="padding-top: 10px;">
+            <el-form :inline="true" :model="searchForm" class="search-form">
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item label="别名" prop="alias">
+                    <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
+                </el-form-item>
+                <el-form-item label="所属分类">
+                    <el-select v-model="searchForm.router_category_id" clearable filterable placeholder="请选择">
+                        <el-option v-for="item in categoriesData"
+                                   :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="是否显示">
+                    <el-select v-model="searchForm.is_show" placeholder="请选择">
+                        <el-option label="全部" value="-1"></el-option>
+                        <el-option label="显示" value="1"></el-option>
+                        <el-option label="隐藏" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
+                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe border
+            v-loading="loading"
+            style="width: 100%;">
+            <el-table-column label="ID" prop="id"></el-table-column>
+            <el-table-column label="名称" prop="name"></el-table-column>
+            <el-table-column label="所属分类" prop="category_name"></el-table-column>
+            <el-table-column label="别名" prop="alias"></el-table-column>
+            <el-table-column label="H5地址" prop="h5_url"></el-table-column>
+            <el-table-column label="排序" prop="sort"></el-table-column>
+            <el-table-column label="额外参数" prop="params"></el-table-column>
+            <el-table-column label="是否显示" prop="is_show">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.is_show"
+                        :active-value="1" :inactive-value="0"
+                        active-color="#13ce66" inactive-color="#ff4949"
+                        @click="changeShow(scope.row)">
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <div class="pagination-container" v-if="pageInfo.total > 0">
+            <el-pagination
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange"
+                :current-page="pageInfo.current_page"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                :page-size="pageInfo.per_page"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="pageInfo.total">
+            </el-pagination>
         </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="closeStoreDialog()">取消</el-button>
-                <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+
+        <el-dialog
+            width="700" center :before-close="closeStoreDialog"
+            v-model="storeDialogVisible" :title="storeDialogTitle">
+            <div class="s-flex jc-ct">
+                <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
+                    <el-form-item label="所属分类" prop="router_category_id">
+                        <el-select v-model="submitForm.router_category_id" clearable filterable placeholder="请选择">
+                            <el-option v-for="item in categoriesData"
+                                       :key="item.value" :label="item.label" :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="名称" prop="name">
+                        <el-input v-model="submitForm.name" />
+                    </el-form-item>
+                    <el-form-item label="别名" prop="alias">
+                        <el-input v-model="submitForm.alias" />
+                    </el-form-item>
+                    <el-form-item label="H5地址" prop="h5_url">
+                        <el-input v-model="submitForm.h5_url" />
+                    </el-form-item>
+                    <el-form-item label="额外参数" prop="params">
+                        <el-input v-model="submitForm.params" placeholder="json格式" />
+                    </el-form-item>
+                    <el-form-item label="排序" prop="sort">
+                        <el-input v-model="submitForm.sort" />
+                    </el-form-item>
+                    <el-form-item label="是否显示" prop="is_show">
+                        <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                    </el-form-item>
+                </el-form>
             </div>
-        </template>
-    </el-dialog>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeStoreDialog()">取消</el-button>
+                    <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+                </div>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <style scoped lang="scss">

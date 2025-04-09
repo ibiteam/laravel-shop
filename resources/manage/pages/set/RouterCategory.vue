@@ -173,108 +173,110 @@ onMounted(() => {
 });
 </script>
 <template>
-    <el-header style="padding-top: 10px;">
-        <el-form :inline="true" :model="searchForm" class="search-form">
-            <el-form-item label="名称" prop="name">
-                <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="别名" prop="alias">
-                <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="是否显示">
-                <el-select v-model="searchForm.is_show" placeholder="请选择">
-                    <el-option label="全部" value="-1"></el-option>
-                    <el-option label="显示" value="1"></el-option>
-                    <el-option label="隐藏" value="0"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
-            </el-form-item>
-        </el-form>
-    </el-header>
-    <el-table
-        :data="tableData"
-        stripe border
-        v-loading="loading"
-        style="width: 100%;"
-        row-key="id"
-        :tree-props="{ children: 'all_children' }">
-        <el-table-column label="分类" min-width="120">
-            <template #default="scope">
-                <div class="s-flex ai-ct">
-                    {{ scope.row.name }}【{{ scope.row.id }}】
-                </div>
-            </template>
-        </el-table-column>
-        <el-table-column label="别名" prop="alias"></el-table-column>
-        <el-table-column label="类型" prop="type">
-            <template #default="scope">
-                <template v-if="scope.row.type === 1">链接</template>
-                <template v-if="scope.row.type === 2">菜单</template>
-            </template>
-        </el-table-column>
-        <el-table-column label="页面" prop="page_title"></el-table-column>
-        <el-table-column label="链接数量" prop="routers_count"></el-table-column>
-        <el-table-column label="是否显示" prop="is_show">
-            <template #default="scope">
-                <el-switch
-                    v-model="scope.row.is_show"
-                    :active-value="1" :inactive-value="0"
-                    active-color="#13ce66" inactive-color="#ff4949"
-                    @click="changeShow(scope.row)">
-                </el-switch>
-            </template>
-        </el-table-column>
-        <el-table-column label="创建时间" prop="created_at"></el-table-column>
-        <el-table-column label="操作">
-            <template #default="scope">
-                <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
-                <el-button link type="danger" size="large" v-if="!scope.row.routers_count" @click="handleDestroy(scope.row.id)">删除</el-button>
-            </template>
-        </el-table-column>
-    </el-table>
-
-    <el-dialog
-        width="700" center :before-close="closeStoreDialog"
-        v-model="storeDialogVisible" :title="storeDialogTitle">
-        <div v-loading="detailFormLoading" class="s-flex jc-ct">
-            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
-                <el-form-item label="分类" prop="parent_id">
-                    <el-select v-model="submitForm.parent_id" placeholder="请选择分类" @change="changeCategory(submitForm)">
-                        <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
-                    </el-select>
-                </el-form-item>
+    <div class="common-wrap">
+        <el-header style="padding-top: 10px;">
+            <el-form :inline="true" :model="searchForm" class="search-form">
                 <el-form-item label="名称" prop="name">
-                    <el-input v-model="submitForm.name" />
+                    <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
                 </el-form-item>
                 <el-form-item label="别名" prop="alias">
-                    <el-input v-model="submitForm.alias" />
+                    <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
                 </el-form-item>
-                <el-form-item label="类型" prop="type">
-                    <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>
-                    <el-radio v-model="submitForm.type" label="2">菜单</el-radio>
-                </el-form-item>
-                <el-form-item label="页面" prop="page_name" v-if="!(submitForm.parent_id === 0 && submitForm.type === '2')"
-                              :rules="{required: true, message: '请选择页面', trigger: 'change'}">
-                    <el-select v-model="submitForm.page_name" placeholder="请选择"
-                               filterable remote reserve-keyword :remote-method="searchPages" :loading="remoteLoading">
-                        <el-option v-for="item in pagePermissions" :label="item.display_name" :value="item.name"></el-option>
+                <el-form-item label="是否显示">
+                    <el-select v-model="searchForm.is_show" placeholder="请选择">
+                        <el-option label="全部" value="-1"></el-option>
+                        <el-option label="显示" value="1"></el-option>
+                        <el-option label="隐藏" value="0"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="是否显示" prop="is_show">
-                    <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
+                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
                 </el-form-item>
             </el-form>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="closeStoreDialog()">取消</el-button>
-                <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+        </el-header>
+        <el-table
+            :data="tableData"
+            stripe border
+            v-loading="loading"
+            style="width: 100%;"
+            row-key="id"
+            :tree-props="{ children: 'all_children' }">
+            <el-table-column label="分类" min-width="120">
+                <template #default="scope">
+                    <div class="s-flex ai-ct">
+                        {{ scope.row.name }}【{{ scope.row.id }}】
+                    </div>
+                </template>
+            </el-table-column>
+            <el-table-column label="别名" prop="alias"></el-table-column>
+            <el-table-column label="类型" prop="type">
+                <template #default="scope">
+                    <template v-if="scope.row.type === 1">链接</template>
+                    <template v-if="scope.row.type === 2">菜单</template>
+                </template>
+            </el-table-column>
+            <el-table-column label="页面" prop="page_title"></el-table-column>
+            <el-table-column label="链接数量" prop="routers_count"></el-table-column>
+            <el-table-column label="是否显示" prop="is_show">
+                <template #default="scope">
+                    <el-switch
+                        v-model="scope.row.is_show"
+                        :active-value="1" :inactive-value="0"
+                        active-color="#13ce66" inactive-color="#ff4949"
+                        @click="changeShow(scope.row)">
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" prop="created_at"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
+                    <el-button link type="danger" size="large" v-if="!scope.row.routers_count" @click="handleDestroy(scope.row.id)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <el-dialog
+            width="700" center :before-close="closeStoreDialog"
+            v-model="storeDialogVisible" :title="storeDialogTitle">
+            <div v-loading="detailFormLoading" class="s-flex jc-ct">
+                <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
+                    <el-form-item label="分类" prop="parent_id">
+                        <el-select v-model="submitForm.parent_id" placeholder="请选择分类" @change="changeCategory(submitForm)">
+                            <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="名称" prop="name">
+                        <el-input v-model="submitForm.name" />
+                    </el-form-item>
+                    <el-form-item label="别名" prop="alias">
+                        <el-input v-model="submitForm.alias" />
+                    </el-form-item>
+                    <el-form-item label="类型" prop="type">
+                        <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>
+                        <el-radio v-model="submitForm.type" label="2">菜单</el-radio>
+                    </el-form-item>
+                    <el-form-item label="页面" prop="page_name" v-if="!(submitForm.parent_id === 0 && submitForm.type === '2')"
+                                  :rules="{required: true, message: '请选择页面', trigger: 'change'}">
+                        <el-select v-model="submitForm.page_name" placeholder="请选择"
+                                   filterable remote reserve-keyword :remote-method="searchPages" :loading="remoteLoading">
+                            <el-option v-for="item in pagePermissions" :label="item.display_name" :value="item.name"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="是否显示" prop="is_show">
+                        <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                    </el-form-item>
+                </el-form>
             </div>
-        </template>
-    </el-dialog>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeStoreDialog()">取消</el-button>
+                    <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+                </div>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <style scoped lang="scss">

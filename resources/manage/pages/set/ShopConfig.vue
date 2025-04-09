@@ -117,7 +117,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="shopConfig-wrap">
+    <div class="common-wrap shopConfig-wrap">
         <el-main>
             <el-tabs v-model="firstActiveName" type="card" @tab-click="firstHandleClick" class="shopConfig-tab">
                 <el-tab-pane label="站点设置" name="site_setup">
@@ -342,8 +342,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .shopConfig-wrap{
-    background: #ffffff;
-    border-radius: 4px;
     :deep(.shopConfig-tab){
         width: 800px;
     }

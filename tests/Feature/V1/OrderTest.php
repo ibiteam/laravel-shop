@@ -76,3 +76,13 @@ it('test my order list interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test my order detail interface', function () {
+    $response = $this->doGet('api/v1/order/my/detail', [
+        'no' => '2025040918889931',
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
