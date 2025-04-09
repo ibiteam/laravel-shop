@@ -307,3 +307,12 @@ a {
 .pd20{
     padding: 20px;
 }
+.common-wrap{
+    background: #ffffff;
+    padding: 20px;
+}
+.pagination-container{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
