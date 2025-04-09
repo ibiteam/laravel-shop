@@ -114,7 +114,7 @@ class AppDecorationController extends BaseController
             // 获取装修信息
             $app_decoration = $app_decoration_service->getAppDecoration($validated['id']);
 
-            $data = $request->get('data');
+            $data = json_decode($request->get('data'), true);
             // 校验组件数据
             $app_decoration_service->validateComponentData($app_decoration, $data);
 
