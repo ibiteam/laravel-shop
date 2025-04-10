@@ -42,14 +42,18 @@ class EvaluateController extends BaseController
         }
     }
 
-    // 订单评价初始化
-    public function evaluateInit(Request $request)
+    /**
+     * 订单评价初始化.
+     */
+    public function evaluateInit(Request $request): JsonResponse
     {
         //
     }
 
-    // 保存订单评价
-    public function store(Request $request)
+    /**
+     * 保存订单评价.
+     */
+    public function store(Request $request): JsonResponse
     {
         //
     }
