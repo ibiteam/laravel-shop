@@ -173,7 +173,7 @@ class AppDecorationController extends BaseController
                 $query->where('no', 'like', "%{$keywords}%")
                     ->orWhere('name', 'like', "%{$keywords}%");
             }) )
-            ->select('no', 'name', 'image', 'price', 'total', 'label')
+            ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->paginate($number);
 
@@ -184,9 +184,11 @@ class AppDecorationController extends BaseController
     public function importGoods(Request $request)
     {
         $goods_ids = $request->get('goods_ids', []);
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
             ->when($goods_ids, fn ($query) => $query->whereIn('id', $goods_ids))
-            ->select('no', 'name', 'image', 'price', 'total')
+            ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->limit(20)->get();
 
         return $this->success($data);
