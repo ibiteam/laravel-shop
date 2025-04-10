@@ -13,6 +13,7 @@ use App\Http\Dao\UserAddressDao;
 use App\Http\Resources\ApiOrderDetailResource;
 use App\Http\Resources\ApiOrderResourceCollection;
 use App\Models\Order;
+use App\Models\OrderEvaluate;
 use App\Models\UserAddress;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -26,6 +27,7 @@ class IndexController extends BaseController
     public const SEARCH_NOT_PAY = 'not_pay'; // 未付款
     public const SEARCH_WAIT_SHIP = 'wait_ship'; // 待发货
     public const SEARCH_WAIT_RECEIVE = 'wait_receive'; // 待收货
+    public const SEARCH_WAIT_EVALUATE = 'wait_evaluate'; // 待评价
     public const SEARCH_SUCCESS = 'success'; // 已完成
 
     /**
@@ -59,6 +61,15 @@ class IndexController extends BaseController
                     ->where('order_status', OrderStatusEnum::CONFIRMED)
                     ->where('pay_status', PayStatusEnum::PAYED)
                     ->where('ship_status', ShippingStatusEnum::SHIPPED);
+            })
+            ->when($type === self::SEARCH_WAIT_EVALUATE, function (Builder $query) use ($current_user) {
+                $evaluate_ids = OrderEvaluate::query()->whereUserId($current_user->id)->pluck('order_id')->unique()->filter()->toArray();
+
+                $query
+                    ->where('order_status', OrderStatusEnum::CONFIRMED)
+                    ->where('pay_status', PayStatusEnum::PAYED)
+                    ->where('ship_status', ShippingStatusEnum::RECEIVED)
+                    ->whereNotIn('id', $evaluate_ids);
             })
             ->when($type === self::SEARCH_SUCCESS, function (Builder $query) {
                 $query

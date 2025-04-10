@@ -42,12 +42,6 @@ class EvaluateController extends BaseController
         }
     }
 
-    // 当前用户待评价列表
-    public function waitIndexByUser(Request $request)
-    {
-        //
-    }
-
     // 订单评价初始化
     public function evaluateInit(Request $request)
     {
