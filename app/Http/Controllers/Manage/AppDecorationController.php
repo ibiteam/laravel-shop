@@ -12,6 +12,7 @@ use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
 use App\Models\AppDecorationItemDraft;
 use App\Models\Goods;
+use App\Models\ShopConfig;
 use App\Services\AppDecoration\AppDecorationLogService;
 use App\Services\AppDecoration\AppDecorationService;
 use App\Utils\Constant;
@@ -164,6 +165,7 @@ class AppDecorationController extends BaseController
         $goods_id = $request->get('goods_id', 0);
         $category_id = $request->get('category_id', 0);
         $number = $request->get('number', 10);
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
             ->when($goods_id, fn ($query) => $query->whereId($goods_id) )
             ->when($category_id, fn ($query) => $query->whereCategoryId($category_id) )
@@ -171,7 +173,8 @@ class AppDecorationController extends BaseController
                 $query->where('no', 'like', "%{$keywords}%")
                     ->orWhere('name', 'like', "%{$keywords}%");
             }) )
-            ->select('no', 'name', 'image', 'price', 'total')
+            ->select('no', 'name', 'image', 'price', 'total', 'label')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->paginate($number);
 
         return $this->success(new CommonResourceCollection($data));
