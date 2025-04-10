@@ -14,7 +14,7 @@
                     @end="handleDragEnd"
                 >
                     <div class="module-item s-flex ai-ct jc-ct" :class="{'disabled': computedTempIsExist({component_name: item.component_name, limit: item.limit})}" v-for="item in its" :key="item.component_name">
-                        <em :class="`${active.svg[item.component_name].icon}`" style="font-size: 22px;"></em>
+                        <em v-if="active.svg[item.component_name]" :class="`${active.svg[item.component_name].icon}`" style="font-size: 22px;"></em>
                         <p>{{ item.name }}</p>
                     </div>
                 </VueDraggable>
@@ -110,6 +110,7 @@ watch(() => props, (newVal) => {
         if (newVal.component_icon) {
             active.name = Object.keys(newVal.component_icon)
             active.components = newVal.component_icon
+            console.log(active.svg)
         }
     }
 }, {

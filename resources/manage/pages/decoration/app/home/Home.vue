@@ -36,6 +36,7 @@
                                 <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
                                 <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
                                 <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
+                                <GoodsRecommend v-else-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
                             </template>
                         </VueDraggable>
                         <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
@@ -44,6 +45,7 @@
                 <HomeSetting v-show="decoration.app_website_data && pageSetting" ref="pageSettingRef" v-bind="{app_website_data: decoration.app_website_data, danping_advertisement: findNotForData('danping_advertisement'), suspended_advertisement: findNotForData('suspended_advertisement')}"></HomeSetting>
                 <MaterialCenterDialog v-if="materialCenterDialogData.show" v-bind="{...materialCenterDialogData}" @close="handlematerialCenterDialogClose" @confirm="handlematerialCenterDialogConfirm"/>
                 <LinkCenterDialog v-if="linkCenterDialogData.show" v-bind="{...linkCenterDialogData}" @close="handleLinkCenterDialogClose" @confirm="handleLinkCenterDialogConfirm"></LinkCenterDialog>
+                <GoodsSelectDialog v-if="goodsDialogData.show" v-bind="{...goodsDialogData}" @close="handleGoodsDialogClose" @confirm="handleGoodsDialogConfirm"></GoodsSelectDialog>
             </div>
         </template>
     </DecorationLayout>
@@ -60,14 +62,13 @@ import HorizontalCarousel from './components/HorizontalCarousel.vue'
 import HotZone from './components/HotZone.vue';
 import AdvertisingBanner from './components/AdvertisingBanner.vue'
 import QuickLink from './components/QuickLink.vue'
+import GoodsRecommend from './components/GoodsRecommend.vue';
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
-import DataExample from './DataExample'
+import GoodsSelectDialog from '@/components/good/SelectDialog.vue'
+// import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
 import { appDecorationInit, appDecorationSave } from '@/api/decoration.js'
-
-
-console.log(DataExample)
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -107,6 +108,10 @@ const materialCenterDialogData = reactive({
 })
 // 路由中心弹窗
 const linkCenterDialogData = reactive({
+    show: false,
+})
+// 商品弹窗
+const goodsDialogData = reactive({
     show: false,
 })
 // 页面基础设置
@@ -215,6 +220,25 @@ const handleLinkCenterDialogClose = () => {
     linkCenterDialogData.show = false
 }
 
+// 接收商品弹窗数据
+const handleGoodsDialogConfirm = (res) => {
+    goodsDialogData.show = false
+    const updateData = {
+        ...goodsDialogData,
+        goods: res
+    }
+    if (goodsDialogData.temp_index) {
+        const index = decoration.data.findIndex(item => item.id === goodsDialogData.temp_index)
+        tempRefs.value[index].updateGoodsComponentData(updateData)
+        return
+    }
+}
+
+// 关闭路由中心弹窗
+const handleGoodsDialogClose = () => {
+    goodsDialogData.show = false
+}
+
 // 保存装修
 const decorationSave = (params) => {
     try {
@@ -278,86 +302,101 @@ const getDecorationHome = () => {
             decoration.component_value = res.data.component_value
             decoration.data = [
                 ...res.data.data,
-                // {
-                //     component_name: 'advertising_banner', // 组件名
-                //     content: { // 表单数据
-                //         column: 2, // 每行显示： 2,3,4 默认显示2个
-                //         background: 1, // 是否有背景色， 1-有 0-无 默认1
-                //         background_color: '#ffffff', // 背景色，默认为白色:#ffffff
-                //         width: 330, // 宽度：默认330 不可修改 2个330,3个220,4个160
-                //         height: 240, // 高度：默认240（最高250）；2个240,3个150，4个150
-                //         title: {
-                //             image: '', // 标题小图标，默认空
-                //             name: '', // 标题名称，默认空
-                //             align: 'left', // 标题对齐，默认左对齐，left-左侧，center-居中
-                //             suffix: '', // 标题右侧文案
-                //             color: '#333333', // 标题颜色，默认#333333
-                //             url: { // 标题右侧文案链接
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             }
-                //         },
-                //         data: []
-                //     },
-                //     id: '999', // 组件id
-                //     is_show: 1, // 组件是否显示
-                //     name: '广告图', // 组件名
-                // },
-                // {
-                //     component_name: 'quick_link', // 组件名
-                //     content: { // 表单数据
-                //         row: 2, // 板块行数 1,2,3 默认2行
-                //         column: 4, // 每行显示： 3,4,5 默认显示4个
-                //         data: [{
-                //             title: '', // 名称
-                //             url: {
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             },
-                //             date_type: 1, // 0:自定义  1:长期 默认长期
-                //             time: [],
-                //             image: '', // 图片链接
-                //             is_show: 1, // 是否显示
-                //         },{
-                //             title: '', // 名称
-                //             url: {
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             },
-                //             date_type: 1, // 0:自定义  1:长期 默认长期
-                //             time: [],
-                //             image: '', // 图片链接
-                //             is_show: 1, // 是否显示
-                //         },{
-                //             title: '', // 名称
-                //             url: {
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             },
-                //             date_type: 1, // 0:自定义  1:长期 默认长期
-                //             time: [],
-                //             image: '', // 图片链接
-                //             is_show: 1, // 是否显示
-                //         },{
-                //             title: '', // 名称
-                //             url: {
-                //                 name: '', // 路由名称
-                //                 value: '', // 路由链接
-                //             },
-                //             date_type: 1, // 0:自定义  1:长期 默认长期
-                //             time: [],
-                //             image: '', // 图片链接
-                //             is_show: 1, // 是否显示
-                //         }]
-                //     },
-                //     id: '998', // 组件id
-                //     is_show: 1, // 组件是否显示
-                //     name: '金刚区', // 组件名
-                // }
+                {
+                    "id": "997",
+                    "name": "商品推荐", // 组件名
+                    "component_name": "goods_recommend",
+                    "is_show": 1,
+                    "is_fixed_assembly": 0,
+                    "sort": 0,
+                    "content": {
+                        "layout": "", //商品布局
+                        "title": {
+                            "icon": "",//小图标
+                            "name": "",//标题
+                            "align": "left",//对齐方式 left center
+                            "suffix": "",//标题右侧文案
+                            "url": {
+                                "name": "",
+                                "value": ""
+                            }
+                        },
+                        "goods": {
+                            "rule": 1,// 推荐规则 1、智能推荐 2、手动推荐
+                            "sort_type": 1,//排序类型 1、销量 2、好评 3、低价 4、新品
+                            "number": 3,//数量限制 1 ~ 20
+                            "goods_nos": [] // 商品集合
+                        }
+                    }
+                }
             ]
             decoration.not_for_data = [
                 ...res.data.not_for_data,
-                
+                {
+                    component_name: 'home_search', // 组件名
+                    content: { // 表单数据
+                        logo: '',
+                        keywords: '', // 关键词
+                        button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
+                        interval: 3, // 关键词轮播时间，最大10 最小1
+                        data: [{
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            title: '', // 搜索提示词
+                        }]
+                    },
+                    data: { // 渲染数据
+                        logo: '',
+                        keywords: '', // 关键词
+                        button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
+                        interval: 3, // 关键词轮播时间，最大10 最小1
+                        items: [{
+                            image: '',
+                            url: '',
+                            title: '',
+                        }],
+                    },
+                    id: '666', // 组件id
+                    is_show: 1, // 组件是否显示
+                    is_fixed_assembly: 1,
+                    name: '搜索', // 组件名
+                },
+                {
+                    component_name: 'label', // 组件名
+                    content: { // 表单数据
+                        font_default_color: '#333', // 标签默认字体颜色
+                        font_selection_color: '#f71111', // 标签选中字体颜色
+                        data: [{
+                            url: {
+                                name: '', // 路由名称
+                                value: '', // 路由链接
+                            },
+                            default_title: '', // 标签默认名称
+                            selection_title: '', // 标签选中名称
+                            default_image: '', // 标签默认图标
+                            selection_image: '', // 标签选中图标
+                            is_show: 1, // 是否显示
+                        }]
+                    },
+                    data: { // 渲染数据
+                        font_default_color: '#333', // 标签默认字体颜色
+                        font_selection_color: '#f71111', // 标签选中字体颜色
+                        items: [{
+                            url: '',
+                            default_title: '', // 标签默认名称
+                            selection_title: '', // 标签选中名称
+                            default_image: '', // 标签默认图标
+                            selection_image: '', // 标签选中图标
+                            is_show: 1, // 是否显示
+                        }],
+                    },
+                    id: '668', // 组件id
+                    is_show: 1, // 组件是否显示
+                    is_fixed_assembly: 1,
+                    name: '标签栏', // 组件名
+                }
             ]
         }
     })
@@ -421,6 +460,12 @@ onMounted(() => {
                 linkCenterDialogData[key] = params[key]
             })
         })
+        // 打开商品弹窗
+        cns.$bus.on('openGoodsDialog', (params = {show: false}) => {
+            Object.keys(params).forEach(key => {
+                goodsDialogData[key] = params[key]
+            })
+        })
     })
 })
 
@@ -429,6 +474,7 @@ onUnmounted(() => {
     cns.$bus.off('updateComponentData')
     cns.$bus.off('openUploadDialog')
     cns.$bus.off('openLinkDialog')
+    cns.$bus.off('openGoodsDialog')
 })
 
 </script>

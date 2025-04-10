@@ -21,8 +21,8 @@
                                 <image-wrapper v-if="form.content.title.image" v-bind="{ src: form.content.title.image, width: '16px', height: '16px', radius: '0' }" style="margin-right: 6px;"/>
                                 <span class="fs14 fw-b" :style="{color: form.content.title.color}">{{form.content.title.name}}</span>
                             </div>
-                            <div class="ad-title-link s-flex ai-ct fs12" v-if="form.content.title.url.value">
-                                更多<em class="iconfont icon-gengduo" style="font-size: 12px;"></em>
+                            <div class="ad-title-link s-flex ai-ct fs12">
+                                {{ form.content.title.suffix }}<em class="iconfont icon-gengduo"  v-if="form.content.title.url.value" style="font-size: 12px;"></em>
                             </div>
                         </div>
                         <div class="ad-banner-wrapper s-flex ai-ct jc-bt flex-wrap">
@@ -147,6 +147,9 @@
                                         </el-radio-button>
                                     </el-tooltip>
                                 </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="右侧文字" label-position="top" :prop="['title', 'suffix']">
+                                <el-input v-model="form.content.title.suffix" style="width: 70%;" placeholder="如：更多"></el-input>
                             </el-form-item>
                             <el-form-item label="链接" label-position="top" :prop="['title', 'url', 'value']">
                                 <LinkInput

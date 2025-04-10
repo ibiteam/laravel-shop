@@ -19,14 +19,20 @@ export function DragTempItemField() {
         },
         // 热区
         'hot_zone': {
-            icon: 'iconfont icon-changjianrequ'
+            icon: 'iconfont icon-chuangjianrequ'
         },
         // 金刚区
         'quick_link': {
             icon: 'iconfont icon-jingangqu'
-        }
+        },
         // 为您推荐
+        'recommend': {
+            icon: 'iconfont icon-weinintuijian'
+        },
         // 商品推荐
+        'goods_recommend': {
+            icon: 'iconfont icon-shangpintuijian'
+        }
     }
 }
 

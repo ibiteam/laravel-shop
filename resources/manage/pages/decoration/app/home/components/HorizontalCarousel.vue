@@ -16,7 +16,7 @@
                                 'disableOnInteraction': false,
                                 'waitForTransition': true,
                             },
-                            loop: true,
+                            loop: form.content.data.length >= 3 ? true : false,
                             pagination: {
                                 'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,
@@ -38,7 +38,7 @@
                             autoplay: {
                                 'delay': (form.content.interval || 3) * 1000,
                             },
-                            loop: true,
+                            loop: form.content.data.length >= 3 ? true : false,
                             pagination: {
                                 'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,

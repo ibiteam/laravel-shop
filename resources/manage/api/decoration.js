@@ -30,3 +30,30 @@ export function appDecorationInit(data) {
 export function appDecorationSave(data) {
     return $http.doPost('manage/set/app_decoration/decoration/save', data)
 }
+
+/**
+ * 移动端装修 获取商品列表
+ * @param {
+ *      keywords: '关键词：商品货号/商品id'
+ *      goods_id: '商品id'
+ *      category_id: '分类id'
+ *      page: 1,
+ *      number: 10,
+ * } 
+ * @returns 
+ */
+export function decorationGoodsList(data) {
+    return $http.doPost('manage/set/app_decoration/goods/list', data)
+}
+
+/**
+ * 移动端装修 导入商品id
+ * @param {
+ *      goods_ids: []
+ * } 
+ * @returns 
+ */
+export function decorationGoodsImport(data) {
+    return $http.doPost('manage/set/app_decoration/goods/import', data)
+}
+
