@@ -219,7 +219,7 @@ onMounted(() => {
 
 <template>
     <div class="order-detail bg-fff manage-public-wrap pd20">
-        <p class="tip-title"><a @click="router.push({name:'manage.order.index'})">订单详情 </a><span>></span><span> c20240680001</span></p>
+        <p class="tip-title"><a @click="router.push({name:'manage.order.index'})">订单列表 </a><span> > </span>订单详情<span> > </span><span>{{ orderInfo.no }}</span></p>
         <div class="detail-item">
             <div class="detail-title">商品信息</div>
             <el-table :data="orderItems" stripe border style="width: 100%;">

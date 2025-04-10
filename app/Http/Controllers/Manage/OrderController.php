@@ -7,6 +7,7 @@ use App\Enums\PayStatusEnum;
 use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Dao\OrderDeliveryDao;
 use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\RegionDao;
 use App\Http\Dao\ShipCompanyDao;
@@ -16,6 +17,8 @@ use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\OrderLog;
+use App\Models\ShipCompany;
 use App\Models\ShopConfig;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
@@ -210,8 +213,10 @@ class OrderController extends BaseController
 
     /**
      * 修改发货.
+     *
+     * @throws \Throwable
      */
-    public function shipUpdate(Request $request): JsonResponse
+    public function shipUpdate(Request $request, OrderLogDao $order_log_dao, OrderDeliveryDao $order_delivery_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -237,18 +242,58 @@ class OrderController extends BaseController
             if ($validated['ship_status'] == $order->ship_status) {
                 throw new BusinessException('发货状态未改变');
             }
-
-            if (! $order->update(['ship_status' => $validated['ship_status']])) {
-                throw new BusinessException('修改订单发货状态失败');
-            }
-            // todo operate: 发货保存以及删除发货记录
-
-            return $this->success('更新发货状态，添加发货记录成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->update(['ship_status' => $validated['ship_status']])) {
+                throw new BusinessException('修改订单发货状态失败');
+            }
+            $current_user = $this->adminUser();
+
+            if ($order->ship_status == ShippingStatusEnum::SHIPPED->value) {
+                $ship_company = ShipCompany::query()->whereId($validated['ship_company_id'])->first();
+
+                if (! $ship_company instanceof ShipCompany) {
+                    throw new BusinessException('快递公司不存在');
+                }
+                // 添加发货记录
+                $order_delivery = $order_delivery_dao->storeByOrder($order, $current_user, $ship_company, [
+                    'ship_no' => $validated['ship_no'],
+                ]);
+
+                $order_log_dao->storeByAdminUser($current_user, $order, '添加了发货');
+
+                admin_operation_log($current_user, "添加订单发货记录：{$order_delivery->id}");
+
+                DB::commit();
+
+                return $this->success('更新发货状态，添加发货记录成功');
+            }
+            // 删除发货记录
+            $order_delivery = $order_delivery_dao->destroyByOrder($order);
+
+            $order_log_dao->storeByAdminUser($current_user, $order, '删除了发货', OrderLog::TYPE_ADMIN_USER);
+
+            admin_operation_log($current_user, '删除订单发货记录：'.$order_delivery->implode(','));
+
+            DB::commit();
+
+            return $this->success('更新发货状态，添加发货记录成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
             return $this->error('操作失败');
         }
     }
