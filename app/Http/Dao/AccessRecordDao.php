@@ -33,6 +33,7 @@ class AccessRecordDao
     public function getListByAdminUserId(int $admin_user_id, int $limit = 12)
     {
         $permission_ids = AccessRecord::query()
+            ->whereHas('permission')
             ->whereAdminUserId($admin_user_id)
             ->whereIsShow(AccessRecord::IS_SHOW_YES)
             ->orderByDesc('updated_at')

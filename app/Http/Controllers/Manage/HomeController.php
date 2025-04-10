@@ -71,13 +71,14 @@ class HomeController extends BaseController
 
         // 我的收藏
         $myCollect = Collect::query()->with('permission:id,name,display_name,icon')
+            ->whereHas('permission')
             ->whereAdminUserId($admin_user->id)->orderByDesc('updated_at')
             ->limit(12)->get()->map(function (Collect $item) {
                 return [
                     'id' => $item->permission_id,
-                    'title' => $item->permission?->display_name,
-                    'name' => $item->permission?->name,
-                    'icon' => $item->permission?->icon,
+                    'title' => $item->permission->display_name,
+                    'name' => $item->permission->name,
+                    'icon' => $item->permission->icon,
                 ];
             });
 
