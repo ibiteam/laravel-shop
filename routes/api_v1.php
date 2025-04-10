@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
+use App\Http\Controllers\Api\V1\Order\EvaluateController;
 use App\Http\Controllers\Api\V1\Order\IndexController as MyOrderIndexController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
@@ -56,6 +57,8 @@ Route::prefix('goods')->group(function () {
     Route::get('/{no}/check_number', [GoodsController::class, 'checkNumber'])->where('no', '^(?!follow$|unfollow$)[a-zA-Z0-9-_]+');
     Route::get('/{no}/{unique}', [GoodsController::class, 'skuItem'])->where('no', '^(?!follow$|unfollow$)[a-zA-Z0-9-_]+');
 });
+// 商品评价列表
+Route::get('evaluate/goods', [EvaluateController::class, 'indexByGoods']);
 
 /**
  * 登录可以访问路由.

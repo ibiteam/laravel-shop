@@ -127,3 +127,15 @@ it('test cancel order api interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test goods evaluate api interface', function () {
+    $response = $this->doGet('api/v1/evaluate/goods', [
+        'no' => 'eda482c3-df45-47a4-abc5-f795db6fefae',
+        'page' => 1,
+        'number' => 10,
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

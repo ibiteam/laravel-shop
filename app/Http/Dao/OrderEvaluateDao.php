@@ -2,6 +2,7 @@
 
 namespace App\Http\Dao;
 
+use App\Http\Resources\ApiOrderEvaluateResource;
 use App\Models\OrderEvaluate;
 use App\Models\OrderEvaluateCount;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -11,7 +12,7 @@ class OrderEvaluateDao
     /**
      * 根据商品ID获取评价列表(分页).
      */
-    public function getListByGoodsId(int $goods_id, int $number = 10): LengthAwarePaginator
+    public function getListByGoodsId(int $goods_id, int $page = 1, int $number = 10): LengthAwarePaginator
     {
         return OrderEvaluate::query()
             ->with('user:id,nickname,avatar')
@@ -19,7 +20,7 @@ class OrderEvaluateDao
             ->whereStatus(OrderEvaluate::STATUS_SUCCESS)
             ->orderBy('created_at', 'desc')
             ->take($number)
-            ->paginate($number);
+            ->paginate($number, page: $page);
     }
 
     /**
@@ -27,9 +28,9 @@ class OrderEvaluateDao
      */
     public function getEvaluateByGoodsId(int $goods_id, int $number = 2): array
     {
-        $order_evaluate = $this->getListByGoodsId($goods_id, $number);
+        $order_evaluate = $this->getListByGoodsId($goods_id, number: $number);
         $total = $order_evaluate->total();
-        $list = $order_evaluate->getCollection()->map(fn (OrderEvaluate $order_evaluate) => $this->itemFormat($order_evaluate));
+        $list = $order_evaluate->getCollection()->map(fn (OrderEvaluate $order_evaluate) => ApiOrderEvaluateResource::make($order_evaluate));
 
         return [$total, $list];
     }
@@ -52,27 +53,5 @@ class OrderEvaluateDao
         }
 
         return $tags;
-    }
-
-    /**
-     * 评价信息格式化.
-     */
-    private function itemFormat(OrderEvaluate $order_evaluate): array
-    {
-        $user = $order_evaluate->user;
-
-        return [
-            'id' => $order_evaluate->id,
-            'nickname' => $order_evaluate->is_anonymous ? '匿名用户' : $user->nickname,
-            'avatar' => $user?->avatar,
-            'content' => $order_evaluate->comment,
-            'images' => $order_evaluate->images,
-            'rank' => $order_evaluate->rank,
-            'goods_rank' => $order_evaluate->goods_rank,
-            'price_rank' => $order_evaluate->price_rank,
-            'bus_rank' => $order_evaluate->bus_rank,
-            'delivery_rank' => $order_evaluate->delivery_rank,
-            'service_rank' => $order_evaluate->service_rank,
-        ];
     }
 }
