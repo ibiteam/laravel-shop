@@ -174,6 +174,10 @@ onUnmounted(() => {
             background-color: #ffffff;
             box-shadow: 0 0 0 1000px #ffffff inset;
         }
+        input:-moz-autofill,
+        input:-moz-autofill:focus {
+            background-color: #ffffff;
+        }
     }
     :deep(.el-button span){
         font-size: 16px;

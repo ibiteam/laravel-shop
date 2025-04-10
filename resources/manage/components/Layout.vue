@@ -585,9 +585,10 @@ onUnmounted(() => {
                         :deep(.el-input__prefix){
                             left: 10px;
                         }
-                        input::placeholder{
-                            color: #ffffff!important;
+                        :deep(.el-select__placeholder.is-transparent){
+                            color: #ffffff;
                         }
+
                     }
                     .user-info{
                         margin-right:20px;
