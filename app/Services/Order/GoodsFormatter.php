@@ -41,7 +41,7 @@ class GoodsFormatter
     /**
      * @var GoodsSku|null 商品规格
      */
-    private ?GoodsSku $goods_sku;
+    private ?GoodsSku $goods_sku = null;
 
     /**
      * @var int 购物车ID
