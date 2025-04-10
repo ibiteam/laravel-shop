@@ -10,6 +10,7 @@ use App\Components\AppComponents\HorizontalCarouselComponent;
 use App\Components\AppComponents\HotZoneComponent;
 use App\Components\AppComponents\LabelComponent;
 use App\Components\AppComponents\QuickLinkComponent;
+use App\Components\AppComponents\RecommendComponent;
 use App\Exceptions\BusinessException;
 use App\Models\AppDecorationItem;
 
@@ -34,6 +35,7 @@ class ComponentFactory
             AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER => AdvertisingBannerComponent::class, // 广告位
             AppDecorationItem::COMPONENT_NAME_HOT_ZONE => HotZoneComponent::class, // 热区
             AppDecorationItem::COMPONENT_NAME_GOODS_RECOMMEND => GoodsRecommendComponent::class, // 商品推荐
+            AppDecorationItem::COMPONENT_NAME_RECOMMEND => RecommendComponent::class, // 商品推荐
         ];
 
         if (! isset($components[$alias])) {

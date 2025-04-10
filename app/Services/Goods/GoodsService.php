@@ -405,7 +405,10 @@ class GoodsService
     // 获取商品推荐数据
     public function getRecommendGoods(?array $goods_nos, int $rule, int $limit, int $sort_type): array
     {
-        $query = Goods::select('no', 'name', 'image', 'price', 'total');
+        // 是否展示销量
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
+        $query = Goods::select('no', 'name', 'image', 'price', 'total')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
         switch ($rule) {
             case AppDecorationItem::RULE_INTELLIGENT:
                 $sort = Goods::$sorts[$sort_type] ?? null;

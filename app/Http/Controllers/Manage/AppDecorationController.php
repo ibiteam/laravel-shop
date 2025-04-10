@@ -57,6 +57,7 @@ class AppDecorationController extends BaseController
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+                AppDecorationItem::COMPONENT_NAME_LABEL,
             ],
         ];
 

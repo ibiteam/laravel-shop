@@ -79,6 +79,7 @@ class AppDecorationItem extends Model
     public const SORT_HIGH_PRAISE = 2; // 好评优先
     public const SORT_LOW_PRICE = 3; // 低价优先
     public const SORT_NEW_PRODUCT = 4; // 新品优先
+    public const COMPONENT_NAME_RECOMMEND = 'recommend'; // 为您推荐
 
     protected $casts = [
         'content' => 'array',

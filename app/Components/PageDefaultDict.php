@@ -40,6 +40,7 @@ class PageDefaultDict
                     // 数据组件
                     'data_name' => [
                         AppDecorationItem::COMPONENT_NAME_GOODS_RECOMMEND,
+                        AppDecorationItem::COMPONENT_NAME_RECOMMEND,
                     ], // 固定组件
                     'fixed_name' => [
                         AppDecorationItem::COMPONENT_NAME_HOME_NAV,
