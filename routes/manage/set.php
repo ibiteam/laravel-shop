@@ -122,8 +122,8 @@ Route::prefix('set')->group(function () {
         Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
             Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
             Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
-            Route::get('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
-            Route::get('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
+            Route::post('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
+            Route::post('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
             Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
