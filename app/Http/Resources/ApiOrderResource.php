@@ -85,7 +85,7 @@ class ApiOrderResource extends JsonResource
             case OrderConstantEnum::STATUS_WAIT_PAY:
                 $buttons[] = ['text' => '取消订单', 'action' => 'cancel'];
 
-                if (! $this->resource->is_edit_address) {
+                if (app(OrderDao::class)->canEditAddress($this->resource)) {
                     $buttons[] = ['text' => '修改地址', 'action' => 'edit_address'];
                 }
 
@@ -98,7 +98,7 @@ class ApiOrderResource extends JsonResource
             case OrderConstantEnum::STATUS_WAIT_SHIP:
                 $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
 
-                if (! $this->resource->is_edit_address) {
+                if (app(OrderDao::class)->canEditAddress($this->resource)) {
                     $buttons[] = ['text' => '修改地址', 'action' => 'edit_address'];
                 }
 

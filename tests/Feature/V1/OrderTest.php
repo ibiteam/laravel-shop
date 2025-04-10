@@ -86,3 +86,24 @@ it('test my order detail interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test edit order address interface', function () {
+    $response = $this->doGet('api/v1/order/my/address/edit', [
+        'no' => '2025040918889931',
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+
+it('test update order address interface', function () {
+    $response = $this->doPost('api/v1/order/my/address/update', [
+        'no' => '2025040918889931',
+        'user_address_id' => 2,
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

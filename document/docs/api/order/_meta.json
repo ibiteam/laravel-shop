@@ -1,1 +1,9 @@
-["init_direct","done_direct","init_cart","done_cart","my_order_index","my_order_detail"]
+[
+    "init_direct",
+    "done_direct",
+    "init_cart",
+    "done_cart",
+    "my_order_index",
+    "my_order_detail",
+    "my_order_address_edit"
+]

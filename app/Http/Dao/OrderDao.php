@@ -44,6 +44,24 @@ class OrderDao
         return OrderConstantEnum::STATUS_SUCCESS;
     }
 
+    /**
+     * 是否允许修改地址
+     */
+    public function canEditAddress(Order $order, bool $is_can_status = false): bool
+    {
+        if ($order->is_edit_address) {
+            return false;
+        }
+
+        if ($is_can_status) {
+            if (! in_array($this->getStatusByOrder($order), [OrderConstantEnum::STATUS_WAIT_PAY, OrderConstantEnum::STATUS_WAIT_SHIP])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     // todo
     public function refundActionByOrderDetail(OrderDetail $order_detail): int
     {

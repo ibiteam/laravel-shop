@@ -8,12 +8,16 @@ use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
+use App\Http\Dao\OrderLogDao;
+use App\Http\Dao\UserAddressDao;
 use App\Http\Resources\ApiOrderDetailResource;
 use App\Http\Resources\ApiOrderResourceCollection;
 use App\Models\Order;
+use App\Models\UserAddress;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class IndexController extends BaseController
@@ -97,6 +101,122 @@ class IndexController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 修改地址回显数据.
+     */
+    public function addressEdit(Request $request, OrderDao $order_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'no' => 'required|string',
+            ], [], [
+                'no' => '订单编号',
+            ]);
+            $current_user = $this->user();
+            $order = Order::query()
+                ->with(['province:id,name', 'city:id,name', 'district:id,name'])
+                ->whereUserId($current_user->id)
+                ->whereNo($validated['no'])
+                ->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            if (! $order_dao->canEditAddress($order, true)) {
+                throw new BusinessException('当前订单不允许修改收货地址');
+            }
+
+            return $this->success([
+                'no' => $order->no,
+                'province_name' => $order->province?->name,
+                'city_name' => $order->city?->name,
+                'district_name' => $order->district?->name,
+                'address' => $order->address,
+                'consignee' => $order->consignee,
+                'phone' => phone_hidden($order->phone),
+            ]);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 修改订单地址
+     *
+     * @throws \Throwable
+     */
+    public function addressUpdate(Request $request, OrderDao $order_dao, UserAddressDao $user_address_dao, OrderLogDao $order_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'no' => 'required|string',
+                'user_address_id' => 'required|integer',
+            ], [], [
+                'no' => '订单编号',
+            ]);
+            $current_user = $this->user();
+
+            $order = Order::query()
+                ->with(['province:id,name', 'city:id,name', 'district:id,name'])
+                ->whereUserId($current_user->id)
+                ->whereNo($validated['no'])
+                ->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            if (! $order_dao->canEditAddress($order, true)) {
+                throw new BusinessException('当前订单不允许修改收货地址');
+            }
+
+            $user_address = $user_address_dao->getUserAddressById($current_user->id, $validated['user_address_id']);
+
+            if (! $user_address instanceof UserAddress) {
+                throw new BusinessException('收货地址不存在');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable) {
+            return $this->error('操作失败');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->update([
+                'province_id' => $user_address->province,
+                'city_id' => $user_address->city,
+                'district_id' => $user_address->district,
+                'address' => $user_address->address_detail,
+                'consignee' => $user_address->recipient_name,
+                'phone' => $user_address->recipient_phone,
+                'is_edit_address' => true,
+            ])) {
+                throw new BusinessException('修改地址失败');
+            }
+            $order_log_dao->storeByUser($current_user, $order, '用户修改订单收货地址');
+            DB::commit();
+
+            return $this->success('修改地址成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable) {
+            DB::rollBack();
+
             return $this->error('操作失败');
         }
     }
