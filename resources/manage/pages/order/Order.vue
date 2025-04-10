@@ -130,7 +130,7 @@ onMounted( () => {
     <div class="common-wrap">
         <el-header style="padding: 10px 0;height: auto;">
             <!-- 添加搜索表单 -->
-            <el-form :inline="true" :model="queryParams" class="search-form" label-width="auto">
+            <el-form :inline="true" :model="queryParams" class="search-form" label-width="120px">
                 <el-form-item label="订单编号" prop="no">
                     <el-input
                         v-model="queryParams.no"
