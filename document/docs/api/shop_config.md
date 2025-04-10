@@ -22,6 +22,7 @@
     "shop_keywords": "",
     "shop_description": "",
     "is_gray": 0,
+    "shop_color": "#E48F34",
     "shop_logo": ""
   }
 }
@@ -36,4 +37,5 @@ data 返回字段说明
 | shop_keywords    | string | 网站关键字  |
 | shop_description | string | 网站描述   |
 | is_gray          | int    | 网站是否置灰 |
+| shop_color       | String | 网站主题色  |
 | shop_logo        | string | 网站logo |

@@ -21,6 +21,7 @@ class CommonController extends BaseController
             ShopConfig::SHOP_KEYWORDS,
             ShopConfig::SHOP_DESCRIPTION,
             ShopConfig::IS_GRAY,
+            ShopConfig::SHOP_COLOR,
             ShopConfig::SHOP_LOGO
         );
 
