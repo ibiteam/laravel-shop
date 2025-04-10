@@ -339,7 +339,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="detail-item">
-                <div class="detail-title"><span>收货地址</span><el-button type="primary" @click="openAddressFormDialog(orderConsigneeInfo.order_id)">编辑</el-button></div>
+                <div class="detail-title"><span class="mr-10">收货地址</span><el-button type="primary" @click="openAddressFormDialog(orderConsigneeInfo.order_id)">编辑</el-button></div>
                 <div class="detail-cont">
                     <div>
                         <span>收&nbsp;&nbsp;货&nbsp;&nbsp;人：</span>
@@ -432,6 +432,11 @@ onMounted(() => {
             padding: 15px;
             min-height: 100px;
             border-radius: 10px;
+            >div{
+                line-height: 24px;
+                color: #666;
+                font-size: 14px;
+            }
         }
     }
     .detail-title{
