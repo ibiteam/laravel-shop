@@ -100,7 +100,6 @@
         }
       ],
       "content": "<p> xxxxxxxxxxxxxxxxxxxxxx </p>",
-      "recommend": [ ],
       "sku_params": {
         "sku_item": {
             "id": 3,
@@ -194,7 +193,6 @@ data.center 参数说明
 | content       | String  | 商品详情                                  |
 | evaluate      | Array   | 商品评价，详见 `data.center.evaluate` 参数说明   |
 | parameters    | Array   | 产品参数，详见 `data.center.parameters` 参数说明 |
-| recommend     | Array   | 商品推荐，详见 `data.center.recommend` 参数说明  |
 | sku_params    | Object  | 商品规格，详见 `data.center.sku_params` 参数说明 |
 
 
@@ -229,12 +227,6 @@ data.center.parameters 参数说明
 |------------------|---------|---------|
 | name | String  | 参数名称   |
 | value | String  | 参数值   |
-
-
-data.center.recommend 参数说明
-
-| 字段               | 字段类型    | 说明      |
-|------------------|---------|---------|
 
 
 data.center.sku_params 参数说明

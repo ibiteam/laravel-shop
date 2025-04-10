@@ -255,7 +255,7 @@ onMounted(() => {
                         {{ scope.row.ship_status_message }}
                         <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.order_id)">编辑</el-button>
                         <span></span>
-                        <!-- todo 查看物流处理 -->
+                        <!--  todo operate: 查看物流处理 -->
                         <el-button v-if="scope.row.ship_status === 1" link type="primary">查看物流</el-button>
                     </template>
                 </el-table-column>

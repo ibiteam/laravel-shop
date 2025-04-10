@@ -45,7 +45,7 @@ class WechatPayOrderService implements PayOrderInterface
                 break;
 
             case PayFormEnum::PAY_FORM_MINI:
-                // todo 如何获取 openid
+                // todo operate: 如何获取 openid
                 $openid = '';
                 $init_config['app_id'] = $config['mini_wechat_pay_app_id'];
                 $payment = new WechatPayUtil($init_config);
@@ -59,7 +59,7 @@ class WechatPayOrderService implements PayOrderInterface
                 break;
 
             case PayFormEnum::PAY_FORM_WECHAT:
-                // todo 如何获取 openid
+                // todo operate: 如何获取 openid
                 $openid = '';
                 $init_config['app_id'] = $config['service_wechat_pay_app_id'];
                 $payment = new WechatPayUtil($init_config);
@@ -74,7 +74,7 @@ class WechatPayOrderService implements PayOrderInterface
                 break;
 
             case PayFormEnum::PAY_FORM_H5:
-                // todo H5支付成功的地址
+                // todo operate: H5支付成功的地址
                 $init_config['app_id'] = $config['service_wechat_pay_app_id'];
                 $payment = new WechatPayUtil($init_config);
                 $pay_info = $payment->h5Pay(

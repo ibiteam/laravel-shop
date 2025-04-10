@@ -59,6 +59,20 @@ class OrderDao
     }
 
     /**
+     * 是否允许删除.
+     */
+    public function canCancel(Order $order): bool
+    {
+        $status = $this->getStatusByOrder($order);
+
+        if (in_array($status, [OrderConstantEnum::STATUS_NOT_CONFIRM, OrderConstantEnum::STATUS_WAIT_PAY])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * 是否允许修改地址
      */
     public function canEditAddress(Order $order, bool $is_can_status = false): bool
@@ -76,9 +90,9 @@ class OrderDao
         return true;
     }
 
-    // todo
     public function refundActionByOrderDetail(OrderDetail $order_detail): int
     {
+        // todo operate: 订单详情申请售后按钮状态
         return 0;
     }
 }

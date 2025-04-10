@@ -242,7 +242,7 @@ class OrderController extends BaseController
             if (! $order->update(['ship_status' => $validated['ship_status']])) {
                 throw new BusinessException('修改订单发货状态失败');
             }
-            // TODO 发货保存以及删除发货记录
+            // todo operate: 发货保存以及删除发货记录
 
             return $this->success('更新发货状态，添加发货记录成功');
         } catch (ValidationException $validation_exception) {

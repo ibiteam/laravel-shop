@@ -218,7 +218,7 @@ class OrderService
                 app(CartDao::class)->clearDoneCartGoods($destroy_cart_ids, $current_user->id);
             }
 
-            // todo 下单完成，判断是否需要扣除积分
+            // todo operate:  下单完成，判断是否需要扣除积分
             // if ($order->integral > 0) {
             //
             // }

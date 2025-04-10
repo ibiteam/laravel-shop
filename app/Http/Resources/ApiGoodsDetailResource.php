@@ -46,7 +46,6 @@ class ApiGoodsDetailResource extends JsonResource
                 'evaluate' => $this->resource->evaluate,
                 'parameters' => $this->resource->parameters->map(fn (GoodsParameter $goods_parameter) => ['name' => $goods_parameter->name, 'value' => $goods_parameter->value]),
                 'content' => $this->resource->detail?->content,
-                'recommend' => [], // todo 待确定数据
                 'sku_params' => $this->resource->sku_params_list,
             ],
             'bottom' => [
