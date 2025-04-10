@@ -205,15 +205,41 @@ class OrderController extends BaseController
     }
 
     /**
-     * TODO 发货修改.
+     * 修改发货.
      */
     public function shipUpdate(Request $request): JsonResponse
     {
         try {
             $validated = $request->validate([
-            ], [], []);
+                'id' => 'required|integer',
+                'ship_status' => 'required|integer|in:'.implode(',', [ShippingStatusEnum::SHIPPED->value, ShippingStatusEnum::UNSHIPPED->value]),
+                'ship_company_id' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value.'|integer',
+                'ship_no' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value.'|string',
+            ], [
+                'ship_company_id.required_if' => '当发货状态为已发货时物流公司ID必填',
+                'ship_no.required_if' => '当发货状态为已发货时物流单号必填',
+            ], [
+                'id' => '订单ID',
+                'ship_status' => '发货状态',
+                'ship_company_id' => '物流公司ID',
+                'ship_no' => '物流单号',
+            ]);
+            $order = Order::query()->whereId($validated['id'])->first();
 
-            return $this->success([]);
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            if ($validated['ship_status'] == $order->ship_status) {
+                throw new BusinessException('发货状态未改变');
+            }
+
+            if (! $order->update(['ship_status' => $validated['ship_status']])) {
+                throw new BusinessException('修改订单发货状态失败');
+            }
+            // TODO 发货保存以及删除发货记录
+
+            return $this->success('更新发货状态，添加发货记录成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

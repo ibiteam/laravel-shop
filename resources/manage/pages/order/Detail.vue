@@ -163,10 +163,10 @@ onMounted(() => {
                 <el-table-column label="发货状态">
                     <template #default="scope">
                         {{ scope.row.ship_status_message }}
-                        <el-button link type="primary" @click="openShipFormDialog(scope.row.id)">编辑</el-button>
+                        <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.id)">编辑</el-button>
                         <span></span>
                         <!-- todo 查看物流处理 -->
-                        <el-button link type="primary">查看物流</el-button>
+                        <el-button v-if="scope.row.ship_status === 1" link type="primary">查看物流</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="订单来源" prop="referer"></el-table-column>
@@ -278,12 +278,12 @@ onMounted(() => {
                         <el-radio :value="0">未发货</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="快递公司" prop="ship_company_id">
+                <el-form-item label="快递公司" prop="ship_company_id" :rules="[{ required: shipForm.ship_status == 1, message: '请选择快递公司', trigger: 'blur'}]">
                     <el-select v-model="shipForm.ship_company_id">
                         <el-option v-for="item in shipCompany" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="快递单号" prop="ship_no">
+                <el-form-item label="快递单号" prop="ship_no" :rules="[{ required: shipForm.ship_status == 1, message: '请输入快递单号', trigger: 'blur'}]">
                     <el-input v-model="shipForm.ship_no" />
                 </el-form-item>
             </el-form>
