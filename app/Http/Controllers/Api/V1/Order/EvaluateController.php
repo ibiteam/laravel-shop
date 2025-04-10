@@ -42,20 +42,18 @@ class EvaluateController extends BaseController
         }
     }
 
-    // 当前用户待评价列表
-    public function waitIndexByUser(Request $request)
+    /**
+     * 订单评价初始化.
+     */
+    public function evaluateInit(Request $request): JsonResponse
     {
         //
     }
 
-    // 订单评价初始化
-    public function evaluateInit(Request $request)
-    {
-        //
-    }
-
-    // 保存订单评价
-    public function store(Request $request)
+    /**
+     * 保存订单评价.
+     */
+    public function store(Request $request): JsonResponse
     {
         //
     }

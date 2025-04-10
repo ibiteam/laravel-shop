@@ -17,13 +17,14 @@
 
 type_enum 枚举说明
 
-| 字段值          | 说明  |
-|--------------|-----|
-| all          | 全部  |
-| not_pay      | 待支付 |
-| wait_ship    | 待发货 |
-| wait_receive | 待收货 |
-| success      | 已完成 |
+| 字段值           | 说明  |
+|---------------|-----|
+| all           | 全部  |
+| not_pay       | 待支付 |
+| wait_ship     | 待发货 |
+| wait_receive  | 待收货 |
+| wait_evaluate | 待评价 |
+| success       | 已完成 |
 
 
 ### 请求方式
