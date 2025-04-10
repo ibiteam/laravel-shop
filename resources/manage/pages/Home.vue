@@ -201,10 +201,22 @@
                                 <div class="menu-title"><span>{{ item.title }}</span></div>
                                 <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
                                     <div class="menu-title"><span>{{ its.title }}</span></div>
-                                    <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(itas,idas) in its.children" :key="itas.value" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
-                                        <span>{{ itas.title }}</span>
-                                        <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
-                                        <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                    <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
+                                        <template v-if="itas.children && itas.children.length > 0">
+                                            <div class="menu-title"><span>{{ itas.title }}</span></div>
+                                            <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(ite,idx) in itas.children" :key="ite.value" style="cursor: pointer;margin-left: 20px" @click="collectionFnc(ite,index,ids,idas,idx)">
+                                                <span>{{ ite.title }}</span>
+                                                <el-icon style="color: #ff6a00" v-if="ite.is_collection"><StarFilled /></el-icon>
+                                                <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
+                                                <span>{{ itas.title }}</span>
+                                                <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
+                                                <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -395,7 +407,7 @@ const searchMenusFnc = $public.debounce(() => {
     searchMenus.value = newArr
 },500)
 
-const collectionFnc = (itas,index,ids,idas) =>{
+const collectionFnc = (itas,index,ids,idas,idx) =>{
     let is_collect = itas.is_collection
     homeCollectMenuAxios(itas.index).then(res => {
         if (cns.$successCode(res.code)) {
@@ -405,7 +417,12 @@ const collectionFnc = (itas,index,ids,idas) =>{
             }else{
                 my_collect.value.push(itas)
             }
-            searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect
+            if (idx !== undefined){
+                searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect
+            }else{
+                searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect
+            }
+
         } else {
             cns.$message.error(res.message);
         }
@@ -755,6 +772,22 @@ onUnmounted(() => {
                 line-height: 3;
                 font-weight: 500;
             }
+            .menu-third {
+                .menu-title {
+                    padding: 0 20px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    span{
+                        color: #333;
+                        font-size: 14px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                }
+
+            }
         }
 
         .search-menu .el-input__wrapper {
@@ -773,12 +806,6 @@ onUnmounted(() => {
         }
     }
 
-    .menu-list .menu-second .menu-title span {
-        font-size: 16px;
-        color: #333;
-        line-height: 3;
-        font-weight: 500;
-    }
 
     .collection-box .menu-listRouter {
         height: 30px;
