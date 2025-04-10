@@ -310,6 +310,7 @@ a {
 .common-wrap{
     background: #ffffff;
     padding: 20px;
+    min-height: 100%;
 }
 .pagination-container{
     display: flex;

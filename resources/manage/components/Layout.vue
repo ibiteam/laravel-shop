@@ -379,6 +379,7 @@ const closeSelectedTag = (view) => {
     if (route.meta.keepAlive) {
         route.meta.keepAlive = false
     }
+    if (view.name == 'manage.home.index' && commonStore.visitedViews.length == 1) return
     commonStore.delVisitedViews(view).then((views) => {
         if (isActive(view)) {
             const latestView = views.slice(-1)[0]
@@ -399,6 +400,7 @@ const closeOthersTags = (view) =>{
 }
 
 const closeAllTags = () => {
+    if (route.name == 'manage.home.index' && commonStore.visitedViews.length == 1) return
     commonStore.delAllViews()
     router.push({name: 'manage.home.index'})
 }
