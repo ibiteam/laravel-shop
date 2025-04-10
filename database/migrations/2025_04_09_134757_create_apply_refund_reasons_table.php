@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('apply_refund_reasons', function (Blueprint $table) {
             $table->id();
-            $table->string('reason')->comment('原因');
+            $table->string('content')->comment('内容');
             $table->tinyInteger('type')->comment('类型 0:退仅款；1退货退款');
             $table->integer('sort')->default(0)->comment('排序');
             $table->timestamps();

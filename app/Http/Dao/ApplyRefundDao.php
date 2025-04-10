@@ -7,7 +7,6 @@ use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Models\ApplyRefund;
-use App\Models\ApplyRefundLog;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\User;
@@ -105,44 +104,5 @@ class ApplyRefundDao
         $refund_max_number = get_new_price(bcsub($order_detail->goods_number, $apply_refund_number, 3));
 
         return [$refund_max_amount, $refund_max_number];
-    }
-
-    /**
-     * 撤销申请.
-     *
-     * @throws BusinessException
-     */
-    public function revoke(User $user, $apply_refund_id): void
-    {
-        $apply_refund = ApplyRefund::whereId($apply_refund_id)->whereUserId($user->id)->first();
-
-        if (! $apply_refund instanceof ApplyRefund) {
-            throw new BusinessException('退款信息不存在');
-        }
-
-        if ($apply_refund->is_revoke == ApplyRefund::REVOKE_YES) {
-            throw new BusinessException('您的撤销次数已经使用，无法撤销');
-        }
-
-        if (in_array($apply_refund->status, [ApplyRefundStatusEnum::REFUSE, ApplyRefundStatusEnum::REFUND_SUCCESS, ApplyRefundStatusEnum::REFUND_CLOSE])) {
-            throw new BusinessException('退款状态不支持撤销');
-        }
-
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE;
-        $apply_refund->is_revoke = ApplyRefund::REVOKE_YES;
-        $apply_refund->save();
-
-        // 添加日志
-        app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->user_name, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
-
-        // 判断是不是撮合
-        // if ($seller_shop_info->is_ziying == SellerShopinfo::ZIYING) {
-        //     // 同步erp关闭
-        //     try {
-        //         (new ApplyRefundService)->stopApproval($apply_refund);
-        //     } catch (\Exception $exception) {
-        //         AliLogUtil::error($exception->getMessage(), $exception->getTrace());
-        //     }
-        // }
     }
 }

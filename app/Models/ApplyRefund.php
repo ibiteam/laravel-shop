@@ -7,6 +7,7 @@ use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int                             $id
@@ -15,21 +16,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int                             $order_id        订单id
  * @property int                             $order_detail_id 订单明细id
  * @property int                             $type            类型
- * @property int                             $status          状态
+ * @property int                             $status          售后状态
  * @property string                          $money           退款金额
  * @property string                          $number          退款数量
- * @property int|null                        $reason_id       退款原因表ID
+ * @property int                             $reason_id       退款原因表ID
  * @property string|null                     $description     补充描述
- * @property string|null                     $certificate     退款凭证,号分割
- * @property string|null                     $job_time        定时任务执行时间
+ * @property array                           $certificate     退款凭证,号分割
  * @property int                             $is_revoke       是否撤销：0否 1是
  * @property int                             $count           申请次数
+ * @property string|null                     $result          结果
+ * @property string|null                     $job_time        定时任务执行时间
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApplyRefundLog> $applyRefundLogs
  * @property-read int|null $apply_refund_logs_count
+ * @property-read \App\Models\ApplyRefundShip|null $applyRefundShip
  * @property-read \App\Models\Order|null $order
  * @property-read \App\Models\OrderDetail|null $orderDetail
+ * @property-read \App\Models\ApplyRefundReason|null $reason
  * @property-read \App\Models\User|null $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund newModelQuery()
@@ -48,6 +52,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereOrderDetailId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereOrderId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereReasonId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereResult($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereUpdatedAt($value)
@@ -81,6 +86,11 @@ class ApplyRefund extends Model
 
     protected $guarded = [];
 
+    public function getCertificateAttribute($value): array
+    {
+        return $value ? explode(',', $value) : [];
+    }
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id', 'id');
@@ -99,5 +109,15 @@ class ApplyRefund extends Model
     public function applyRefundLogs(): HasMany
     {
         return $this->hasMany(ApplyRefundLog::class, 'apply_refund_id', 'id')->orderByDesc('id');
+    }
+
+    public function reason(): BelongsTo
+    {
+        return $this->belongsTo(ApplyRefundReason::class, 'reason_id', 'id');
+    }
+
+    public function applyRefundShip(): HasOne
+    {
+        return $this->hasOne(ApplyRefundShip::class, 'apply_refund_id', 'id');
     }
 }

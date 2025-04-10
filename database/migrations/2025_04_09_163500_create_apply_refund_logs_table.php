@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('action_name')->nullable()->comment('操作人');
             $table->string('action')->nullable()->comment('操作行为');
             $table->tinyInteger('type')->comment('类型：0买方 1卖方');
+            $table->integer('apply_refund_ship_id')->default(0)->comment('售后物流ID');
             $table->timestamps();
         });
     }

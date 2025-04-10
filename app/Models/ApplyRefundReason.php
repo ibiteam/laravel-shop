@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int                             $id
- * @property string                          $reason     原因
+ * @property string                          $content    内容
  * @property int                             $type       类型 0:退仅款；1退货退款
  * @property int                             $sort       排序
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -16,9 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereUpdatedAt($value)

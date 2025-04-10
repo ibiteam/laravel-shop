@@ -16,6 +16,9 @@ return new class extends Migration
             $table->integer('apply_refund_id')->comment('申请退款ID');
             $table->string('no')->comment('物流单号');
             $table->integer('ship_company_id')->comment('物流公司ID');
+            $table->string('phone')->nullable()->comment('手机号');
+            $table->string('description')->nullable()->comment('描述说明');
+            $table->string('certificate')->nullable()->comment('凭证 ,号分割');
             $table->timestamps();
         });
     }
