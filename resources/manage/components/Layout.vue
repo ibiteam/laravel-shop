@@ -98,7 +98,6 @@
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item @click="router.push({name:'manage.shop_config.index'})">设置</el-dropdown-item>
-                                            <el-dropdown-item @click="dropRefresh">刷新</el-dropdown-item>
                                             <el-dropdown-item @click="logOut">退出登录</el-dropdown-item>
                                         </el-dropdown-menu>
                                     </template>
@@ -108,7 +107,7 @@
                     </div>
                 </el-header>
                 <el-main style='height: 100%' class='s-flex flex-dir'>
-                    <div class='router-tabs'>
+                    <div class='router-tabs s-flex ai-ct jc-bt'>
                         <el-tabs
                             v-model="routerActived"
                             closable
@@ -125,6 +124,7 @@
                                 </template>
                             </el-tab-pane>
                         </el-tabs>
+                        <div class="refresh-btn s-flex ai-ct" @click="dropRefresh"><el-icon><Refresh /></el-icon><div>刷新</div></div>
                         <ul
                             class="contextmenu"
                             v-show="visible"
@@ -240,9 +240,18 @@ const checkMenuActive = () => {
             item.children.forEach(ite => {
                 if (ite.children && ite.children.length>0){
                     ite.children.forEach(it => {
-                        if (it.name == route.name){
-                            menuIndex.value = index
-                            menuTreeRef.value.setCurrentKey(Number(it.index))
+                        if (it.children && it.children.length>0){
+                            it.children.forEach(its => {
+                                if (its.name == route.name){
+                                    menuIndex.value = index
+                                    menuTreeRef.value.setCurrentKey(Number(its.index))
+                                }
+                            })
+                        }else{
+                            if (it.name == route.name){
+                                menuIndex.value = index
+                                menuTreeRef.value.setCurrentKey(Number(it.index))
+                            }
                         }
                     })
                 }else{
@@ -262,8 +271,15 @@ const formatMenu = () => {
             item.children.forEach(ite => {
                 if(ite.children && ite.children.length > 0){
                     ite.children.forEach(it => {
-                        it.source = item.title + '-' + ite.title
-                        menuListCopy.push(it)
+                        if (it.children && it.children.length > 0){
+                            it.children.forEach(its => {
+                                its.source = item.title + '-' + ite.title + '-' + it.title
+                                menuListCopy.push(its)
+                            })
+                        }else{
+                            it.source = item.title + '-' + ite.title
+                            menuListCopy.push(it)
+                        }
                     })
                 }else{
                     ite.source = item.title
@@ -317,6 +333,7 @@ const tabChange = (name) =>{
 
 const tabRemove = (name) =>{
     const view = commonStore.visitedViews.filter((ite) => ite.name == name)
+    if (name == 'manage.home.index' && commonStore.visitedViews.length == 1) return
     commonStore.delVisitedViews(view[0]).then((views) => {
         if (isActive(view[0])) {
             const latestView = views.slice(-1)[0]
@@ -327,6 +344,7 @@ const tabRemove = (name) =>{
             }
         }
     })
+
 }
 
 let cachedViews = computed(() => {
@@ -427,6 +445,7 @@ const logOut = () =>{
             if(cns.$successCode(res.code)){
                 cns.$cookies.remove('manage-token')
                 router.push({name:'login'})
+                commonStore.resetVisitedViews()
             } else {
                 cns.$message.error(res.message);
             }
@@ -614,6 +633,9 @@ onUnmounted(() => {
                         :deep(.el-select__wrapper){
                             background: var(--manage-color);
                             height:40px;
+                            box-shadow: none;
+                            border-radius: 20px;
+                            border: 1px solid #bbbbbb;
                         }
                         :deep(.el-select__input){
                             color: #ffffff;
@@ -673,6 +695,7 @@ onUnmounted(() => {
                         border-bottom: none;
                         height: 30px;
                         line-height: 30px;
+                        user-select: none;
                         &:last-child{
                             margin-right: 0;
                         }
@@ -683,6 +706,21 @@ onUnmounted(() => {
                         }
                         .el-icon{
                             margin-right: 5px;
+                        }
+                    }
+                }
+                .refresh-btn{
+                    font-size: 14px;
+                    color: #666666;
+                    margin-right: 20px;
+                    cursor: pointer;
+                    .el-icon{
+                        margin-right: 5px;
+                        width: 18px;
+                        height: 18px;
+                        svg{
+                            width: 18px;
+                            height: 18px;
                         }
                     }
                 }

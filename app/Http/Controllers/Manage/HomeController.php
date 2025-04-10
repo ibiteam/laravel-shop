@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Enums\CacheNameEnum;
 use App\Enums\RefererEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AccessRecordDao;
@@ -149,7 +150,7 @@ class HomeController extends BaseController
     {
         $admin_user = $this->adminUser();
 
-        Cache::forget('shop_config_all_code');
+        Cache::forget(CacheNameEnum::SHOP_CONFIG_ALL->value);
 
         Cache::tags(config('auth.manage.guard').'_permission_menus')->forget('permission_menus_'.$admin_user->id);
 

@@ -80,7 +80,7 @@ class AdminUser extends Authenticatable
 
     public function orderLog(): MorphMany
     {
-        return $this->morphMany(OrderLog::class, 'operateType');
+        return $this->morphMany(OrderLog::class, 'operateType', 'operate_type', 'operate_type_id');
     }
 
     public function loginLog(): HasMany

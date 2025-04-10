@@ -89,7 +89,9 @@ class ApiOrderResource extends JsonResource
                     $buttons[] = ['text' => '修改地址', 'action' => 'edit_address'];
                 }
 
-                $buttons[] = ['text' => '去支付', 'action' => 'pay'];
+                if ($this->resource->order_amount > 0) {
+                    $buttons[] = ['text' => '去支付', 'action' => 'pay'];
+                }
 
                 break;
 

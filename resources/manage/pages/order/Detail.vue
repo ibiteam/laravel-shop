@@ -1,8 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
-import { orderDetail, orderShipEdit, orderShipUpdate } from '@/api/order.js';
-import { Plus } from '@element-plus/icons-vue';
+import { orderDetail, orderShipEdit, orderShipUpdate, orderAddressEdit, orderAddressUpdate } from '@/api/order.js';
 import _ from 'lodash';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -51,7 +50,10 @@ const getData = (orderId) => {
     })
 }
 
-/* 发货修改 */
+/* 发货修改开始 */
+const shipFormDialogVisible = ref(false)
+const shipFormInitLoading = ref(false)
+const submitShipFormLoading = ref(false)
 const shipFormRef = ref(null);
 const shipForm = reactive({
     id: 0,
@@ -65,10 +67,6 @@ const shipFormRules = ref({
     ],
 })
 const shipCompany = ref([]);
-const shipFormDialogVisible = ref(false)
-const shipFormInitLoading = ref(false)
-const submitShipFormLoading = ref(false)
-
 const openShipFormDialog = (orderId) => {
     shipFormDialogVisible.value = true
     shipFormInitLoading.value = true;
@@ -111,6 +109,98 @@ const closeShipFormDialog = () => {
     shipForm.ship_company_id = null
     shipForm.ship_no = ''
 }
+/* 发货修改结束 */
+/* 修改收货地址开始 */
+const addressFormDialogVisible = ref(false)
+const addressFormInitLoading = ref(false)
+const addressFormSubmitLoading = ref(false);
+const addressFormRef = ref(null);
+const addressForm = reactive({
+    id: 0,
+    consignee: '',
+    phone: '',
+    address: '',
+    region: [],
+});
+const addressFormRules = ref({
+    consignee: [
+        { required: true, message: '请输入收货人', trigger: 'blur' },
+    ],
+    phone: [
+        { required: true, message: '请输入收货人手机号', trigger: 'blur' },
+    ],
+    address: [
+        { required: true, message: '请输入收货人地址', trigger: 'blur' },
+    ],
+    region: [
+        { required: true, message: '请选择省份', trigger: 'change' }
+    ]
+})
+const regionData = ref([])
+const openAddressFormDialog = (orderId) => {
+    addressFormDialogVisible.value = true
+    addressFormInitLoading.value = true;
+    addressForm.id = orderId;
+    orderAddressEdit({ id: orderId }).then(res => {
+        addressFormInitLoading.value = false;
+        if (cns.$successCode(res.code)) {
+            // 收货地址信息
+            addressForm.consignee = res.data.info.consignee;
+            addressForm.phone = res.data.info.phone;
+            addressForm.address = res.data.info.address;
+            addressForm.region = [res.data.info.province_id,res.data.info.city_id,res.data.info.district_id];
+
+            regionData.value = res.data.regions;
+        }
+    });
+}
+const submitAddressForm = _.throttle(() => {
+    console.log('addressForm',addressForm);
+    addressFormRef.value.validate((valid) => {
+        if (valid) {
+            if (addressForm.region.length != 3) {
+                cns.$message.error('请选择省市区')
+                return false;
+            }
+            let orderId = addressForm.id;
+            let requestAddressData = {
+                id: addressForm.id,
+                consignee: addressForm.consignee,
+                phone: addressForm.phone,
+                address: addressForm.address,
+                province_id: addressForm.region[0],
+                city_id: addressForm.region[1],
+                district_id: addressForm.region[2],
+            }
+            addressFormSubmitLoading.value = true;
+            orderAddressUpdate(requestAddressData).then(res => {
+                addressFormSubmitLoading.value = false;
+                if (cns.$successCode(res.code)) {
+                    getData(orderId)
+                    closeAddressFormDialog()
+                    cns.$message.success(res.message)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            });
+        }
+    });
+}, 1000);
+const closeAddressFormDialog = () => {
+    regionData.value = [];
+    addressFormDialogVisible.value = false
+    addressFormInitLoading.value = false
+    addressFormSubmitLoading.value = false
+
+    addressForm.id = 0
+    addressForm.consignee = '';
+    addressForm.phone = '';
+    addressForm.address = '';
+    addressForm.province_id = '';
+    addressForm.city_id = '';
+    addressForm.district_id = '';
+}
+/* 修改收货地址结束 */
 
 onMounted(() => {
     let title = '订单详情'
@@ -163,7 +253,7 @@ onMounted(() => {
                 <el-table-column label="发货状态">
                     <template #default="scope">
                         {{ scope.row.ship_status_message }}
-                        <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.id)">编辑</el-button>
+                        <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.order_id)">编辑</el-button>
                         <span></span>
                         <!-- todo 查看物流处理 -->
                         <el-button v-if="scope.row.ship_status === 1" link type="primary">查看物流</el-button>
@@ -249,7 +339,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="detail-item">
-                <div class="detail-title">收货地址</div>
+                <div class="detail-title s-flex ai-ct">收货地址<el-button class="ml-10" size="small" type="primary" @click="openAddressFormDialog(orderConsigneeInfo.order_id)">编辑</el-button></div>
                 <div class="detail-cont">
                     <div>
                         <span>收&nbsp;&nbsp;货&nbsp;&nbsp;人：</span>
@@ -297,6 +387,30 @@ onMounted(() => {
     </el-dialog>
     <!-- 查看物流 -->
     <!-- 编辑收货地址 -->
+    <el-dialog v-model="addressFormDialogVisible" title="编辑收货地址" width="500" center :before-close="closeAddressFormDialog">
+        <div v-loading="addressFormInitLoading" class="s-flex jc-ct">
+            <el-form :model="addressForm" ref="addressFormRef" :rules="addressFormRules" label-width="auto" style="width: 100%;" size="default">
+                <el-form-item label="收货人" prop="consignee">
+                    <el-input v-model="addressForm.consignee" />
+                </el-form-item>
+                <el-form-item label="省市区" prop="region">
+                    <el-cascader v-model="addressForm.region" :options="regionData" clearable />
+                </el-form-item>
+                <el-form-item label="详细地址" prop="address">
+                    <el-input v-model="addressForm.address" />
+                </el-form-item>
+                <el-form-item label="手机号" prop="phone">
+                    <el-input v-model="addressForm.phone" />
+                </el-form-item>
+            </el-form>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closeAddressFormDialog()">取消</el-button>
+                <el-button type="primary" :loading="addressFormSubmitLoading" @click="submitAddressForm()">确定</el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <style scoped lang="scss">
@@ -318,6 +432,11 @@ onMounted(() => {
             padding: 15px;
             min-height: 100px;
             border-radius: 10px;
+            >div{
+                line-height: 40px;
+                color: #666;
+                font-size: 14px;
+            }
         }
     }
     .detail-title{
@@ -339,7 +458,6 @@ onMounted(() => {
             border-radius: 2px;
             z-index: 1;
         }
-
     }
 }
 .order-amount {
