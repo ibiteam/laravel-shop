@@ -311,6 +311,7 @@ a {
     background: #ffffff;
     padding: 20px;
     min-height: 100%;
+    border-radius: 5px;
 }
 .pagination-container{
     display: flex;

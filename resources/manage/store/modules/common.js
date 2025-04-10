@@ -5,7 +5,6 @@ export const useCommonStore = defineStore('shop-common', {
             shopConfig:{},
             adminUser:{},
             visitedViews: [],
-            cachedViews: [],
             refreshView:{}
         }
     },
@@ -35,12 +34,6 @@ export const useCommonStore = defineStore('shop-common', {
                     query: view.query,
                 })
             }
-
-            /** 添加页面keep-alive缓存 **/
-            if (view.meta && view.meta.keepAlive) {
-                this.cachedViews.push(view.name)
-            }
-            this.cachedViews = [...new Set(this.cachedViews)]
         },
         delVisitedViews(view) {
             return new Promise((resolve) => {
@@ -48,10 +41,6 @@ export const useCommonStore = defineStore('shop-common', {
                 this.visitedViews.forEach((item, index) => {
                     if (item.path === path) {
                         this.visitedViews.splice(index, 1)
-                        /** 删除页面keep-alive缓存 **/
-                        if (view.meta && view.meta.keepAlive) {
-                            this.cachedViews.length && this.cachedViews.splice(index, 1)
-                        }
                     }
                 })
                 resolve([...this.visitedViews])
@@ -62,31 +51,16 @@ export const useCommonStore = defineStore('shop-common', {
                 for (const [i, v] of this.visitedViews.entries()) {
                     if (v.path === view.path) {
                         this.visitedViews = this.visitedViews.slice(i, i + 1)
-                        /** 删除页面keep-alive缓存 **/
-                        if (view.meta && view.meta.keepAlive) {
-                            this.cachedViews.length && (this.cachedViews = this.cachedViews.slice(i, i + 1))
-                        }
                         break
                     }
                 }
                 resolve([...this.visitedViews])
             })
         },
-        delAllViews(state) {
+        delAllViews() {
             return new Promise((resolve) => {
                 this.visitedViews = []
-                this.cachedViews = []
                 resolve([...this.visitedViews])
-            })
-        },
-        addCachedViews(view) {
-            return new Promise((resolve) => {
-                /** 添加页面keep-alive缓存 **/
-                if (view.meta && view.meta.keepAlive) {
-                    this.cachedViews.push(view.name)
-                }
-                this.cachedViews = [...new Set(this.cachedViews)]
-                resolve([...this.cachedViews])
             })
         },
         refreshQuery(view){
@@ -101,15 +75,9 @@ export const useCommonStore = defineStore('shop-common', {
                     item.title = title
                 }
             })
-            this.cachedViews.forEach(item => {
-                if (item.name == view.name){
-                    item.title = title
-                }
-            })
         },
         resetVisitedViews(){
             this.visitedViews = []
-            this.cachedViews = []
         }
     }
 })

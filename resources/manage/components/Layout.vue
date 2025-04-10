@@ -139,11 +139,9 @@
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
-                                <keep-alive :include="cachedViews">
-                                    <div :key="route.path" style="height: 100%;">
-                                        <component :is="Component"></component>
-                                    </div>
-                                </keep-alive>
+                                <div :key="route.path" style="height: 100%;">
+                                    <component :is="Component"></component>
+                                </div>
                             </transition>
                         </router-view>
                         <div v-else v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
@@ -346,13 +344,6 @@ const tabRemove = (name) =>{
     })
 
 }
-
-let cachedViews = computed(() => {
-    if (route.meta && route.meta.keepAlive) {
-        commonStore.addCachedViews(route)
-    }
-    return commonStore.cachedViews
-})
 
 const openTabMenu = (tag, e) => {
     visible.value = true
