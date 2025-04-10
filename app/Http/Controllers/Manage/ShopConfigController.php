@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Enums\CacheNameEnum;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminOperationLog;
 use App\Models\ShopConfig;
@@ -52,7 +53,7 @@ class ShopConfigController extends BaseController
         }
 
         // 删除缓存
-        Cache::forget('shop_config_all_code');
+        Cache::forget(CacheNameEnum::SHOP_CONFIG_ALL->value);
 
         // 重新更新缓存
         $shop_config_dao->getAll();
