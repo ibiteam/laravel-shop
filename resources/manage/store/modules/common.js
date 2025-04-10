@@ -94,6 +94,18 @@ export const useCommonStore = defineStore('shop-common', {
                 this.refreshView = view
                 resolve()
             })
+        },
+        updateVisitedViewsTitle(view,title){
+            this.visitedViews.forEach(item => {
+                if (item.path == view.path){
+                    item.title = title
+                }
+            })
+            this.cachedViews.forEach(item => {
+                if (item.path == view.path){
+                    item.title = title
+                }
+            })
         }
     }
 })

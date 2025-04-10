@@ -9,6 +9,7 @@
                 </div>
                 <div class='menu-tree' v-if="menus.length>0">
                     <el-tree
+                        ref="menuTreeRef"
                         style="max-width: 200px"
                         :data="menus[menuIndex].children"
                         :icon='ArrowRight'
@@ -16,6 +17,8 @@
                               children: 'children',
                               label: 'label',
                             }"
+                        node-key="index"
+                        :highlight-current="true"
                         @node-click="(e,data,el) => openMenu(e)">
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
@@ -180,6 +183,7 @@ const menuValue = ref('')//快速搜索
 const menuQuery = ref('')
 const menuOptions = ref([])
 const menuLoading = ref(false)
+const menuTreeRef =ref(null)
 
 const routerActived = ref('')
 
@@ -222,12 +226,36 @@ const getConfig = () => {
             root.style.setProperty('--manage-color', res.data.shop_config.manage_color);
             root.style.setProperty('--manage-color-over', res.data.shop_config.mouse_move_color);
             pageLoad.value = true
+            nextTick(()=>{
+                checkMenuActive()
+            })
         } else {
             cns.$message.error(res.message);
         }
     });
 }
-
+const checkMenuActive = () => {
+    menus.value.forEach((item,index) => {
+        if (item.children && item.children.length>0){
+            item.children.forEach(ite => {
+                if (ite.children && ite.children.length>0){
+                    ite.children.forEach(it => {
+                        if (it.name == route.name){
+                            menuIndex.value = index
+                            menuTreeRef.value.setCurrentKey(Number(it.index))
+                            console.log(menuTreeRef.value.getCurrentKey())
+                        }
+                    })
+                }else{
+                    if (ite.name == route.name){
+                        menuIndex.value = index
+                        menuTreeRef.value.setCurrentKey(Number(ite.index))
+                    }
+                }
+            })
+        }
+    })
+}
 const formatMenu = () => {
     let menuListCopy = []
     menus.value.forEach(item => {
@@ -522,6 +550,15 @@ onUnmounted(() => {
                     }
                     :hover{
                         background: unset;
+                    }
+                }
+            }
+            :deep(.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content){
+                background: #ffffff;
+                .custom-tree-node{
+                    background-color: #F6FAFF;
+                    span{
+                        color: #077FFF;
                     }
                 }
             }
