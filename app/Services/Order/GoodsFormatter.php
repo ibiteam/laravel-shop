@@ -9,7 +9,6 @@ use App\Models\GoodsSku;
 use App\Models\GoodsSpecValue;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\ShopConfig;
 use App\Models\User;
 
 class GoodsFormatter
@@ -147,6 +146,11 @@ class GoodsFormatter
     public function initFormat(): array
     {
         $goods = $this->getGoods();
+        $sku_data = '';
+
+        foreach ($this->getSkuData() as $sku_datum) {
+            $sku_data .= $sku_datum['key'].':'.$sku_datum['value'].';';
+        }
 
         return [
             'no' => $goods->no,
@@ -156,12 +160,11 @@ class GoodsFormatter
             'thumb' => $goods->image,
             'price' => $goods->price,
             'integral' => $goods->integral,
-            'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
             'unit' => $goods->unit,
             'number' => $goods->total,
             'buy_number' => $this->getBuyNumber(),
             'sku_id' => $this->getSkuId(),
-            'sku_data' => $this->getSkuData(),
+            'sku_data' => $sku_data,
         ];
     }
 

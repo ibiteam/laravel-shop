@@ -56,6 +56,24 @@ class OrderDetail extends Model
         return $this->belongsTo(Goods::class, 'goods_id', 'id');
     }
 
+    /**
+     * @return string 获取商品规格字符串
+     */
+    public function skuValue(): string
+    {
+        $sku_value = '';
+
+        if (empty($this->goods_sku_value)) {
+            return $sku_value;
+        }
+
+        foreach ($this->goods_sku_value as $item) {
+            $sku_value .= $item['key'].':'.$item['value'].';';
+        }
+
+        return $sku_value;
+    }
+
     protected function casts(): array
     {
         return [

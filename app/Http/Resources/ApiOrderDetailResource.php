@@ -47,7 +47,7 @@ class ApiOrderDetailResource extends JsonResource
                     'goods_image' => $item->goods?->image,
                     'goods_price' => price_number_format($item->goods_price),
                     'number' => $item->goods_number,
-                    'sku_value' => $item->goods_sku_value,
+                    'sku_value' => $item->skuValue(),
                     'sku_id' => $item->goods_sku_id,
                     'refund_action' => app(OrderDao::class)->refundActionByOrderDetail($item),
                 ];
@@ -58,7 +58,6 @@ class ApiOrderDetailResource extends JsonResource
                 'shipping_fee' => price_number_format($this->resource->shipping_fee),
                 'coupon_amount' => price_number_format($this->resource->coupon_amount),
                 'integral' => price_number_format($this->resource->integral),
-                'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
                 'order_amount' => price_number_format($this->resource->order_amount),
             ],
         ];

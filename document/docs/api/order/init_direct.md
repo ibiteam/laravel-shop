@@ -46,25 +46,11 @@
                 "thumb": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
                 "price": "10.23",
                 "integral": 0,
-                "integral_name": "积分",
                 "unit": "个",
                 "number": 246,
                 "buy_number": 3,
                 "sku_id": 3,
-                "sku_data": [
-                    {
-                        "key": "颜色",
-                        "value": "红色"
-                    },
-                    {
-                        "key": "号码",
-                        "value": "L"
-                    },
-                    {
-                        "key": "送装服务",
-                        "value": "不送装"
-                    }
-                ]
+                "sku_data": "颜色:红色;号码:L;送装服务:不送装;"
             }
         ],
         "total": {
@@ -108,14 +94,11 @@ data.goods 参数说明
 | thumb            | String  | 商品图片   |
 | price            | Float   | 商品价格   |
 | integral         | Integer | 商品所需积分 |
-| integral_name    | String  | 商品积分叫法 |
 | unit             | String  | 商品单位   |
 | number           | Integer | 商品库存   |
 | buy_number       | String  | 购买数量   |
 | sku_id           | Integer | 商品规格ID |
-| sku_data         | Array   | 商品规格   |
-| sku_data.*.key   | String  | 商品规格名  |
-| sku_data.*.value | String  | 商品规格值  |
+| sku_data         | String  | 商品规格   |
 
 
 data.total 参数说明

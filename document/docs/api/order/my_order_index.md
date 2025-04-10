@@ -47,20 +47,7 @@ type_enum 枚举说明
                         "goods_image": "https://testcdn.ibisaas.com/2025/01/23/NEF7tKfku7VJd9LQzcJExEdLp3PWpdzHP6yuBF7Q.png",
                         "goods_price": "￥10.23",
                         "number": 3,
-                        "sku_value": [
-                            {
-                                "key": "颜色",
-                                "value": "红色"
-                            },
-                            {
-                                "key": "号码",
-                                "value": "L"
-                            },
-                            {
-                                "key": "送装服务",
-                                "value": "不送装"
-                            }
-                        ],
+                        "sku_value": "颜色:红色;号码:L;送装服务:不送装;",
                         "sku_id": 3
                     }
                 ],
@@ -110,17 +97,15 @@ data.list 返回参数说明
 
 data.list.*.items 返回参数说明
 
-| 字段                | 字段类型    | 字段说明   |
-|-------------------|---------|--------|
-| goods_no          | String  | 商品编号   |
-| goods_name        | String  | 商品名称   |
-| goods_image       | String  | 商品图片   |
-| goods_price       | String  | 商品价格   |
-| number            | Integer | 购买数量   |
-| sku_value         | Array   | 商品规格   |
-| sku_value.*.key   | String  | 商品规格名  |
-| sku_value.*.value | String  | 商品规格值  |
-| sku_id            | Integer | 商品规格ID |
+| 字段          | 字段类型    | 字段说明   |
+|-------------|---------|--------|
+| goods_no    | String  | 商品编号   |
+| goods_name  | String  | 商品名称   |
+| goods_image | String  | 商品图片   |
+| goods_price | String  | 商品价格   |
+| number      | Integer | 购买数量   |
+| sku_value   | String  | 商品规格   |
+| sku_id      | Integer | 商品规格ID |
 
 data.list.*.logistics 返回参数说明
 
