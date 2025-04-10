@@ -32,6 +32,7 @@ export const useCommonStore = defineStore('shop-common', {
                     path: view.path,
                     title: view.meta.title || 'no-name',
                     query: view.query,
+                    params:view.params
                 })
             }
         },

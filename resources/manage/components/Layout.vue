@@ -326,7 +326,7 @@ const moveToCurrentTag = () => {
 
 const tabChange = (name) =>{
     const view = commonStore.visitedViews.filter((ite) => ite.name == name)
-    router.push({ name: view[0].name , query: view[0].query})
+    router.push({ name:view[0].name,query: view[0].query,params:view[0].params})
 }
 
 const tabRemove = (name) =>{
@@ -336,7 +336,7 @@ const tabRemove = (name) =>{
         if (isActive(view[0])) {
             const latestView = views.slice(-1)[0]
             if (latestView) {
-                router.push({name: latestView.name,query:latestView.query})
+                router.push({name: latestView.name,query:latestView.query,params:latestView.params})
             } else {
                 router.push({name: 'manage.home.index'})
             }
@@ -375,7 +375,7 @@ const closeSelectedTag = (view) => {
         if (isActive(view)) {
             const latestView = views.slice(-1)[0]
             if (latestView) {
-                router.push({name: latestView.name,query:latestView.query})
+                router.push({name: latestView.name,query:latestView.query,params:latestView.params})
             } else {
                 router.push({name: 'manage.home.index'})
             }
@@ -384,7 +384,7 @@ const closeSelectedTag = (view) => {
 }
 
 const closeOthersTags = (view) =>{
-    router.push({name: view.name,query:view.query})
+    router.push({name: view.name,query:view.query,params:view.params})
     commonStore.delOthersViews(view).then(() => {
         moveToCurrentTag()
     })
