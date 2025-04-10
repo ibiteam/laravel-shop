@@ -40,7 +40,7 @@ class ApiOrderResource extends JsonResource
                     'goods_image' => $item->goods?->image,
                     'goods_price' => price_number_format($item->goods_price),
                     'number' => $item->goods_number,
-                    'sku_value' => $item->goods_sku_value,
+                    'sku_value' => $item->skuValue(),
                     'sku_id' => $item->goods_sku_id,
                 ];
             }),

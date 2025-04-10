@@ -9,6 +9,8 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 
 const router = useRouter();
 const route = useRoute();
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 /* 订单明细数据 */
 const orderItems = ref([]);
 /* 订单数据 */
@@ -111,8 +113,14 @@ const closeShipFormDialog = () => {
 }
 
 onMounted(() => {
+    let title = '订单详情'
+    if (route.params.no){
+        title = "订单详情-" + route.params.no
+        commonStore.updateVisitedViewsTitle(route, title)
+    }
     getData(route.query.id)
 })
+
 
 
 </script>

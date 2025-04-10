@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\CommonController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
 use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
 
 /* 发送短信 */
 Route::post('sms-action', [SmsController::class, 'handleAction']);
+Route::get('shop/config', [CommonController::class, 'shopConfig']);
 Route::post('check/action/code', [SmsController::class, 'checkActionCode']);
 // 文件上传
 Route::post('upload', [UploadController::class, 'upload']);
