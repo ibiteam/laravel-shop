@@ -94,7 +94,7 @@ class GoodsFormatter
                 $sum = OrderDetail::query()->whereGoodsId($goods->id)->whereIn('order_id', $order_ids)->sum('goods_number');
 
                 if ($sum >= $goods->quota_number) {
-                    throw new BusinessException('该商品限购'.$goods->quota_number.'件，您已购买'.$sum.'件，请选择其他商品');
+                    throw new BusinessException('该商品限购'.$goods->quota_number.'件，您已超过限制，请选择其他商品');
                 }
             }
         }
