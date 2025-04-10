@@ -15,6 +15,7 @@ Route::prefix('order')->group(function () {
         Route::post('ship/update', [OrderController::class, 'shipUpdate']);
         Route::get('address/edit', [OrderController::class, 'addressEdit']);
         Route::post('address/update', [OrderController::class, 'addressUpdate']);
+        Route::get('express/query', [OrderController::class, 'queryExpress']);
     });
 
     // 退款原因

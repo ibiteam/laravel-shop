@@ -1,7 +1,14 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
-import { orderDetail, orderShipEdit, orderShipUpdate, orderAddressEdit, orderAddressUpdate } from '@/api/order.js';
+import {
+    orderDetail,
+    orderShipEdit,
+    orderShipUpdate,
+    orderAddressEdit,
+    orderAddressUpdate,
+    orderQueryExpress
+} from '@/api/order.js';
 import _ from 'lodash';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -203,6 +210,28 @@ const closeAddressFormDialog = () => {
     addressForm.district_id = '';
 }
 /* 修改收货地址结束 */
+/* 物流轨迹开始 */
+const logisticsVisible = ref(false)
+const logisticsInitLoading = ref(false);
+const logisticsData = ref([])
+const openLogisticsDialog = (orderId) => {
+    logisticsInitLoading.value = true
+    orderQueryExpress({id: orderId}).then(res => {
+        logisticsInitLoading.value = false
+        if (cns.$successCode(res.code)) {
+            logisticsData.value = res.data
+            logisticsVisible.value = true
+        } else {
+            cns.$message.error(res.message)
+        }
+    })
+}
+const closeLogisticsDialog = () => {
+    logisticsVisible.value = false;
+    logisticsData.value = [];
+    logisticsInitLoading.value = false;
+}
+/* 物流轨迹结束 */
 
 onMounted(() => {
     let title = '订单详情'
@@ -258,7 +287,7 @@ onMounted(() => {
                         <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.order_id)">编辑</el-button>
                         <span></span>
                         <!--  todo operate: 查看物流处理 -->
-                        <el-button v-if="scope.row.ship_status === 1" link type="primary">查看物流</el-button>
+                        <el-button v-if="scope.row.ship_status === 1" :loading="logisticsInitLoading" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="订单来源" prop="referer"></el-table-column>
@@ -361,7 +390,7 @@ onMounted(() => {
     </div>
 
     <!-- 发货修改 -->
-    <el-dialog v-model="shipFormDialogVisible" title="发货修改" width="500" center :before-close="closeShipFormDialog">
+    <el-dialog v-model="shipFormDialogVisible" title="发货修改" width="600" center :before-close="closeShipFormDialog">
         <div v-loading="shipFormInitLoading" class="s-flex jc-ct">
             <el-form :model="shipForm" ref="shipFormRef" :rules="shipFormRules" label-width="auto" style="width: 100%;" size="default">
                 <el-form-item label="发货状态" prop="ship_status">
@@ -388,8 +417,22 @@ onMounted(() => {
         </template>
     </el-dialog>
     <!-- 查看物流 -->
+    <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
+        <div style="height: 60vh;overflow: auto">
+            <el-timeline :reverse="false">
+                <el-timeline-item v-for="(shipItem, index) in logisticsData" :key="index" :timestamp="shipItem.time">
+                    {{ shipItem.context }}
+                </el-timeline-item>
+            </el-timeline>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button type="info" @click="closeLogisticsDialog()">关闭</el-button>
+            </div>
+        </template>
+    </el-dialog>
     <!-- 编辑收货地址 -->
-    <el-dialog v-model="addressFormDialogVisible" title="编辑收货地址" width="500" center :before-close="closeAddressFormDialog">
+    <el-dialog v-model="addressFormDialogVisible" title="编辑收货地址" width="600" center :before-close="closeAddressFormDialog">
         <div v-loading="addressFormInitLoading" class="s-flex jc-ct">
             <el-form :model="addressForm" ref="addressFormRef" :rules="addressFormRules" label-width="auto" style="width: 100%;" size="default">
                 <el-form-item label="收货人" prop="consignee">

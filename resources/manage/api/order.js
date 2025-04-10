@@ -20,6 +20,9 @@ export function orderAddressEdit(data) {
 export function orderAddressUpdate(data) {
     return $http.doPost('manage/order/info/address/update', data)
 }
+export function orderQueryExpress(data) {
+    return $http.doGet('manage/order/info/express/query', data)
+}
 
 // 退款原因
 export function applyRefundReasonIndex(data) {

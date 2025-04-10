@@ -7,6 +7,7 @@ use App\Enums\PayStatusEnum;
 use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Dao\OrderDao;
 use App\Http\Dao\OrderDeliveryDao;
 use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\RegionDao;
@@ -16,11 +17,13 @@ use App\Models\AdminOperationLog;
 use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\Order;
+use App\Models\OrderDelivery;
 use App\Models\OrderDetail;
 use App\Models\OrderLog;
 use App\Models\ShipCompany;
 use App\Models\ShopConfig;
 use App\Models\Transaction;
+use App\Services\ExpressService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -404,6 +407,41 @@ class OrderController extends BaseController
             DB::rollBack();
 
             return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 快递查询.
+     */
+    public function queryExpress(Request $request, OrderDao $order_dao, ExpressService $express_service): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|string',
+            ], [], [
+                'id' => '订单编号',
+            ]);
+            $order = Order::query()->whereId($validated['id'])->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            $order_delivery = $order->orderDelivery()->with('shipCompany:id,code')->latest()->where('status', OrderDelivery::STATUS_WAIT)->first();
+
+            if (! $order_delivery instanceof OrderDelivery) {
+                throw new BusinessException('订单发货单不存在');
+            }
+
+            $data = $express_service->queryExpress($order_delivery->ship_no, $order_delivery->shipCompany->code ?? '', $order->phone);
+
+            return $this->success($data);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败'.$throwable->getMessage());
         }
     }
 }
