@@ -30,10 +30,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ApplyRefundLog> $applyRefundLogs
  * @property-read int|null $apply_refund_logs_count
+ * @property-read \App\Models\ApplyRefundReason|null $applyRefundReason
  * @property-read \App\Models\ApplyRefundShip|null $applyRefundShip
  * @property-read \App\Models\Order|null $order
  * @property-read \App\Models\OrderDetail|null $orderDetail
- * @property-read \App\Models\ApplyRefundReason|null $reason
  * @property-read \App\Models\User|null $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund newModelQuery()
@@ -64,10 +64,9 @@ class ApplyRefund extends Model
 {
     use DatetimeTrait;
 
-    // 类型 0退款；1退货退款；2已发货-仅退款
+    // 类型 0退款；1退货退款
     public const TYPE_REFUND_MONEY = 0;
     public const TYPE_REFUND_GOODS = 1;
-    public const TYPE_REFUND_SHIPPING_GOODS = 2;
 
     // 是否撤销
     public const REVOKE_NO = 0; // 未撤销
@@ -111,7 +110,7 @@ class ApplyRefund extends Model
         return $this->hasMany(ApplyRefundLog::class, 'apply_refund_id', 'id')->orderByDesc('id');
     }
 
-    public function reason(): BelongsTo
+    public function applyRefundReason(): BelongsTo
     {
         return $this->belongsTo(ApplyRefundReason::class, 'reason_id', 'id');
     }

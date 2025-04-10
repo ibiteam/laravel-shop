@@ -17,6 +17,7 @@ return new class extends Migration
             $table->tinyInteger('type')->comment('类型 0:退仅款；1退货退款');
             $table->integer('sort')->default(0)->comment('排序');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
