@@ -7,6 +7,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Models\Order;
+use App\Models\OrderDelivery;
 use App\Models\OrderDetail;
 
 class OrderDao
@@ -47,6 +48,26 @@ class OrderDao
     /**
      * 是否允许评价.
      */
+    public function canReceive(Order $order, ?OrderConstantEnum $order_constant_enum = null): bool
+    {
+        if (is_null($order_constant_enum)) {
+            $order_constant_enum = $this->getStatusByOrder($order);
+        }
+
+        if ($order_constant_enum !== OrderConstantEnum::STATUS_WAIT_RECEIVE) {
+            return false;
+        }
+
+        if ($order->orderDelivery->isEmpty() || $order->orderDelivery->where('status', OrderDelivery::STATUS_WAIT)->isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 是否允许评价.
+     */
     public function canEvaluate(Order $order, ?OrderConstantEnum $order_constant_enum = null): bool
     {
         if (is_null($order_constant_enum)) {
@@ -69,9 +90,9 @@ class OrderDao
      */
     public function canDestroy(Order $order): bool
     {
-        $status = $this->getStatusByOrder($order);
+        $order_constant_enum = $this->getStatusByOrder($order);
 
-        if (in_array($status, [OrderConstantEnum::STATUS_CANCELLED, OrderConstantEnum::STATUS_SUCCESS])) {
+        if (in_array($order_constant_enum, [OrderConstantEnum::STATUS_CANCELLED, OrderConstantEnum::STATUS_SUCCESS])) {
             return true;
         }
 
@@ -83,9 +104,9 @@ class OrderDao
      */
     public function canCancel(Order $order): bool
     {
-        $status = $this->getStatusByOrder($order);
+        $order_constant_enum = $this->getStatusByOrder($order);
 
-        if (in_array($status, [OrderConstantEnum::STATUS_NOT_CONFIRM, OrderConstantEnum::STATUS_WAIT_PAY])) {
+        if (in_array($order_constant_enum, [OrderConstantEnum::STATUS_NOT_CONFIRM, OrderConstantEnum::STATUS_WAIT_PAY])) {
             return true;
         }
 
@@ -102,7 +123,9 @@ class OrderDao
         }
 
         if ($is_can_status) {
-            if (! in_array($this->getStatusByOrder($order), [OrderConstantEnum::STATUS_WAIT_PAY, OrderConstantEnum::STATUS_WAIT_SHIP])) {
+            $order_constant_enum = $this->getStatusByOrder($order);
+
+            if (! in_array($order_constant_enum, [OrderConstantEnum::STATUS_WAIT_PAY, OrderConstantEnum::STATUS_WAIT_SHIP])) {
                 return false;
             }
         }

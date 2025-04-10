@@ -114,7 +114,10 @@ class ApiOrderResource extends JsonResource
                 if ($this->resource->detail_count === 1) {
                     $buttons[] = ['text' => '再次购买', 'action' => 'again'];
                 }
-                $buttons[] = ['text' => '确认收货', 'action' => 'receive'];
+
+                if (app(OrderDao::class)->canReceive($this->resource)) {
+                    $buttons[] = ['text' => '确认收货', 'action' => 'receive'];
+                }
 
                 break;
 

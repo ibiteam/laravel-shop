@@ -13,6 +13,7 @@ use App\Http\Dao\UserAddressDao;
 use App\Http\Resources\ApiOrderDetailResource;
 use App\Http\Resources\ApiOrderResourceCollection;
 use App\Models\Order;
+use App\Models\OrderDelivery;
 use App\Models\OrderEvaluate;
 use App\Models\UserAddress;
 use Illuminate\Database\Eloquent\Builder;
@@ -342,6 +343,71 @@ class IndexController extends BaseController
 
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable) {
+            DB::rollBack();
+
+            return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 确认收货.
+     *
+     * @throws \Throwable
+     */
+    public function receive(Request $request, OrderDao $order_dao, OrderLogDao $order_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'no' => 'required|string',
+            ], [], [
+                'no' => '订单编号',
+            ]);
+            $current_user = $this->user();
+            $order = Order::query()
+                ->with(['orderDelivery'])
+                ->whereUserId($current_user->id)
+                ->whereNo($validated['no'])
+                ->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            if (! $order_dao->canReceive($order)) {
+                throw new BusinessException('订单状态不允许确认收货');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->update([
+                'order_status' => ShippingStatusEnum::RECEIVED,
+                'received_at' => now()->toDateTimeString(),
+            ])) {
+                throw new BusinessException('确认收货失败');
+            }
+
+            if (! $order->orderDelivery()->update(['status' => OrderDelivery::STATUS_SUCCESS])) {
+                throw new BusinessException('确认收货失败~');
+            }
+
+            $order_log_dao->storeByUser($current_user, $order, '对订单确认了收货');
+
+            DB::commit();
+
+            return $this->success('确认收货成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
             DB::rollBack();
 
             return $this->error('操作失败');

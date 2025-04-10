@@ -10,5 +10,6 @@
     "my_order_destroy",
     "my_order_cancel",
     "evaluate_init",
-    "evaluate_store"
+    "evaluate_store",
+    "my_order_receive"
 ]

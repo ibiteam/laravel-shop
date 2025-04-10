@@ -177,3 +177,13 @@ it('test order evaluate store api interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test order receive api interface', function () {
+    $response = $this->doPost('api/v1/order/my/receive', [
+        'no' => '2025040918889931',
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

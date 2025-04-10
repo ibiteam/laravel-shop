@@ -87,6 +87,7 @@ Route::middleware('api.auth')->group(function () {
             Route::post('address/update', [MyOrderIndexController::class, 'addressUpdate']);
             Route::get('evaluate/init', [EvaluateController::class, 'init']);
             Route::post('evaluate/store', [EvaluateController::class, 'store']);
+            Route::post('receive', [MyOrderIndexController::class, 'receive']);
         });
 
         // 申请售后

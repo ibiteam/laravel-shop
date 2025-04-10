@@ -46,6 +46,8 @@ use Illuminate\Support\Carbon;
 class OrderDelivery extends Model
 {
     use DatetimeTrait;
+    public const STATUS_SUCCESS = 1; // 已收货
+    public const STATUS_WAIT = 0; // 待收货
 
     protected $guarded = [];
 
