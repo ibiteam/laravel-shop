@@ -45,6 +45,20 @@ class OrderDao
     }
 
     /**
+     * 是否允许删除.
+     */
+    public function canDestroy(Order $order): bool
+    {
+        $status = $this->getStatusByOrder($order);
+
+        if (in_array($status, [OrderConstantEnum::STATUS_CANCELLED, OrderConstantEnum::STATUS_SUCCESS])) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * 是否允许修改地址
      */
     public function canEditAddress(Order $order, bool $is_can_status = false): bool
