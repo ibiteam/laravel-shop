@@ -11,6 +11,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
 use App\Models\AppDecorationItemDraft;
+use App\Models\Goods;
 use App\Services\AppDecoration\AppDecorationLogService;
 use App\Services\AppDecoration\AppDecorationService;
 use App\Utils\Constant;
@@ -153,6 +154,38 @@ class AppDecorationController extends BaseController
         }
 
         return $this->success([]);
+    }
+
+    // 推荐商品列表
+    public function goodsList(Request $request)
+    {
+        $keywords = $request->get('keywords', '');
+        $goods_id = $request->get('goods_id', 0);
+        $category_id = $request->get('category_id', 0);
+        $number = $request->get('number', 10);
+        $data = Goods::query()
+            ->when($goods_id, fn ($query) => $query->whereId($goods_id) )
+            ->when($category_id, fn ($query) => $query->whereCategoryId($category_id) )
+            ->when($keywords, fn ($query) => $query->where(function($query)use($keywords){
+                $query->where('no', 'like', "%{$keywords}%")
+                    ->orWhere('name', 'like', "%{$keywords}%");
+            }) )
+            ->select('no', 'name', 'image', 'price', 'total')
+            ->latest()->paginate($number);
+
+        return $this->success(new CommonResourceCollection($data));
+    }
+
+    // 导入商品
+    public function importGoods(Request $request)
+    {
+        $goods_ids = $request->get('goods_ids', []);
+        $data = Goods::query()
+            ->when($goods_ids, fn ($query) => $query->whereIn('id', $goods_ids))
+            ->select('no', 'name', 'image', 'price', 'total')
+            ->latest()->limit(20)->get();
+
+        return $this->success($data);
     }
 
     /**

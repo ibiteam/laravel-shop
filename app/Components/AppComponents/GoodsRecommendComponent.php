@@ -7,6 +7,7 @@ use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Models\Category;
 use App\Models\Goods;
+use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
 
@@ -49,7 +50,7 @@ class GoodsRecommendComponent extends PageComponent
                     'rule' => 1, // 推荐规则 1、智能推荐 2、手动推荐
                     'sort_type' => 1, // 排序类型 1、销量 2、好评 3、低价 4、新品
                     'number' => 3, // 数量限制 1 ~ 20
-                    'goods_ids' => []
+                    'goods_nos' => []
                 ], // 商品设置
             ],
         ];
@@ -80,7 +81,7 @@ class GoodsRecommendComponent extends PageComponent
             'content.goods.rule' => 'required|in:'.AppDecorationItem::RULE_INTELLIGENT.','.AppDecorationItem::RULE_MANUAL,
             'content.goods.sort_type' => 'required_if:content.goods.rule,1|in:' . AppDecorationItem::SORT_SALES.','.AppDecorationItem::SORT_HIGH_PRAISE.','.AppDecorationItem::SORT_LOW_PRICE.','.AppDecorationItem::SORT_NEW_PRODUCT,
             'content.goods.number' => 'required_if:content.goods.rule,1|min:1|max:20',
-            'content.goods.goods_ids' => 'required_if:content.goods.rule,2|array',
+            'content.goods.goods_nos' => 'required_if:content.goods.rule,2|array',
         ], $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
@@ -99,23 +100,15 @@ class GoodsRecommendComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['goods'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            if (AppDecorationItem::RULE_INTELLIGENT == $item['rule']) {
-                // 从模型中根据排序类型获取 row
-                return [
-                    'rule' => $item['rule'],
-                    'goods_data' => Goods::select('name', 'image', 'price', 'total')
-                        ->orderByRaw("total DESC")
-                        ->limit($item['number'])->get()
-                ];
-            }  else if(AppDecorationItem::RULE_MANUAL == $item['rule']) {
-                return [
-                    'rule' => $item['rule'],
-                    'goods_data' => Goods::select('name', 'image', 'price', 'total')->whereIn('goods_id', $item['goods_ids'])->get()
-                ];
-            }
+        $goodsService = new GoodsService();
+        $items = collect($content['goods'])->sortByDesc('sort')->map(function ($item) use (&$items, $goodsService) {
+            $data['rule'] = $item['rule'];
+            $data['number'] = $item['number'] ?? Constant::ZERO;
+            $data['sort_type'] = $item['sort_type'] ?? Constant::ZERO;
+            $data['goods_nos'] = $item['goods_nos'] ?? [];
+            $data['goods_data'] = $goodsService->getRecommendGoods($data['goods_nos'], $data['rule'], $data['number'], $data['sort_type']);
 
-            return null;
+            return $data;
         })->filter()->values()->toArray();
 
         return [
@@ -155,7 +148,7 @@ class GoodsRecommendComponent extends PageComponent
             'id.integer' => '板块ID 必须是整数',
             'id.exists' => '板块ID 不存在',
             'name.required' => '请设置板块名称',
-            'name.max' => '板块名称不能超过 :max 个字符',
+            'name.max' => '板块名称不能超过 100 个字符',
             'component_name.required' => '组件名称不能为空',
             'component_name.in' => '组件名称无效，请选择正确的组件名称',
             'is_show.required' => '是否显示不能为空',
@@ -184,10 +177,10 @@ class GoodsRecommendComponent extends PageComponent
             'content.goods.sort_type.required_if' => '排序类型不能为空（当推荐规则为智能推荐时）',
             'content.goods.sort_type.in' => '排序类型的值无效，请选择正确的排序类型',
             'content.goods.number.required_if' => '数量限制不能为空（当推荐规则为智能推荐时）',
-            'content.goods.number.min' => '数量限制最小值是 :min',
-            'content.goods.number.max' => '数量限制最大值是 :max',
-            'content.goods.goods_ids.required_if' => '商品ID列表不能为空（当推荐规则为手动推荐时）',
-            'content.goods.goods_ids.array' => '商品ID列表必须是一个数组',
+            'content.goods.number.min' => '数量限制最小值是 1',
+            'content.goods.number.max' => '数量限制最大值是 20',
+            'content.goods.goods_nos.required_if' => '商品编号列表不能为空（当推荐规则为手动推荐时）',
+            'content.goods.goods_nos.array' => '商品编号列表必须是一个数组',
         ];
     }
 

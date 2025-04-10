@@ -32,28 +32,20 @@ class PageDefaultDict
                 $data = [
                     // 广告组件
                     'advertisement_name' => [
+                        AppDecorationItem::COMPONENT_NAME_QUICK_LINK,
+                        AppDecorationItem::COMPONENT_NAME_HOT_ZONE,
                         AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_ONE,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_TWO,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_ADVERTISING_THREE,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_THEME_ADVERTISING,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_QUICK_LINK,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_CHANNEL_SQUARE
+                        AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER,
                     ],
                     // 数据组件
                     'data_name' => [
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_SELLER,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_RECOMMEND_THEME,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_HOT_SALE_GOOD,
+                        AppDecorationItem::COMPONENT_NAME_GOODS_RECOMMEND,
                     ], // 固定组件
                     'fixed_name' => [
+                        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+                        AppDecorationItem::COMPONENT_NAME_LABEL,
                         AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                         AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_HOME_NAV,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_LABEL,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_LARGE_SCREEN,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_SIDE_ADVERTISING,
-//                        AppWebsiteDecorationItem::COMPONENT_NAME_SECOND_ADVERTISEMENT,
                     ]
                 ];
 

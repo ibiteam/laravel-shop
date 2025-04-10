@@ -10,6 +10,7 @@ use App\Http\Dao\GoodsDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
+use App\Models\AppDecorationItem;
 use App\Models\Goods;
 use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
@@ -399,5 +400,20 @@ class GoodsService
                 })->values(),
             ];
         });
+    }
+
+    // 获取商品推荐数据
+    public function getRecommendGoods(?array $goods_nos, int $rule, int $limit, int $sort_type): array
+    {
+        $query = Goods::select('no', 'name', 'image', 'price', 'total');
+        switch ($rule) {
+            case AppDecorationItem::RULE_INTELLIGENT:
+                $sort = Goods::$sorts[$sort_type] ?? null;
+                $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}") )->limit($limit);
+            case AppDecorationItem::RULE_MANUAL:
+                $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
+        }
+
+        return $query->get();
     }
 }

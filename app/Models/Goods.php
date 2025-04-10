@@ -93,6 +93,13 @@ class Goods extends Model
 
     protected $guarded = [];
 
+    // 排序对应字段
+    public static $sorts = [
+        AppDecorationItem::SORT_SALES => 'sales_volume DESC',
+        AppDecorationItem::SORT_LOW_PRICE => 'price ASC',
+        AppDecorationItem::SORT_NEW_PRODUCT => 'created_at DESC',
+    ];
+
     // 配置模型索引
     public function searchableAs(): string
     {
