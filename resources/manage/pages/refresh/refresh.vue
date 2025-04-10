@@ -14,12 +14,12 @@ const commonStore = useCommonStore()
 onMounted(() => {
     // 取到路由带过来的参数
     let routeValue = commonStore.refreshView;
-    console.log(routeValue)
     let view = {
         name: routeValue.name,
         title: "正在刷新",
         path: routeValue.path,
     };
+    commonStore.refreshQuery({})
     //返回路由的数据
     commonStore.delVisitedViews(view).then((views) => {
         commonStore.visitedViews.forEach((item, index) => {

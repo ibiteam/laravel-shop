@@ -106,6 +106,10 @@ export const useCommonStore = defineStore('shop-common', {
                     item.title = title
                 }
             })
+        },
+        resetVisitedViews(){
+            this.visitedViews = []
+            this.cachedViews = []
         }
     }
 })
