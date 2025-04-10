@@ -27,6 +27,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string      $source      来源
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read Collection<int, OrderEvaluate> $evaluates
+ * @property-read int|null $evaluates_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection<int, OrderLog> $orderLog
@@ -72,6 +74,11 @@ class User extends Authenticatable
     public function userLogs(): HasMany
     {
         return $this->hasMany(UserLog::class, 'user_id', 'id');
+    }
+
+    public function evaluates(): HasMany
+    {
+        return $this->hasMany(OrderEvaluate::class, 'user_id', 'id');
     }
 
     protected function casts(): array

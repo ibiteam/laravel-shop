@@ -140,3 +140,40 @@ it('test goods evaluate api interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test order evaluate init api interface', function () {
+    $response = $this->doGet('api/v1/order/my/evaluate/init', [
+        'no' => '2025040918889931',
+    ]);
+    dump($response);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});
+
+it('test order evaluate store api interface', function () {
+    $response = $this->doPost('api/v1/order/my/evaluate/store', [
+        'no' => '2025040918889931',
+        'items' => [
+            [
+                'id' => 22,
+                'comment' => '测试评价',
+                'images' => [
+                    url('images/icons/wechat_pay_logo.png'),
+                ],
+            ],
+        ],
+        'rank' => 2,
+        'goods_rank' => 2,
+        'price_rank' => 2,
+        'bus_rank' => 2,
+        'delivery_rank' => 2,
+        'service_rank' => 2,
+        'is_anonymous' => 1,
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

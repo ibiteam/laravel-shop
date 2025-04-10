@@ -85,6 +85,8 @@ Route::middleware('api.auth')->group(function () {
             Route::post('cancel', [MyOrderIndexController::class, 'cancel']);
             Route::get('address/edit', [MyOrderIndexController::class, 'addressEdit']);
             Route::post('address/update', [MyOrderIndexController::class, 'addressUpdate']);
+            Route::get('evaluate/init', [EvaluateController::class, 'init']);
+            Route::post('evaluate/store', [EvaluateController::class, 'store']);
         });
 
         // 申请售后

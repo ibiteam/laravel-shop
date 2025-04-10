@@ -26,9 +26,10 @@ class ApiOrderResource extends JsonResource
         if (! $this->resource instanceof Order) {
             return [];
         }
-        $order_constant_enum = app(OrderDao::class)->getStatusByOrder($this->resource);
+        $order_dao = app(OrderDao::class);
+        $order_constant_enum = $order_dao->getStatusByOrder($this->resource);
         $last_logistics = $this->getLastLogistics();
-        $default_evaluate = $this->getEvaluate();
+        $can_evaluate = $order_dao->canEvaluate($this->resource, $order_constant_enum);
 
         return [
             'no' => $this->resource->no,
@@ -47,11 +48,11 @@ class ApiOrderResource extends JsonResource
             }),
             'order_amount' => price_number_format($this->resource->order_amount),
             'logistics' => $last_logistics,
-            'evaluate' => $default_evaluate,
+            'evaluate' => ! $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
             'buttons' => $this->getButtons(
                 $order_constant_enum,
                 is_array($last_logistics),
-                is_array($default_evaluate)
+                $can_evaluate
             ),
         ];
     }
@@ -59,9 +60,9 @@ class ApiOrderResource extends JsonResource
     /**
      * @param OrderConstantEnum $order_constant_enum 页面状态
      * @param bool              $has_logistics       是否有物流
-     * @param bool              $not_evaluate        是否未评价
+     * @param bool              $can_evaluate        是否可以评价
      */
-    private function getButtons(OrderConstantEnum $order_constant_enum, bool $has_logistics = false, bool $not_evaluate = false): array
+    private function getButtons(OrderConstantEnum $order_constant_enum, bool $has_logistics = false, bool $can_evaluate = false): array
     {
         if (! $this->resource instanceof Order) {
             return [];
@@ -120,7 +121,7 @@ class ApiOrderResource extends JsonResource
             case OrderConstantEnum::STATUS_SUCCESS:
                 $buttons[] = ['text' => '删除订单', 'action' => 'delete'];
 
-                if ($not_evaluate) {
+                if ($can_evaluate) {
                     $buttons[] = ['text' => '去评价', 'action' => 'evaluate'];
                 }
 
@@ -160,25 +161,5 @@ class ApiOrderResource extends JsonResource
         }
 
         return null;
-    }
-
-    private function getEvaluate(): ?array
-    {
-        if (! (
-            $this->resource->order_status === OrderStatusEnum::CONFIRMED->value
-            && $this->resource->pay_status === PayStatusEnum::PAYED->value
-            && $this->resource->ship_status === ShippingStatusEnum::RECEIVED->value
-        )) {
-            return null;
-        }
-
-        if ($this->resource->evaluate->isNotEmpty()) {
-            return null;
-        }
-
-        return [
-            'default_value' => 4,
-            'description' => '请对订单进行评价',
-        ];
     }
 }

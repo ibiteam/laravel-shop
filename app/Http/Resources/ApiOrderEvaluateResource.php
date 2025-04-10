@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\OrderEvaluate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,10 @@ class ApiOrderEvaluateResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        if (! $this->resource instanceof OrderEvaluate) {
+            return [];
+        }
+
         $user = $this->resource->user;
 
         return [
@@ -28,6 +33,7 @@ class ApiOrderEvaluateResource extends JsonResource
             'bus_rank' => $this->resource->bus_rank,
             'delivery_rank' => $this->resource->delivery_rank,
             'service_rank' => $this->resource->service_rank,
+            'comment_at' => $this->resource->comment_at,
         ];
     }
 }

@@ -41,6 +41,7 @@
                 "price_rank": 5,
                 "bus_rank": 5,
                 "delivery_rank": 5,
+                "comment_at": "2025-01-01 00:00:00",
                 "service_rank": 5
             },
             {
@@ -57,6 +58,7 @@
                 "price_rank": 5,
                 "bus_rank": 5,
                 "delivery_rank": 5,
+                "comment_at": "2025-01-01 00:00:00",
                 "service_rank": 5
             }
         ],
@@ -88,6 +90,7 @@ data.list 返回参数说明
 | bus_rank      | Integer | 商家服务评分 |
 | delivery_rank | Integer | 交货速度评分 |
 | service_rank  | Integer | 服务评分   |
+| comment_at    | String  | 发表评价时间 |
 
 data.meta 返回参数说明
 

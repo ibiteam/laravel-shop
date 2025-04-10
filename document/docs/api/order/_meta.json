@@ -8,5 +8,7 @@
     "my_order_address_edit",
     "my_order_address_update",
     "my_order_destroy",
-    "my_order_cancel"
+    "my_order_cancel",
+    "evaluate_init",
+    "evaluate_store"
 ]

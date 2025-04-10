@@ -45,6 +45,26 @@ class OrderDao
     }
 
     /**
+     * 是否允许评价.
+     */
+    public function canEvaluate(Order $order, ?OrderConstantEnum $order_constant_enum = null): bool
+    {
+        if (is_null($order_constant_enum)) {
+            $order_constant_enum = $this->getStatusByOrder($order);
+        }
+
+        if ($order_constant_enum !== OrderConstantEnum::STATUS_SUCCESS) {
+            return false;
+        }
+
+        if ($order->evaluate->isNotEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * 是否允许删除.
      */
     public function canDestroy(Order $order): bool
@@ -59,7 +79,7 @@ class OrderDao
     }
 
     /**
-     * 是否允许删除.
+     * 是否允许取消.
      */
     public function canCancel(Order $order): bool
     {
