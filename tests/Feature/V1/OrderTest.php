@@ -107,3 +107,13 @@ it('test update order address interface', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test destroy order api interface', function () {
+    $response = $this->doPost('api/v1/order/my/destroy', [
+        'no' => '2025040866420167',
+    ]);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

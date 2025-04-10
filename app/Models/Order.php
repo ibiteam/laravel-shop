@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
@@ -43,6 +44,7 @@ use Illuminate\Support\Carbon;
  * @property string      $ip              下单IP
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read Region|null $city
  * @property-read Collection<int, OrderDetail> $detail
  * @property-read int|null $detail_count
@@ -58,6 +60,7 @@ use Illuminate\Support\Carbon;
  *
  * @method static Builder<static>|Order newModelQuery()
  * @method static Builder<static>|Order newQuery()
+ * @method static Builder<static>|Order onlyTrashed()
  * @method static Builder<static>|Order query()
  * @method static Builder<static>|Order whereAddress($value)
  * @method static Builder<static>|Order whereCancelReason($value)
@@ -66,6 +69,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereCouponAmount($value)
  * @method static Builder<static>|Order whereCouponId($value)
  * @method static Builder<static>|Order whereCreatedAt($value)
+ * @method static Builder<static>|Order whereDeletedAt($value)
  * @method static Builder<static>|Order whereDistrictId($value)
  * @method static Builder<static>|Order whereGoodsAmount($value)
  * @method static Builder<static>|Order whereId($value)
@@ -90,13 +94,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereType($value)
  * @method static Builder<static>|Order whereUpdatedAt($value)
  * @method static Builder<static>|Order whereUserId($value)
+ * @method static Builder<static>|Order withTrashed()
+ * @method static Builder<static>|Order withoutTrashed()
  *
  * @mixin \Eloquent
  */
 class Order extends Model
 {
-    use DatetimeTrait;
-
+    use DatetimeTrait, SoftDeletes;
     public const PAYMENT_METHOD_ONLINE = 'online'; // 在线支付
 
     public static array $paymentMethodMap = [

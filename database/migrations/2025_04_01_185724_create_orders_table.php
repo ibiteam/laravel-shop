@@ -43,6 +43,7 @@ return new class extends Migration
             $table->string('source', 30)->comment('下单来源');
             $table->string('ip', 20)->comment('下单IP');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('user_id')->references('id')->on((new User)->getTable());
         });

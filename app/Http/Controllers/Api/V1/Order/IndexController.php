@@ -220,4 +220,57 @@ class IndexController extends BaseController
             return $this->error('操作失败');
         }
     }
+
+    /**
+     * 删除订单.
+     *
+     * @throws \Throwable
+     */
+    public function destroy(Request $request, OrderDao $order_dao, OrderLogDao $order_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'no' => 'required|string',
+            ], [], [
+                'no' => '订单编号',
+            ]);
+            $current_user = $this->user();
+            $order = $order_dao->getInfoByNo($validated['no'], $current_user->id);
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            if (! $order_dao->canDestroy($order)) {
+                throw new BusinessException('订单状态不允许删除');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->delete()) {
+                throw new BusinessException('删除失败');
+            }
+
+            $order_log_dao->storeByUser($current_user, $order, '删除订单');
+            DB::commit();
+
+            return $this->success('删除订单成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable) {
+            DB::rollBack();
+
+            return $this->error('操作失败');
+        }
+    }
 }

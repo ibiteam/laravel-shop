@@ -78,6 +78,7 @@ Route::middleware('api.auth')->group(function () {
         Route::prefix('my')->group(function () {
             Route::get('index', [MyOrderIndexController::class, 'index']);
             Route::get('detail', [MyOrderIndexController::class, 'detail']);
+            Route::post('destroy', [MyOrderIndexController::class, 'destroy']);
             Route::get('address/edit', [MyOrderIndexController::class, 'addressEdit']);
             Route::post('address/update', [MyOrderIndexController::class, 'addressUpdate']);
         });
