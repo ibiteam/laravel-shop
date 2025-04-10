@@ -13,6 +13,12 @@
     },
     {
         "type": "file",
+        "name": "shop_config",
+        "label": "网站配置",
+        "collapsed": true
+    },
+    {
+        "type": "file",
         "name": "check_action_code",
         "label": "校验短信验证码",
         "collapsed": true
