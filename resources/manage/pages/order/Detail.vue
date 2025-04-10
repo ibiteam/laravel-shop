@@ -274,7 +274,7 @@ onMounted(() => {
                 <el-table-column label="库存" prop="goods_stock"></el-table-column>
                 <el-table-column label="小计" prop="goods_amount"></el-table-column>
             </el-table>
-            <div class="order-amount" style="text-align: right;">合计：{{ orderGoodsAmount }}</div>
+            <div class="order-amount" style="text-align: right;margin-top: 10px;">合计：{{ orderGoodsAmount }}</div>
         </div>
         <div class="detail-item">
             <div class="detail-title">订单信息</div>
@@ -286,7 +286,6 @@ onMounted(() => {
                         {{ scope.row.ship_status_message }}
                         <el-button v-if="scope.row.ship_status !== 2" link type="primary" @click="openShipFormDialog(scope.row.order_id)">编辑</el-button>
                         <span></span>
-                        <!--  todo operate: 查看物流处理 -->
                         <el-button v-if="scope.row.ship_status === 1" :loading="logisticsInitLoading" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
                     </template>
                 </el-table-column>
