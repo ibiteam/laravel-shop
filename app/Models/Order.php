@@ -97,6 +97,12 @@ class Order extends Model
 {
     use DatetimeTrait;
 
+    public const PAYMENT_METHOD_ONLINE = 'online'; // 在线支付
+
+    public static array $paymentMethodMap = [
+        self::PAYMENT_METHOD_ONLINE => '在线支付',
+    ];
+
     protected $guarded = [];
 
     public function user(): BelongsTo

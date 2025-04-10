@@ -9,7 +9,6 @@ use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CartDao;
-use App\Http\Dao\PaymentDao;
 use App\Http\Dao\UserAddressDao;
 use App\Models\Order;
 use App\Models\User;
@@ -54,6 +53,11 @@ class OrderService
     private bool $is_set_source = false;
 
     /**
+     * @var bool 是否设置支付方式
+     */
+    private bool $is_set_payment_method = false;
+
+    /**
      * @var User 当前用户
      */
     private User $user;
@@ -76,7 +80,7 @@ class OrderService
     /**
      * @var float|int 订单商品总金额
      */
-    private float $goods_amount = 0;
+    private float|int $goods_amount = 0;
 
     /**
      * @var int 订单商品总积分
@@ -86,7 +90,7 @@ class OrderService
     /**
      * @var float|int 订单运费
      */
-    private float $shipping_fee = 0;
+    private float|int $shipping_fee = 0;
 
     /**
      * @var string 下单IP
@@ -97,6 +101,11 @@ class OrderService
      * @var RefererEnum 下单来源
      */
     private RefererEnum $source;
+
+    /**
+     * @var string 支付方式
+     */
+    private string $payment_method;
 
     /**
      * @throws BusinessException
@@ -117,6 +126,12 @@ class OrderService
             $item_format[] = $goods_formatter->initFormat();
         }
 
+        $payment_methods = [];
+
+        foreach (Order::$paymentMethodMap as $alias => $name) {
+            $payment_methods[] = ['name' => $name, 'alias' => $alias];
+        }
+
         return [
             'user_address' => app(UserAddressDao::class)->showByIdOrDefault($this->getUser()->id, $user_address_id),
             'goods' => $item_format,
@@ -128,7 +143,7 @@ class OrderService
                 'total_amount' => $this->getAmount(),
                 'total_integral' => $this->getGoodsIntegral(),
             ],
-            'payment_methods' => app(PaymentDao::class)->getEffectiveList(),
+            'payment_methods' => $payment_methods,
         ];
     }
 
@@ -147,6 +162,7 @@ class OrderService
             || ! $this->is_set_source
             || ! $this->goods_formatters
             || ! $this->is_set_calculate_price
+            || ! $this->is_set_payment_method
         ) {
             throw new BusinessException('生成失败！');
         }
@@ -181,6 +197,7 @@ class OrderService
                 'remark' => $remark,
                 'ip' => $this->getIp(),
                 'source' => $this->getSource(),
+                'payment_method' => $this->getPaymentMethod(),
             ]);
             $destroy_cart_ids = [];
 
@@ -307,6 +324,20 @@ class OrderService
         $this->is_set_goods_formatters = true;
 
         $this->goods_formatters = $goods_formatters;
+
+        return $this;
+    }
+
+    public function getPaymentMethod(): string
+    {
+        return $this->payment_method;
+    }
+
+    public function setPaymentMethod(string $payment_method): self
+    {
+        $this->is_set_payment_method = true;
+
+        $this->payment_method = $payment_method;
 
         return $this;
     }

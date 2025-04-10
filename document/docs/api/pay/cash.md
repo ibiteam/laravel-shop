@@ -27,7 +27,7 @@
             "order_amount": "30.69",
             "created_at": "2025-04-07 19:55:53"
         },
-        "payment_methods": [
+        "payments": [
             {
                 "name": "微信支付",
                 "description": "此方式仅支持付款金额≤900元的订单",
@@ -50,7 +50,7 @@ data.order 参数说明
 | order_amount | String | 订单金额 |
 | created_at   | String | 下单时间 |
 
-data.payment_methods 参数说明
+data.payments 参数说明
 
 | 字段           | 字段类型    | 说明     |
 |--------------|---------|--------|

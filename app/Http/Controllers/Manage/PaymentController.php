@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Requests\Manage\PaymentMethodRequest;
 use App\Http\Resources\CommonResource;
@@ -89,7 +89,7 @@ class PaymentController extends BaseController
                 'sort' => $validated['sort'],
             ];
 
-            if ($payment->alias == PaymentMethodEnum::WECHAT->value) {
+            if ($payment->alias == PaymentEnum::WECHAT->value) {
                 $update_data['config'] = $this->checkWechatConfig($validated['config']);
             }
 

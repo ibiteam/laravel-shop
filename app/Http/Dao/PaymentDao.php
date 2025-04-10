@@ -2,7 +2,7 @@
 
 namespace App\Http\Dao;
 
-use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentEnum;
 use App\Models\Payment;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
@@ -32,8 +32,8 @@ class PaymentDao
             ->get();
     }
 
-    public function getInfoByAlias(PaymentMethodEnum $payment_method_enum): ?Payment
+    public function getInfoByAlias(PaymentEnum $payment_enum): ?Payment
     {
-        return Payment::query()->whereAlias($payment_method_enum->value)->first();
+        return Payment::query()->whereAlias($payment_enum->value)->first();
     }
 }
