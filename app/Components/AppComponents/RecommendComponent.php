@@ -76,7 +76,7 @@ class RecommendComponent extends PageComponent
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
 
         $items = Goods::query()
-            ->select('no', 'image', 'name', 'price', 'label')
+            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->orderByDesc('sales_volume')
             ->orderByDesc('id')

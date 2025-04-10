@@ -348,7 +348,9 @@ class ApplyRefundService
     {
         if ($apply_refund_id) {
             $apply_refund = ApplyRefund::query()
-                ->with(['order', 'orderDetail', 'applyRefundShip', 'reason'])
+                ->with(['order', 'orderDetail', 'applyRefundShip', 'applyRefundReason' => function ($query) {
+                    $query->withTrashed();
+                }])
                 ->whereUserId($user->id)->whereId($apply_refund_id)
                 ->first();
 
@@ -381,7 +383,9 @@ class ApplyRefundService
             }
 
             $apply_refund = ApplyRefund::query()
-                ->with(['order', 'orderDetail', 'applyRefundShip', 'reason'])
+                ->with(['order', 'orderDetail', 'applyRefundShip', 'applyRefundReason' => function ($query) {
+                    $query->withTrashed();
+                }])
                 ->whereUserId($user->id)->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
                 ->orderByDesc('id')
                 ->first();
@@ -498,7 +502,7 @@ class ApplyRefundService
                 'certificate' => $apply_refund->certificate,
                 'apply_refund_shipping_id' => $apply_refund->applyRefundShip?->id,
                 'apply_refund_shipping_no' => $apply_refund->applyRefundShip?->no,
-                'updated_at' => $apply_refund->updated_at ? $apply_refund->updated_at->format('Y-m-d H:i:s') : '',
+                'updated_at' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
                 'comment' => $temp_comment,
                 'system_time' => time(),
                 'job_time' => $apply_refund->job_time ? strtotime($apply_refund->job_time) : '',

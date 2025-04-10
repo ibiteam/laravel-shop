@@ -407,7 +407,7 @@ class GoodsService
     {
         // 是否展示销量
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-        $query = Goods::select('no', 'name', 'image', 'price', 'total')
+        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
         switch ($rule) {
             case AppDecorationItem::RULE_INTELLIGENT:

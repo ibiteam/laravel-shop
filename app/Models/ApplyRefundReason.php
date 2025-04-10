@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property int                             $id
@@ -12,21 +13,26 @@ use Illuminate\Database\Eloquent\Model;
  * @property int                             $sort       排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereSort($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefundReason withoutTrashed()
  *
  * @mixin \Eloquent
  */
 class ApplyRefundReason extends Model
 {
-    use DatetimeTrait;
+    use DatetimeTrait, SoftDeletes;
     protected $guarded = [];
 }

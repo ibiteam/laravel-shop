@@ -34,7 +34,7 @@ class GoodsRecommendComponent extends PageComponent
             'is_fixed_assembly' => Constant::ZERO, // 不是固定组件
             'sort' => Constant::ZERO,
             'content' => [
-                'layout' => '', // 商品布局 1、单列 2、双列 3、三列
+                'layout' => AppDecorationItem::LAYOUT_ONE, // 商品布局 1、单列 2、双列 3、三列
                 'recommend' => 0, // 智能推荐 1、开启 0、关闭 - 暂不处理
                 'title' => [
                     'icon' => '', // 小图标

@@ -107,6 +107,13 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('订单', Permission::MODULE_ORDER, 97, Permission::IS_LEFT_NAV, 'ShoppingBag');
         $this->addPermission('订单管理', Permission::ORDER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
         $this->addPermission('订单列表', Permission::MANAGE_ORDER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_MANAGE);
+
+        $this->addPermission('退款管理', Permission::APPLY_REFUND_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
+        $this->addPermission('退款原因', Permission::MANAGE_APPLY_REFUND_REASON_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
+        $this->addPermission('退款原因新增|编辑', Permission::MANAGE_APPLY_REFUND_REASON_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
+        $this->addPermission('退款原因删除', Permission::MANAGE_APPLY_REFUND_REASON_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
+        $this->addPermission('退款申请', Permission::MANAGE_APPLY_REFUND_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
+        $this->addPermission('退款申请编辑', Permission::MANAGE_APPLY_REFUND_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
     }
 
     private function addArticlePermission(): void
