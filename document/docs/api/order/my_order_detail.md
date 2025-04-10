@@ -49,6 +49,7 @@
                 "number": 3,
                 "sku_value": "颜色:红色;号码:L;送装服务:不送装;",
                 "sku_id": 3,
+                "goods_unit": "件",
                 "show_refund": 0
             }
         ],
@@ -96,16 +97,17 @@ data 返回参数说明
 
 data.list.*.items 返回参数说明
 
-| 字段                | 字段类型    | 字段说明                        |
-|-------------------|---------|-----------------------------|
-| goods_no          | String  | 商品编号                        |
-| goods_name        | String  | 商品名称                        |
-| goods_image       | String  | 商品图片                        |
-| goods_price       | String  | 商品价格                        |
-| number            | Integer | 购买数量                        |
-| sku_value         | String  | 商品规格                        |
-| sku_id            | Integer | 商品规格ID                      |
-| refund_action     | Integer | 订单商品操作，详见 `refund_action`枚举 |
+| 字段            | 字段类型    | 字段说明                        |
+|---------------|---------|-----------------------------|
+| goods_no      | String  | 商品编号                        |
+| goods_name    | String  | 商品名称                        |
+| goods_image   | String  | 商品图片                        |
+| goods_price   | String  | 商品价格                        |
+| goods_unit    | String  | 商品单位                        |
+| number        | Integer | 购买数量                        |
+| sku_value     | String  | 商品规格                        |
+| sku_id        | Integer | 商品规格ID                      |
+| refund_action | Integer | 订单商品操作，详见 `refund_action`枚举 |
 
 
 status_enum 枚举说明

@@ -36,6 +36,7 @@ class ApiOrderResource extends JsonResource
             'items' => $this->resource->detail->map(function (OrderDetail $item) {
                 return [
                     'goods_no' => $item->goods_no,
+                    'goods_unit' => $item->goods_unit,
                     'goods_name' => $item->goods_name,
                     'goods_image' => $item->goods?->image,
                     'goods_price' => price_number_format($item->goods_price),

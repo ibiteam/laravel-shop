@@ -44,6 +44,7 @@ class ApiOrderDetailResource extends JsonResource
                 return [
                     'goods_no' => $item->goods_no,
                     'goods_name' => $item->goods_name,
+                    'goods_unit' => $item->goods_unit,
                     'goods_image' => $item->goods?->image,
                     'goods_price' => price_number_format($item->goods_price),
                     'number' => $item->goods_number,
