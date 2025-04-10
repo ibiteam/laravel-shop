@@ -1,6 +1,6 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
-import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
+import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
 import { orderDetail, orderShipEdit, orderShipUpdate } from '@/api/order.js';
 import { Plus } from '@element-plus/icons-vue';
 import _ from 'lodash';

@@ -243,7 +243,6 @@ const checkMenuActive = () => {
                         if (it.name == route.name){
                             menuIndex.value = index
                             menuTreeRef.value.setCurrentKey(Number(it.index))
-                            console.log(menuTreeRef.value.getCurrentKey())
                         }
                     })
                 }else{

@@ -97,12 +97,12 @@ export const useCommonStore = defineStore('shop-common', {
         },
         updateVisitedViewsTitle(view,title){
             this.visitedViews.forEach(item => {
-                if (item.path == view.path){
+                if (item.name == view.name){
                     item.title = title
                 }
             })
             this.cachedViews.forEach(item => {
-                if (item.path == view.path){
+                if (item.name == view.name){
                     item.title = title
                 }
             })
