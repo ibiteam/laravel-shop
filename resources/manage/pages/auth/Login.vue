@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted,onUnmounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { accountLogin, getLoginInfo } from '@/api/user.js';
 import { useRouter } from 'vue-router'
@@ -87,6 +87,7 @@ const loginRules = reactive({
     ]
 })
 const handleLogin = _.throttle(() => {
+    console.log(1)
     loginFormRef.value.validate((valid) => {
         if (valid) {
             loading.value = true;
@@ -111,8 +112,15 @@ const submitLogin = () => {
         }
     })
 };
+const listenerKeydowm = (event) => {
+    if (event.key === 'Enter') {
+        handleLogin()
+    }
+};
 
 onMounted(() => {
+    // 监听回车键按下
+    document.addEventListener('keydown', listenerKeydowm, false);
     getLoginInfo().then(res => {
         if(cns.$successCode(res.code)){
             pageData.value = res.data?.config;
@@ -123,6 +131,9 @@ onMounted(() => {
             cns.$message.error(res.message);
         }
     })
+})
+onUnmounted(() => {
+    document.removeEventListener('keydown', listenerKeydowm, false)
 })
 </script>
 
@@ -158,6 +169,11 @@ onMounted(() => {
         .el-input__icon {line-height: 48px !important;}
         .el-input__suffix {line-height: 48px !important;}
         .el-input__prefix {display: flex;align-items: center;height: 100%;}
+        input:-webkit-autofill,
+        input:-webkit-autofill:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 1000px #ffffff inset;
+        }
     }
     :deep(.el-button span){
         font-size: 16px;
