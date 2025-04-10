@@ -116,6 +116,18 @@ class RecommendComponent extends PageComponent
     private function messages(): array
     {
         return [
+            'id.integer' => '板块ID 格式不正确',
+            'id.exists' => '板块ID 不正确',
+            'name.required' => '请设置板块名称',
+            'name.max' => '板块名称不能超过 100 个字符',
+            'component_name.required' => '未设置组件别名，请刷新页面后重试',
+            'component_name.in' => '组件别名参数不正确，请刷新页面后重试',
+            'is_show.required' => '请设置板块是否展示',
+            'is_show.integer' => '板块是否展示参数格式不正确',
+            'is_show.in' => '板块是否展示参数格式不正确',
+            'content.required' => '请设置板块对应数据',
+            'content.array' => '板块数据格式不正确',
+            'content.title.required' => '标题 参数未设置',
         ];
     }
 }
