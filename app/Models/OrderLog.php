@@ -44,6 +44,8 @@ use Illuminate\Support\Carbon;
 class OrderLog extends Model
 {
     use DatetimeTrait;
+    public const TYPE_USER = 1; // 可见类型：用户
+    public const TYPE_ADMIN_USER = 2; // 可见类型：管理员
 
     protected $guarded = [];
 

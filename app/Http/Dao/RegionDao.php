@@ -29,7 +29,7 @@ class RegionDao
      *
      * @return mixed
      */
-    public function getRegionTree()
+    public function getRegionTree(): mixed
     {
         $specialRegion = ['香港特别行政区', '澳门特别行政区', '台湾'];
 

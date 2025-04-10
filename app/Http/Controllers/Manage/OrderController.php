@@ -7,8 +7,11 @@ use App\Enums\PayStatusEnum;
 use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Dao\OrderLogDao;
+use App\Http\Dao\RegionDao;
 use App\Http\Dao\ShipCompanyDao;
 use App\Http\Resources\ManageOrderResourceCollection;
+use App\Models\AdminOperationLog;
 use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\Order;
@@ -18,6 +21,7 @@ use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OrderController extends BaseController
@@ -103,7 +107,7 @@ class OrderController extends BaseController
                     ];
                 }),
                 'order_info' => [
-                    'id' => $order->id,
+                    'order_id' => $order->id,
                     'no' => $order->no,
                     'order_status' => $order->order_status,
                     'order_status_message' => OrderStatusEnum::getLabelBySource($order->order_status),
@@ -158,6 +162,7 @@ class OrderController extends BaseController
                     'consignee' => $order->consignee,
                     'address' => $order->province?->name.' '.$order->city?->name.' '.$order->district?->name.' '.$order->address,
                     'phone' => $order->phone,
+                    'order_id' => $order->id,
                 ],
                 'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
             ]);
@@ -213,8 +218,8 @@ class OrderController extends BaseController
             $validated = $request->validate([
                 'id' => 'required|integer',
                 'ship_status' => 'required|integer|in:'.implode(',', [ShippingStatusEnum::SHIPPED->value, ShippingStatusEnum::UNSHIPPED->value]),
-                'ship_company_id' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value.'|integer',
-                'ship_no' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value.'|string',
+                'ship_company_id' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value,
+                'ship_no' => 'required_if:ship_status,'.ShippingStatusEnum::SHIPPED->value,
             ], [
                 'ship_company_id.required_if' => '当发货状态为已发货时物流公司ID必填',
                 'ship_no.required_if' => '当发货状态为已发货时物流单号必填',
@@ -245,6 +250,115 @@ class OrderController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 修改订单收货地址回显数据.
+     */
+    public function addressEdit(Request $request, RegionDao $region_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer',
+            ], [], [
+                'id' => '订单ID',
+            ]);
+            $order = Order::query()->whereId($validated['id'])->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+
+            return $this->success([
+                'info' => [
+                    'province_id' => $order->province_id,
+                    'city_id' => $order->city_id,
+                    'district_id' => $order->district_id,
+                    'address' => $order->address,
+                    'consignee' => $order->consignee,
+                    'phone' => $order->phone,
+                ],
+                'regions' => $region_dao->getRegionTree(),
+            ]);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+    }
+
+    /**
+     * 修改订单收货地址
+     *
+     * @throws \Throwable
+     */
+    public function addressUpdate(Request $request, OrderLogDao $order_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer',
+                'province_id' => 'required|integer|exists:regions,id',
+                'city_id' => 'required|integer|exists:regions,id',
+                'district_id' => 'required|integer|exists:regions,id',
+                'address' => 'required|string',
+                'consignee' => 'required|string',
+                'phone' => 'required|string',
+            ], [], [
+                'id' => '订单ID',
+                'province_id' => '省份ID',
+                'city_id' => '城市ID',
+                'district_id' => '区县ID',
+                'address' => '详细地址',
+                'consignee' => '收货人',
+                'phone' => '手机号',
+            ]);
+            $order = Order::query()->whereId($validated['id'])->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        $current_user = $this->adminUser();
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->update([
+                'province_id' => $validated['province_id'],
+                'city_id' => $validated['city_id'],
+                'district_id' => $validated['district_id'],
+                'address' => $validated['address'],
+                'consignee' => $validated['consignee'],
+                'phone' => $validated['phone'],
+            ])) {
+                throw new BusinessException('修改订单收货地址失败');
+            }
+            // 添加订单操作日志
+            $order_log_dao->storeByAdminUser($current_user, $order, '修改订单收货地址');
+            // 添加管理员操作日志
+            admin_operation_log($current_user, "修改了订单：{$order->no} 的收货地址", AdminOperationLog::TYPE_UPDATE);
+
+            DB::commit();
+
+            return $this->success('修改订单收货地址成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
             return $this->error('操作失败');
         }
     }

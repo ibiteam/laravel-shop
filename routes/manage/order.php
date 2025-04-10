@@ -11,5 +11,7 @@ Route::prefix('order')->group(function () {
         Route::get('/detail', [OrderController::class, 'detail']);
         Route::get('ship/edit', [OrderController::class, 'shipEdit']);
         Route::post('ship/update', [OrderController::class, 'shipUpdate']);
+        Route::get('address/edit', [OrderController::class, 'addressEdit']);
+        Route::post('address/update', [OrderController::class, 'addressUpdate']);
     });
 });
