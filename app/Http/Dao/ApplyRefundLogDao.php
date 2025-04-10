@@ -73,7 +73,7 @@ class ApplyRefundLogDao
                     'created_at' => $apply_refund_log->created_at->format('Y-m-d H:i:s'),
                     'action' => $apply_refund_log->action,
                     'type' => $apply_refund_log->type,
-                    'reason' => $apply_refund_log->applyRefund->reason->content,
+                    'reason' => $apply_refund_log->applyRefund->applyRefundReason->content,
                     'refund_money' => $apply_refund_log->applyRefund->money,
                     'refund_number' => get_new_price($apply_refund_log->applyRefund->number),
                     'unit' => $temp_unit,

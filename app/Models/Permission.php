@@ -111,8 +111,16 @@ class Permission extends SpatiePermission
     public const MANAGE_MATERIAL_CENTER_DELETE = 'manage.material_center.delete'; // 素材中心 删除
 
     // 二级 订单部分
-    public const ORDER_MANAGE = 'order.manage';
+    public const ORDER_MANAGE = 'order.manage'; // 订单管理
     public const MANAGE_ORDER_INDEX = 'manage.order.index'; // 订单列表
+    public const APPLY_REFUND_MANAGE = 'apply_refund.manage'; // 退款管理
+    public const MANAGE_APPLY_REFUND_REASON_INDEX = 'manage.apply_refund_reason.index'; // 退款原因
+    public const MANAGE_APPLY_REFUND_REASON_UPDATE = 'manage.apply_refund_reason.update'; // 退款原因新增|编辑
+    public const MANAGE_APPLY_REFUND_REASON_DELETE = 'manage.apply_refund_reason.delete'; // 退款原因删除
+    public const MANAGE_APPLY_REFUND_INDEX = 'manage.apply_refund.index'; // 退款申请
+    public const MANAGE_APPLY_REFUND_UPDATE = 'manage.apply_refund.update'; // 退款申请编辑
+
+
 
     public function __construct(array $attributes = [])
     {
