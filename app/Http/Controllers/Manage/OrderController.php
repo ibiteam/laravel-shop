@@ -162,7 +162,6 @@ class OrderController extends BaseController
                     'consignee' => $order->consignee,
                     'address' => $order->province?->name.' '.$order->city?->name.' '.$order->district?->name.' '.$order->address,
                     'phone' => $order->phone,
-                    'order_id' => $order->id,
                 ],
                 'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
             ]);

@@ -13,7 +13,8 @@ const commonStore = useCommonStore()
 /* 订单明细数据 */
 const orderItems = ref([]);
 /* 订单数据 */
-const orderInfo = ref([]);
+const orderData = ref([]);
+const orderInfo = ref({});
 /* 订单时间节点数据 */
 const orderTimeData = ref([]);
 /* 订单费用信息 */
@@ -36,10 +37,11 @@ const getData = (orderId) => {
         if (cns.$successCode(res.code)) {
             integralName.value = res.data.integral_name
             orderGoodsAmount.value = res.data.order_amount_data.goods_amount
+            orderInfo.value = res.data.order_info
 
             orderPayData.value = res.data.order_pay_data
             orderItems.value = res.data.order_items
-            orderInfo.value = [res.data.order_info]
+            orderData.value = [res.data.order_info]
             orderTimeData.value = [res.data.order_time]
             orderAmountData.value = [res.data.order_amount_data]
             orderBuyerInfo.value = res.data.order_buyer_info
@@ -247,7 +249,7 @@ onMounted(() => {
         </div>
         <div class="detail-item">
             <div class="detail-title">订单信息</div>
-            <el-table :data="orderInfo" stripe border style="width: 100%;">
+            <el-table :data="orderData" stripe border style="width: 100%;">
                 <el-table-column label="订单状态" prop="order_status_message"></el-table-column>
                 <el-table-column label="付款状态" prop="pay_status_message"></el-table-column>
                 <el-table-column label="发货状态">
@@ -339,7 +341,7 @@ onMounted(() => {
                 </div>
             </div>
             <div class="detail-item">
-                <div class="detail-title s-flex ai-ct">收货地址<el-button class="ml-10" size="small" type="primary" @click="openAddressFormDialog(orderConsigneeInfo.order_id)">编辑</el-button></div>
+                <div class="detail-title s-flex ai-ct">收货地址<el-button class="ml-10" size="small" type="primary" @click="openAddressFormDialog(orderInfo.order_id)">编辑</el-button></div>
                 <div class="detail-cont">
                     <div>
                         <span>收&nbsp;&nbsp;货&nbsp;&nbsp;人：</span>
