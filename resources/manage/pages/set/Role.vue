@@ -3,11 +3,12 @@
         <el-header style="padding-top: 10px;">
             <el-form :inline="true" :model="searchForm" class="search-form">
                 <el-form-item label="角色名称" prop="display_name">
-                    <el-input v-model="searchForm.display_name" clearable placeholder="请输入" @keyup.enter="getData()" />
+                    <el-input v-model="searchForm.display_name" clearable placeholder="请输入"
+                              @keyup.enter="getData()" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="getData()">查询</el-button>
-                    <el-button type="danger" @click="openStoreDialog()">添加</el-button>
+                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
+                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
                 </el-form-item>
             </el-form>
         </el-header>
@@ -32,8 +33,10 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template #default="scope">
-                    <el-button type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
-                    <el-button type="success" size="large" v-if="!scope.row.role_number" @click="handleDestroy(scope.row.id)">删除</el-button>
+                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
+                    <el-button link type="danger" size="large" v-if="!scope.row.role_number"
+                               @click="handleDestroy(scope.row.id)">删除
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -65,7 +68,9 @@
                     <!--todo: 角色权限-->
                     <div class="permission-main">
                         <div class="permission-main-title">角色权限（角色拥有的权限）</div>
-                        <el-checkbox v-model="checkPermission" class="permission-check" @change="handleCheckAllChange">全选</el-checkbox>
+                        <el-checkbox v-model="checkPermission" class="permission-check" @change="handleCheckAllChange">
+                            全选
+                        </el-checkbox>
                         <el-tree
                             ref="treeRef"
                             :data="allPermissions"
@@ -90,8 +95,8 @@
 
 <script setup lang="ts">
 import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
-import {ref, reactive, getCurrentInstance, onMounted, nextTick} from 'vue';
-import * as echarts from "echarts";
+import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import { Plus, Search } from '@element-plus/icons-vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -113,7 +118,7 @@ const storeDialogTitle = ref('');
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
 const allPermissions = ref([]);
-const allPermissionsKey =  ref([])
+const allPermissionsKey = ref([]);
 const submitForm = reactive({
     id: 0,
     display_name: '',
@@ -124,12 +129,12 @@ const submitForm = reactive({
 const submitFormRules = reactive({
     display_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
 });
-const checkPermission = ref(false)
-const treeRef = ref(null)
+const checkPermission = ref(false);
+const treeRef = ref(null);
 const defaultProps = {
     children: 'children',
-    label: 'display_name',
-}
+    label: 'display_name'
+};
 const openStoreDialog = (id = 0) => {
     storeDialogTitle.value = id > 0 ? '编辑' : '添加';
     detailFormLoading.value = true;
@@ -138,23 +143,23 @@ const openStoreDialog = (id = 0) => {
         if (cns.$successCode(res.code)) {
             allPermissions.value = res.data.all_permissions;
             res.data.all_permissions.forEach(item => {
-                allPermissionsKey.value.push(item.id)
-                if (item.children && item.children.length > 0){
+                allPermissionsKey.value.push(item.id);
+                if (item.children && item.children.length > 0) {
                     item.children.forEach(ite => {
-                        allPermissionsKey.value.push(ite.id)
-                        if (ite.children && ite.children.length > 0){
+                        allPermissionsKey.value.push(ite.id);
+                        if (ite.children && ite.children.length > 0) {
                             ite.children.forEach(it => {
-                                allPermissionsKey.value.push(it.id)
-                                if (it.children && it.children.length > 0){
+                                allPermissionsKey.value.push(it.id);
+                                if (it.children && it.children.length > 0) {
                                     it.children.forEach(itd => {
-                                        allPermissionsKey.value.push(itd.id)
-                                    })
+                                        allPermissionsKey.value.push(itd.id);
+                                    });
                                 }
-                            })
+                            });
                         }
-                    })
+                    });
                 }
-            })
+            });
 
             if (id > 0) {
                 submitForm.id = res.data.role_info.id;
@@ -162,8 +167,8 @@ const openStoreDialog = (id = 0) => {
                 submitForm.description = res.data.role_info.description;
                 submitForm.self_permissions = res.data.role_info.self_permissions;
                 nextTick(() => {
-                    if (treeRef.value.getCheckedKeys().length == allPermissionsKey.value.length){
-                        checkPermission.value = true
+                    if (treeRef.value.getCheckedKeys().length == allPermissionsKey.value.length) {
+                        checkPermission.value = true;
                     }
                 });
             }
@@ -183,9 +188,9 @@ const openStoreDialog = (id = 0) => {
 const closeStoreDialog = () => {
     storeDialogTitle.value = '';
     detailFormLoading.value = false;
-    allPermissions.value = []
-    allPermissionsKey.value = []
-    checkPermission.value = false
+    allPermissions.value = [];
+    allPermissionsKey.value = [];
+    checkPermission.value = false;
     submitForm.id = 0;
     submitForm.display_name = '';
     submitForm.description = '';
@@ -281,23 +286,23 @@ const handleSizeChange = (val) => {
     getData(1);
 };
 
-const handleCheckAllChange = () =>{
-    if (checkPermission.value){
-        treeRef.value.setCheckedKeys(allPermissionsKey.value)
-        submitForm.self_permissions = allPermissionsKey.value
-    }else{
-        treeRef.value.setCheckedKeys([])
-        submitForm.self_permissions = []
+const handleCheckAllChange = () => {
+    if (checkPermission.value) {
+        treeRef.value.setCheckedKeys(allPermissionsKey.value);
+        submitForm.self_permissions = allPermissionsKey.value;
+    } else {
+        treeRef.value.setCheckedKeys([]);
+        submitForm.self_permissions = [];
     }
-}
+};
 const handleCheckChange = () => {
-    submitForm.self_permissions = treeRef.value.getCheckedKeys()
-    if (submitForm.self_permissions.length == allPermissionsKey.value.length){
-        checkPermission.value = true
-    }else{
-        checkPermission.value = false
+    submitForm.self_permissions = treeRef.value.getCheckedKeys();
+    if (submitForm.self_permissions.length == allPermissionsKey.value.length) {
+        checkPermission.value = true;
+    } else {
+        checkPermission.value = false;
     }
-}
+};
 
 onMounted(() => {
     getData();
@@ -305,7 +310,7 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.role-wrap{
+.role-wrap {
     .search-form {
         display: flex;
         flex-wrap: wrap;
@@ -319,16 +324,19 @@ onMounted(() => {
             width: 200px;
         }
     }
-    .permission-main{
-        .permission-main-title{
+
+    .permission-main {
+        .permission-main-title {
             color: #3d3d3d;
             font-size: 14px;
             font-weight: 500;
         }
-        .permission-check{
+
+        .permission-check {
             margin-top: 10px;
         }
-        .el-tree{
+
+        .el-tree {
             max-height: 400px;
             overflow-y: auto;
             margin-top: 10px;
