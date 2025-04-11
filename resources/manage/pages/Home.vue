@@ -6,7 +6,7 @@
                     <div class="information">
                         <div class="welcome">
                             <em class=""></em>
-                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>上午好，张三</span>
+                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
                         <div class="quick-view-box s-flex">
                             <div class="quick-view s-flex ai-ct">
@@ -248,7 +248,8 @@ import { useRoute,useRouter } from 'vue-router';
 const route = useRoute()
 const router =  useRouter()
 
-
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 
 let lineRef = null
 
@@ -460,6 +461,19 @@ const getData = () => {
     });
 }
 
+const firendlyTime = () => {
+    let hours = new Date().getHours()
+    if (hours < 11){
+        return '早上好'
+    }else if (hours < 13){
+        return '中午好'
+    }else if (hours < 17){
+        return '下午好'
+    }else{
+        return '晚上好'
+    }
+}
+
 const toPage = (item) => {
     if (item.name){
         router.push({name:item.name})
@@ -488,6 +502,7 @@ onUnmounted(() => {
 <style scoped lang='scss'>
 .seller-home {
     transform: translate(0, 0);
+    user-select: none;
     .container.member {
         overflow-y: hidden;
     }
@@ -617,6 +632,7 @@ onUnmounted(() => {
                 border-radius: 10px;
                 border: 1px solid rgba(0, 0, 0, 0.1);
                 cursor: pointer;
+                user-select: none;
             }
             .module-main .module-content .module-model:hover{
                 box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -681,6 +697,7 @@ onUnmounted(() => {
                 align-items: center;
                 margin-bottom: 10px;
                 cursor: pointer;
+                user-select: none;
             }
 
             .home-right .shortcut .opt-list .icon {
