@@ -418,7 +418,7 @@ class GoodsService
                 $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
         }
 
-        return $query->get();
+        return $query->get()->toArray();
     }
 
     // 获取 为您推荐 数据

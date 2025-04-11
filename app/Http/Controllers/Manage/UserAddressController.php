@@ -58,7 +58,6 @@ class UserAddressController extends BaseController
             $user_address->id = $id;
             $user_address->user_id = $validated['user_id'];
             $user_address->address_detail = $validated['address_detail'];
-            $user_address->address_detail = $validated['address_detail'];
             $user_address->recipient_name = $validated['recipient_name'];
             $user_address->recipient_phone = $validated['recipient_phone'];
             $user_address->province = $validated['province'];

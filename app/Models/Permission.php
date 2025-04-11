@@ -72,6 +72,9 @@ class Permission extends SpatiePermission
     public const MANAGE_ROUTER_INDEX = 'manage.router.index'; // 访问地址
     public const MANAGE_ROUTER_UPDATE = 'manage.router.update'; // 访问地址新增|编辑
     public const MANAGE_ROUTER_DELETE = 'manage.router.delete'; // 访问地址删除
+    public const MANAGE_APP_SERVICE_CONFIG_INDEX = 'manage.app_service_config.index'; // 外部服务
+    public const MANAGE_APP_SERVICE_CONFIG_UPDATE = 'manage.app_service_config.update'; // 外部服务编辑
+    public const MANAGE_APP_SERVICE_LOG_INDEX = 'manage.app_service_config_log.index'; // 外部服务日志
     public const PERMISSION_MANAGE = 'permission.manage'; // 权限管理
     public const MANAGE_ADMIN_USER_INDEX = 'manage.admin_user.index'; // 管理员列表
     public const MANAGE_ADMIN_USER_UPDATE = 'manage.admin_user.update'; // 管理员新增|编辑

@@ -55,6 +55,10 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('访问地址', Permission::MANAGE_ROUTER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('访问地址新增|编辑', Permission::MANAGE_ROUTER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
         $this->addPermission('访问地址删除', Permission::MANAGE_ROUTER_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        // 外部服务
+        $this->addPermission('外部服务', Permission::MANAGE_APP_SERVICE_CONFIG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('访问地址新增|编辑', Permission::MANAGE_APP_SERVICE_CONFIG_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('外部服务日志', Permission::MANAGE_APP_SERVICE_LOG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
 
         $this->addPermission('权限管理', Permission::PERMISSION_MANAGE, 98, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
         $this->addPermission('管理员列表', Permission::MANAGE_ADMIN_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::PERMISSION_MANAGE);
