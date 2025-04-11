@@ -15,6 +15,7 @@ use App\Models\Goods;
 use App\Models\ShopConfig;
 use App\Services\AppDecoration\AppDecorationLogService;
 use App\Services\AppDecoration\AppDecorationService;
+use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -156,6 +157,12 @@ class AppDecorationController extends BaseController
         }
 
         return $this->success([]);
+    }
+
+    // 为您推荐组件数据
+    public function recommendData(GoodsService $goods_service)
+    {
+        return $this->success($goods_service->getRecommendData());
     }
 
     // 推荐商品列表

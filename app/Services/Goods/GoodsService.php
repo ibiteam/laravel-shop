@@ -8,6 +8,7 @@ use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
 use App\Http\Dao\OrderEvaluateDao;
+use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\AppDecorationItem;
@@ -418,5 +419,23 @@ class GoodsService
         }
 
         return $query->get();
+    }
+
+    // 获取 为您推荐 数据
+    public function getRecommendData(): CommonResourceCollection
+    {
+        // 是否展示销量
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
+
+        $items = Goods::query()
+            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
+            ->orderByDesc('sales_volume')
+            ->orderByDesc('id')
+            ->paginate(6);
+
+        $data =  new CommonResourceCollection($items);
+
+        return $data;
     }
 }

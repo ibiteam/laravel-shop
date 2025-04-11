@@ -8,6 +8,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecorationItem;
 use App\Models\Goods;
 use App\Models\ShopConfig;
+use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -71,24 +72,11 @@ class RecommendComponent extends PageComponent
      */
     public function getContent($data): array
     {
-        $content = $data['content'];
-        // 是否展示销量
-        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-
-        $items = Goods::query()
-            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
-            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
-            ->orderByDesc('sales_volume')
-            ->orderByDesc('id')
-            ->paginate(6);
-
-        $datas = new CommonResourceCollection($items);
-
         return [
             'component_name' => $data['component_name'],
             'sort' => $data['sort'] ?? 0,
-            'title' => $content['title'],
-            'items' => $datas,
+            'title' => $data['content']['title'] ?? '',
+            'items' => app(GoodsService::class)->getRecommendData(),
         ];
     }
 
