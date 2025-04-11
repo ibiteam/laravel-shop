@@ -42,12 +42,15 @@ class Router extends Model
     public const IS_SHOW_NO = 0; // 不显示
     protected $guarded = [];
 
-    protected $casts = [
-        'params' => 'json',
-    ];
-
     public function routerCategory(): BelongsTo
     {
         return $this->belongsTo(RouterCategory::class, 'router_category_id', 'id');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'params' => 'json',
+        ];
     }
 }
