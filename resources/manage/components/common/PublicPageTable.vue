@@ -4,7 +4,7 @@
             :data="data"
             border
             stripe
-            style="width: 100%">
+            style="width: 100%;min-height: 700px">
             <slot></slot>
         </el-table>
         <Pagination :pageInfo="pageInfo" @sizeChange="(value) => emit('sizeChange', value)" @currentChange="(value) => emit('currentChange', value)"></Pagination>
@@ -37,5 +37,7 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-
+.el-table--border:before,.el-table--border:after{
+    display: none;
+}
 </style>
