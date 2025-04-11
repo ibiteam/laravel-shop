@@ -3,9 +3,25 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="goods-recommend-wrapper" style="min-height: 100px;" @click="handleChooseDragItem">
-                    <div class="recommend-wrapper"
-                    >
-                        <div class="recommend-title-wrapper s-flex" v-if="form.content.title.name" :class="form.content.title.align == 'center' ? 'jc-ct' : 'jc-fs'" style="margin-bottom: 10px;">
+                    <div class="recommend-wrapper" v-if="!form.content.goods?.goods_data || !form.content.goods.goods_data?.length">
+                        <div class="goods-wrapper1">
+                            <div class="goods-item s-flex ai-fs jc-bt">
+                                <image-wrapper v-bind="{ src: '', width: '130px', height: '130px', radius: '10px' }"/>
+                                <div class="goods-info s-flex jc-bt flex-dir">
+                                    <div class="goods-name elli-2 s-flex ai-ct fs13">
+                                        <Tag color="linear-gradient(90deg, #5436D5 4%, #735CFF 99%)">商品标签</Tag>
+                                        商品名称
+                                    </div>
+                                    <div class="goods-subname elli-1">
+                                        商品副标题
+                                    </div>
+                                    <GoodsPrice v-bind="{price: '199.00', priceColor: '#f71111'}"></GoodsPrice>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommend-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
+                        <div class="recommend-title-wrapper s-flex" :class="form.content.title.align == 'center' ? 'jc-ct' : 'jc-fs'" style="margin-bottom: 10px;">
                             <div class="ad-title s-flex ai-ct jc-ct" >
                                 <image-wrapper v-if="form.content.title.image" v-bind="{ src: form.content.title.image, width: '16px', height: '16px', radius: '0' }" style="margin-right: 6px;"/>
                                 <span class="fs14 fw-b" :style="{color: form.content.title.color}">{{form.content.title.name}}</span>
@@ -14,23 +30,50 @@
                                 {{ form.content.title.suffix }}<em class="iconfont icon-gengduo"  v-if="form.content.title.url.value" style="font-size: 12px;"></em>
                             </div>
                         </div>
-                        <!-- <div class="ad-banner-wrapper s-flex ai-ct jc-bt flex-wrap">
-                            <div v-for="(item, index) in form.content.data" :key="index" 
-                                :style="{
-                                    width: (form.content.width / 2 - (form.content.background ? '5' : 0)) + 'px',
-                                    marginBottom: (form.content.background ? '10px' : 0)
-                                }"
-                            >
-                                <image-wrapper 
-                                    v-bind="{
-                                        src: item.image,
-                                        width: '100%',
-                                        height: (form.content.height ? form.content.height / 2 : 100) + 'px', 
-                                        radius: '0'
-                                    }" 
-                                />
+                        <div class="goods-wrapper1" v-if="form.content.layout == 1 && form.content.goods.goods_data">
+                            <div class="goods-item s-flex ai-fs jc-bt" v-for="item in form.content.goods.goods_data" :key="item.no">
+                                <image-wrapper v-bind="{ src: item.image, width: '130px', height: '130px', radius: '10px' }"/>
+                                <div class="goods-info s-flex jc-bt flex-dir">
+                                    <div class="goods-name elli-2 s-flex ai-ct fs13">
+                                        <Tag color="linear-gradient(90deg, #5436D5 4%, #735CFF 99%)" v-if="item.label">{{item.label}}</Tag>
+                                        {{item.name}}
+                                    </div>
+                                    <div class="goods-subname elli-1" v-if="item.sub_name">
+                                        {{item.sub_name}}
+                                    </div>
+                                    <GoodsPrice v-bind="{price: item.price, priceColor: '#f71111'}"></GoodsPrice>
+                                </div>
                             </div>
-                        </div> -->
+                        </div>
+                        <div class="goods-wrapper2 s-flex ai-ct jc-bt flex-wrap" v-if="form.content.layout == 2 && form.content.goods.goods_data">
+                            <div class="goods-item" v-for="item in form.content.goods.goods_data" :key="item.no">
+                                <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%', radius: '10px 10px 0 0' }"/>
+                                <div class="goods-info s-flex jc-bt flex-dir">
+                                    <div class="goods-name elli-2 s-flex ai-ct fs13">
+                                        <Tag color="linear-gradient(90deg, #5436D5 4%, #735CFF 99%)" v-if="item.label">{{item.label}}</Tag>
+                                        {{item.name}}
+                                    </div>
+                                    <div class="s-flex ai-ct jc-bt">
+                                        <GoodsPrice v-bind="{price: item.price, priceColor: '#f71111'}"></GoodsPrice>
+                                        <span class="fs10 co-999" v-if="item.sales_volume">已售{{item.sales_volume}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="goods-wrapper3 s-flex ai-ct jc-bt flex-wrap" v-if="form.content.layout == 3 && form.content.goods.goods_data">
+                            <div class="goods-item" v-for="item in form.content.goods.goods_data" :key="item.no">
+                                <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%', radius: '10px 10px 0 0' }"/>
+                                <div class="goods-info s-flex jc-bt flex-dir">
+                                    <div class="goods-name elli-2 s-flex ai-ct fs13">
+                                        {{item.name}}
+                                    </div>
+                                    <div class="s-flex ai-ct jc-bt">
+                                        <GoodsPrice v-bind="{price: item.price, priceColor: '#f71111'}"></GoodsPrice>
+                                        <span class="fs10 co-999" v-if="item.sales_volume">已售{{item.sales_volume}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -41,7 +84,7 @@
                     <el-form lable-width="auto" :model="form.content" ref="templateSetForm">
                         <div class="setting-bar-item">
                             <div class="item-title">显示设置</div>
-                            <el-form-item label="商品布局" label-position="top" :prop="'column'" required>
+                            <el-form-item label="商品布局" label-position="top" :prop="'layout'" required>
                                 <el-radio-group v-model="form.content.layout" fill="var(--main-color)">
                                     <el-radio v-for="layout in LayoutOption" :value="layout.value" :key="layout.value">{{layout.label}}</el-radio>
                                 </el-radio-group>
@@ -144,6 +187,8 @@ import ImageWrapper from '@/pages/decoration/components/app/ImageWrapper.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
+import GoodsPrice from '@/pages/decoration/components/GoodsPrice.vue'
+import { Tag } from 'vant';
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
 import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, MinGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
@@ -237,7 +282,6 @@ watch([() => props.component], (newValue) => {
             form[key] = temp[key]
 
         })
-        console.log(form)
     }
 }, {
     immediate: true,
@@ -251,7 +295,7 @@ watch([() => props.component], (newValue) => {
     padding: 5px 10px 5px;
     .recommend-wrapper {
         border-radius: 10px;
-        padding: 10px;
+        padding: 10px 10px 0;
         background-color: #fff;
         box-sizing: border-box;
     }
@@ -264,6 +308,61 @@ watch([() => props.component], (newValue) => {
             bottom: 0;
             margin: auto 0;
         }
+    }
+    .goods-wrapper1 {
+        padding-bottom: 10px;
+        .goods-item {
+            height: 130px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+        .goods-info {
+            width: calc(100% - 130px);
+            height: 100%;
+            padding-left: 10px;
+        }
+        .goods-subname {
+            color: #f71111;
+            width: 100%;
+        }
+    }
+    .goods-wrapper2 {
+        .goods-item {
+            flex: 0 0 calc(50% - 5px);
+            // width: 175px;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            .goods-info {
+                width: 100%;
+                padding: 10px;
+                box-sizing: border-box;
+                .goods-name {
+                    margin-bottom: 8px;
+                }
+            }
+        }
+    }
+    .goods-wrapper3 {
+        .goods-item {
+            margin-bottom: 5px;
+            flex: 0 0 calc(33.33% - 5px);
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+            .goods-info {
+                width: 100%;
+                padding: 5px 0;
+                box-sizing: border-box;
+                .goods-name {
+                    margin-bottom: 4px;
+                }
+            }
+        }
+    }
+    .fs10 {
+        font-size: 10px;
     }
 }
 .goods-form-wrapper {

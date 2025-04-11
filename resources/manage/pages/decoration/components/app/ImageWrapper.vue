@@ -6,7 +6,7 @@
             </div>
         </template>
         <template #error>
-            <div class="image-item" :style="{ width, height, borderRadius: `${radius}`, border: '1px solid #f2f2f2' }">
+            <div class="image-item" :style="{ width, height, borderRadius: `${radius}` }">
                 <img src="@/assets/images/decoration/app-nopic.png" />
             </div>
         </template>
@@ -47,6 +47,7 @@ const props = defineProps({
     img {
         width: auto;
         height: 100%;
+        max-width: 100%;
         max-height: 100%;
         margin: 0 auto;
     }

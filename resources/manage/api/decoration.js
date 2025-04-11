@@ -57,3 +57,12 @@ export function decorationGoodsImport(data) {
     return $http.doPost('manage/set/app_decoration/goods/import', data)
 }
 
+
+/**
+ * 移动端装修 为您推荐获取商品列表
+ * @returns 
+ */
+export function decorationRecommendData() {
+    return $http.doGet('manage/set/app_decoration/recommend/data')
+}
+

@@ -37,6 +37,7 @@
                                 <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
                                 <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
                                 <GoodsRecommend v-else-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
+                                <Recommend v-else-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></Recommend>
                             </template>
                         </VueDraggable>
                         <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
@@ -63,6 +64,7 @@ import HotZone from './components/HotZone.vue';
 import AdvertisingBanner from './components/AdvertisingBanner.vue'
 import QuickLink from './components/QuickLink.vue'
 import GoodsRecommend from './components/GoodsRecommend.vue';
+import Recommend from './components/Recommend.vue';
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 import GoodsSelectDialog from '@/components/good/SelectDialog.vue'
@@ -310,7 +312,7 @@ const getDecorationHome = () => {
                     "is_fixed_assembly": 0,
                     "sort": 0,
                     "content": {
-                        "layout": "", //商品布局
+                        "layout": 1, //商品布局
                         "title": {
                             "icon": "",//小图标
                             "name": "",//标题
