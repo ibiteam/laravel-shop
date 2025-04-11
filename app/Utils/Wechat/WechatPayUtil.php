@@ -17,7 +17,7 @@ class WechatPayUtil
         $this->initializeApplication([
             'app_id' => $config['app_id'],
             'mch_id' => $config['mch_id'],
-            'notify_url' => route('notify.wechat.pay'),
+            'notify_url' => $config['notify_url'],
             'private_key' => $config['private_key'],
             'certificate' => $config['certificate'],
             'v2_secret_key' => $config['v2_secret_key'],

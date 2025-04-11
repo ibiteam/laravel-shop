@@ -333,7 +333,7 @@ class IndexController extends BaseController
 
             $order_log_dao->storeByUser($current_user, $order, '取消订单');
 
-            // todo operate: 退积分以及退优惠券以及退金钱
+            // todo operate: 退积分以及退优惠券以及退金钱以及退库存
 
             DB::commit();
 
