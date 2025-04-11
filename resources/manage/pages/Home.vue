@@ -200,24 +200,33 @@
                             <div class="menu-list" v-for="(item,index) in searchMenus" :key="item.value">
                                 <div class="menu-title"><span>{{ item.title }}</span></div>
                                 <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
-                                    <div class="menu-title"><span>{{ its.title }}</span></div>
-                                    <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
-                                        <template v-if="itas.children && itas.children.length > 0">
-                                            <div class="menu-title"><span>{{ itas.title }}</span></div>
-                                            <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(ite,idx) in itas.children" :key="ite.value" style="cursor: pointer;margin-left: 20px" @click="collectionFnc(ite,index,ids,idas,idx)">
-                                                <span>{{ ite.title }}</span>
-                                                <el-icon style="color: #ff6a00" v-if="ite.is_collection"><StarFilled /></el-icon>
-                                                <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
-                                                <span>{{ itas.title }}</span>
-                                                <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
-                                                <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
-                                            </div>
-                                        </template>
-                                    </div>
+                                    <template v-if="its.children && its.children.length > 0">
+                                        <div class="menu-title" ><span>{{ its.title }}</span></div>
+                                        <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
+                                            <template v-if="itas.children && itas.children.length > 0">
+                                                <div class="menu-title"><span>{{ itas.title }}</span></div>
+                                                <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(ite,idx) in itas.children" :key="ite.value" style="cursor: pointer;margin-left: 40px" @click="collectionFnc(ite,index,ids,idas,idx)">
+                                                    <span>{{ ite.title }}</span>
+                                                    <el-icon style="color: #ff6a00" v-if="ite.is_collection"><StarFilled /></el-icon>
+                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                                </div>
+                                            </template>
+                                            <template v-else>
+                                                <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
+                                                    <span>{{ itas.title }}</span>
+                                                    <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
+                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(its,index,ids)">
+                                            <span>{{ its.title }}</span>
+                                            <el-icon style="color: #ff6a00" v-if="its.is_collection"><StarFilled /></el-icon>
+                                            <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -407,20 +416,22 @@ const searchMenusFnc = $public.debounce(() => {
     searchMenus.value = newArr
 },500)
 
-const collectionFnc = (itas,index,ids,idas,idx) =>{
-    let is_collect = itas.is_collection
-    homeCollectMenuAxios(itas.index).then(res => {
+const collectionFnc = (item,index,ids,idas,idx) =>{
+    let is_collect = item.is_collection
+    homeCollectMenuAxios(item.index).then(res => {
         if (cns.$successCode(res.code)) {
             if(is_collect){
-                let collectIndex = my_collect.value.findIndex(a => a.name === itas.name)
+                let collectIndex = my_collect.value.findIndex(a => a.name === item.name)
                 my_collect.value.splice(collectIndex,1)
             }else{
-                my_collect.value.push(itas)
+                my_collect.value.push(item)
             }
             if (idx !== undefined){
                 searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect
-            }else{
+            }else if (idas !== undefined){
                 searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect
+            }else{
+                searchMenus.value[index].children[ids].is_collection = !is_collect
             }
 
         } else {
@@ -775,6 +786,7 @@ onUnmounted(() => {
                 color: #333;
                 line-height: 3;
                 font-weight: 500;
+                padding: 0 20px;
             }
             .menu-third {
                 .menu-title {
@@ -810,11 +822,40 @@ onUnmounted(() => {
         }
     }
 
-
+    .menu-second-listRouter{
+        height: 48px;
+        border-radius: 10px;
+        padding: 0 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        &:hover {
+            background-color: #f4f6f7;
+            .el-icon {
+                display: block !important;
+            }
+        }
+        span{
+            font-size: 16px;
+            color: #333;
+            line-height: 3;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        i{
+            cursor: pointer;
+            color: #333;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .collection-box .menu-listRouter {
         height: 30px;
         border-radius: 10px;
         padding: 0 10px;
+        margin-left: 20px;
         cursor: pointer;
         display: flex;
         justify-content: space-between;
