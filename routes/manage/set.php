@@ -53,6 +53,23 @@ Route::prefix('set')->group(function () {
         });
     });
 
+
+    // 外部服务
+    Route::prefix('app_service')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_INDEX])->group(function () {
+            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_CONFIG_INDEX);
+        });
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_UPDATE])->group(function () {
+            Route::post('update', [RouterController::class, 'update']);
+        });
+    });
+    // 外部服务日志
+    Route::prefix('app_service')->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
+            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
+        });
+    });
+
     // 管理员列表
     Route::prefix('admin_user')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_INDEX])->group(function () {
@@ -124,6 +141,7 @@ Route::prefix('set')->group(function () {
             Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
             Route::post('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
             Route::post('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
+            Route::get('/recommend/data', [AppDecorationController::class, 'recommendData']); // 为您推荐组件数据
         });
         Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
             Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
