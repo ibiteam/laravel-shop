@@ -40,17 +40,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        <div class="pagination-container" v-if="pageInfo.total > 0">
-            <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="pageInfo.current_page"
-                :page-sizes="[10, 20, 30, 50, 100]"
-                :page-size="pageInfo.per_page"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="pageInfo.total">
-            </el-pagination>
-        </div>
+        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
 
         <el-dialog
             width="700" center :before-close="closeStoreDialog"
@@ -97,6 +87,7 @@
 import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { Plus, Search } from '@element-plus/icons-vue';
+import Page from '@/components/common/Pagination.vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 

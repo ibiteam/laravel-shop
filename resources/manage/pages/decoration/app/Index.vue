@@ -1,5 +1,6 @@
 <script setup>
 import { appDecoration } from '@/api/decoration.js';
+import Page from '@/components/common/Pagination.vue'
 import { useRouter } from 'vue-router';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
@@ -97,17 +98,7 @@ const goDecoration = (row) => {
         </el-table-column>
     </el-table>
     <!-- 添加分页组件 -->
-    <div class="pagination-container" v-if="pageInfo.total > 0">
-        <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageInfo.current_page"
-            :page-sizes="[10, 15, 30, 50, 100]"
-            :page-size="pageInfo.per_page"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="pageInfo.total">
-        </el-pagination>
-    </div>
+    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
 </template>
 
 <style scoped lang="scss">

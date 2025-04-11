@@ -603,8 +603,12 @@ onUnmounted(() => {
                 width: 176px;
                 height: 70px;
                 border-radius: 10px;
-                border: 1px dashed rgba(0, 0, 0, 0.1);
+                border: 1px solid rgba(0, 0, 0, 0.1);
                 cursor: pointer;
+            }
+            .module-main .module-content .module-model:hover{
+                box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+                border: none;
             }
             .module-main .module-content .module-model>.module-imgs{
                 width: 40px;

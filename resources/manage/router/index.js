@@ -29,11 +29,11 @@ const router = createRouter({
         { path: '/login', component: Login, name: 'login' },
         {
             path:'/',
-            redirect: '/home',
+            redirect: '/',
             component: () => import('@/components/Layout.vue'),
             children:[
                 // 首页
-                { path: '/home', component: Home, name: 'manage.home.index',meta:{title:'首页'}},
+                { path: '/', component: Home, name: 'manage.home.index',meta:{title:'首页'}},
                 // 设置
                 { path: '/set/shop_config', component: SetShopConfig, name: 'manage.shop_config.index',meta:{title:'商店设置'} },
                 { path: '/set/router_category', component: SetRouterCategory, name: 'manage.router_category.index',meta:{title:'访问地址分类'} },
@@ -65,6 +65,7 @@ const router = createRouter({
                 { path: '/decoration/app/home', component: () => import('@/pages/decoration/app/home/Home.vue'), name: 'decorationAppHome', meta:{title:'移动端装修 - 首页'} },
             ]
         },
+        { path: '/:pathMatch(.*)*', name: 'not-found', redirect: '/' }
     ],
 });
 export default router
