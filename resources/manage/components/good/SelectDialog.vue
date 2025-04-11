@@ -83,7 +83,7 @@
                     </el-tab-pane>
                     <el-tab-pane label="商品ID导入" name="2">
                         <el-input
-                            v-model="export_data"
+                            v-model="export_text"
                             :rows="10"
                             resize="none"
                             type="textarea"
@@ -146,6 +146,9 @@ import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } fro
 import { VueDraggable } from 'vue-draggable-plus'
 import { categoryIndex } from '@/api/goods.js';
 import { decorationGoodsList, decorationGoodsImport } from '@/api/decoration.js'
+import { EVENT_CODE } from 'element-plus'
+
+console.log(EVENT_CODE)
 
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -162,7 +165,7 @@ const props = defineProps({
 const emit = defineEmits(['confirm', 'close'])
 
 const dialogVisible = ref(false)
-const tabActive = ref('1')
+const tabActive = ref('2')
 const queryParams = reactive({
     keywords: '',      // 商品名称搜索
     goods_id: '',
@@ -170,7 +173,8 @@ const queryParams = reactive({
 })
 const categoryOptions = ref([]);
 // 导入id
-const export_data = ref('')
+const export_text = ref('')
+const export_data = ref([])
 const exporting = ref(false)
 const pageInfo = reactive({
     page: 1,
@@ -296,7 +300,7 @@ const getCategory = () => {
 }
 
 
-watch([() => props, () => check.nos], (newVal) => {
+watch([() => props, () => export_text], (newVal) => {
     if (newVal[0]) {
         dialogVisible.value = newVal[0].show
         if (dialogVisible.value) {
@@ -304,17 +308,14 @@ watch([() => props, () => check.nos], (newVal) => {
             getCategory()
         }
     }
-    // if (newVal[1]) {
-    //     const nos = new Array(...newVal[1])
-    //     console.log(nos)
-    //     if (nos.length > 0) {
-    //         nos.map(i => {
-    //             check.data.push(i)
-    //         })
-    //     } else {
-    //         check.data = []
-    //     }
-    // }
+    if (newVal[1]) {
+        let inputText = JSON.parse(JSON.stringify(newVal[1].value))
+        
+        // 使用正则表达式分割文本，逗号或换行符作为分隔符
+        const regex = /[,，\n]+/g;
+        const splitResult = inputText.split(regex).filter(item => item.trim() !== '');
+        export_data.value = splitResult;
+    }
 }, {
     immediate: true,
     deep: true

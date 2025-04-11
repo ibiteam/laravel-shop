@@ -1,15 +1,15 @@
 <template>
-    <div class="uploader s-flex ai-ct jc-ct" :style="{width: width +'px', height: height + 'px', backgroundColor}" v-loading="uploading">
-        <el-image v-if="src" :src="src" :fit="fit" :style="{width: width +'px', height: height + 'px', minWidth: '64px', minHeight: '64px'}">
+    <div class="uploader s-flex ai-ct jc-ct" :style="{width, height, backgroundColor}" v-loading="uploading">
+        <el-image v-if="src" :src="src" :fit="fit" :style="{width, height, minWidth: '64px', minHeight: '64px'}">
         </el-image>
         <div class="s-flex ai-ct jc-ct flex-dir" v-else>
-            <em class="iconfont icon-jiahao1" ></em>
+            <em class="iconfont icon-jiahao1" :style="{fontSize: iconSize}"></em>
             <slot name="upload-placeholder"></slot>
         </div>
         <div class="upload-modal s-flex ai-ct jc-ct">
-            <em class="iconfont icon-shangchuan1 icon-btn" @click="emit('material')" title="从素材库选择"></em>
-            <em class="iconfont icon-shangchuan icon-btn" @click="handleLocalUpload" title="从本地上传图片"></em>
-            <em class="iconfont icon-shanchu icon-btn" v-if="src" @click="emit('remove')" title="删除图片"></em>
+            <em class="iconfont icon-shangchuan1 icon-btn" :style="{fontSize: iconSize}" @click="emit('material')" title="从素材库选择"></em>
+            <em class="iconfont icon-shangchuan icon-btn" :style="{fontSize: iconSize}" @click="handleLocalUpload" title="从本地上传图片"></em>
+            <em class="iconfont icon-shanchu icon-btn" :style="{fontSize: iconSize}" v-if="src" @click="emit('remove')" title="删除图片"></em>
         </div>
         <input type="file" ref="uploadImageRef" style="display: none" @change="beforeUpload" accept="image/jpeg,image/jpg,image/png,image/gif">
     </div>
@@ -23,11 +23,11 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
     width: {
         type: [String, Number],
-        default: 64
+        default: '64px'
     },
     height: {
         type: [String, Number],
-        default: 64
+        default: '64px'
     },
     backgroundColor: {
         type: String,
@@ -40,6 +40,10 @@ const props = defineProps({
     fit: {
         type: String,
         default: 'fill', // cover, contain, fill, none, scale-down
+    },
+    iconSize: {
+        type: String,
+        default: '16px'
     }
 })
 
@@ -117,8 +121,6 @@ const handleLocalUpload = () => {
         em{
             cursor: pointer;
             color: #fff;
-            font-size: 16px;
-
         }
     }
 }

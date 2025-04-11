@@ -110,7 +110,6 @@ watch(() => props, (newVal) => {
         if (newVal.component_icon) {
             active.name = Object.keys(newVal.component_icon)
             active.components = newVal.component_icon
-            console.log(active.svg)
         }
     }
 }, {

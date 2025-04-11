@@ -1,5 +1,5 @@
 <template>
-    <el-container class="decoration-layout-container">
+    <el-container class="decoration-layout-container" id="decorationLayoutContainer">
         <el-aside class="decoration-layout-aside" width="300px">
             <slot name="aside-content"></slot>
         </el-aside>
@@ -47,6 +47,7 @@ const props = defineProps({
     width: 100%;
     height: 100%;
     overflow: hidden;
+    position: relative;
     .decoration-layout-aside {
         position: relative;
         border-right: 1px solid #D8D8D8;
