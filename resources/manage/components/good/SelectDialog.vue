@@ -176,7 +176,7 @@ const pageInfo = reactive({
     page: 1,
     number: 10,
     total: 0,
-    currentPage: 1,
+    current_page: 1,
     layout: 'total, sizes, prev, pager, next',
 })
 const tableRef = ref(null)
@@ -264,7 +264,7 @@ const handleImport = () => {
 
 const handleLoad = () => {
     if (tableLoading.value) return
-    getGoodsList({page: pageInfo.currentPage++})
+    getGoodsList({page: pageInfo.current_page++})
 }
 
 const getGoodsList = (params = {page: 1}) => {
@@ -276,8 +276,8 @@ const getGoodsList = (params = {page: 1}) => {
             tableData.value = res.data.list;
             // // 更新分页信息
             pageInfo.total = res.data.meta.total;
-            pageInfo.number = Number(res.data.meta.per_page);
-            pageInfo.currentPage = res.data.meta.current_page;
+            pageInfo.per_page = Number(res.data.meta.per_page);
+            pageInfo.current_page = res.data.meta.current_page;
         } else {
             cns.$message.error(res.message)
         }
@@ -321,7 +321,7 @@ watch([() => props, () => check.nos], (newVal) => {
 })
 
 onMounted(() => {
-    
+
 })
 </script>
 <style lang='scss' scoped>

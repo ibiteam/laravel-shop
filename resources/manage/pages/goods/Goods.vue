@@ -4,6 +4,7 @@ import { categoryIndex, goodsIndex, goodsChangeStatus } from '@/api/goods.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Page from '@/components/common/Pagination.vue';
+import PublicPageTable from '@/components/common/PublicPageTable.vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -57,9 +58,9 @@ const resetSearch = () => {
 
 // 添加分页相关状态
 const pageInfo = reactive({
-    number: 10,
+    per_page: 10,
     total: 0,
-    currentPage: 1,
+    current_page: 1,
 })
 
 // 页码改变
@@ -69,15 +70,15 @@ const handleCurrentChange = (val) => {
 
 // 每页条数改变
 const handleSizeChange = (val) => {
-    pageInfo.number = val;
+    pageInfo.per_page = val;
     getData(1);
 }
 
 // 设置分页数据
 const setPageInfo = (meta) => {
     pageInfo.total = meta.total;
-    pageInfo.number = Number(meta.per_page);
-    pageInfo.currentPage = meta.current_page;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
 }
 
 /* 商品分类选择触发函数 */
@@ -93,7 +94,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    queryParams.number = pageInfo.number;
+    queryParams.number = pageInfo.per_page;
 
     goodsIndex(queryParams).then(res => {
         loading.value = false;
@@ -114,7 +115,7 @@ const handleStatusChange = (goodsId) => {
   goodsChangeStatus({ id: goodsId}).then(res => {
       if (cns.$successCode(res.code)) {
           cns.$message.success(res.message)
-          getData(pageInfo.currentPage)
+          getData(pageInfo.current_page)
       } else {
           cns.$message.error(res.message)
       }
@@ -220,11 +221,10 @@ onMounted( () => {
                 </el-form-item>
             </el-form>
         </el-header>
-        <el-table
+        <PublicPageTable
             :data="tableData"
-            stripe
-            border
             v-loading="loading"
+            :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="商品ID" prop="id"></el-table-column>
             <el-table-column label="分类" prop="category.name"></el-table-column>
@@ -263,9 +263,7 @@ onMounted( () => {
                     <el-button link type="primary" size="large" @click="openDetailView(scope.row.id)">编辑</el-button>
                 </template>
             </el-table-column>
-        </el-table>
-        <!-- 添加分页组件 -->
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+        </PublicPageTable>
     </div>
 </template>
 
