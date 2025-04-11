@@ -3,10 +3,12 @@
 namespace App\Services\Pay;
 
 use App\Enums\PayFormEnum;
+use App\Enums\RouteEnum;
 use App\Http\Dao\TransactionDao;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\ShopConfig;
+use App\Services\RouteService;
 use App\Utils\Wechat\WechatPayUtil;
 
 class WechatPayOrderService implements PayOrderInterface
@@ -57,12 +59,11 @@ class WechatPayOrderService implements PayOrderInterface
                 break;
 
             case PayFormEnum::PAY_FORM_H5:
-                // todo operate: H5支付成功的地址
                 $pay_info = $wechat_pay_util->h5Pay(
                     shop_config(ShopConfig::SHOP_NAME).'订单支付',
                     $transaction->transaction_no,
                     $order->order_amount,
-                    ''
+                    app(RouteService::class)->getRoutePath(RouteEnum::PAY_SUCCESS, ['no' => $order->no])
                 );
 
                 break;
