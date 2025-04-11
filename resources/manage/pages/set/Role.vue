@@ -12,10 +12,10 @@
                 </el-form-item>
             </el-form>
         </el-header>
-        <el-table
+        <PublicPageTable
             :data="tableData"
-            stripe border
             v-loading="loading"
+            :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="角色名称" prop="display_name"></el-table-column>
@@ -39,9 +39,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-        </el-table>
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
-
+        </PublicPageTable>
         <el-dialog
             width="700" center :before-close="closeStoreDialog"
             :close-on-click-modal="false"
@@ -87,7 +85,7 @@
 import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { Plus, Search } from '@element-plus/icons-vue';
-import Page from '@/components/common/Pagination.vue'
+import PublicPageTable from '@/components/common/PublicPageTable.vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 

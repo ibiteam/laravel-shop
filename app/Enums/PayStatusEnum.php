@@ -9,6 +9,7 @@ enum PayStatusEnum: int
         return match ($this) {
             self::PAY_WAIT => '未付款',
             self::PAYED => '已付款',
+            self::PARTIAL => '已付款(部分)',
         };
     }
 
@@ -22,8 +23,10 @@ enum PayStatusEnum: int
         return match ($source) {
             0 => self::PAY_WAIT,
             1 => self::PAYED,
+            2 => self::PARTIAL,
         };
     }
     case PAY_WAIT = 0; // 未支付
     case PAYED = 1; // 已支付
+    case PARTIAL = 2; // 部分支付
 }

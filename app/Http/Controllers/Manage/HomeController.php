@@ -100,7 +100,7 @@ class HomeController extends BaseController
         $collect_permission_ids = array_column($collect_permissions, 'id');
         $menus = $permission_dao->fetchAndFormatPermissions($admin_user, config('auth.manage.guard'), $collect_permission_ids);
 
-        return $this->success(['collect_permissions' => $collect_permissions, 'menus' => $menus]);
+        return $this->success(['collect_permissions' => $collect_permissions, 'menus' => $permission_dao->buildTree($menus, 'index')]);
     }
 
     /**

@@ -99,7 +99,7 @@ class PermissionDao
             ->toArray();
     }
 
-    private function buildTree(array $data, string $primary_key = 'id', int $parent_id = 0, int $level = 0): array
+    public function buildTree(array $data, string $primary_key = 'id', int $parent_id = 0, int $level = 0): array
     {
         $response = [];
 

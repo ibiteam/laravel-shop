@@ -243,7 +243,7 @@ import { nextTick, onMounted, ref, reactive, onUnmounted, computed,getCurrentIns
 const cns = getCurrentInstance().appContext.config.globalProperties
 import * as echarts from 'echarts'
 import $public from '@/utils/public'
-import {getConfigAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
+import {getCollectMenuAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
 import { useRoute,useRouter } from 'vue-router';
 const route = useRoute()
 const router =  useRouter()
@@ -364,10 +364,11 @@ const closeCollect = () => {
     searchtools.value = ''
 }
 const openCollect = () => {
-    getConfigAxios().then(res => {
+    getCollectMenuAxios().then(res => {
         if (cns.$successCode(res.code)) {
             menus.value = res.data.menus
             searchMenus.value = res.data.menus
+            my_collect.value = res.data.collect_permissions
             collectionVisible.value = true
             setTimeout(() => {
                 searchtoolsRef.value.focus()
@@ -460,7 +461,7 @@ const getData = () => {
 }
 
 const toPage = (item) => {
-    if (item.src){
+    if (item.name){
         router.push({name:item.name})
     }
 }
@@ -853,6 +854,7 @@ onUnmounted(() => {
     }
     .collection-box .menu-listRouter {
         height: 30px;
+        align-items: center;
         border-radius: 10px;
         padding: 0 10px;
         margin-left: 20px;

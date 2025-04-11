@@ -51,6 +51,25 @@ class WechatPayUtil
     }
 
     /**
+     * 查询订单支付信息.
+     *
+     *
+     * @throws \Exception
+     */
+    public function queryOrder(string $out_trade_no): array
+    {
+        try {
+            return $this->application->getClient()->get("/v3/pay/transactions/out-trade-no/$out_trade_no", [
+                'mchid' => $this->application->getMerchant()->getMerchantId(),
+            ])->toArray();
+        } catch (\Throwable $throwable) {
+            Log::error('微信支付查询订单失败：'.$throwable->getMessage(), $throwable->getTrace());
+
+            throw new \Exception('微信支付查询订单失败');
+        }
+    }
+
+    /**
      * V3 H5网页版支付.
      *
      * @throws \Exception

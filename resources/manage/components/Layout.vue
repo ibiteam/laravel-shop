@@ -203,6 +203,9 @@ watch(() => route.path,(to, from) => {
     }
     addViewTags()
     moveToCurrentTag()
+    nextTick(()=>{
+        checkMenuActive()
+    })
 })
 
 watch(() => visible.value,(value) => {
