@@ -2,7 +2,11 @@
 
 namespace App\Utils\Wechat;
 
+use App\Enums\PayFormEnum;
+use EasyWeChat\Kernel\Contracts\Server as WechatPayServer;
+use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
 use EasyWeChat\Pay\Application;
+use EasyWeChat\Pay\Server;
 use Illuminate\Support\Facades\Log;
 
 class WechatPayUtil
@@ -12,12 +16,18 @@ class WechatPayUtil
     /**
      * @throws \Exception
      */
-    public function __construct(?array $config)
+    public function __construct(?array $config, PayFormEnum $pay_form_enum)
     {
+        $app_id = match ($pay_form_enum) {
+            PayFormEnum::PAY_FORM_MINI => $config['mini_wechat_pay_app_id'],
+            PayFormEnum::PAY_FORM_APP => $config['app_wechat_pay_app_id'],
+            default => $config['service_wechat_pay_app_id']
+        };
+
         $this->initializeApplication([
-            'app_id' => $config['app_id'],
+            'app_id' => $app_id,
             'mch_id' => $config['mch_id'],
-            'notify_url' => $config['notify_url'],
+            'notify_url' => route('notify.wechat.pay'),
             'private_key' => $config['private_key'],
             'certificate' => $config['certificate'],
             'v2_secret_key' => $config['v2_secret_key'],
@@ -26,6 +36,18 @@ class WechatPayUtil
                 'throw' => false,
             ],
         ]);
+    }
+
+    /**
+     * 服务器端回调.
+     *
+     * @throws InvalidArgumentException
+     * @throws \ReflectionException
+     * @throws \Throwable
+     */
+    public function server(): Server|WechatPayServer
+    {
+        return $this->application->getServer();
     }
 
     /**
