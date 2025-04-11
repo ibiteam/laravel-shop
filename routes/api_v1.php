@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\CommonController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
+use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
 use App\Http\Controllers\Api\V1\Order\EvaluateController;
@@ -18,6 +19,13 @@ use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use App\Http\Controllers\Api\V1\UploadController;
 use Illuminate\Support\Facades\Route;
+
+// 首页
+Route::get('home', [HomeController::class, 'home']);
+// 搜索
+Route::get('search', [HomeController::class, 'search']);
+// 为您推荐
+Route::get('recommend', [HomeController::class, 'recommend']);
 
 /* 发送短信 */
 Route::post('sms-action', [SmsController::class, 'handleAction']);

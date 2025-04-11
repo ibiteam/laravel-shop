@@ -57,7 +57,7 @@ class HotZoneComponent extends PageComponent
     public function validate($data): array
     {
         $validator = Validator::make($data, [
-            'id' => 'nullable|integer|exists:\App\Models\AppDecorationItem,id',
+            'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_HOT_ZONE,
             'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,

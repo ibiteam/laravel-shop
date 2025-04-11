@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Models\Goods;
 use App\Utils\AppServiceConfig\IbiChatUtil;
 use App\Utils\Constant;
 use App\Utils\Md5Utils;
@@ -17,7 +18,7 @@ class ChatController extends BaseController
     // 获取客服地址
     public function chatUrl(Request $request)
     {
-        $goods_id = $request->get('goods_id',0);
+        $goods_no = $request->get('no','');
         $source_url = $request->get('source_url','');
         $url = '';
 //        $platform_is_show = shop_config(ShopConfig::SERVER_IS_SHOW);
@@ -48,7 +49,7 @@ class ChatController extends BaseController
                 ];
             }
 
-            if ($goods_id) {
+            if ($goods_no && $goods_id = Goods::query()->whereNo($goods_no)->value('id')) {
                 $data['goods_id'] = $goods_id;
             }
             $data['seller_id'] = Constant::ZERO;

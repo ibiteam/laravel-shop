@@ -19,9 +19,9 @@ class WechatPayUtil
     public function __construct(?array $config, PayFormEnum $pay_form_enum)
     {
         $app_id = match ($pay_form_enum) {
-            PayFormEnum::PAY_FORM_MINI => $config['mini_wechat_pay_app_id'],
+            PayFormEnum::PAY_FORM_MINI => config('easywechat.mini_app.default.app_id'),
             PayFormEnum::PAY_FORM_APP => $config['app_wechat_pay_app_id'],
-            default => $config['service_wechat_pay_app_id']
+            default => config('easywechat.official_account.default.app_id')
         };
 
         $this->initializeApplication([

@@ -173,8 +173,6 @@ class PaymentController extends BaseController
             'v2_secret_key' => 'required|string',
             'private_key' => 'required|string',
             'certificate' => 'required|string',
-            'service_wechat_pay_app_id' => 'nullable|string',
-            'mini_wechat_pay_app_id' => 'nullable|string',
             'app_wechat_pay_app_id' => 'nullable|string',
         ], [], [
             'mic_id' => '商户号',
@@ -182,8 +180,6 @@ class PaymentController extends BaseController
             'v2_secret_key' => '商户密钥（V2）',
             'private_key' => '商户私钥',
             'certificate' => '商户证书',
-            'service_wechat_pay_app_id' => '微信支付服务号APPID',
-            'mini_wechat_pay_app_id' => '微信支付小程序APPID',
             'app_wechat_pay_app_id' => '微信支付应用程序(App)APPID',
         ]);
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Plus, RefreshLeft, Search } from '@element-plus/icons-vue';
+import { Plus, QuestionFilled, RefreshLeft, Search } from '@element-plus/icons-vue';
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { paymentMethodChangeField, paymentMethodEdit, paymentMethodIndex, paymentMethodUpdate } from '@/api/set';
@@ -326,14 +326,18 @@ onMounted(() => {
                         </el-upload>
                     </el-form-item>
                     <template v-if="detailForm.alias === 'wechat'">
-                        <el-form-item label="微信支付服务号APP_ID" prop="config.service_wechat_pay_app_id">
-                            <el-input v-model="detailForm.config.service_wechat_pay_app_id" />
-                        </el-form-item>
-                        <el-form-item label="微信支付小程序APP_ID" prop="config.mini_wechat_pay_app_id">
-                            <el-input v-model="detailForm.config.mini_wechat_pay_app_id" />
-                        </el-form-item>
                         <el-form-item label="微信支付应用程序(App)APP_ID" prop="config.app_wechat_pay_app_id">
-                            <el-input v-model="detailForm.config.app_wechat_pay_app_id" />
+                            <div class="s-flex ai-ct" style="width: 100%;">
+                                <el-input v-model="detailForm.config.app_wechat_pay_app_id" />
+                                <el-popover
+                                    class="box-item"
+                                    content="APPID是商户移动应用唯一标识，在开放平台(移动应用)申请。此处需填写与 商户号 完成绑定的appid"
+                                    placement="top-end">
+                                    <template #reference>
+                                        <el-icon><QuestionFilled /></el-icon>
+                                    </template>
+                                </el-popover>
+                            </div>
                         </el-form-item>
                         <el-form-item label="商户号" prop="config.mch_id" :rules="[{required: true, message: '商户号不能为空', trigger: 'blur'}]">
                             <el-input v-model="detailForm.config.mch_id" />
