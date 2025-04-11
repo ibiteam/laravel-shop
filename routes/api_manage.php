@@ -14,6 +14,7 @@ Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
     Route::prefix('home')->group(function () {
         Route::get('config', [HomeController::class, 'config']);  // 初始化配置
         Route::get('dashboard', [HomeController::class, 'dashboard']);  // 首页数据
+        Route::get('collect_manage', [HomeController::class, 'collectManage']);  // 收藏管理
         Route::post('collect_menu', [HomeController::class, 'collectMenu']); // 收藏菜单
         Route::get('clear_cache', [HomeController::class, 'clearCache']);   // 清除缓存
     });

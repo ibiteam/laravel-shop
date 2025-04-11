@@ -78,7 +78,7 @@ class PermissionDao
     /**
      * 查询并格式化权限数据.
      */
-    private function fetchAndFormatPermissions(AdminUser $admin_user, string $guard_name, array $collect_permission_ids): array
+    public function fetchAndFormatPermissions(AdminUser $admin_user, string $guard_name, array $collect_permission_ids): array
     {
         return $admin_user->getPermissionsViaRoles()
             ->where('is_left_nav', Permission::IS_LEFT_NAV)

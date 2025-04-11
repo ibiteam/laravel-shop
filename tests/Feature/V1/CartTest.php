@@ -7,7 +7,6 @@ it('cart list', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart number', function () {
@@ -17,7 +16,6 @@ it('cart number', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart store', function () {
@@ -31,7 +29,6 @@ it('cart store', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart destroy', function () {
@@ -43,7 +40,6 @@ it('cart destroy', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 
@@ -59,7 +55,6 @@ it('cart change number', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart change check', function () {
@@ -73,7 +68,6 @@ it('cart change check', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart move collect', function () {
@@ -85,7 +79,6 @@ it('cart move collect', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 it('cart empty invalid', function () {
@@ -95,7 +88,6 @@ it('cart empty invalid', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 
@@ -106,5 +98,4 @@ it('cart place order', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });

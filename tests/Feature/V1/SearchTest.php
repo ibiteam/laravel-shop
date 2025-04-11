@@ -15,7 +15,6 @@ it('search goods', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });
 
 
@@ -29,5 +28,4 @@ it('search keywords', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
-    dump($res);
 });

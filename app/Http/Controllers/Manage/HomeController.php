@@ -6,11 +6,12 @@ use App\Enums\CacheNameEnum;
 use App\Enums\RefererEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\AccessRecordDao;
+use App\Http\Dao\CollectDao;
 use App\Http\Dao\PermissionDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AccessStatistic;
 use App\Models\Collect;
-use App\Models\Permission;
+use App\Models\Order;
 use App\Models\ShopConfig;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class HomeController extends BaseController
     /**
      * 初始化配置.
      */
-    public function config(Request $request, PermissionDao $permission_dao, ShopConfigDao $shop_config_dao)
+    public function config(PermissionDao $permission_dao, ShopConfigDao $shop_config_dao)
     {
         $admin_user = $this->adminUser();
 
@@ -49,13 +50,13 @@ class HomeController extends BaseController
     /**
      * 首页数据.
      */
-    public function dashboard(AccessRecordDao $access_record_dao)
+    public function dashboard(AccessRecordDao $access_record_dao, CollectDao $collect_dao)
     {
         $admin_user = $this->adminUser();
 
         // 数量统计 todo
         $number_data['user_number'] = User::query()->count();  // 用户数
-        $number_data['order_number'] = 100;  // 订单数
+        $number_data['order_number'] = Order::query()->count();  // 订单数
         $number_data['total_transaction_value'] = 10000;  // 总交易额
 
         // 用户数据
@@ -71,20 +72,10 @@ class HomeController extends BaseController
         }
 
         // 我的收藏
-        $myCollect = Collect::query()->with('permission:id,name,display_name,icon')
-            ->whereHas('permission')
-            ->whereAdminUserId($admin_user->id)->orderByDesc('updated_at')
-            ->limit(12)->get()->map(function (Collect $item) {
-                return [
-                    'id' => $item->permission_id,
-                    'title' => $item->permission->display_name,
-                    'name' => $item->permission->name,
-                    'icon' => $item->permission->icon,
-                ];
-            });
+        $myCollect = $collect_dao->getListByAdminUserId($admin_user->id, 12);
 
         // 最近访问
-        $accessRecord = $access_record_dao->getListByAdminUserId($admin_user->id);
+        $accessRecord = $access_record_dao->getListByAdminUserId($admin_user->id, 12);
 
         $data['number_data'] = $number_data;
         $data['access_statistic'] = $accessStatistic;
@@ -96,9 +87,26 @@ class HomeController extends BaseController
     }
 
     /**
-     * 收藏菜单.
+     * 收藏管理.
      */
-    public function collectMenu(Request $request)
+    public function collectManage(PermissionDao $permission_dao, CollectDao $collect_dao)
+    {
+        $admin_user = $this->adminUser();
+
+        // 收藏列表
+        $collect_permissions = $collect_dao->getListByAdminUserId($admin_user->id);
+
+        // 收藏的权限菜单
+        $collect_permission_ids = array_column($collect_permissions, 'id');
+        $menus = $permission_dao->fetchAndFormatPermissions($admin_user, config('auth.manage.guard'), $collect_permission_ids);
+
+        return $this->success(['collect_permissions' => $collect_permissions, 'menus' => $menus]);
+    }
+
+    /**
+     * 收藏(取消收藏)菜单.
+     */
+    public function collectMenu(Request $request, CollectDao $collect_dao)
     {
         $admin_user = $this->adminUser();
 
@@ -108,32 +116,11 @@ class HomeController extends BaseController
             ], [], [
                 'id' => '菜单ID',
             ]);
-            $menu_id = $validated['id'];
-            $menu = Permission::query()->whereId($menu_id)->first();
+            $permission_id = $validated['id'];
 
-            if (! $menu) {
-                throw new BusinessException('菜单不存在');
-            }
+            $collect_dao->createOrDelete($admin_user, $permission_id);
 
-            $permission_codes = $admin_user->getAllPermissions()->pluck('name')->flip();
-
-            if (! isset($permission_codes[$menu->name])) {
-                throw new BusinessException('没有权限');
-            }
-
-            $collect = Collect::query()->whereAdminUserId($admin_user->id)->wherePermissionId($menu_id)->first();
-
-            if ($collect) {
-                $collect->delete();
-
-                return $this->success('取消收藏成功');
-            }
-            Collect::create([
-                'admin_user_id' => $admin_user->id,
-                'permission_id' => $menu_id,
-            ]);
-
-            return $this->success('收藏成功');
+            return $this->success('操作成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

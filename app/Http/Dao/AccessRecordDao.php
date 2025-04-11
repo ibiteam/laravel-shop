@@ -30,7 +30,7 @@ class AccessRecordDao
     /**
      * 获取最新访问记录.
      */
-    public function getListByAdminUserId(int $admin_user_id, int $limit = 12)
+    public function getListByAdminUserId(int $admin_user_id, int $limit = 0): array
     {
         $permission_ids = AccessRecord::query()
             ->whereHas('permission')
@@ -46,8 +46,9 @@ class AccessRecordDao
             ->whereIsLeftNav(Permission::IS_LEFT_NAV)
             ->whereIn('id', $permission_ids)
             ->orderByRaw('FIND_IN_SET(id,?)', [implode(',', $permission_ids)])
-            ->limit($limit)
-            ->get()->map(function (Permission $permission) {
+            ->when($limit, function ($query, $limit) {
+                return $query->limit($limit);
+            })->get()->map(function (Permission $permission) {
                 return [
                     'id' => $permission->id,
                     'title' => $permission->display_name,
