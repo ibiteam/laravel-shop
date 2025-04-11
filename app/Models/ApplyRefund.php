@@ -76,11 +76,11 @@ class ApplyRefund extends Model
      * 进行中的申请售后状态汇总 map.
      */
     public static array $statusInProgressMap = [
-        ApplyRefundStatusEnum::NOT_PROCESSED,
-        ApplyRefundStatusEnum::REFUSE,
-        ApplyRefundStatusEnum::REFUSE_EXAMINE,
-        ApplyRefundStatusEnum::BUYER_SEND_SHIP,
-        ApplyRefundStatusEnum::SELLER_RECEIPT,
+        ApplyRefundStatusEnum::NOT_PROCESSED->value,
+        ApplyRefundStatusEnum::REFUSE->value,
+        ApplyRefundStatusEnum::REFUSE_EXAMINE->value,
+        ApplyRefundStatusEnum::BUYER_SEND_SHIP->value,
+        ApplyRefundStatusEnum::SELLER_RECEIPT->value,
     ];
 
     protected $guarded = [];

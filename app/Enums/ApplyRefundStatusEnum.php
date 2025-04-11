@@ -7,10 +7,10 @@ enum ApplyRefundStatusEnum: int
     public function getLabel(): string
     {
         return match ($this) {
-            self::NOT_PROCESSED => '待处理',
-            self::REFUSE => '已拒绝退款',
-            self::REFUSE_EXAMINE => '退货审核成功 待买家发货',
-            self::BUYER_SEND_SHIP => '买家已发货 待卖家收货',
+            self::NOT_PROCESSED => '退款待处理',
+            self::REFUSE => '已经拒绝退款',
+            self::REFUSE_EXAMINE => '退货审核成功',
+            self::BUYER_SEND_SHIP => '买家已发货',
             self::SELLER_RECEIPT => '卖家已收货',
             self::REFUND_SUCCESS => '退款成功',
             self::REFUND_CLOSE => '退款关闭',
@@ -34,9 +34,8 @@ enum ApplyRefundStatusEnum: int
             6 => self::REFUND_CLOSE,
         };
     }
-
-    case NOT_PROCESSED = 0; // 待处理
-    case REFUSE = 1; // 已拒绝退款
+    case NOT_PROCESSED = 0; // 退款待处理
+    case REFUSE = 1; // 已经拒绝退款
     case REFUSE_EXAMINE = 2; // 退货审核成功 待买家发货
     case BUYER_SEND_SHIP = 3; // 买家已发货 待卖家收货
     case SELLER_RECEIPT = 4; // 卖家已收货

@@ -33,7 +33,7 @@ class ApplyRefundService
             throw new BusinessException('订单未找到');
         }
 
-        if ($order->order_status != OrderStatusEnum::UNCONFIRMED || $order->pay_status != PayStatusEnum::PAYED) {
+        if ($order->order_status != OrderStatusEnum::UNCONFIRMED->value || $order->pay_status != PayStatusEnum::PAYED->value) {
             // 未确认订单或未付款订单 不能申请售后
             throw new BusinessException('订单状态不允许申请售后');
         }
@@ -54,7 +54,7 @@ class ApplyRefundService
             ],
         ];
 
-        if ($order->pay_status != PayStatusEnum::PAY_WAIT) {
+        if ($order->pay_status != PayStatusEnum::PAY_WAIT->value) {
             $tmp_refund_type[] = [
                 'label' => '我要退货退款',
                 'value' => ApplyRefund::TYPE_REFUND_GOODS,
@@ -180,13 +180,13 @@ class ApplyRefundService
                 throw new BusinessException('申请售后不存在');
             }
 
-            if ($apply_refund->status != ApplyRefundStatusEnum::REFUSE) {
+            if ($apply_refund->status != ApplyRefundStatusEnum::REFUSE->value) {
                 throw new BusinessException('请先等待商家操作');
             }
 
             $order = $apply_refund->order;
 
-            if (! ($order instanceof Order) || $order->pay_status != PayStatusEnum::PAYED) {
+            if (! ($order instanceof Order) || $order->pay_status != PayStatusEnum::PAYED->value) {
                 throw new BusinessException('订单已不支持退款');
             }
 
@@ -200,7 +200,7 @@ class ApplyRefundService
             $count = $apply_refund->count + 1;
         } else {
             // 新增申请售后
-            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->wherePayStatus(PayStatusEnum::PAYED)->first();
+            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
 
             if (! $order) {
                 throw new BusinessException('订单已不支持退款');
@@ -272,7 +272,7 @@ class ApplyRefundService
             'order_id' => $order->id,
             'order_detail_id' => $order_detail->id,
             'type' => $type,
-            'status' => ApplyRefundStatusEnum::NOT_PROCESSED,
+            'status' => ApplyRefundStatusEnum::NOT_PROCESSED->value,
             'money' => $money,
             'number' => $number,
             'reason_id' => $reason_id,
@@ -340,7 +340,7 @@ class ApplyRefundService
     }
 
     /**
-     * 根据 订单id 订单明细id 获取申请售后信息.
+     * 根据 申请售后id 或 订单id,订单明细id 获取申请售后信息.
      *
      * @throws BusinessException
      */
@@ -415,11 +415,11 @@ class ApplyRefundService
             throw new BusinessException('您的撤销次数已经使用，无法撤销');
         }
 
-        if (in_array($apply_refund->status, [ApplyRefundStatusEnum::REFUSE, ApplyRefundStatusEnum::REFUND_SUCCESS, ApplyRefundStatusEnum::REFUND_CLOSE])) {
+        if (in_array($apply_refund->status, [ApplyRefundStatusEnum::REFUSE->value, ApplyRefundStatusEnum::REFUND_SUCCESS->value, ApplyRefundStatusEnum::REFUND_CLOSE->value])) {
             throw new BusinessException('退款状态不支持撤销');
         }
 
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE;
+        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE->value;
         $apply_refund->is_revoke = ApplyRefund::REVOKE_YES;
         $apply_refund->result = '';
         $apply_refund->save();
@@ -462,7 +462,7 @@ class ApplyRefundService
         $from_init = null;
         $address = null;
 
-        if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE) {
+        if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
             $temp_comment = '拒绝原因：'.$apply_refund->result;
 
             [$refund_max_amount, $refund_max_number] = app(ApplyRefundDao::class)->getMaxAmountAndNumber($order_detail, $order, $user, $apply_refund->id);
@@ -471,15 +471,15 @@ class ApplyRefundService
                 'refund_max_amount' => $refund_max_amount,
                 'refund_max_number' => $refund_max_number,
             ];
-        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE) {
+        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
             $apply_refund_shipping = ApplyRefundShip::query()->whereApplyRefundId($apply_refund->id)->first();
 
             if ($apply_refund_shipping) {
                 $address['apply_refund_shipping'] = $apply_refund_shipping->toArray();
             }
-        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUND_SUCCESS) {
+        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUND_SUCCESS->value) {
             $temp_comment = '款项已原路退回 ¥'.$apply_refund->money;
-        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUND_CLOSE) {
+        } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUND_CLOSE->value) {
             $temp_comment = '卖家已发货，退款流程关闭，交易正常进行';
             $apply_refund_log = ApplyRefundLog::whereApplyRefundId($apply_refund->id)->orderByDesc('id')->first();
 

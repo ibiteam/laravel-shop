@@ -21,12 +21,11 @@ class ApplyRefundDao
     public function verifyApply(User $user, string $order_no, int $order_detail_id): void
     {
         $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
-
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
         }
 
-        if ($order->pay_status < PayStatusEnum::PAYED) {
+        if ($order->pay_status < PayStatusEnum::PAYED->value) {
             throw new BusinessException('订单未支付');
         }
 
@@ -57,7 +56,7 @@ class ApplyRefundDao
      */
     public function checkTimeliness(Order $order): void
     {
-        if ($order->ship_status == ShippingStatusEnum::RECEIVED) {
+        if ($order->ship_status == ShippingStatusEnum::RECEIVED->value) {
             // TODO 配置项：售后时效（天）
             $sale_service_time = 15;
 
@@ -80,20 +79,20 @@ class ApplyRefundDao
         if ($apply_refund_id > 0) {
             // 修改申请时 不获取已拒绝的信息
             $apply_refunds = $query->whereIn('status', [
-                ApplyRefundStatusEnum::NOT_PROCESSED,
-                ApplyRefundStatusEnum::REFUSE_EXAMINE,
-                ApplyRefundStatusEnum::BUYER_SEND_SHIP,
-                ApplyRefundStatusEnum::SELLER_RECEIPT,
-                ApplyRefundStatusEnum::REFUND_SUCCESS,
+                ApplyRefundStatusEnum::NOT_PROCESSED->value,
+                ApplyRefundStatusEnum::REFUSE_EXAMINE->value,
+                ApplyRefundStatusEnum::BUYER_SEND_SHIP->value,
+                ApplyRefundStatusEnum::SELLER_RECEIPT->value,
+                ApplyRefundStatusEnum::REFUND_SUCCESS->value,
             ])->select(['money', 'number'])->get();
         } else {
             $apply_refunds = $query->whereIn('status', [
-                ApplyRefundStatusEnum::NOT_PROCESSED,
-                ApplyRefundStatusEnum::REFUSE,
-                ApplyRefundStatusEnum::REFUSE_EXAMINE,
-                ApplyRefundStatusEnum::BUYER_SEND_SHIP,
-                ApplyRefundStatusEnum::SELLER_RECEIPT,
-                ApplyRefundStatusEnum::REFUND_SUCCESS,
+                ApplyRefundStatusEnum::NOT_PROCESSED->value,
+                ApplyRefundStatusEnum::REFUSE->value,
+                ApplyRefundStatusEnum::REFUSE_EXAMINE->value,
+                ApplyRefundStatusEnum::BUYER_SEND_SHIP->value,
+                ApplyRefundStatusEnum::SELLER_RECEIPT->value,
+                ApplyRefundStatusEnum::REFUND_SUCCESS->value,
             ])->select(['money', 'number'])->get();
         }
 
