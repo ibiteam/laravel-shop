@@ -44,7 +44,7 @@ class PageDefaultDict
                     ], // 固定组件
                     'fixed_name' => [
                         AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-                        AppDecorationItem::COMPONENT_NAME_LABEL,
+//                        AppDecorationItem::COMPONENT_NAME_LABEL,
                         AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                         AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
                     ]

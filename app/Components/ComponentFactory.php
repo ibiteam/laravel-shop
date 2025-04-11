@@ -27,7 +27,7 @@ class ComponentFactory
     {
         $components = [
             AppDecorationItem::COMPONENT_NAME_HOME_NAV => HomeNavComponent::class, // 导航搜索
-            AppDecorationItem::COMPONENT_NAME_LABEL => LabelComponent::class, // 导航搜索
+//            AppDecorationItem::COMPONENT_NAME_LABEL => LabelComponent::class, // 底部菜单栏
             AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT => AdvertComponent::class, // 弹屏广告
             AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT => AdvertComponent::class, // 悬浮广告
             AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL => HorizontalCarouselComponent::class, // 轮播图
