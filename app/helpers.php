@@ -6,7 +6,6 @@ use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
 use App\Models\SensitiveWord;
 use App\Models\ShopConfig;
-use App\Services\MobileRouterService;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
@@ -183,24 +182,6 @@ if (! function_exists('is_ios_request')) {
     }
 }
 
-if (! function_exists('source_port')) {
-    /**
-     * 获取来源.
-     */
-    function source_port(): string
-    {
-        if (is_miniProgram_request()) {
-            return MobileRouterService::SOURCE_MINI;
-        } elseif (is_m_request()) {
-            return MobileRouterService::SOURCE_H5;
-        } elseif (is_app_request()) {
-            return MobileRouterService::SOURCE_APP;
-        }
-
-        return '';
-    }
-}
-
 if (! function_exists('admin_operation_log')) {
     /**
      * 记录后台管理员操作日志.
@@ -336,6 +317,7 @@ if (! function_exists('chinese_number_down_format')) {
         return (string) (floor($number / $fixed_number).$unit);
     }
 }
+
 if (! function_exists('get_flow_sn')) {
     /**
      * 获取流水号.
