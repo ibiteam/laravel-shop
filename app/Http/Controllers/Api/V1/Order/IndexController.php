@@ -45,7 +45,13 @@ class IndexController extends BaseController
             ->with(['detail', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
             ->latest()
             ->whereUserId($current_user->id)
-            ->when(! is_null($keywords), fn (Builder $query) => $query->whereLike('no', "%$keywords%"))
+            ->when(! is_null($keywords), function (Builder $query) use ($keywords) {
+                $query->where(function (Builder $query) use ($keywords) {
+                    $query->whereLike('no', "%$keywords%")->orWhereHas('detail', function (Builder $query) use ($keywords) {
+                        $query->whereLike('goods_name', "%$keywords%")->orWhereLike('goods_no', "%$keywords%");
+                    });
+                });
+            })
             ->when($type === self::SEARCH_NOT_PAY, function (Builder $query) {
                 $query
                     ->where('order_status', OrderStatusEnum::CONFIRMED)

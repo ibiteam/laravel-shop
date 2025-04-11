@@ -10,7 +10,7 @@
 
 | 字段       | 字段类型    | 是否必须 | 说明                  |
 |----------|---------|------|---------------------|
-| keywords | Integer | Y    | 收货地址ID              |
+| keywords | String  | N    | 关键词：订单编号、商品名称、商品货号  |
 | type     | String  | N    | 类型，详见 `type_enum`枚举 |
 | page     | Integer | Y    | 页码                  |
 | number   | Integer | Y    | 每页条数                |
