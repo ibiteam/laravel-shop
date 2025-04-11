@@ -2,7 +2,7 @@
 import { Plus, Search } from '@element-plus/icons-vue';
 import Page from '@/components/common/Pagination.vue'
 import { routerIndex, routerStore, routerChangeShow, routerCategories } from '@/api/set.js';
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -66,7 +66,11 @@ const openStoreDialog = (row = {}) => {
         submitForm.is_show = 1;
     }
     storeDialogVisible.value = true;
+    nextTick(() => {
+        submitFormRef.value.clearValidate();
+    });
 };
+
 const closeStoreDialog = () => {
     storeDialogTitle.value = '';
     submitForm.id = 0;
@@ -239,7 +243,7 @@ onMounted(() => {
                         <el-input v-model="submitForm.name" />
                     </el-form-item>
                     <el-form-item label="别名" prop="alias">
-                        <el-input v-model="submitForm.alias" />
+                        <el-input v-model="submitForm.alias" :disabled = 'submitForm.id > 0'/>
                     </el-form-item>
                     <el-form-item label="H5地址" prop="h5_url">
                         <el-input v-model="submitForm.h5_url" />

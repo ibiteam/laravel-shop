@@ -38,7 +38,7 @@ class RouterController extends BaseController
                 'name' => $router->name,
                 'alias' => $router->alias,
                 'h5_url' => $router->h5_url,
-                'params' => $router->params,
+                'params' => $router->params ? json_encode($router->params, JSON_UNESCAPED_UNICODE) : '',
                 'is_show' => $router->is_show,
                 'sort' => $router->sort,
                 'created_at' => $router->created_at->format('Y-m-d H:i:s'),
@@ -116,11 +116,23 @@ class RouterController extends BaseController
                 }
             }
 
+            $params = $validated['params'] ?? null;
+            if ($params !== null) {
+                $decodedParams = json_decode($params, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new BusinessException('额外参数必须是有效的 JSON 格式');
+                }
+                if (!is_array($decodedParams) || array_values($decodedParams) === $decodedParams) {
+                    throw new BusinessException('额外参数必须是 JSON 键值对');
+                }
+                $params = $decodedParams;
+            }
+
             $router->router_category_id = $validated['router_category_id'];
             $router->name = $validated['name'];
             $router->alias = $validated['alias'];
             $router->h5_url = $validated['h5_url'];
-            $router->params = $validated['params'] ?? '';
+            $router->params = $params;
             $router->sort = $validated['sort'] ?? 0;
             $router->is_show = intval($validated['is_show']);
 

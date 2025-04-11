@@ -1,7 +1,7 @@
 <script setup>
 import { Plus, Search } from '@element-plus/icons-vue';
 import { routerCategoryIndex, routerCategoryInfo, routerCategoryStore, routerCategoryDestroy, routerCategoryChangeShow, routerCategoryGetPages } from '@/api/set.js';
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -66,6 +66,9 @@ const openStoreDialog = (categoryId = 0) => {
     });
 
     storeDialogVisible.value = true;
+    nextTick(() => {
+        submitFormRef.value.clearValidate();
+    });
 };
 
 const closeStoreDialog = () => {
@@ -228,6 +231,7 @@ onMounted(() => {
                     </el-switch>
                 </template>
             </el-table-column>
+            <!--<el-table-column label="排序" prop="sort"></el-table-column>-->
             <el-table-column label="创建时间" prop="created_at"></el-table-column>
             <el-table-column label="操作">
                 <template #default="scope">
@@ -251,7 +255,7 @@ onMounted(() => {
                         <el-input v-model="submitForm.name" />
                     </el-form-item>
                     <el-form-item label="别名" prop="alias">
-                        <el-input v-model="submitForm.alias" />
+                        <el-input v-model="submitForm.alias" :disabled = 'submitForm.id > 0' />
                     </el-form-item>
                     <el-form-item label="类型" prop="type">
                         <el-radio v-model="submitForm.type" label="1" v-if="submitForm.parent_id === 0">链接</el-radio>

@@ -28,6 +28,7 @@ class RouterCategoryController extends BaseController
             ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
             ->with('allChildren')->whereParentId(0)
+            ->orderByDesc('sort')
             ->orderByDesc('id')
             ->get();
 
