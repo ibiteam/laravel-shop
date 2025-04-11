@@ -24,7 +24,7 @@ class WechatPayUtil
             default => config('easywechat.official_account.default.app_id')
         };
 
-        $this->initializeApplication([
+        $this->application = new Application([
             'app_id' => $app_id,
             'mch_id' => $config['mch_id'],
             'notify_url' => route('notify.wechat.pay'),
@@ -36,6 +36,14 @@ class WechatPayUtil
                 'throw' => false,
             ],
         ]);
+    }
+
+    /**
+     * 获取应用实例.
+     */
+    public function application(): ?Application
+    {
+        return $this->application;
     }
 
     /**
@@ -197,22 +205,6 @@ class WechatPayUtil
         $attributes['key'] = $key;
 
         return strtoupper(call_user_func_array('md5', [urldecode(http_build_query($attributes))]));
-    }
-
-    /**
-     * 初始化微信支付.
-     *
-     * @throws \Exception
-     */
-    private function initializeApplication(?array $config): void
-    {
-        try {
-            if (! $this->application instanceof Application) {
-                $this->application = new Application($config);
-            }
-        } catch (\Throwable $ex) {
-            throw new \Exception($ex->getMessage());
-        }
     }
 
     /**
