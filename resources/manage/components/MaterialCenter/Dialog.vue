@@ -141,7 +141,7 @@ const pageInfo = reactive({
     page: 1,
     number: 10,
     total: 0,
-    currentPage: 1,
+    current_page: 1,
     layout: 'total, sizes, prev, pager, next',
 })
 const tableRef = ref(null)
@@ -211,12 +211,12 @@ const checkDir = (id) => {
 
 const handleSizeChange = (val) => {
     //切换一页显示数据条数
-    getMaterialData({page: pageInfo.currentPage, number: val})
+    getMaterialData({page: pageInfo.current_page, number: val})
 }
 
 const handleCurrentChange = (val) => {
     //切换页码
-    getMaterialData({page: val, number: pageInfo.number})
+    getMaterialData({page: val, number: pageInfo.per_page})
 }
 
 
@@ -252,8 +252,8 @@ const getMaterialData = (params = {page: 1, number: 10}) => {
             tableData.value = res.data.list;
             // 更新分页信息
             pageInfo.total = res.data.meta.total;
-            pageInfo.number = Number(res.data.meta.per_page);
-            pageInfo.currentPage = res.data.meta.current_page;
+            pageInfo.per_page = Number(res.data.meta.per_page);
+            pageInfo.current_page = res.data.meta.current_page;
         } else {
             cns.$message.error(res.message)
         }

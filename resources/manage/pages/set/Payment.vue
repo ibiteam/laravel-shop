@@ -41,7 +41,7 @@ const resetSearch = () => {
 const pageInfo = reactive({
     number: 10,
     total: 0,
-    currentPage: 1,
+    current_page: 1,
 })
 
 // 页码改变
@@ -51,22 +51,22 @@ const handleCurrentChange = (val) => {
 
 // 每页条数改变
 const handleSizeChange = (val) => {
-    pageInfo.number = val;
+    pageInfo.per_page = val;
     getData(1);
 }
 
 // 设置分页数据
 const setPageInfo = (meta) => {
     pageInfo.total = meta.total;
-    pageInfo.number = Number(meta.per_page);
-    pageInfo.currentPage = meta.current_page;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
 }
 
 const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    queryParams.number = pageInfo.number;
+    queryParams.number = pageInfo.per_page;
     paymentMethodIndex(queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
@@ -87,7 +87,7 @@ const handleFieldChange = (itemId,field) => {
     paymentMethodChangeField({ id: itemId, field: field }).then(res => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
-            getData(pageInfo.currentPage)
+            getData(pageInfo.current_page)
         } else {
             cns.$message.error(res.message);
         }
@@ -186,7 +186,7 @@ const submitDetailForm = _.throttle(() => {
                 detailSubmitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeDetailDialog();
-                    getData(pageInfo.currentPage);
+                    getData(pageInfo.current_page);
                 } else {
                     cns.$message.error(res.message);
                 }

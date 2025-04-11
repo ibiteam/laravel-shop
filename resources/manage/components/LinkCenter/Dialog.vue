@@ -124,7 +124,7 @@ const pageInfo = reactive({
     page: 1,
     number: 10,
     total: 0,
-    currentPage: 1,
+    current_page: 1,
     layout: 'total, sizes, prev, pager, next',
 })
 const tableRef = ref(null)
@@ -168,12 +168,12 @@ const checkTree = (data) => {
 }
 const handleSizeChange = (val) => {
     //切换一页显示数据条数
-    getLinkTableData({page: pageInfo.currentPage, number: val})
+    getLinkTableData({page: pageInfo.current_page, number: val})
 }
 
 const handleCurrentChange = (val) => {
     //切换页码
-    getLinkTableData({page: val, number: pageInfo.number})
+    getLinkTableData({page: val, number: pageInfo.per_page})
 }
 
 
@@ -231,8 +231,8 @@ const getLinkTableData = (params = {page: 1, number: 10}) => {
                 tableData.value = res.data.list;
                 // 更新分页信息
                 pageInfo.total = res.data.meta.total;
-                pageInfo.number = Number(res.data.meta.per_page);
-                pageInfo.currentPage = res.data.meta.current_page;
+                pageInfo.per_page = Number(res.data.meta.per_page);
+                pageInfo.current_page = res.data.meta.current_page;
             }
         } else {
             cns.$message.error(res.message)
