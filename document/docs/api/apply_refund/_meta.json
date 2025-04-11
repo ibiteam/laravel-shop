@@ -1,0 +1,9 @@
+[
+    "verify",
+    "init",
+    "show",
+    "store",
+    "detail",
+    "log",
+    "revoke"
+]

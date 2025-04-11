@@ -76,5 +76,11 @@
         "name": "pay",
         "label": "支付",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "apply_refund",
+        "label": "申请售后/退款",
+        "collapsed": true
     }
 ]
