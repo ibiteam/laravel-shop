@@ -10,7 +10,7 @@ const cns = getCurrentInstance().appContext.config.globalProperties
 const queryParams = reactive({
     page: 1,
     number: 10,
-    user_id: '1', // 用户id
+    user_id: 0, // 用户id - 从url中获取
     recipient_name: '', // 收货人
 });
 
@@ -80,7 +80,7 @@ const setPageInfo = (meta) => {
 
 const updateForm = () => {
     updateLoading.value = true
-    subFormRef.value.validate((valid, fields) => {
+    subFormRef.value.validate((valid) => {
         if (valid) {
             addressUpdate(subForm.value).then(function (res) {
                 if (res.code === 200) {
@@ -90,7 +90,7 @@ const updateForm = () => {
                 } else {
                     cns.$message.error(res.data.message);
                 }
-            }).catch(function (res) {
+            }).catch(function () {
             });
             updateLoading.value = false;
         } else {
@@ -138,6 +138,10 @@ const handleChange = (value) => {
 }
 
 onMounted( () => {
+    // 解析URL查询字符串
+    const urlParams = new URLSearchParams(window.location.search);
+    // 获取user_id参数
+    queryParams.user_id = urlParams.get('user_id') || '';
     getData()
     areasData()
 });

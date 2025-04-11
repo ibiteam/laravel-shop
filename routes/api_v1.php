@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AddressController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\CommonController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
@@ -59,7 +60,8 @@ Route::prefix('goods')->group(function () {
 });
 // 商品评价列表
 Route::get('evaluate/goods', [EvaluateController::class, 'indexByGoods']);
-
+// 获取客服地址
+Route::get('chat/url', [ChatController::class, 'chatUrl']);
 /**
  * 登录可以访问路由.
  */

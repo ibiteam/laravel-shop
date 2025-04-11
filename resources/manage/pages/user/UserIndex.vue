@@ -3,8 +3,11 @@ import { Plus, Search, RefreshLeft} from '@element-plus/icons-vue';
 import { getUserIndex, userUpdate } from '@/api/user.js'
 import Page from '@/components/common/Pagination.vue'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
+
+const router = useRouter()
 
 // 添加查询参数对象，增加搜索条件
 const queryParams = reactive({
@@ -74,7 +77,7 @@ const getData = (page = 1) => {
 
 const updateForm = () => {
     updateLoading.value = true
-    subFormRef.value.validate((valid, fields) => {
+    subFormRef.value.validate((valid) => {
         if (valid) {
             userUpdate(subForm.value).then(function (res) {
                 if (res.code === 200) {
@@ -84,7 +87,7 @@ const updateForm = () => {
                 } else {
                     cns.$message.error(res.data.message);
                 }
-            }).catch(function (res) {
+            }).catch(function () {
             });
             updateLoading.value = false;
         } else {
@@ -95,7 +98,7 @@ const updateForm = () => {
 };
 
 const userAddress = (row) => {
-
+    router.push({ name: 'manage.user.address' , query: {user_id: row.id}})
 };
 
 const modifyUser = (row) => {
