@@ -34,8 +34,16 @@ Route::prefix('order')->group(function () {
     // 退款申请
     Route::prefix('apply_refund')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_APPLY_REFUND_INDEX])->group(function () {
-            Route::get('/', [ApplyRefundController::class, 'index'])->name(Permission::MANAGE_APPLY_REFUND_INDEX);
+            Route::get('/', [ApplyRefundController::class, 'index'])->name(Permission::MANAGE_APPLY_REFUND_INDEX); // 列表
+            Route::get('detail', [ApplyRefundController::class, 'detail']); // 详情
         });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APPLY_REFUND_UPDATE])->group(function () {});
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APPLY_REFUND_UPDATE])->group(function () {
+            Route::post('agree_apply', [ApplyRefundController::class, 'agreeApply']);   // 同意申请
+            Route::post('close_apply', [ApplyRefundController::class, 'closeApply']);   // 关闭申请
+            Route::post('execute_refund', [ApplyRefundController::class, 'executeRefund']); // 执行退款
+            Route::post('refuse_refund', [ApplyRefundController::class, 'refuseRefund']);   // 拒绝退款
+            Route::post('confirm_receipt', [ApplyRefundController::class, 'confirmReceipt']);  // 确认收货
+            Route::post('query_express', [ApplyRefundController::class, 'queryExpress']);   // 查询快递信息
+        });
     });
 });

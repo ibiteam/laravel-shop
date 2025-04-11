@@ -19,8 +19,6 @@ class PaymentTableSeeder extends Seeder
             '此方式仅支持付款金额≤900元的订单',
             url('/images/icons/wechat_pay_logo.png'),
             [
-                'service_wechat_pay_app_id' => '',
-                'mini_wechat_pay_app_id' => '',
                 'app_wechat_pay_app_id' => '',
                 'mch_id' => '',
                 'secret_key' => '',

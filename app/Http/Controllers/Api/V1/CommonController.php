@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\ShopConfig;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -25,8 +26,16 @@ class CommonController extends BaseController
             ShopConfig::SHOP_COLOR,
             ShopConfig::SHOP_LOGO
         );
+        $data['cart_count'] = 0;
 
-        $data['cart_count'] = $request->user() ? $cart_dao->getValidCarNumber($request->user()->id) : [];
+        $current_user = $this->user();
+
+        if ($current_user instanceof User) {
+            $data['cart_count'] = $cart_dao->getValidCarNumber($request->user()->id);
+        }
+
+        // 微信公众号 APP id
+        $data['wechat_app_id'] = config('easywechat.official_account.default.app_id');
 
         return $this->success($data);
     }
