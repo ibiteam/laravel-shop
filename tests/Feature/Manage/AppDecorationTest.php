@@ -95,3 +95,12 @@ it('test import goods', function () {
     $response = $this->doPost('api/manage/set/app_decoration/goods/import', $data);
     dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
 });
+
+it('test goods intelligent', function () {
+    $data = [
+        'number' => '',
+        'sort_type' => '',
+    ];
+    $response = $this->doPost('api/manage/set/app_decoration/goods/intelligent', $data);
+    dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
+});

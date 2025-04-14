@@ -106,8 +106,8 @@ class GoodsRecommendComponent extends PageComponent
                 $data['rule'] = $item['rule'];
                 $data['number'] = $item['number'] ?? Constant::ZERO;
                 $data['sort_type'] = $item['sort_type'] ?? Constant::ZERO;
-                $data['goods_nos'] = $item['goods_nos'] ?? [];
-                $data['goods_data'] = $goodsService->getRecommendGoods($data['goods_nos'], $data['rule'], $data['number'], $data['sort_type']);
+                $data['goods_nos'] = $item['goods_nos'] ?? null;
+                $data['goods_data'] = $goodsService->getRecommendGoods($data['number'], $data['sort_type'], $data['goods_nos'], $data['rule']);
 
                 return $data;
             })->filter()->values()->toArray();

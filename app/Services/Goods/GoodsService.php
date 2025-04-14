@@ -404,7 +404,7 @@ class GoodsService
     }
 
     // 获取商品推荐数据
-    public function getRecommendGoods(?array $goods_nos, int $rule, int $limit, int $sort_type): array
+    public function getRecommendGoods(int $limit, int $sort_type, ?array $goods_nos = null, int $rule = AppDecorationItem::RULE_INTELLIGENT): array
     {
         // 是否展示销量
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
