@@ -62,10 +62,10 @@ class HotZoneComponent extends PageComponent
             'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
             'content.image' => 'required', // 图片地址
             'content.areas' => 'required|array|max:10',
-            'content.areas.*.x' => 'required|int',
-            'content.areas.*.y' => 'required|int',
-            'content.areas.*.width' => 'required|int',
-            'content.areas.*.height' => 'required|integer|min:200|max:2000',
+            'content.areas.*.x' => 'present|nullable',
+            'content.areas.*.y' => 'present|nullable',
+            'content.areas.*.width' => 'present|int|nullable',
+            'content.areas.*.height' => 'present|int|nullable',
             'content.areas.*.url.name' => 'present|nullable',
             'content.areas.*.url.value' => 'present|nullable',
         ], $this->messages());
