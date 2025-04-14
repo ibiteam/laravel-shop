@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Manage\ApplyRefundController;
 use App\Http\Controllers\Manage\ApplyRefundReasonController;
-use App\Http\Controllers\Manage\OrderController;
+use App\Http\Controllers\Manage\Order\OrderController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
