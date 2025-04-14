@@ -1,5 +1,8 @@
 <?php
 
+use Tests\ApiTestCase;
+use Tests\ManageTestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +14,9 @@
 |
 */
 
-pest()->extend(Tests\TestCase::class)->in('Feature');
+// pest()->extend(Tests\TestCase::class)->in('Feature');
+uses(ApiTestCase::class)->in('Feature/V1');
+uses(ManageTestCase::class)->in('Feature/Manage');
 
 pest()->extend(Tests\TestCase::class)->in('Unit');
 
