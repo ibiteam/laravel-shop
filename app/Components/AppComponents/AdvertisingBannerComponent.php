@@ -37,7 +37,7 @@ class AdvertisingBannerComponent extends PageComponent
                 'column' => AppDecorationItem::NUMBER_COLUMN_TWO, // 每行显示
                 'background' => AppDecorationItem::BACKGROUND_COLOR_SHOW, // 是否展示背景色 1、有 0、无
                 'background_color' => '#ffffff', // 背景色 默认 白色
-                'width' => 350, // 宽度：默认330 不可修改 2个330,3个220,4个160
+                'width' => 340, // 宽度：默认330 不可修改 2个330,3个220,4个160
                 'height' => 190, // 高度：默认240（最高250）；2个240,3个150，4个150
                 'title' => [
                     'image' => '', // 图片地址
@@ -106,9 +106,9 @@ class AdvertisingBannerComponent extends PageComponent
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
-        if ($msg = $this->checkColumn($data['content'])) {
-            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
-        }
+//        if ($msg = $this->checkColumn($data['content'])) {
+//            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
+//        }
         // 独立校验 time 字段
         foreach ($data['content']['data'] as $index => $item) {
             $date_type = $item['date_type'] ?? null;
@@ -137,7 +137,7 @@ class AdvertisingBannerComponent extends PageComponent
             $data['url'] = $item['url'];
             $data['date_type'] = $item['date_type'];
             $data['time'] = $item['time'];
-            $data['sort'] = $item['sort'];
+            $data['sort'] = $item['sort'] ?? 0;
 
             if ($item['is_show']) {
                 return $data;
@@ -174,7 +174,7 @@ class AdvertisingBannerComponent extends PageComponent
             'component_name' => $data['component_name'],
             'is_show' => $data['is_show'],
             'is_fixed_assembly' => $data['is_fixed_assembly'],
-            'sort' => $data['sort'],
+            'sort' => $data['sort'] ?? 0,
             'content' => $data['content'] ?? null, // 表单提交数据
             'data' => $this->getContent($data), // 战术数据
         ];
