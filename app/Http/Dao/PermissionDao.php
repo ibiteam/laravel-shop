@@ -93,7 +93,7 @@ class PermissionDao
                     'title' => $permission->display_name,
                     'icon' => $permission->icon,
                     'sort' => $permission->sort,
-                    'is_collection' => isset($collect_permission_ids[$permission->id]),
+                    'is_collection' => in_array($permission->id, $collect_permission_ids),
                 ];
             })
             ->toArray();
