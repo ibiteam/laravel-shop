@@ -191,12 +191,17 @@ class AppDecorationController extends BaseController
     public function importGoods(Request $request)
     {
         $goods_ids = $request->get('goods_ids', []);
+        $goods_nos = $request->get('goods_nos', []);
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
-            ->when($goods_ids, fn ($query) => $query->whereIn('id', $goods_ids))
+            ->where(fn ($query) => $query->whereIn('id', $goods_ids)->orWhereIn('no', $goods_nos))
             ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
-            ->latest()->limit(20)->get();
+            ->latest()->get();
+
+        if (count($data) > 20) {
+            return $this->error('导入商品加上已选商品不能超过 20 个');
+        }
 
         return $this->success($data);
     }
