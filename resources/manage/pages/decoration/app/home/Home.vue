@@ -27,11 +27,13 @@
                             filter=".fixed.setting-bar-wrapper"
                             handle=".drag-item"
                             dragClass=".drag-item"
+                            ghostClass="drag-placeholder"
+                            :scroll="true"
                             :group="{name: 'decoration', pull: true, put: true}"
                             :forceFallback="false"
                             @add="handleDragAdd">
                             <template v-for="(temp, index) in decoration.data">
-                                <div class="drag-placeholder" v-if="dragData.placeholderIndex == index">释放鼠标将组件添加至此处</div>
+                                <!-- <div class="drag-placeholder" v-if="dragData.placeholderIndex == index"></div> -->
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
                                 <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
                                 <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
@@ -40,7 +42,7 @@
                                 <Recommend v-else-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></Recommend>
                             </template>
                         </VueDraggable>
-                        <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar>
+                        <!-- <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar> -->
                     </div>
                 </main>
                 <HomeSetting v-show="decoration.app_website_data && pageSetting" ref="pageSettingRef" v-bind="{app_website_data: decoration.app_website_data, danping_advertisement: findNotForData('danping_advertisement'), suspended_advertisement: findNotForData('suspended_advertisement')}"></HomeSetting>
@@ -56,7 +58,7 @@ import 'vant/lib/index.css';
 import { VueDraggable } from 'vue-draggable-plus'
 import DecorationLayout from '@/pages/decoration/DecorationLayout.vue'; 
 import ToolBar from './../../components/ToolBar.vue'
-import BottomNavBar from './components/BottomNavBar.vue'
+// import BottomNavBar from './components/BottomNavBar.vue'
 import HomeSetting from './components/HomeSetting.vue'
 import Search from './components/Search.vue'
 import HorizontalCarousel from './components/HorizontalCarousel.vue'
@@ -183,9 +185,9 @@ const handlematerialCenterDialogConfirm = (res) => {
         if (not_for_data == 'home_search') {
             homeSearchRef.value.updateUploadComponentData(updateData)
         }
-        if (not_for_data == 'label') {
-            homeLabelRef.value.updateUploadComponentData(updateData)
-        }
+        // if (not_for_data == 'label') {
+        //     homeLabelRef.value.updateUploadComponentData(updateData)
+        // }
         return
     }
 }
@@ -210,9 +212,9 @@ const handleLinkCenterDialogConfirm = (res) => {
         if (not_for_data == 'home_search') {
             homeSearchRef.value.updateLinkComponentData(updateData)
         }
-        if (not_for_data == 'label') {
-            homeLabelRef.value.updateLinkComponentData(updateData)
-        }
+        // if (not_for_data == 'label') {
+        //     homeLabelRef.value.updateLinkComponentData(updateData)
+        // }
         return
     }
 }
@@ -302,104 +304,10 @@ const getDecorationHome = () => {
             decoration.app_website_data = res.data.app_website_data
             decoration.component_icon = res.data.component_icon
             decoration.component_value = res.data.component_value
-            decoration.data = [
-                ...res.data.data,
-                {
-                    "id": "997",
-                    "name": "商品推荐", // 组件名
-                    "component_name": "goods_recommend",
-                    "is_show": 1,
-                    "is_fixed_assembly": 0,
-                    "sort": 0,
-                    "content": {
-                        "layout": 1, //商品布局
-                        "title": {
-                            "icon": "",//小图标
-                            "name": "",//标题
-                            "align": "left",//对齐方式 left center
-                            "suffix": "",//标题右侧文案
-                            "url": {
-                                "name": "",
-                                "value": ""
-                            }
-                        },
-                        "goods": {
-                            "rule": 1,// 推荐规则 1、智能推荐 2、手动推荐
-                            "sort_type": 1,//排序类型 1、销量 2、好评 3、低价 4、新品
-                            "number": 3,//数量限制 1 ~ 20
-                            "goods_nos": [] // 商品集合
-                        }
-                    }
-                }
-            ]
-            decoration.not_for_data = [
-                ...res.data.not_for_data,
-                {
-                    component_name: 'home_search', // 组件名
-                    content: { // 表单数据
-                        logo: '',
-                        keywords: '', // 关键词
-                        button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
-                        interval: 3, // 关键词轮播时间，最大10 最小1
-                        data: [{
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            title: '', // 搜索提示词
-                        }]
-                    },
-                    data: { // 渲染数据
-                        logo: '',
-                        keywords: '', // 关键词
-                        button_color: '#f71111', // 搜索按钮背景色（默认#f71111）
-                        interval: 3, // 关键词轮播时间，最大10 最小1
-                        items: [{
-                            image: '',
-                            url: '',
-                            title: '',
-                        }],
-                    },
-                    id: '666', // 组件id
-                    is_show: 1, // 组件是否显示
-                    is_fixed_assembly: 1,
-                    name: '搜索', // 组件名
-                },
-                {
-                    component_name: 'label', // 组件名
-                    content: { // 表单数据
-                        font_default_color: '#333', // 标签默认字体颜色
-                        font_selection_color: '#f71111', // 标签选中字体颜色
-                        data: [{
-                            url: {
-                                name: '', // 路由名称
-                                value: '', // 路由链接
-                            },
-                            default_title: '', // 标签默认名称
-                            selection_title: '', // 标签选中名称
-                            default_image: '', // 标签默认图标
-                            selection_image: '', // 标签选中图标
-                            is_show: 1, // 是否显示
-                        }]
-                    },
-                    data: { // 渲染数据
-                        font_default_color: '#333', // 标签默认字体颜色
-                        font_selection_color: '#f71111', // 标签选中字体颜色
-                        items: [{
-                            url: '',
-                            default_title: '', // 标签默认名称
-                            selection_title: '', // 标签选中名称
-                            default_image: '', // 标签默认图标
-                            selection_image: '', // 标签选中图标
-                            is_show: 1, // 是否显示
-                        }],
-                    },
-                    id: '668', // 组件id
-                    is_show: 1, // 组件是否显示
-                    is_fixed_assembly: 1,
-                    name: '标签栏', // 组件名
-                }
-            ]
+            decoration.data = res.data.data
+            decoration.not_for_data = res.data.not_for_data
+        } else {
+            cns.$message.error(res.message)
         }
     })
 }
@@ -609,12 +517,19 @@ export default {
                     height: 44px;
                     line-height: 44px;
                     margin: 0 auto;
-                    border: 2px dotted var(--main-color);
-                    color: var(--main-color);
+                    // border: 2px dotted var(--main-color);
                     text-align: center;
                     box-sizing: border-box;
-                    background-color: var(--main-color-20);
+                    // background-color: var(--main-color-20);
                     user-select: none;
+                    &::after {
+                        content: '释放鼠标将组件添加至此处';
+                        display: block;
+                        width: 375px;
+                        height: 44px;
+                        line-height: 44px;
+                        color: var(--main-color);
+                    }
                 }
             }
         }
