@@ -3,13 +3,13 @@
 namespace App\Services\Pay;
 
 use App\Enums\PayFormEnum;
-use App\Enums\RouteEnum;
+use App\Enums\RouterEnum;
 use App\Http\Dao\TransactionDao;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\ShopConfig;
 use App\Models\WechatUser;
-use App\Services\RouteService;
+use App\Services\RouterService;
 use App\Utils\Wechat\WechatPayUtil;
 
 class WechatPayOrderService implements PayOrderInterface
@@ -51,7 +51,7 @@ class WechatPayOrderService implements PayOrderInterface
                     shop_config(ShopConfig::SHOP_NAME).'订单支付',
                     $transaction->transaction_no,
                     $order->order_amount,
-                    app(RouteService::class)->getRoutePath(RouteEnum::ORDER_SUCCESS)
+                    app(RouterService::class)->getRouterPath(RouterEnum::ORDER_SUCCESS)
                 );
 
                 break;

@@ -23,9 +23,9 @@ class GoodsCategoryController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $data = Category::query()->whereParentId(0)->with('allChildren')->get();
-        $vue_app_url = trim(config('host.vue_app_url'), '/');
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $data = $data->map(function (Category $category) use ($vue_app_url) {
-            $category->setAttribute('url', $vue_app_url.'/category?cat_id='.$category->id);
+            $category->setAttribute('h5_url', $vue_app_url.'/category?cat_id='.$category->id);  // 分类h5地址
 
             return $category;
         })->toArray();

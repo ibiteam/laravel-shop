@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum RouteEnum: string
+enum RouterEnum: string
 {
     public function getLabel(): string
     {
@@ -22,10 +22,9 @@ enum RouteEnum: string
         return match ($source) {
             'pay_success' => self::PAY_SUCCESS,
             'order_success' => self::ORDER_SUCCESS,
-            default => self::PAY_SUCCESS,
         };
     }
-    case PAY_SUCCESS = 'pay_success';
 
+    case PAY_SUCCESS = 'pay_success';
     case ORDER_SUCCESS = 'order_success';
 }

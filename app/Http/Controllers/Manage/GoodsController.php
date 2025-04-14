@@ -51,10 +51,10 @@ class GoodsController extends BaseController
             ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
             ->paginate($number);
 
-        $vue_app_url = trim(config('host.vue_app_url'), '/');
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $list->getCollection()->transform(function (Goods $goods) use ($vue_app_url) {
-            // 添加字段goods_url
-            $goods->setAttribute('goods_url', $vue_app_url.'/good?goods_no='.$goods->no);
+            $goods->setAttribute('h5_url', $vue_app_url.'/good?goods_no='.$goods->no);  // 商品h5地址
+
             return $goods;
         });
 

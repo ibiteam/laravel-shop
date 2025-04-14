@@ -30,14 +30,17 @@ class RouterController extends BaseController
             ->when($router_category_id, fn ($query) => $query->where('router_category_id', '=', $router_category_id))
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
             ->orderByDesc('created_at')->paginate($number);
-        $data->getCollection()->transform(function (Router $router) {
+
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
+
+        $data->getCollection()->transform(function (Router $router) use ($vue_app_url) {
             return [
                 'id' => $router->id,
                 'category_name' => $router->routerCategory?->name,
                 'router_category_id' => $router->router_category_id,
                 'name' => $router->name,
                 'alias' => $router->alias,
-                'h5_url' => $router->h5_url,
+                'h5_url' => $vue_app_url .'/'.ltrim($router->h5_url, '/'),
                 'params' => $router->params ? json_encode($router->params, JSON_UNESCAPED_UNICODE) : '',
                 'is_show' => $router->is_show,
                 'sort' => $router->sort,
