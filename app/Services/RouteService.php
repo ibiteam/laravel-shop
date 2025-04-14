@@ -18,7 +18,7 @@ class RouteService
             return '';
         }
 
-        $path = $route->h5_url;
+        $path = rtrim(config('host.vue_app_url'), '/').'/'.ltrim($route->h5_url, '/');
         $set_data = [];
 
         foreach ($route->params as $key => $value) {

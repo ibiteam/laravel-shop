@@ -15,9 +15,8 @@ class RouterTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $vue_app_url = trim(config('host.vue_app_url'), '/');
-
-        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouteEnum::PAY_SUCCESS, '支付成功', "{$vue_app_url}/pay/success", ['no' => ''], 1);
+        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouteEnum::PAY_SUCCESS, '支付成功', '/pay/success', ['no' => ''], 1);
+        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouteEnum::ORDER_SUCCESS, '下单成功', '/order/success', sort: 1);
     }
 
     private function addRouter(
