@@ -10,9 +10,9 @@ class RouteService
     /**
      * 获取完整请求地址
      */
-    public function getRoutePath(RouteEnum $mobile_route_enum, array $params = []): string
+    public function getRoutePath(RouteEnum $route_enum, array $params = []): string
     {
-        $route = Router::query()->whereAlias($mobile_route_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
+        $route = Router::query()->whereAlias($route_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
 
         if (! $route instanceof Router) {
             return '';
