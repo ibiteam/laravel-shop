@@ -51,6 +51,13 @@ class GoodsController extends BaseController
             ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
             ->paginate($number);
 
+        $vue_app_url = trim(config('host.vue_app_url'), '/');
+        $list->getCollection()->transform(function (Goods $goods) use ($vue_app_url) {
+            // 添加字段goods_url
+            $goods->setAttribute('goods_url', $vue_app_url.'/good?goods_no='.$goods->no);
+            return $goods;
+        });
+
         return $this->success(new CommonResourceCollection($list));
     }
 
