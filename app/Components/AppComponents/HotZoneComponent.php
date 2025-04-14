@@ -65,7 +65,7 @@ class HotZoneComponent extends PageComponent
             'content.areas.*.x' => 'required|int',
             'content.areas.*.y' => 'required|int',
             'content.areas.*.width' => 'required|int',
-            'content.areas.*.height' => 'required|int|min:200|max:2000',
+            'content.areas.*.height' => 'required|integer|min:200|max:2000',
             'content.areas.*.url.name' => 'present|nullable',
             'content.areas.*.url.value' => 'present|nullable',
         ], $this->messages());
@@ -146,7 +146,7 @@ class HotZoneComponent extends PageComponent
             'content.areas.*.width.required' => '宽度不能为空',
             'content.areas.*.width.int' => '宽度必须是整数',
             'content.areas.*.height.required' => '高度不能为空',
-            'content.areas.*.height.int' => '高度必须是整数',
+            'content.areas.*.height.integer' => '高度必须是整数',
             'content.areas.*.height.min' => '高度最小值是 200',
             'content.areas.*.height.max' => '高度最大值是 2000',
             'content.areas.*.url.name.present' => '链接别名参数未设置',
