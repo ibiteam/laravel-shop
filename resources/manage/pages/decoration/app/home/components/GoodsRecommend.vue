@@ -154,26 +154,59 @@
                         </div>
                         <div class="setting-bar-item">
                             <div class="item-title">商品设置</div>
-                            <el-form-item label="" label-position="top" :prop="['goods', 'goods_nos']" :rules="[
-                                { required: true, message: '最少选择1个商品', trigger: 'change' },
-                                { 
-                                    validator: (rule, value, callback) => {
-                                        if (value.length <= 0) {
-                                            callback(new Error('最少选择1个商品'));
-                                        } else if (value.length > 20) {
-                                            callback(new Error('最多选择20个商品'));
-                                        } else { callback(); }
-                                    }, trigger: 'change' 
-                                },
-                            ]">
-                                <div class="goods-form-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
-                                    <div class="goods-thumb-wrapper" v-for="(item,index) in form.content.goods.goods_data" :key="item.no">
-                                        <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%' }" style="z-index: 2;"/>
-                                        <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 3">+{{ form.content.goods.goods_nos.length - 4 }}</div>
-                                    </div>
-                                </div>
+                            <el-form-item label="推荐规则" label-position="top" :prop="['goods', 'rule']" required>
+                                <el-radio-group v-model="form.content.goods.rule" fill="var(--main-color)">
+                                    <el-radio v-for="rule in RuleOption" :value="rule.value" :key="rule.value">{{rule.label}}</el-radio>
+                                </el-radio-group>
                             </el-form-item>
-                            <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_nos.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_nos.length}}/{{MaxGoodsNumber}})</el-button>
+                            <template v-if="form.content.goods.rule == 1">
+                                <el-form-item label="排序类型" :prop="['goods', 'sort_type']">
+                                    <el-select v-model="form.content.goods.sort_type" style="width: 70%;" @change="getIntelligentRecommendData">
+                                        <el-option v-for="sort_type in SortTypeOption" :key="sort_type.value" :value="sort_type.value" :label="sort_type.label"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item class="not-required" label="数量限制" :prop="['goods', 'number']" :rules="
+                                    [
+                                        { required: true, message: '请输入数量限制', trigger: 'blur' },
+                                        { validator: (rule, value, callback) => {
+                                            if (value < RecommendGoodsNumber.min || value > RecommendGoodsNumber.max) {
+                                                callback(new Error(`数量限制在${RecommendGoodsNumber.min}~${RecommendGoodsNumber.max}`));
+                                            } else if (isNaN(value)) {
+                                                callback(new Error('请输入数字'));
+                                            } else if (!Number.isInteger(value * 1)) {
+                                                callback(new Error('请输入整数'));
+                                            } else { 
+                                                getIntelligentRecommendData()
+                                                callback();
+                                            }
+                                        }, trigger: 'blur' },
+                                    ]
+                                ">
+                                    <el-input v-model="form.content.goods.number" style="width: 70%;"></el-input>
+                                </el-form-item>
+                            </template>
+                            <template v-else>
+                                <el-form-item label="" label-position="top" :prop="['goods', 'goods_nos']" :rules="[
+                                    { required: true, message: '最少选择1个商品', trigger: 'change' },
+                                    { 
+                                        validator: (rule, value, callback) => {
+                                            if (value.length <= 0) {
+                                                callback(new Error('最少选择1个商品'));
+                                            } else if (value.length > 20) {
+                                                callback(new Error('最多选择20个商品'));
+                                            } else { callback(); }
+                                        }, trigger: 'change' 
+                                    },
+                                ]">
+                                    <div class="goods-form-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
+                                        <div class="goods-thumb-wrapper" v-for="(item,index) in form.content.goods.goods_data" :key="item.no">
+                                            <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%' }" style="z-index: 2;"/>
+                                            <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 3">+{{ form.content.goods.goods_nos.length - 4 }}</div>
+                                        </div>
+                                    </div>
+                                </el-form-item>
+                                <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_nos.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_nos.length}}/{{MaxGoodsNumber}})</el-button>
+                            </template>
                         </div>
                     </el-form>
                 </template>
@@ -191,8 +224,9 @@ import GoodsPrice from '@/pages/decoration/components/GoodsPrice.vue'
 import { Tag } from 'vant';
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, MinGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
+import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, MinGoodsNumber, RuleOption, SortTypeOption, RecommendGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
 import { updateNested } from '@/pages/decoration/utils/common.js'
+import { decorationIntelligentRecommendData } from '@/api/decoration.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -243,7 +277,7 @@ const updateLinkComponentData = (res) => {
 // 添加商品数据
 const handleAddGoods = () => {
     if (form.content.goods.goods_nos.length >= MaxGoodsNumber) return
-    cns.$bus.emit('openGoodsDialog', {temp_index: form.id, show: true, max: MaxGoodsNumber})
+    cns.$bus.emit('openGoodsDialog', {temp_index: form.id, show: true, max: MaxGoodsNumber, default_goods: form.content.goods.goods_data, default_nos: form.content.goods.goods_nos})
 }
 
 // 更新商品数据
@@ -256,6 +290,13 @@ const updateGoodsComponentData = (res) => {
     form.content.goods.goods_data = res.goods
 }
 
+const getIntelligentRecommendData = () => {
+    decorationIntelligentRecommendData({sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
+        if (cns.$successCode(res.code)) {
+            form.content.goods['goods_data'] = res.data
+        }
+    })
+}
 
 // 保存
 const handleTempFormSubmit = () => {
@@ -280,8 +321,10 @@ watch([() => props.component], (newValue) => {
         let temp = JSON.parse(JSON.stringify(newValue[0]))
         Object.keys(temp).forEach(key => {
             form[key] = temp[key]
-
         })
+        if (form.content.goods?.sort_type == 1) {
+            getIntelligentRecommendData()
+        }
     }
 }, {
     immediate: true,

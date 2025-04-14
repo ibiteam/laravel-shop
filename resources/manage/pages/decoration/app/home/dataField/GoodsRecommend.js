@@ -72,5 +72,36 @@ export const TitleAlignOption = [{
     icon: 'iconfont icon-juzhongduiqi'
 }]
 
+// 推荐规则
+export const RuleOption = [{
+    value: 1,
+    label: '智能推荐'
+}, {
+    value: 2,
+    label: '手动推荐'
+}]
+
+// 排序方式
+export const SortTypeOption = [{
+    value: 1,
+    label: '销量'
+}, {
+    value: 2,
+    label: '好评'
+}, {
+    value: 3,
+    label: '低价'
+}, {
+    value: 4,
+    label: '新品'
+}]
+
+// 智能推荐数量
+export const RecommendGoodsNumber = {
+    default: 3,
+    min: 1,
+    max: 20,
+}
+
 export const MaxGoodsNumber = 20
 export const MinGoodsNumber = 1

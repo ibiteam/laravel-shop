@@ -89,6 +89,12 @@
                             type="textarea"
                             placeholder="请输入商品ID,以逗号或者回车形式隔开"
                         />
+                        <!-- <el-input-tag
+                            v-model="export_data"
+                            ref="inputTagRef"
+                            
+                            placeholder="请输入商品ID,以逗号或者回车形式隔开"
+                        /> -->
                         <div class="s-flex jc-fe mt-10">
                             <el-button type="primary" :disabled="exporting" @click.stop="handleImport">导入</el-button>
                         </div>
@@ -146,10 +152,6 @@ import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } fro
 import { VueDraggable } from 'vue-draggable-plus'
 import { categoryIndex } from '@/api/goods.js';
 import { decorationGoodsList, decorationGoodsImport } from '@/api/decoration.js'
-import { EVENT_CODE } from 'element-plus'
-
-console.log(EVENT_CODE)
-
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -160,12 +162,24 @@ const props = defineProps({
     max: {
         type: Number,
         default: 20
+    },
+    default_nos: {
+        type: Array,
+        default: () => {
+            return []
+        }
+    },
+    default_goods: {
+        type: Array,
+        default: () => {
+            return []
+        }
     }
 })
 const emit = defineEmits(['confirm', 'close'])
 
 const dialogVisible = ref(false)
-const tabActive = ref('2')
+const tabActive = ref('1')
 const queryParams = reactive({
     keywords: '',      // 商品名称搜索
     goods_id: '',
@@ -256,9 +270,27 @@ const handleConfirm = () => {
 const handleImport = () => {
     if (exporting.value) return
     exporting.value = true
-    decorationGoodsImport({goods_ids: export_data.value}).then(res => {
+    if (export_data.value.length == 0) {
+        cns.$message.error('请输入要导入的商品id')
+        exporting.value = false
+        return
+    }
+    if (export_data.value.length + check.data.length > props.max) {
+        cns.$message.error(`最多只能导入${props.max - check.data.length}条数据，请修改`)
+        exporting.value = false
+        return
+    }
+    decorationGoodsImport({goods_ids: export_data.value, goods_nos: check.nos}).then(res => {
         if (cns.$successCode(res.code)) {
-
+            if (res.data.length > 0) {
+                export_data.value = []
+                export_text.value = ''
+                cns.$message.success('导入成功')
+                check.data = res.data
+                check.nos = check.data.map(item => {
+                    return item.no
+                })
+            }
         } else {
             cns.$message.error(res.message)
         }
@@ -300,17 +332,28 @@ const getCategory = () => {
 }
 
 
-watch([() => props, () => export_text], (newVal) => {
+watch([() => props], (newVal) => {
     if (newVal[0]) {
         dialogVisible.value = newVal[0].show
         if (dialogVisible.value) {
             getGoodsList()
             getCategory()
         }
+        if (newVal[0].default_goods.length > 0) {
+            check.data = JSON.parse(JSON.stringify(newVal[0].default_goods))
+            check.nos = check.data.map(item => {
+                return item.no
+            })
+        }
     }
-    if (newVal[1]) {
-        let inputText = JSON.parse(JSON.stringify(newVal[1].value))
-        
+}, {
+    immediate: true,
+    deep: true
+})
+
+watch(() => export_text, (newVal) => {
+    if (newVal && newVal.value != '') {
+        let inputText = JSON.parse(JSON.stringify(newVal.value))
         // 使用正则表达式分割文本，逗号或换行符作为分隔符
         const regex = /[,，\n]+/g;
         const splitResult = inputText.split(regex).filter(item => item.trim() !== '');

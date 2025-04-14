@@ -27,19 +27,18 @@
                             filter=".fixed.setting-bar-wrapper"
                             handle=".drag-item"
                             dragClass=".drag-item"
-                            ghostClass="drag-placeholder"
                             :scroll="true"
                             :group="{name: 'decoration', pull: true, put: true}"
                             :forceFallback="false"
                             @add="handleDragAdd">
                             <template v-for="(temp, index) in decoration.data">
-                                <!-- <div class="drag-placeholder" v-if="dragData.placeholderIndex == index"></div> -->
+                                <div class="drag-placeholder" v-if="dragData.placeholderIndex == index"></div>
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
                                 <HotZone v-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
                                 <AdvertisingBanner v-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
                                 <QuickLink v-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
                                 <GoodsRecommend v-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
-                                <Recommend v-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></Recommend>
+                                <Recommend v-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index, default_data: defaultRecommendData}"></Recommend>
                             </template>
                         </VueDraggable>
                         <!-- <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar> -->
@@ -70,9 +69,8 @@ import Recommend from './components/Recommend.vue';
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 import GoodsSelectDialog from '@/components/good/SelectDialog.vue'
-// import DataExample from './DataExample'
 import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
-import { appDecorationInit, appDecorationSave } from '@/api/decoration.js'
+import { appDecorationInit, appDecorationSave, decorationRecommendData } from '@/api/decoration.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -118,6 +116,8 @@ const linkCenterDialogData = reactive({
 const goodsDialogData = reactive({
     show: false,
 })
+// 为您推荐默认数据
+const defaultRecommendData = ref([])
 // 页面基础设置
 const pageSetting = ref(true)
 const pageSettingRef = ref(null)
@@ -143,23 +143,26 @@ const handleDragChoose = (e) => {
 }
 
 // 装修组件顺序控制
-const sortDecorationData = (id, direction) => {
+const sortDecorationData = (params = {component: {}, direction: 'up'}) => {
+    // id, direction
+    const {component, direction} = params
+    const id = component.id
     const index = decoration.data.findIndex(item => item.id === id);
     if (direction === 'up') {
         if (index == 0) return
         const preItem = decoration.data[index - 1];
         if (!preItem) return
-        const temp = decoration.data[index];
+        // const temp = decoration.data[index];
         decoration.data[index] = preItem;
-        decoration.data[index - 1] = temp;
+        decoration.data[index - 1] = component;
     }
     if (direction === 'down') {
         if (index == decoration.data.length - 1) return
         const nextItem = decoration.data[index + 1];
         if (!nextItem) return
-        const temp = decoration.data[index];
+        // const temp = decoration.data[index];
         decoration.data[index] = nextItem;
-        decoration.data[index + 1] = temp;
+        decoration.data[index + 1] = component;
     }
 }
 
@@ -197,7 +200,7 @@ const handleLinkCenterDialogConfirm = (res) => {
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
-        value: res[0]?.h5_url || res[0]?.goods_url || res[0]?.url
+        value: res[0]?.h5_url
     }}
     if (linkCenterDialogData.temp_index) {
         const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
@@ -312,6 +315,16 @@ const getDecorationHome = () => {
             cns.$message.error(res.message)
         }
     })
+    getDecorationRecommendData()
+}
+
+// 获取为您推荐数据
+const getDecorationRecommendData = () => {
+    decorationRecommendData().then(res => {
+        if (cns.$successCode(res.code)) {
+            defaultRecommendData.value = res.data.list
+        }
+    })
 }
 
 const openPageSetting = () => {
@@ -353,11 +366,11 @@ onMounted(() => {
             }
             // 升序
             if (res.type == 'sort_up') {
-                sortDecorationData(res.component.id, 'up')
+                sortDecorationData({component: res.component, direction: 'up'})
             }
             // 降序
             if (res.type == 'sort_down') {
-                sortDecorationData(res.component.id, 'down')
+                sortDecorationData({component: res.component, direction: 'down'})
             }
         })
         // 打开素材中心弹窗
@@ -519,10 +532,10 @@ export default {
                     height: 44px;
                     line-height: 44px;
                     margin: 0 auto;
-                    // border: 2px dotted var(--main-color);
+                    border: 2px dotted var(--main-color);
                     text-align: center;
                     box-sizing: border-box;
-                    // background-color: var(--main-color-20);
+                    background-color: var(--main-color-20);
                     user-select: none;
                     &::after {
                         content: '释放鼠标将组件添加至此处';
