@@ -21,10 +21,10 @@ class RouterCategoryTableSeeder extends Seeder
         $this->addRouterCategory('自定义链接', RouterCategoryEnum::CUSTOM_LINK, null, RouterCategory::TYPE_LINK, 97, Permission::MANAGE_ROUTER_INDEX);
 
         // 二级
-        $this->addRouterCategory('商品分类', RouterCategoryEnum::GOODS_CATEGORY, RouterCategoryEnum::GOODS_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_GOODS_INDEX);
-        $this->addRouterCategory('商品', RouterCategoryEnum::GOODS_LIST, RouterCategoryEnum::GOODS_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_CATEGORY_INDEX);
-        // $this->addRouterCategory('文章分类', RouterCategoryEnum::ARTICLE_CATEGORY, RouterCategoryEnum::ARTICLE_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_ARTICLE_INDEX);
-        // $this->addRouterCategory('文章', RouterCategoryEnum::ARTICLE_LIST, RouterCategoryEnum::ARTICLE_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_ARTICLE_CATEGORY_INDEX);
+        $this->addRouterCategory('商品分类', RouterCategoryEnum::GOODS_CATEGORY, RouterCategoryEnum::GOODS_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_CATEGORY_INDEX);
+        $this->addRouterCategory('商品', RouterCategoryEnum::GOODS_LIST, RouterCategoryEnum::GOODS_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_GOODS_INDEX);
+        // $this->addRouterCategory('文章分类', RouterCategoryEnum::ARTICLE_CATEGORY, RouterCategoryEnum::ARTICLE_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_ARTICLE_CATEGORY_INDEX);
+        // $this->addRouterCategory('文章', RouterCategoryEnum::ARTICLE_LIST, RouterCategoryEnum::ARTICLE_LINK, RouterCategory::TYPE_MENU, 0, Permission::MANAGE_ARTICLE_INDEX);
     }
 
     private function addRouterCategory(

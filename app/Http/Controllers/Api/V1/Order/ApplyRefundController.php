@@ -95,7 +95,7 @@ class ApplyRefundController extends BaseController
     }
 
     /**
-     * 申请售后 发起.
+     * 申请售后 新增编辑.
      */
     public function store(ApplyRefundStoreRequest $request, ApplyRefundService $apply_refund_service)
     {
@@ -110,7 +110,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('申请售后发起异常~');
+            return $this->error('申请售后发起异常~'.$throwable->getMessage());
         }
     }
 
@@ -121,16 +121,16 @@ class ApplyRefundController extends BaseController
     {
         try {
             $validated = $request->validate([
+                'apply_refund_id' => 'required_without:order_no,order_detail_id|integer',
                 'order_no' => 'required_without:apply_refund_id|string',
                 'order_detail_id' => 'required_without:apply_refund_id|integer',
-                'apply_refund_id' => 'required_without:order_no,order_detail_id|integer',
             ], [], [
+                'apply_refund_id.required_without' => '申请售后ID参数错误',
+                'apply_refund_id.integer' => '申请售后ID格式不正确',
                 'order_no.required_without' => '订单编号参数错误',
                 'order_no.string' => '订单编号格式不正确',
                 'order_detail_id.required_without' => '订单明细ID参数错误',
                 'order_detail_id.integer' => '订单明细ID格式不正确',
-                'apply_refund_id.required_without' => '申请售后ID参数错误',
-                'apply_refund_id.integer' => '申请售后ID格式不正确',
             ]);
 
             $order_no = $validated['order_no'] ?? '';

@@ -50,29 +50,29 @@ class ApplyRefundJob implements ShouldQueue
         }
 
         switch ($this->status) {
-            case ApplyRefundStatusEnum::NOT_PROCESSED: // 状态:待处理
-                if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED) {
+            case ApplyRefundStatusEnum::NOT_PROCESSED->value: // 状态:待处理
+                if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED->value) {
                     $this->apply_refund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::REFUSE: // 状态: 已拒绝退款
-                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE) {
+            case ApplyRefundStatusEnum::REFUSE->value: // 状态: 已拒绝退款
+                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
                     $this->apply_refund_close($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::REFUSE_EXAMINE: // 状态: 退货审核成功 待买家发货
-                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE) {
+            case ApplyRefundStatusEnum::REFUSE_EXAMINE->value: // 状态: 退货审核成功 待买家发货
+                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
                     $this->apply_refund_close($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::BUYER_SEND_SHIP:  // 状态: 买家已发货 待卖家收货
-                if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP) {
+            case ApplyRefundStatusEnum::BUYER_SEND_SHIP->value:  // 状态: 买家已发货 待卖家收货
+                if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
                     $this->apply_refund($this->action, $this->type, $this->status);
                 }
 
@@ -94,7 +94,7 @@ class ApplyRefundJob implements ShouldQueue
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE;
+        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE->value;
 
         DB::beginTransaction();
 
@@ -102,7 +102,7 @@ class ApplyRefundJob implements ShouldQueue
             $apply_refund->save();
 
             // 买家超时未申请，不记录日志
-            if ($status === ApplyRefundStatusEnum::REFUSE_EXAMINE) {
+            if ($status === ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
@@ -121,7 +121,7 @@ class ApplyRefundJob implements ShouldQueue
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS;
+        $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
         $apply_refund->result = '卖家超时未处理，退款成功';
 
         DB::beginTransaction();
@@ -130,11 +130,11 @@ class ApplyRefundJob implements ShouldQueue
             $apply_refund->save();
 
             // 发起申请售后 超时未处理 增加2条记录
-            if ($status === ApplyRefundStatusEnum::NOT_PROCESSED) {
+            if ($status === ApplyRefundStatusEnum::NOT_PROCESSED->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未处理', ApplyRefundLog::TYPE_SELLER);
             }
 
-            if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP) {
+            if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未确认收货', ApplyRefundLog::TYPE_SELLER);
             }
             app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
