@@ -33,16 +33,16 @@ class HotZoneComponent extends PageComponent
             'content' => [
                 'image' => '', // 图片地址
                 'areas' => [
-                    [
-                        'x' => 89, // x坐标
-                        'y' => 86, // y坐标
-                        'width' => 750, // 宽度
-                        'height' => 200, // 高度 200 ~ 2000
-                        'url' => [
-                            'name' => '',
-                            'value' => '',
-                        ],
-                    ],
+//                    [
+//                        'x' => '', // x坐标
+//                        'y' => '', // y坐标
+//                        'width' => '', // 宽度
+//                        'height' => '', // 高度 200 ~ 2000
+//                        'url' => [
+//                            'name' => '',
+//                            'value' => '',
+//                        ],
+//                    ],
                 ],
             ],
         ];
@@ -62,10 +62,10 @@ class HotZoneComponent extends PageComponent
             'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
             'content.image' => 'required', // 图片地址
             'content.areas' => 'required|array|max:10',
-            'content.areas.*.x' => 'required|int',
-            'content.areas.*.y' => 'required|int',
-            'content.areas.*.width' => 'required|int',
-            'content.areas.*.height' => 'required|int|min:200|max:2000',
+            'content.areas.*.x' => 'present|nullable',
+            'content.areas.*.y' => 'present|nullable',
+            'content.areas.*.width' => 'present|int|nullable',
+            'content.areas.*.height' => 'present|int|nullable',
             'content.areas.*.url.name' => 'present|nullable',
             'content.areas.*.url.value' => 'present|nullable',
         ], $this->messages());
@@ -146,7 +146,7 @@ class HotZoneComponent extends PageComponent
             'content.areas.*.width.required' => '宽度不能为空',
             'content.areas.*.width.int' => '宽度必须是整数',
             'content.areas.*.height.required' => '高度不能为空',
-            'content.areas.*.height.int' => '高度必须是整数',
+            'content.areas.*.height.integer' => '高度必须是整数',
             'content.areas.*.height.min' => '高度最小值是 200',
             'content.areas.*.height.max' => '高度最大值是 2000',
             'content.areas.*.url.name.present' => '链接别名参数未设置',
