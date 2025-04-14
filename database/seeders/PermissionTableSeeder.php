@@ -118,6 +118,9 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('退款原因删除', Permission::MANAGE_APPLY_REFUND_REASON_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
         $this->addPermission('退款申请', Permission::MANAGE_APPLY_REFUND_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
         $this->addPermission('退款申请编辑', Permission::MANAGE_APPLY_REFUND_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::APPLY_REFUND_MANAGE);
+
+        $this->addPermission('发货管理', Permission::ORDER_DELIVERY_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
+        $this->addPermission('发货列表', Permission::MANAGE_ORDER_DELIVERY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_DELIVERY_MANAGE);
     }
 
     private function addArticlePermission(): void
