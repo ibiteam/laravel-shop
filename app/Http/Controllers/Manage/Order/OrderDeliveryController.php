@@ -8,16 +8,20 @@ use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\OrderDeliveryDao;
+use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\ShipCompanyDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Models\OrderDetail;
+use App\Models\OrderLog;
 use App\Models\ShipCompany;
 use App\Utils\ExcelUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class OrderDeliveryController extends BaseController
 {
@@ -60,13 +64,13 @@ class OrderDeliveryController extends BaseController
         $current_user = $this->adminUser();
 
         $order_delivery_dao = app(OrderDeliveryDao::class);
+        $order_log_dao = app(OrderLogDao::class);
 
         try {
-            $res = ExcelUtil::import($file, function ($data) use ($current_user, $order_delivery_dao) {
+            $res = ExcelUtil::import($file, function ($data) use ($current_user, $order_delivery_dao, $order_log_dao) {
                 $error_data = [];
                 $import_data = [];
-
-                $success_number = 0;
+                $success_data = [];
 
                 if (count($data) > 1000) {
                     throw new BusinessException('导入数量限制 单次最多导入 1000 条数据');
@@ -230,21 +234,117 @@ class OrderDeliveryController extends BaseController
 
                     $order_delivery->items()->createMany($order_delivery_items);
                     $order->update(['ship_status' => $order_ship_status, 'shipped_at' => $import_datum['shipped_at']]);
-
-                    $success_number++;
+                    $order_log_dao->storeByAdminUser($current_user, $order, '添加发货', OrderLog::TYPE_ADMIN_USER);
+                    $success_data[] = $order_delivery->id;
                 }
 
                 return [
-                    'success_number' => $success_number,
                     'error_data' => $error_data,
+                    'success_data' => $success_data,
                 ];
             });
 
-            return $this->success($res);
+            if (! empty($res['success_data'])) {
+                admin_operation_log($current_user, '导入发货信息：发货单ID'.implode(',', $res['success_data']));
+            }
+
+            return $this->success([
+                'success_number' => count($res['success_data']),
+                'error_number' => count($res['error_data']),
+                'error_data' => $res['error_data'],
+            ]);
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('导入发货信息失败！');
+        }
+    }
+
+    /**
+     * 删除发货单.
+     *
+     * @throws \Throwable
+     */
+    public function destroy(Request $request, OrderLogDao $order_log_dao): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer',
+            ], [], [
+                'id' => '发货单ID',
+            ]);
+            $order_delivery = OrderDelivery::query()->with('order')->whereId($validated['id'])->first();
+
+            if (! $order_delivery instanceof OrderDelivery) {
+                throw new BusinessException('发货单不存在');
+            }
+
+            if ($order_delivery->status === OrderDelivery::STATUS_SUCCESS) {
+                throw new BusinessException('该发货单已完成收货，无法删除');
+            }
+            // 需要修改订单发货状态 判断是未发货还是部分发货
+            $order_ship_status = ShippingStatusEnum::UNSHIPPED;
+            $order_shipped_at = null;
+            $order_deliveries = OrderDelivery::query()->whereOrderId($order_delivery->order_id)->where('id', '!=', $order_delivery->id)->orderByDesc('shipped_at')->get();
+
+            foreach ($order_deliveries as $key => $order_delivery_datum) {
+                if ($key === 0) {
+                    $order_shipped_at = $order_delivery_datum->shipped_at;
+                }
+
+                if ($order_delivery_datum->status === OrderDelivery::STATUS_WAIT) {
+                    $order_ship_status = ShippingStatusEnum::PART;
+
+                    break;
+                }
+                $order_ship_status = ShippingStatusEnum::SHIPPED;
+            }
+
+            $order = $order_delivery->order;
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单不存在');
+            }
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        $current_user = $this->adminUser();
+
+        DB::beginTransaction();
+
+        try {
+            if (! $order->update(['ship_status' => $order_ship_status, 'shipped_at' => $order_shipped_at])) {
+                throw new BusinessException('修改订单发货状态失败');
+            }
+
+            if (! $order_delivery->items()->delete()) {
+                throw new BusinessException('删除发货单商品失败');
+            }
+
+            if (! $order_delivery->delete()) {
+                throw new BusinessException('删除发货单失败');
+            }
+
+            $order_log_dao->storeByAdminUser($current_user, $order, '调整发货信息', OrderLog::TYPE_ADMIN_USER);
+
+            admin_operation_log($current_user, "删除发货单,发货单ID：$order_delivery->id");
+
+            DB::commit();
+
+            return $this->success('删除发货单成功');
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
+            return $this->error('删除失败');
         }
     }
 }

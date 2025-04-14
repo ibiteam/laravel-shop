@@ -124,6 +124,7 @@ class Permission extends SpatiePermission
     public const MANAGE_APPLY_REFUND_UPDATE = 'manage.apply_refund.update'; // 退款申请编辑
     public const ORDER_DELIVERY_MANAGE = 'order_delivery.manage'; // 发货管理
     public const MANAGE_ORDER_DELIVERY_INDEX = 'manage.order_delivery.index'; // 发货列表
+    public const MANAGE_ORDER_DELIVERY_UPDATE = 'manage.order_delivery.update'; // 发货记录编辑
 
     public function __construct(array $attributes = [])
     {

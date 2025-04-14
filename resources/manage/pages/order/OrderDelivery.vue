@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Search, RefreshLeft, Upload } from '@element-plus/icons-vue';
-import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport } from '@/api/order';
+import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
@@ -106,11 +106,13 @@ const closeLogisticsDialog = () => {
 /* 导入发货开始 */
 const importVisible = ref(false)
 const importSuccessNumber = ref(0)
+const importErrorNumber = ref(0)
 const importErrorData = ref([]);
 const importFileLoading = ref(false)
 const openImportDialog = () => {
     importVisible.value = true;
     importSuccessNumber.value = 0
+    importErrorNumber.value = 0
     importErrorData.value = [];
     importFileLoading.value = false;
 }
@@ -125,11 +127,13 @@ const downloadFile = () => {
 const submitImport = (request) => {
     importFileLoading.value = true
     importSuccessNumber.value = 0
+    importErrorNumber.value = 0
     importErrorData.value = [];
     orderDeliveryImport({ import_file: request.file }).then(res => {
         importFileLoading.value = false
         if (cns.$successCode(res.code)) {
             importSuccessNumber.value = res.data.success_number
+            importErrorNumber.value = res.data.error_number
             importErrorData.value = res.data.error_data
             if (res.data.success_number > 0) {
                 getData(1);
@@ -143,9 +147,29 @@ const closeImportDialog = () => {
     importVisible.value = false;
     importFileLoading.value = false;
     importSuccessNumber.value = 0
+    importErrorNumber.value = 0
     importErrorData.value = [];
 }
 /* 导入发货结束 */
+/* 删除发货开始 */
+const handleDelete = (id) => {
+    cns.$confirm('此操作将永久删除该发货单, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true,
+    }).then(() => {
+        orderDeliveryDestroy({id: id}).then(res => {
+            if (cns.$successCode(res.code)) {
+                cns.$message.success(res.message)
+                getData(pageInfo.current_page)
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
+    })
+}
+/* 删除发货结束 */
 
 onMounted(() => {
     getData();
@@ -231,6 +255,11 @@ onMounted(() => {
             </el-table-column>
             <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
             <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
+            <el-table-column label="操作"width="160px">
+                <template #default="scope">
+                    <el-button link type="primary" size="large" @click="handleDelete(scope.row.id)">删除</el-button>
+                </template>
+            </el-table-column>
         </PublicPageTable>
         <!-- 查看物流 -->
         <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
