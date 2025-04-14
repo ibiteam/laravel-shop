@@ -74,7 +74,7 @@ const resetSearch = () => {
 
 // 添加分页相关状态
 const pageInfo = reactive({
-    number: 10,
+    per_page: 10,
     total: 0,
     current_page: 1,
 })

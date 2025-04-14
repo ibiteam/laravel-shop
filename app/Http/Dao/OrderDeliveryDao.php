@@ -27,7 +27,7 @@ class OrderDeliveryDao
         }
 
         $order_delivery = OrderDelivery::query()->create([
-            'delivery_no' => 'D'.get_flow_sn(),
+            'delivery_no' => $this->generateDeliveryNo(),
             'order_id' => $order->id,
             'ship_company_id' => $ship_company->id,
             'ship_no' => $params['ship_no'],
@@ -60,5 +60,13 @@ class OrderDeliveryDao
         OrderDelivery::query()->whereIn('id', $order_delivery_ids)->delete();
 
         return $order_delivery_ids;
+    }
+
+    /**
+     * 生成发货单号.
+     */
+    public function generateDeliveryNo(): string
+    {
+        return 'D'.get_flow_sn();
     }
 }

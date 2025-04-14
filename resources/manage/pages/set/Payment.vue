@@ -4,8 +4,8 @@ import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { paymentMethodChangeField, paymentMethodEdit, paymentMethodIndex, paymentMethodUpdate } from '@/api/set';
 import { fileUpload } from '@/api/common';
-import Page from '@/components/common/Pagination.vue'
 import _ from 'lodash';
+import PublicPageTable from '@/components/common/PublicPageTable.vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
@@ -39,7 +39,7 @@ const resetSearch = () => {
 
 // 添加分页相关状态
 const pageInfo = reactive({
-    number: 10,
+    per_page: 10,
     total: 0,
     current_page: 1,
 })
@@ -225,11 +225,12 @@ onMounted(() => {
                 </el-form-item>
             </el-form>
         </el-header>
-        <el-table
+        <PublicPageTable
             :data="tableData"
-            stripe
-            border
             v-loading="loading"
+            :pageInfo="pageInfo"
+            @sizeChange="handleSizeChange"
+            @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="名称" prop="name"></el-table-column>
@@ -280,9 +281,7 @@ onMounted(() => {
                     <el-button link type="primary" size="large" @click="openDetailDialog(scope.row.id)">编辑</el-button>
                 </template>
             </el-table-column>
-        </el-table>
-        <!-- 添加分页组件 -->
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+        </PublicPageTable>
 
         <el-dialog
             v-model="detailDialogVisible"

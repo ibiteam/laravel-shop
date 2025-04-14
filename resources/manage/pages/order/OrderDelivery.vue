@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Search, RefreshLeft } from '@element-plus/icons-vue'
-import { orderDeliveryIndex, orderQueryExpress } from '@/api/order';
+import { Search, RefreshLeft, Upload } from '@element-plus/icons-vue';
+import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport } from '@/api/order';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
+import importFilePath from '@/assets/xlsx/发货模板.xlsx'
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -37,7 +38,7 @@ const resetSearch = () => {
 
 // 添加分页相关状态
 const pageInfo = reactive({
-    number: 10,
+    per_page: 10,
     total: 0,
     current_page: 1,
 })
@@ -102,6 +103,49 @@ const closeLogisticsDialog = () => {
     logisticsInitLoading.value = false;
 }
 /* 物流轨迹结束 */
+/* 导入发货开始 */
+const importVisible = ref(false)
+const importSuccessNumber = ref(0)
+const importErrorData = ref([]);
+const importFileLoading = ref(false)
+const openImportDialog = () => {
+    importVisible.value = true;
+    importSuccessNumber.value = 0
+    importErrorData.value = [];
+    importFileLoading.value = false;
+}
+const downloadFile = () => {
+    const link = document.createElement('a');
+    link.href = importFilePath;
+    link.download = '发货模板.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+const submitImport = (request) => {
+    importFileLoading.value = true
+    importSuccessNumber.value = 0
+    importErrorData.value = [];
+    orderDeliveryImport({ import_file: request.file }).then(res => {
+        importFileLoading.value = false
+        if (cns.$successCode(res.code)) {
+            importSuccessNumber.value = res.data.success_number
+            importErrorData.value = res.data.error_data
+            if (res.data.success_number > 0) {
+                getData(1);
+            }
+        } else {
+            cns.$message.error(res.message)
+        }
+    })
+}
+const closeImportDialog = () => {
+    importVisible.value = false;
+    importFileLoading.value = false;
+    importSuccessNumber.value = 0
+    importErrorData.value = [];
+}
+/* 导入发货结束 */
 
 onMounted(() => {
     getData();
@@ -150,6 +194,7 @@ onMounted(() => {
                 <el-form-item>
                     <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
                     <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
+                    <el-button :icon="Upload" type="warning" @click="openImportDialog">导入发货</el-button>
                 </el-form-item>
             </el-form>
         </el-header>
@@ -185,7 +230,7 @@ onMounted(() => {
                 </template>
             </el-table-column>
             <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
-            <el-table-column label="发货时间" prop="received_at" width="160px"></el-table-column>
+            <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
         </PublicPageTable>
         <!-- 查看物流 -->
         <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
@@ -201,6 +246,39 @@ onMounted(() => {
                     <el-button type="info" @click="closeLogisticsDialog()">关闭</el-button>
                 </div>
             </template>
+        </el-dialog>
+        <!-- 导入发货 -->
+        <el-dialog v-model="importVisible" title="导入发货" width="600" center :before-close="closeImportDialog">
+            <div class="detail-item">
+                <div class="detail-title">下载模板</div>
+                <el-button @click="downloadFile">点击下载模板</el-button>
+            </div>
+            <div class="detail-item">
+                <div class="detail-title">导入发货</div>
+                <el-upload
+                    accept=".xlsx"
+                    action=""
+                    :show-file-list="false"
+                    :http-request="(request) => submitImport(request)"
+                    :with-credentials="true">
+                    <el-button :loading="importFileLoading" type="primary">选择文件</el-button>
+                </el-upload>
+            </div>
+            <div class="detail-item">
+                <div class="detail-title">导入结果</div>
+                <div v-if="importSuccessNumber > 0">
+                    <span class="import-response import-response-success">导入成功 {{ importSuccessNumber }} 条数据</span>
+                </div>
+                <div v-if="importErrorData.length > 0">
+                    <div>
+                        <span class="import-response import-response-error">导入失败 {{ importErrorData.length }} 条数据</span>
+                    </div>
+                    <el-table :data="importErrorData" stripe border style="width: 100%;">
+                        <el-table-column label="错误行数" prop="line"></el-table-column>
+                        <el-table-column label="错误信息" prop="message"></el-table-column>
+                    </el-table>
+                </div>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -218,5 +296,50 @@ onMounted(() => {
     :deep(.el-input) {
         width: 200px;
     }
+}
+.detail-item{
+    padding: 15px 0;
+    .detail-cont{
+        border: 1px solid #E5E5E5;
+        padding: 15px;
+        min-height: 100px;
+        border-radius: 10px;
+        >div{
+            line-height: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+    }
+}
+.detail-title{
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 30px;
+    color: #333;
+    position: relative;
+    padding-left: 10px;
+    margin-bottom: 15px;
+    &:before{
+        content: '';
+        position: absolute;
+        width: 4px;
+        height: 16px;
+        background: #3D9CFF;
+        left: 0;
+        top: 7px;
+        border-radius: 2px;
+        z-index: 1;
+    }
+}
+.import-response {
+    margin-bottom: 5px;
+    font-size: 18px;
+    line-height: 40px;
+}
+.import-response-success {
+    color: #67C23AFF;
+}
+.import-response-error {
+    color: var(--red-color);
 }
 </style>

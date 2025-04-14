@@ -51,5 +51,6 @@ Route::prefix('order')->group(function () {
     // 发货管理
     Route::prefix('delivery')->group(function () {
         Route::get('/', [OrderDeliveryController::class, 'index'])->name(Permission::MANAGE_ORDER_DELIVERY_INDEX)->middleware('manage.permission');
+        Route::post('import', [OrderDeliveryController::class, 'import']);
     });
 });

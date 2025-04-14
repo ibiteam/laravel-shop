@@ -28,6 +28,10 @@ export function orderDeliveryIndex(data) {
     return $http.doGet('manage/order/delivery', data)
 }
 
+export function orderDeliveryImport(data) {
+    return $http.doPost('manage/order/delivery/import', data)
+}
+
 // 退款原因
 export function applyRefundReasonIndex(data) {
     return $http.doGet('manage/order/apply_refund_reason', data)
