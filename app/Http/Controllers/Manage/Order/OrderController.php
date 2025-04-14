@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Order;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\RefererEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\OrderDeliveryDao;
 use App\Http\Dao\OrderLogDao;

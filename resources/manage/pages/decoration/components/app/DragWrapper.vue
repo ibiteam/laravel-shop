@@ -3,7 +3,7 @@
         <div class="drag-content drag-item" :class="{ 'drag-select': select, 'drag-fixed': !show_select }">
             <div class="drag-hidden s-flex ai-ct jc-ct" v-if="!component.is_show" @click.stop="handleClickHiddenModel">已隐藏</div>
             <slot name="content"></slot>
-            <div class="drag-tooltip" :class="{ 'select': select }" v-if="show_tooltip">{{ component.name }}</div>
+            <div class="drag-tooltip" :class="{ 'select': select }" v-if="show_tooltip" @click.stop="handleChooseDragItem">{{ component.name }}</div>
             <div class="drag-tools s-flex ai-ct jc-bt flex-dir" v-if="select && show_select">
                 <icon :name="component.is_show ? 'eye-o' : 'closed-eye'" class="icon" size="20px" @click.stop="handleClickTools({type: 'show'})"/>
                 <icon name="delete-o" class="icon" size="20px" @click.stop="handleClickTools({type: 'remove'})"/>
@@ -66,6 +66,10 @@ const handleClickHiddenModel = () => {
 const handleClickTools = (params) => {
     const { type } = params
     cns.$bus.emit('updateComponentData', {type, component: props.component})
+}
+
+const handleChooseDragItem = () => {
+    cns.$bus.emit('chooseDragItem', {temp_index: props.component.id})
 }
 
 </script>
