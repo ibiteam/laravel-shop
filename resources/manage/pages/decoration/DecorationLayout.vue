@@ -88,13 +88,13 @@ const pageInfo = reactive({
 
 // 页码改变
 const handleCurrentChange = (val) => {
-    getHistory(val);
+    getHistory({page: val});
 }
 
 // 每页条数改变
 const handleSizeChange = (val) => {
     pageInfo.per_page = val;
-    getHistory(1);
+    getHistory({page: 1});
 }
 
 // 获取历史记录
@@ -106,9 +106,9 @@ const getHistory = (params = {page: 1}) => {
         if (cns.$successCode(res.code)) {
             history.data = res.data.list;
             // // 更新分页信息
-            history.total = res.data.meta.total;
-            history.per_page = Number(res.data.meta.per_page);
-            history.current_page = res.data.meta.current_page;
+            pageInfo.total = res.data.meta.total;
+            pageInfo.per_page = Number(res.data.meta.per_page);
+            pageInfo.current_page = res.data.meta.current_page;
         } else {
             cns.$message.error(res.message)
         }
