@@ -104,3 +104,11 @@ it('test goods intelligent', function () {
     $response = $this->doPost('api/manage/set/app_decoration/goods/intelligent', $data);
     dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
 });
+
+it('test history', function () {
+    $data = [
+        'id' => 1,
+    ];
+    $response = $this->doPost('api/manage/set/app_decoration/history', $data);
+    dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
+});

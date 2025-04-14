@@ -6,7 +6,7 @@ use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $app_decoration_id 装修页面ID
@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationLog whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationLog whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppDecorationLog whereUpdatedAt($value)
+ * @property-read \App\Models\AdminUser $admin_user
  * @mixin \Eloquent
  */
 class AppDecorationLog extends Model
@@ -34,5 +35,11 @@ class AppDecorationLog extends Model
     public function getAppDecorationItemIdsAttribute($input)
     {
         return json_decode($input, true);
+    }
+
+    // 关联管理员
+    public function admin_user()
+    {
+        return $this->belongsTo(AdminUser::class, 'admin_user_id', 'id');
     }
 }

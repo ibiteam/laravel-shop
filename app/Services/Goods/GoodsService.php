@@ -410,11 +410,14 @@ class GoodsService
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
-        if (AppDecorationItem::RULE_INTELLIGENT == $rule) {
-            $sort = Goods::$sorts[$sort_type] ?? null;
-            $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}") )->limit($limit);
-        } elseif (AppDecorationItem::RULE_MANUAL == $rule){
-            $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
+        switch ($rule) {
+            case AppDecorationItem::RULE_INTELLIGENT:
+                $sort = Goods::$sorts[$sort_type] ?? null;
+                $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}") )->limit($limit);
+                break;
+            case AppDecorationItem::RULE_MANUAL:
+                $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
+                break;
         }
 
         return $query->get()->toArray();

@@ -99,18 +99,8 @@ class GoodsRecommendComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $goodsService = new GoodsService;
-        $items = collect($content['goods'])
-//            ->sortByDesc('sort')
-            ->map(function ($item) use (&$items, $goodsService) {
-                $data['rule'] = $item['rule'];
-                $data['number'] = $item['number'] ?? Constant::ZERO;
-                $data['sort_type'] = $item['sort_type'] ?? Constant::ZERO;
-                $data['goods_nos'] = $item['goods_nos'] ?? null;
-                $data['goods_data'] = $goodsService->getRecommendGoods($data['number'], $data['sort_type'], $data['goods_nos'], $data['rule']);
-
-                return $data;
-            })->filter()->values()->toArray();
+        $goods = $content['goods'];
+        $goods['goods_data'] = app(GoodsService::class)->getRecommendGoods($goods['number'], $goods['sort_type'], $goods['goods_nos'], $goods['rule']);
 
         return [
             'component_name' => $data['component_name'],
@@ -118,7 +108,7 @@ class GoodsRecommendComponent extends PageComponent
             'layout' => $content['layout'],
             'recommend' => $content['recommend'],
             'title' => $content['title'],
-            'items' => $items,
+            'items' => $goods,
         ];
     }
 

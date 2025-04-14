@@ -11,6 +11,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
 use App\Models\AppDecorationItemDraft;
+use App\Models\AppDecorationLog;
 use App\Models\Goods;
 use App\Models\ShopConfig;
 use App\Services\AppDecoration\AppDecorationLogService;
@@ -20,6 +21,7 @@ use App\Utils\Constant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AppDecorationController extends BaseController
@@ -86,6 +88,7 @@ class AppDecorationController extends BaseController
             if ($exception instanceof BusinessException) {
                 return $this->error($exception->getMessage());
             }
+            Log::error($exception->getMessage());
 
             return $this->error('初始化失败');
         }
@@ -157,6 +160,26 @@ class AppDecorationController extends BaseController
         }
 
         return $this->success([]);
+    }
+
+    // 历史记录
+    public function decorationHistory(Request $request, AppDecorationLogService $app_decoration_log_service)
+    {
+        $log_data = $app_decoration_log_service->getAllLogsPaginate((int)$request->get('id')); // 装修页面id
+
+        return $this->success($log_data);
+    }
+
+    // 还原历史记录
+    public function historyRestore(Request $request)
+    {
+        $log_id = $request->get('log_id'); // 装修记录id
+
+        if (!AppDecorationLog::whereId($log_id)->update(['updated_at' => now()])) {
+            return $this->error('还原失败');
+        }
+
+        return $this->success('保存成功');
     }
 
     // 为您推荐组件数据
