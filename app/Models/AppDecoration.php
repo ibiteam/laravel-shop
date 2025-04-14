@@ -61,6 +61,7 @@ class AppDecoration extends Model
     public const OPERATE_TYPE_SAVE_DRAFT = 1;
 
     public const ALIAS_HOME = 'home'; // 首页
+    public const MOBILE_HOME_BY_H5 = 'mobile_home_by_h5'; // h5 首页缓存
 
     public function adminUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
