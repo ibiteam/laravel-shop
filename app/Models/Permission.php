@@ -123,7 +123,14 @@ class Permission extends SpatiePermission
     public const MANAGE_APPLY_REFUND_INDEX = 'manage.apply_refund.index'; // 退款申请
     public const MANAGE_APPLY_REFUND_UPDATE = 'manage.apply_refund.update'; // 退款申请编辑
 
-
+    // 二级 文章部分
+    public const ARTICLE_MANAGE = 'article.manage'; // 文章管理
+    public const MANAGE_ARTICLE_CATEGORY_INDEX = 'manage.article_category.index'; // 文章分类
+    public const MANAGE_ARTICLE_CATEGORY_UPDATE = 'manage.article_category.update'; // 文章分类新增|编辑
+    public const MANAGE_ARTICLE_CATEGORY_DELETE = 'manage.article_category.delete'; // 文章分类删除
+    public const MANAGE_ARTICLE_INDEX = 'manage.article.index'; // 文章列表
+    public const MANAGE_ARTICLE_UPDATE = 'manage.article.update'; // 文章列表新增|编辑
+    public const MANAGE_ARTICLE_DELETE = 'manage.article.delete'; // 文章列表删除
 
     public function __construct(array $attributes = [])
     {

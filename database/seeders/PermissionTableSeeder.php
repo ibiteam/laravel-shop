@@ -109,6 +109,7 @@ class PermissionTableSeeder extends Seeder
     private function addOrderPermission(): void
     {
         $this->addPermission('订单', Permission::MODULE_ORDER, 97, Permission::IS_LEFT_NAV, 'ShoppingBag');
+
         $this->addPermission('订单管理', Permission::ORDER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
         $this->addPermission('订单列表', Permission::MANAGE_ORDER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_MANAGE);
 
@@ -123,6 +124,14 @@ class PermissionTableSeeder extends Seeder
     private function addArticlePermission(): void
     {
         $this->addPermission('文章', Permission::MODULE_ARTICLE, 96, Permission::IS_LEFT_NAV, 'Notebook');
+
+        $this->addPermission('文章管理', Permission::ARTICLE_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ARTICLE);
+        $this->addPermission('文章分类', Permission::MANAGE_ARTICLE_CATEGORY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
+        $this->addPermission('文章分类新增|编辑', Permission::MANAGE_ARTICLE_CATEGORY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
+        $this->addPermission('文章分类删除', Permission::MANAGE_ARTICLE_CATEGORY_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
+        $this->addPermission('文章列表', Permission::MANAGE_ARTICLE_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
+        $this->addPermission('文章列表新增|编辑', Permission::MANAGE_ARTICLE_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
+        $this->addPermission('文章列表删除', Permission::MANAGE_ARTICLE_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ARTICLE_MANAGE);
     }
 
     private function addToolPermission(): void
