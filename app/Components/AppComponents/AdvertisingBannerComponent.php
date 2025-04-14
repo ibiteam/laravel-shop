@@ -3,7 +3,6 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Services\AppDecoration\AppDecorationItemService;
@@ -12,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AdvertisingBannerComponent extends PageComponent
 {
-
     public function icon(): array
     {
         return [
@@ -59,7 +57,7 @@ class AdvertisingBannerComponent extends PageComponent
                         'date_type' => AppDecorationItem::LONG_TIME, // 1、长期 0、时间范围
                         'time' => [], //
                         'image' => '', // 图片地址
-                        'sort' => 1, // 排序
+                        //                        'sort' => 1, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                 ],
@@ -97,23 +95,26 @@ class AdvertisingBannerComponent extends PageComponent
             'content.data.*.image' => 'required',
             'content.data.*.url.name' => 'present|nullable',
             'content.data.*.url.value' => 'present|nullable',
-            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+            //            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.data.*.is_show' => 'required|in:'.$is_show_validate_string,
             'content.data.*.date_type' => 'present|in:'.$is_show_validate_string,
             'content.data.*.time' => 'array',
         ], $this->messages());
+
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
+
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
-//        if ($msg = $this->checkColumn($data['content'])) {
-//            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
-//        }
+        //        if ($msg = $this->checkColumn($data['content'])) {
+        //            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
+        //        }
         // 独立校验 time 字段
         foreach ($data['content']['data'] as $index => $item) {
             $date_type = $item['date_type'] ?? null;
             $time = $item['time'] ?? null;
-            if (AppDecorationItem::CUSTOM_TIME == $date_type) {
+
+            if ($date_type == AppDecorationItem::CUSTOM_TIME) {
                 app(AppDecorationItemService::class)->validateTimeFields($this->getName(), $time, $data['id'], $index);
             }
         }
@@ -132,19 +133,21 @@ class AdvertisingBannerComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['data'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            $data['image'] = $item['image'] ?? '';
-            $data['url'] = $item['url'];
-            $data['date_type'] = $item['date_type'];
-            $data['time'] = $item['time'];
-            $data['sort'] = $item['sort'] ?? 0;
+        $items = collect($content['data'])
+//            ->sortByDesc('sort')
+            ->map(function ($item) use (&$items) {
+                $data['image'] = $item['image'] ?? '';
+                $data['url'] = $item['url'];
+                $data['date_type'] = $item['date_type'];
+                $data['time'] = $item['time'];
+                $data['sort'] = $item['sort'] ?? 0;
 
-            if ($item['is_show']) {
-                return $data;
-            }
+                if ($item['is_show']) {
+                    return $data;
+                }
 
-            return null;
-        })->filter()->values()->toArray();
+                return null;
+            })->filter()->values()->toArray();
 
         return [
             'component_name' => $data['component_name'],

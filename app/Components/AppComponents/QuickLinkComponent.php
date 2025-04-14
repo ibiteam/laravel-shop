@@ -16,17 +16,17 @@ class QuickLinkComponent extends PageComponent
             'name' => $this->getName() ?: '金刚区',
             'component_name' => $this->getComponentName(),
             'limit' => 0,
-            'icon' => "&#xe7ce;",
-            'sort' => "",
+            'icon' => '&#xe7ce;',
+            'sort' => '',
         ];
     }
 
     public function parameter(): array
     {
         return [
-            'id' => '', //组件自增id
+            'id' => '', // 组件自增id
             'name' => $this->getName() ?: '金刚区',
-            'component_name' => $this->getComponentName(),// 组件名称
+            'component_name' => $this->getComponentName(), // 组件名称
             'is_show' => Constant::ONE,
             'is_fixed_assembly' => Constant::ZERO, // 不是固定组件
             'sort' => Constant::ZERO,
@@ -41,7 +41,7 @@ class QuickLinkComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'sort' => 1, // 排序
+                        //                        'sort' => 1, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                     [
@@ -51,7 +51,7 @@ class QuickLinkComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'sort' => 2, // 排序
+                        //                        'sort' => 2, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                     [
@@ -61,7 +61,7 @@ class QuickLinkComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'sort' => 3, // 排序
+                        //                        'sort' => 3, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                     [
@@ -71,7 +71,7 @@ class QuickLinkComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'sort' => 4, // 排序
+                        //                        'sort' => 4, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                 ],
@@ -80,8 +80,8 @@ class QuickLinkComponent extends PageComponent
     }
 
     /**
-     * @param $data
      * @return array|\Illuminate\Contracts\Validation\Validator|\Illuminate\Validation\Validator
+     *
      * @throws \App\Exceptions\BusinessException
      */
     public function validate($data): array
@@ -90,24 +90,26 @@ class QuickLinkComponent extends PageComponent
             'id' => 'nullable',
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_QUICK_LINK,
-            'is_show' => 'required|integer|in:'. Constant::ONE.','.Constant::ZERO,
-            'content.row' => 'required|in:'. AppDecorationItem::PLATE_HEIGHT_ONE.','.AppDecorationItem::PLATE_HEIGHT_TWO.','.AppDecorationItem::PLATE_HEIGHT_THREE, // 每行展示 1行 2行 3行
-            'content.column' => 'required|in:'. AppDecorationItem::NUMBER_ROWS_THREE.','.AppDecorationItem::NUMBER_ROWS_FOUR.','.AppDecorationItem::NUMBER_ROWS_FIVE, // 每行个数 3个 4个 5个
+            'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
+            'content.row' => 'required|in:'.AppDecorationItem::PLATE_HEIGHT_ONE.','.AppDecorationItem::PLATE_HEIGHT_TWO.','.AppDecorationItem::PLATE_HEIGHT_THREE, // 每行展示 1行 2行 3行
+            'content.column' => 'required|in:'.AppDecorationItem::NUMBER_ROWS_THREE.','.AppDecorationItem::NUMBER_ROWS_FOUR.','.AppDecorationItem::NUMBER_ROWS_FIVE, // 每行个数 3个 4个 5个
             'content.data' => 'required|array',
             'content.data.*.image' => 'required',
             'content.data.*.title' => 'max:6',
             'content.data.*.url.name' => 'present|nullable',
             'content.data.*.url.value' => 'present|nullable',
-            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
-            'content.data.*.is_show' => 'required|int:' . Constant::ONE . ',' . Constant::ZERO,
+            //            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+            'content.data.*.is_show' => 'required|int:'.Constant::ONE.','.Constant::ZERO,
         ], $this->messages());
+
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
         $title = array_column($data['content']['data'], 'title');
         $title_arr = $this->checkUnique($title);
-        if ( $title_arr ) {
-            throw new ProcessDataException($this->getName().'：'.implode('，' ,$title_arr) .'，名称已存在，请修改！', ['id' => $data['id']]);
+
+        if ($title_arr) {
+            throw new ProcessDataException($this->getName().'：'.implode('，', $title_arr).'，名称已存在，请修改！', ['id' => $data['id']]);
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
@@ -119,23 +121,24 @@ class QuickLinkComponent extends PageComponent
     }
 
     /**
-     * 格式化组件数据
-     * @param $data
-     * @return array
+     * 格式化组件数据.
      */
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['data'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            $data['image'] = $item['image'] ?? '';
-            $data['title'] = $item['title'] ?? '';
-            $data['url'] = $item['url'];
-            if ($item['is_show']) {
-                return $data;
-            }
+        $items = collect($content['data'])
+//            ->sortByDesc('sort')
+            ->map(function ($item) use (&$items) {
+                $data['image'] = $item['image'] ?? '';
+                $data['title'] = $item['title'] ?? '';
+                $data['url'] = $item['url'];
 
-            return null;
-        })->filter()->values()->toArray();
+                if ($item['is_show']) {
+                    return $data;
+                }
+
+                return null;
+            })->filter()->values()->toArray();
 
         return [
             'component_name' => $data['component_name'],
@@ -147,9 +150,7 @@ class QuickLinkComponent extends PageComponent
     }
 
     /**
-     * 后台数据渲染
-     * @param $data
-     * @return array
+     * 后台数据渲染.
      */
     public function display($data): array
     {
@@ -201,6 +202,7 @@ class QuickLinkComponent extends PageComponent
         $counts = array_count_values($array);
         // 遍历统计结果，找出重复的字段名
         $duplicateFields = [];
+
         foreach ($counts as $value => $count) {
             if ($count > 1) {
                 $duplicateFields[] = $value;
