@@ -106,6 +106,19 @@ class ApiOrderResource extends JsonResource
 
                 break;
 
+            case OrderConstantEnum::STATUS_PART:
+                $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+
+                if ($has_logistics) {
+                    $buttons[] = ['text' => '查看物流', 'action' => 'logistics'];
+                }
+
+                if ($this->resource->detail_count === 1) {
+                    $buttons[] = ['text' => '再次购买', 'action' => 'again'];
+                }
+
+                break;
+
             case OrderConstantEnum::STATUS_WAIT_RECEIVE:
                 if ($has_logistics) {
                     $buttons[] = ['text' => '查看物流', 'action' => 'logistics'];
