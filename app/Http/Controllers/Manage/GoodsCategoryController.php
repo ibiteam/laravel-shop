@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Dao\CategoryDao;
 use App\Models\AdminOperationLog;
 use App\Models\Category;
 use App\Models\Goods;
@@ -29,22 +30,24 @@ class GoodsCategoryController extends BaseController
     /**
      * 获取信息.
      */
-    public function edit(Request $request): JsonResponse
+    public function edit(Request $request, CategoryDao $category_dao)
     {
-        $top_categories = Category::query()->whereParentId(0)->selectRaw('id AS value,name AS label')->get()->toArray();
-        array_unshift($top_categories, ['value' => 0, 'label' => '顶级分类']);
+        $id = $request->get('id') ?? 0;
+
+        $tree_categories = $category_dao->getTreeList();
+
         $info = null;
 
-        if ($id = $request->get('id')) {
+        if ($id) {
             $info = Category::query()->whereId($id)->select(['id', 'name', 'title', 'keywords', 'description', 'logo', 'parent_id', 'sort', 'is_show'])->first();
 
             if (! $info instanceof Category) {
-                return $this->error('数据不存在');
+                return $this->error('分类不存在');
             }
         }
 
         return $this->success([
-            'top_categories' => $top_categories,
+            'tree_categories' => $tree_categories,
             'info' => $info,
         ]);
     }
