@@ -48,7 +48,7 @@ class ApiOrderResource extends JsonResource
             }),
             'order_amount' => price_number_format($this->resource->order_amount),
             'logistics' => $last_logistics,
-            'evaluate' => ! $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
+            'evaluate' => $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
             'buttons' => $this->getButtons(
                 $order_constant_enum,
                 is_array($last_logistics),
