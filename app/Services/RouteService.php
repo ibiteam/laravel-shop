@@ -10,15 +10,15 @@ class RouteService
     /**
      * 获取完整请求地址
      */
-    public function getRoutePath(RouteEnum $mobile_route_enum, array $params = []): string
+    public function getRoutePath(RouteEnum $route_enum, array $params = []): string
     {
-        $route = Router::query()->whereAlias($mobile_route_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
+        $route = Router::query()->whereAlias($route_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
 
         if (! $route instanceof Router) {
             return '';
         }
 
-        $path = $route->h5_url;
+        $path = rtrim(config('host.vue_app_url'), '/').'/'.ltrim($route->h5_url, '/');
         $set_data = [];
 
         foreach ($route->params as $key => $value) {
