@@ -106,9 +106,9 @@ class AdvertisingBannerComponent extends PageComponent
         }
 
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
-        //        if ($msg = $this->checkColumn($data['content'])) {
-        //            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
-        //        }
+        if ($msg = $this->checkColumn($data['content'])) {
+            throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
+        }
         // 独立校验 time 字段
         foreach ($data['content']['data'] as $index => $item) {
             $date_type = $item['date_type'] ?? null;
@@ -194,13 +194,13 @@ class AdvertisingBannerComponent extends PageComponent
 
         switch ($column) {
             case AppDecorationItem::NUMBER_COLUMN_TWO:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 340) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是340";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 350) {
-                    return "每行显示 {$column}，无背景图的情况下，款度只能是350";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 340) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是340";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 350) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是350";
+//                }
 
                 if ($height < 190 || $height > 250) {
                     return "每行显示 {$column}，高度范围 190 - 250";
@@ -214,13 +214,13 @@ class AdvertisingBannerComponent extends PageComponent
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_THREE:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 220) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是220";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 230) {
-                    return "每行显示 {$column}，无背景图的情况下，宽度只能是230";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 220) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是220";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 230) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是230";
+//                }
 
                 if ($height < 280 || $height > 400) {
                     return "每行显示 {$column}，高度范围 280 - 400";
@@ -234,13 +234,13 @@ class AdvertisingBannerComponent extends PageComponent
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_FOUR:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是160";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 170) {
-                    return "每行显示 {$column}，无背景图的情况下，宽度只能是170";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是160";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 170) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是170";
+//                }
 
                 if ($height < 220 || $height > 350) {
                     return "每行显示 {$column}，高度范围 220 - 350";
