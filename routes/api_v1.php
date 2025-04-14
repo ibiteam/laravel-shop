@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use App\Http\Controllers\Api\V1\UploadController;
+use App\Http\Controllers\Api\V1\WechatController;
 use Illuminate\Support\Facades\Route;
 
 // 首页
@@ -26,7 +27,6 @@ Route::get('home', [HomeController::class, 'home']);
 Route::get('search', [HomeController::class, 'search']);
 // 为您推荐
 Route::get('recommend', [HomeController::class, 'recommend']);
-
 /* 发送短信 */
 Route::post('sms-action', [SmsController::class, 'handleAction']);
 Route::get('shop/config', [CommonController::class, 'shopConfig']);
@@ -40,6 +40,7 @@ Route::prefix('auth')->group(function () {
     Route::post('login/password', [AuthController::class, 'loginByPassword']); // 账号(用户名+手机号)密码登录
     Route::post('login/phone', [AuthController::class, 'loginByPhone']); // 手机号登录
     Route::post('forget/password', [AuthController::class, 'forgetPassword']); // 忘记密码
+    Route::post('wechat', [WechatController::class, 'auth']); // 微信公众号授权
 });
 
 // 搜索
@@ -70,6 +71,7 @@ Route::prefix('goods')->group(function () {
 Route::get('evaluate/goods', [EvaluateController::class, 'indexByGoods']);
 // 获取客服地址
 Route::get('chat/url', [ChatController::class, 'chatUrl']);
+
 /**
  * 登录可以访问路由.
  */
