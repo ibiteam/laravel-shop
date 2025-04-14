@@ -35,11 +35,11 @@
                             <template v-for="(temp, index) in decoration.data">
                                 <!-- <div class="drag-placeholder" v-if="dragData.placeholderIndex == index"></div> -->
                                 <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
-                                <HotZone v-else-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
-                                <AdvertisingBanner v-else-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
-                                <QuickLink v-else-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
-                                <GoodsRecommend v-else-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
-                                <Recommend v-else-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></Recommend>
+                                <HotZone v-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
+                                <AdvertisingBanner v-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
+                                <QuickLink v-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
+                                <GoodsRecommend v-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
+                                <Recommend v-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></Recommend>
                             </template>
                         </VueDraggable>
                         <!-- <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar> -->
@@ -197,7 +197,7 @@ const handleLinkCenterDialogConfirm = (res) => {
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
-        value: res[0]?.h5_url
+        value: res[0]?.h5_url || res[0]?.goods_url || res[0]?.url
     }}
     if (linkCenterDialogData.temp_index) {
         const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
@@ -306,6 +306,8 @@ const getDecorationHome = () => {
             decoration.component_value = res.data.component_value
             decoration.data = res.data.data
             decoration.not_for_data = res.data.not_for_data
+
+            
         } else {
             cns.$message.error(res.message)
         }

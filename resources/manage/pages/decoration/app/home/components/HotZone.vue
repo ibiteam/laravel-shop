@@ -34,7 +34,7 @@
                 </template>
             </setting-bar>
         </teleport>
-        <HotZoneDialog v-if="showDialog" v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas, temp_index, background_image: form.content.image}" @save="handleHotZoneSelectSave" @close="showDialog = false" />
+        <HotZoneDialog v-if="showDialog" v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas, temp_index, background_image: form.content.image}" ref="hotZoneDialogRef" @save="handleHotZoneSelectSave" @close="showDialog = false" />
     </section>
 </template>
 <script setup>
@@ -82,6 +82,7 @@ const form = reactive({
 })
 
 const showDialog = ref(false)
+const hotZoneDialogRef = ref(null)
 
 // 通知打开选择图片弹窗
 const handleOpenUpload = (index) => {
@@ -94,7 +95,8 @@ const updateUploadComponentData = (res) => {
 
 // 更新选择路由数据
 const updateLinkComponentData = (res) => {
-    form.content = updateNested(form.content, res.keys, res.link)
+    hotZoneDialogRef.value.updateLinkComponentData(res)
+    // form.content = updateNested(form.content, res.keys, res.link)
 }
 
 // 更新热区选择

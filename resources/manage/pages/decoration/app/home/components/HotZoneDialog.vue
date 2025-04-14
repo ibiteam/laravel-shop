@@ -86,7 +86,7 @@
                                         <LinkInput
                                             :name="area.url?.name"
                                             :value="area.url?.value"
-                                            @select="handleOpenLink(['areas', index, 'url'])"
+                                            @select="handleOpenLink([index, 'url'])"
                                             @input="(res) => {
                                                 hotZoneDialog.data[index].url = res
                                             }"
@@ -111,6 +111,7 @@ import { ref, reactive, watch, defineEmits, getCurrentInstance, onMounted, nextT
 import FreeZoneSelect from '@/pages/decoration/components/FreeZoneSelect.vue'
 import SettingBar from '@/pages/decoration/components/SettingBar.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
+import { updateNested } from '@/pages/decoration/utils/common.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -178,6 +179,15 @@ const handleClose = (done) => {
     emit('close')
     // done()
 }
+
+// 更新选择路由数据
+const updateLinkComponentData = (res) => {
+    hotZoneDialog.data = updateNested(hotZoneDialog.data, res.keys, res.link)
+}
+
+defineExpose({
+    updateLinkComponentData
+})
 
 watch(() => props, (newVal) => {
     if (newVal) {
