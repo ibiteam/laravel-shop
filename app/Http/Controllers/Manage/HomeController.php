@@ -30,9 +30,7 @@ class HomeController extends BaseController
     {
         $admin_user = $this->adminUser();
 
-        // 权限菜单
-        $collect_permission_ids = Collect::query()->whereAdminUserId($admin_user->id)->select('permission_id')->get()->keyBy('permission_id')->toArray();
-        $menus = $permission_dao->getTreePermissionByAdminUser($admin_user, $collect_permission_ids);
+        $menus = $permission_dao->getTreePermissionByAdminUser($admin_user);
 
         $shop_config = $shop_config_dao->multipleConfig(
             ShopConfig::MANAGE_COLOR,

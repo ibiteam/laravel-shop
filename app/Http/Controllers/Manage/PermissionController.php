@@ -37,7 +37,7 @@ class PermissionController extends BaseController
                 'name' => 'required|string',
                 'display_name' => 'required|string',
                 'icon' => 'nullable|string',
-                'sort' => 'required|integer',
+                'sort' => 'nullable|integer',
             ], [], [
                 'id' => '权限ID',
                 'parent_id' => '权限分类',
@@ -57,7 +57,7 @@ class PermissionController extends BaseController
             $permission->name = $validated['name'];
             $permission->display_name = $validated['display_name'];
             $permission->icon = $validated['icon'];
-            $permission->sort = $validated['sort'];
+            $permission->sort = $validated['sort'] ?? 0;
 
             if (! $permission->save()) {
                 return $this->error('保存失败');

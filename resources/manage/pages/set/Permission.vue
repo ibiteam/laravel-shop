@@ -10,7 +10,47 @@
                 </el-form-item>
             </el-form>
         </el-header>
-        <!--todo: 权限-->
+
+        <el-main>
+            <div class="box-main">
+                <div class="tree-box">
+                    <el-tree
+                        :data="permissionData"
+                        node-key="id"
+                        :default-expanded-keys="expandedArr"
+                        :default-checked-keys="checkedArr"
+                        :props="{children:'children', label:'display_name'}"
+                        @node-click="treeChoose">
+                    </el-tree>
+                </div>
+                <el-form v-if="submitForm.id > 0" :model="submitForm" ref="submitFormRef" :rules="submitFormRules"
+                         label-position="top" status-icon label-width="auto" size="default">
+                    <el-form-item label="所属分类" prop="parent_id">
+                        <el-cascader v-model="submitForm.parent_id" placeholder="未选择默认顶级分类" style="width: 400px;"
+                                     :options="permissionData" clearable
+                                     :props="{ checkStrictly: true, value:'id', label:'display_name', emitPath:false}">
+                        </el-cascader>
+                    </el-form-item>
+                    <el-form-item label="名称" prop="display_name">
+                        <el-input v-model="submitForm.display_name" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="权限值(该权限所代表的权限值)" prop="name">
+                        <el-input v-model.number="submitForm.name" disabled></el-input>
+                    </el-form-item>
+                    <el-form-item label="图标地址" prop="icon">
+                        <el-input v-model.number="submitForm.icon"></el-input>
+                    </el-form-item>
+                    <el-form-item label="排序(数字越大越靠前)" prop="sort">
+                        <el-input v-model.number="submitForm.sort"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+
+        </el-main>
+
     </div>
 </template>
 
@@ -26,6 +66,8 @@ const searchForm = reactive({
 });
 
 const permissionData = ref([]);
+const expandedArr = ref([]);    // 默认展开第一行
+const checkedArr = ref([]);     // 默认选中
 const loading = ref(false);
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
@@ -39,8 +81,8 @@ const submitForm = reactive({
 });
 
 const submitFormRules = reactive({
+    display_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
     name: [{ required: true, message: '请输入权限值', trigger: 'blur' }],
-    display_name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
 });
 
 /* 提交 */
@@ -51,6 +93,7 @@ const onSubmit = () => {
             permissionStore(submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
+                    cns.$message.success(res.message);
                     getData();
                 } else {
                     cns.$message.error(res.message);
@@ -69,6 +112,13 @@ const getData = () => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             permissionData.value = res.data;
+            if (res.data.length) {
+                expandedArr.value.push(res.data[0].id);
+                if (res.data[0].children) {
+                    setExpandedArr(res.data[0].children);
+                }
+            }
+
         } else {
             cns.$message.error(res.message);
         }
@@ -78,11 +128,76 @@ const getData = () => {
     });
 };
 
+const setExpandedArr = (arr) => {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].children && arr[i].children.length) {
+            expandedArr.value.push(arr[i].id);
+        } else {
+            setExpandedArr(arr[i].children);
+        }
+    }
+};
+
+// tree点击事件
+const treeChoose = (data) => {
+    submitForm.id = data.id;
+    submitForm.parent_id = data.parent_id;
+    submitForm.name = data.name;
+    submitForm.display_name = data.display_name;
+    submitForm.icon = data.icon;
+    submitForm.sort = data.sort;
+};
+
 onMounted(() => {
     getData();
 });
 </script>
 
 <style scoped lang="scss">
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
 
+    :deep(.el-select) {
+        width: 200px;
+    }
+
+    :deep(.el-input) {
+        width: 200px;
+    }
+}
+
+.el-range-editor.el-input__inner {
+    width: 250px;
+}
+
+.el-range-separator {
+    position: absolute;
+    left: 107px;
+    top: 3px;
+}
+
+.box-main {
+    min-width: 1250px;
+    display: flex;
+}
+
+.box-main .el-tree {
+    width: 600px;
+}
+
+.box-main .el-form {
+    flex: 1;
+    padding: 0 20px;
+}
+
+.box-main .tree-box {
+    height: 800px;
+    overflow-y: auto;
+}
+
+.box-main .el-form .el-input {
+    width: 400px;
+}
 </style>

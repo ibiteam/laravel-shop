@@ -1,5 +1,5 @@
 <script setup>
-import { Plus, Delete } from '@element-plus/icons-vue';
+import { Plus, Delete, Search } from '@element-plus/icons-vue';
 import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
@@ -13,7 +13,7 @@ const loading = ref(false);
 const detailDialogVisible = ref(false);
 const detailDialogTitle = ref('');
 const detailFormLoading = ref(false);
-const topCategories = ref([]);
+const treeCategories = ref([]);
 const detailForm = reactive({
     id: 0,
     name: '',
@@ -46,7 +46,7 @@ const openDetailDialog = (goodsCategoryId = 0) => {
     categoryEdit({ id: goodsCategoryId }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
-            topCategories.value = res.data.top_categories;
+            treeCategories.value = res.data.tree_categories;
             if (goodsCategoryId > 0) {
                 detailForm.id = res.data.info.id;
                 detailForm.title = res.data.info.title;
@@ -114,7 +114,7 @@ const submitDetailForm = _.throttle(() => {
 }, 1000);
 
 const handleDestroy = (goodsCategoryId) => {
-    cns.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
+    cns.$confirm('此操作将永久删除, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -163,7 +163,7 @@ onMounted(() => {
 <template>
     <div class="common-wrap">
         <el-header style="padding-top: 10px;">
-            <el-button type="primary" @click="openDetailDialog()">添加分类</el-button>
+            <el-button :icon="Plus" type="warning" @click="openDetailDialog()">添加</el-button>
         </el-header>
         <el-table
             :data="tableData"
@@ -214,9 +214,10 @@ onMounted(() => {
                 <el-form :model="detailForm" ref="detailFormRef" :rules="detailFormRules" label-width="auto"
                          style="width: 480px" size="default">
                     <el-form-item label="上级分类" prop="parent_id">
-                        <el-select v-model="detailForm.parent_id" placeholder="请选择上级分类">
-                            <el-option v-for="item in topCategories" :label="item.label" :value="item.value" />
-                        </el-select>
+                        <el-cascader v-model="detailForm.parent_id" placeholder="顶级分类" style="width: 400px;"
+                                     filterable clearable :options="treeCategories"
+                                     :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
+                        </el-cascader>
                     </el-form-item>
                     <el-form-item label="商品分类" prop="name">
                         <el-input v-model="detailForm.name" />
@@ -256,7 +257,8 @@ onMounted(() => {
             <template #footer>
                 <div class="dialog-footer">
                     <el-button @click="closeDetailDialog()">取消</el-button>
-                    <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交</el-button>
+                    <el-button type="primary" :loading="detailSubmitLoading" @click="submitDetailForm()">提交
+                    </el-button>
                 </div>
             </template>
         </el-dialog>

@@ -34,18 +34,18 @@ Route::prefix('goods')->group(function () {
 
     // 商品分类
     Route::prefix('category')->group(function () {
-        Route::middleware(['manage.permission:' . PermissionModel::MANAGE_CATEGORY_INDEX])->group(function () {
+        Route::middleware(['manage.permission:'.PermissionModel::MANAGE_CATEGORY_INDEX])->group(function () {
             Route::get('/', [GoodsCategoryController::class, 'index'])->name(PermissionModel::MANAGE_CATEGORY_INDEX); // 列表
-            Route::get('/edit', [GoodsCategoryController::class, 'edit']); // 获取信息
+            Route::get('edit', [GoodsCategoryController::class, 'edit']); // 获取信息
         });
 
-        Route::middleware(['manage.permission:' . PermissionModel::MANAGE_CATEGORY_UPDATE])->group(function () {
-            Route::post('/update', [GoodsCategoryController::class, 'update']); // 更新(新增)
-            Route::post('/change_show', [GoodsCategoryController::class, 'changeShow']); // 切换是否显示
+        Route::middleware(['manage.permission:'.PermissionModel::MANAGE_CATEGORY_UPDATE])->group(function () {
+            Route::post('update', [GoodsCategoryController::class, 'update']); // 更新(新增)
+            Route::post('change_show', [GoodsCategoryController::class, 'changeShow']); // 切换是否显示
         });
 
-        Route::middleware(['manage.permission:' . PermissionModel::MANAGE_CATEGORY_DELETE])->group(function () {
-            Route::post('/destroy', [GoodsCategoryController::class, 'destroy']); // 删除
+        Route::middleware(['manage.permission:'.PermissionModel::MANAGE_CATEGORY_DELETE])->group(function () {
+            Route::post('destroy', [GoodsCategoryController::class, 'destroy']); // 删除
         });
     });
 });
