@@ -78,3 +78,24 @@ export function decorationIntelligentRecommendData(data) {
     return $http.doPost('manage/set/app_decoration/goods/intelligent', data)
 }
 
+/**
+ * 移动端装修 获取装修历史记录 
+ * @param {
+ *      id: '1', // 页面id
+ * }
+ * @returns 
+ */
+export function appDecorationHistory(data) {
+    return $http.doGet('manage/set/app_decoration/history', data)
+}
+
+/**
+ * 移动端装修 还原历史
+ * @param {
+ *      log_id: '1',
+ * }
+ * @returns 
+ */
+export function appDecorationHistoryRestore(data) {
+    return $http.doPost('manage/set/app_decoration/history/restore', data)
+}

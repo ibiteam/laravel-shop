@@ -4,7 +4,7 @@
             :data="data"
             border
             stripe
-            style="width: 100%;min-height: 700px">
+            :style="{width, minHeight}">
             <slot></slot>
         </el-table>
         <Pagination :pageInfo="pageInfo" @sizeChange="(value) => emit('sizeChange', value)" @currentChange="(value) => emit('currentChange', value)"></Pagination>
@@ -31,6 +31,14 @@ defineProps({
                 current_page: 1
             }
         }
+    },
+    width: {
+        type: String,
+        default: '100%'
+    },
+    minHeight: {
+        type: String,
+        default: '700px'
     }
 })
 

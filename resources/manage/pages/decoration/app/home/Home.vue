@@ -2,6 +2,7 @@
     <DecorationLayout 
         :pageName="decoration.app_website_data?.name"
         :time="decoration.app_website_data?.release_time"
+        :id="decoration.app_website_data?.id"
         @pageSetting="openPageSetting"
         @pageSave="decorationSave"
     >
