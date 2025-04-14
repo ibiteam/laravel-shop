@@ -42,7 +42,6 @@ class HotZoneComponent extends PageComponent
                             'name' => '',
                             'value' => '',
                         ],
-                        'sort' => 1, // 排序
                     ],
                 ],
             ],
@@ -64,12 +63,11 @@ class HotZoneComponent extends PageComponent
             'content.image' => 'required', // 图片地址
             'content.areas' => 'required|array|max:10',
             'content.areas.*.x' => 'required|int',
-            'content.items.*.y' => 'required|int',
-            'content.items.*.width' => 'required|int',
-            'content.items.*.height' => 'required|min:200|max:2000',
-            'content.items.*.url.name' => 'present|nullable',
-            'content.items.*.url.value' => 'present|nullable',
-            'content.items.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+            'content.areas.*.y' => 'required|int',
+            'content.areas.*.width' => 'required|int',
+            'content.areas.*.height' => 'required|min:200|max:2000',
+            'content.areas.*.url.name' => 'present|nullable',
+            'content.areas.*.url.value' => 'present|nullable',
         ], $this->messages());
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
@@ -88,13 +86,6 @@ class HotZoneComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['items'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            if (!$item['is_show']) {
-                return null;
-            }
-
-            return $item;
-        })->filter()->values()->toArray();
 
         return [
             'component_name' => $data['component_name'],
@@ -159,11 +150,6 @@ class HotZoneComponent extends PageComponent
             'content.areas.*.height.max' => '高度最大值是 2000',
             'content.areas.*.url.name.present' => '链接别名参数未设置',
             'content.areas.*.url.value.present' => '链接值参数未设置',
-            'content.areas.*.sort.nullable' => '排序可以为空',
-            'content.areas.*.sort.sometimes' => '排序字段有时需要验证',
-            'content.areas.*.sort.integer' => '排序必须是整数',
-            'content.areas.*.sort.min' => '排序最小值是 1',
-            'content.areas.*.sort.max' => '排序最大值是 100',
         ];
     }
 }
