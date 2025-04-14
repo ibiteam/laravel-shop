@@ -168,7 +168,7 @@ class AppDecorationController extends BaseController
     // 商品推荐组件 - 智能推荐数据
     public function goodsForIntelligent(Request $request, GoodsService $goods_service)
     {
-        $sort_type = $request->get('sort_type') ?: 1;
+        $sort_type = $request->get('sort_type') ?: AppDecorationItem::SORT_SALES;
         $number = (int)$request->get('number') ?: 3;
         $goods_data = $goods_service->getRecommendGoods(limit:$number, sort_type:$sort_type);
 
