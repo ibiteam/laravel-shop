@@ -99,6 +99,10 @@ export function paymentMethodEdit(data) {
 export function paymentMethodUpdate(data) {
     return $http.doPost('manage/set/payment/update', data)
 }
+// 交易流水表
+export function transactionIndex() {
+    return $http.doGet('manage/set/payment/transaction')
+}
 // 快递公司
 export function shipCompanyIndex(data) {
     return $http.doGet('manage/set/ship_company', data)
