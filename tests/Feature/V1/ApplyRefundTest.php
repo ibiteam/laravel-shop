@@ -34,11 +34,11 @@ it('store', function () {
         'order_no' => '2025041096246684',
         'order_detail_id' => 1,
         'type' => 1,
-        'number' => 1,
-        'money' => 1,
+        'number' => 2,
+        'money' => 5,
         'reason_id' => 1,
         'description' => '测试',
-        'certificate' => 'https://www.baidu.com',
+        'certificate' => 'https://www.baidu.com,https://learnku.com',
     ]);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
     dump($res);
@@ -46,9 +46,9 @@ it('store', function () {
 
 it('detail', function () {
     $response = $this->doGet('api/v1/order/apply_refund/detail', [
-        'apply_refund_id' => 1,
-        // 'order_no' => '2025041096246684',
-        // 'order_detail_id' => 1,
+        // 'apply_refund_id' => 1,
+        'order_no' => '2025041096246684',
+        'order_detail_id' => 1,
     ]);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
     dump($res);

@@ -9,6 +9,7 @@ use App\Exceptions\BusinessException;
 use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\ShopConfig;
 use App\Models\User;
 
 class ApplyRefundDao
@@ -57,10 +58,9 @@ class ApplyRefundDao
     public function checkTimeliness(Order $order): void
     {
         if ($order->ship_status == ShippingStatusEnum::RECEIVED->value) {
-            // TODO 配置项：售后时效（天）
-            $sale_service_time = 15;
-
-            if (strtotime($order->received_at) + ($sale_service_time * 24 * 3600) < time()) {
+            // 售后时效（天）
+            $after_sales_timeliness = intval(shop_config(ShopConfig::AFTER_SALES_TIMELINESS));
+            if ($after_sales_timeliness && strtotime($order->received_at) + ($after_sales_timeliness * 24 * 3600) < time()) {
                 throw new BusinessException('抱歉，由于您超出售后时间，无法申请售后');
             }
         }
