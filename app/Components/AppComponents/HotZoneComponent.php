@@ -33,16 +33,16 @@ class HotZoneComponent extends PageComponent
             'content' => [
                 'image' => '', // 图片地址
                 'areas' => [
-                    [
-                        'x' => '', // x坐标
-                        'y' => '', // y坐标
-                        'width' => '', // 宽度
-                        'height' => '', // 高度 200 ~ 2000
-                        'url' => [
-                            'name' => '',
-                            'value' => '',
-                        ],
-                    ],
+//                    [
+//                        'x' => '', // x坐标
+//                        'y' => '', // y坐标
+//                        'width' => '', // 宽度
+//                        'height' => '', // 高度 200 ~ 2000
+//                        'url' => [
+//                            'name' => '',
+//                            'value' => '',
+//                        ],
+//                    ],
                 ],
             ],
         ];
