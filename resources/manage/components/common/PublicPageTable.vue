@@ -38,7 +38,7 @@ defineProps({
     },
     minHeight: {
         type: String,
-        default: '700px'
+        default: '600px'
     }
 })
 
