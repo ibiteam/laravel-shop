@@ -69,7 +69,7 @@ class GoodsRecommendComponent extends PageComponent
             'content.layout' => 'required|in:'.AppDecorationItem::LAYOUT_ONE.','.AppDecorationItem::LAYOUT_TWO.','.AppDecorationItem::LAYOUT_THREE, // 商品布局
             'content.recommend' => 'required|in:'.Constant::ONE.','.Constant::ZERO, // 智能推荐 1、开启 0、关闭
             'content.title' => 'required|array',
-            'content.title.icon' => 'required|int',
+            'content.title.icon' => 'present|nullable',
             'content.title.name' => 'present|nullable',
             'content.title.align' => 'required|in:'.AppDecorationItem::ALIGN_LEFT.','.AppDecorationItem::ALIGN_CENTER,
             'content.title.suffix' => 'present|nullable',
@@ -163,8 +163,7 @@ class GoodsRecommendComponent extends PageComponent
             'content.recommend.in' => '智能推荐的值无效，请选择正确的设置',
             'content.title.required' => '标题数据不能为空',
             'content.title.array' => '标题数据必须是一个数组',
-            'content.title.icon.required' => '小图标不能为空',
-            'content.title.icon.int' => '小图标必须是整数',
+            'content.title.icon.present' => '小图标字段不能为空',
             'content.title.name.present' => '标题名称参数未设置',
             'content.title.align.required' => '对齐方式不能为空',
             'content.title.align.in' => '对齐方式的值无效，请选择正确的对齐方式',
