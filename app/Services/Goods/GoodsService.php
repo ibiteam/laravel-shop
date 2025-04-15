@@ -92,8 +92,10 @@ class GoodsService
                     throw new BusinessException('商品价格不能为空！');
                 }
             }
-            $store_data['price'] = min(array_column($request_sku_data, 'price')) ?? 0;
-            $store_data['integral'] = min(array_column($request_sku_data, 'integral')) ?? 0;
+            $tmp_sku_prices = array_column($request_sku_data, 'price');
+            $store_data['price'] = $tmp_sku_prices ? min($tmp_sku_prices) : 0;
+            $tmp_sku_integrals = array_column($request_sku_data, 'integral');
+            $store_data['integral'] = $tmp_sku_integrals ? min($tmp_sku_integrals) : 0;
         }
 
         // 校验价格与积分
