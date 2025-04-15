@@ -43,8 +43,8 @@ class WechatController extends BaseController
             }
             $wechat_user->is_subscribe = (bool) ($wechat_raw['subscribe'] ?? 0);
             $wechat_user->subscribe_time = $wechat_raw['subscribe_time'] ?? '';
-            $wechat_user->language = $wechat_raw['language'];
-            $wechat_user->remark = $wechat_raw['remark'];
+            $wechat_user->language = $wechat_raw['language'] ?? 'zh_CN';
+            $wechat_user->remark = $wechat_raw['remark'] ?? '';
 
             $wechat_user->save();
 
