@@ -452,7 +452,8 @@ export default {
     }
 }
 // 公用swiper分页样式
-.swiper-pagination.decoration-swiper-pagination{
+.swiper-pagination.decoration-swiper-pagination,
+.swiper-pagination{
     .swiper-pagination-bullet{
         width: 6px;
         height: 6px;
