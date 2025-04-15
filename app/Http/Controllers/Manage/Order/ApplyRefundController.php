@@ -7,6 +7,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
+use App\Http\Dao\OrderLogDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Jobs\Order\ApplyRefundJob;
 use App\Models\ApplyRefund;
@@ -105,8 +106,10 @@ class ApplyRefundController extends BaseController
     /**
      * 同意申请.
      */
-    public function agreeApply(Request $request)
+    public function agreeApply(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -134,7 +137,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 退款交易检测
-            app(ApplyRefundDao::class)->refundTransactionCheck($apply_refund);
+            $apply_refund_dao->refundTransactionCheck($apply_refund);
 
             $buyer_refund_time = intval(shop_config(ShopConfig::BUYER_REFUND_TIME));
             $job_time = Carbon::now()->addDays($buyer_refund_time);
@@ -149,7 +152,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = "卖家同意了本次{$typeMsg}申请";
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家同意了'.$typeMsg, ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了'.$typeMsg, ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, "卖家同意了{$typeMsg}");
+
+                admin_operation_log($current_user, "同意了{$typeMsg}申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -174,8 +181,10 @@ class ApplyRefundController extends BaseController
     /**
      * 关闭申请.
      */
-    public function closeApply(Request $request)
+    public function closeApply(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -200,7 +209,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '退款流程已关闭，交易正常进行';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家已发货，退款流程关闭，交易正常进行', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家已发货，退款流程关闭，交易正常进行', ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '关闭了售后申请');
+
+                admin_operation_log($current_user, "关闭了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -222,8 +235,10 @@ class ApplyRefundController extends BaseController
     /**
      * 执行退款(卖家主动同意退款给买家).
      */
-    public function executeRefund(Request $request)
+    public function executeRefund(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -249,7 +264,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
+            $apply_refund_dao->wechatRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -259,12 +274,16 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '卖家同意了退款';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+
+                $order_log_dao->storeByAdminUser($current_user, $order, '卖家同意了退款');
+
+                admin_operation_log($current_user, "同意了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -286,8 +305,10 @@ class ApplyRefundController extends BaseController
     /**
      * 拒绝退款.
      */
-    public function refuseRefund(Request $request)
+    public function refuseRefund(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -317,7 +338,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->job_time = $job_time;
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家拒绝了退货退款', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家拒绝了退货退款', ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家拒绝了退款');
+
+                admin_operation_log($current_user, "拒绝了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -342,8 +367,10 @@ class ApplyRefundController extends BaseController
     /**
      * 确认收货.
      */
-    public function confirmReceipt(Request $request)
+    public function confirmReceipt(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -362,7 +389,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
+            $apply_refund_dao->wechatRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -372,12 +399,16 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '款项已原路返回买家账号';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+
+                $order_log_dao->storeByAdminUser($current_user, $order, '卖家确认收货，已退款给买家');
+
+                admin_operation_log($current_user, "确认收货退款给买家，退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
