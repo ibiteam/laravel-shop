@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Enums\PayFormEnum;
+use App\Enums\PaymentEnum;
+use App\Exceptions\BusinessException;
+use App\Http\Dao\TransactionDao;
 use App\Http\Resources\Manage\TransactionResourceCollection;
 use App\Models\Order;
+use App\Models\Payment;
 use App\Models\Transaction;
+use App\Utils\Wechat\WechatPayUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class TransactionController extends BaseController
 {
@@ -25,6 +32,7 @@ class TransactionController extends BaseController
         $list = Transaction::query()
             ->with(['typeInfo:id,no', 'user:id,user_name', 'payment:id,name'])
             ->latest()
+            ->latest('id')
             ->when($transaction_no, fn (Builder $query) => $query->where('transaction_no', $transaction_no))
             ->when($transaction_type, fn (Builder $query) => $query->where('transaction_type', $transaction_type))
             ->when(is_numeric($status), fn (Builder $query) => $query->where('status', $status))
@@ -40,5 +48,71 @@ class TransactionController extends BaseController
             ->paginate($number);
 
         return $this->success(new TransactionResourceCollection($list));
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse|void
+     */
+    public function refund(Request $request, TransactionDao $transaction_dao)
+    {
+        try {
+            $validated = $request->validate([
+                'id' => 'required|integer',
+            ], [], [
+                'id' => '交易记录ID',
+            ]);
+            $transaction = Transaction::query()->with('payment')->whereId($validated['id'])->first();
+
+            if (! $transaction instanceof Transaction) {
+                throw new BusinessException('交易记录不存在');
+            }
+
+            if ($transaction->status !== Transaction::STATUS_SUCCESS) {
+                throw new BusinessException('交易记录状态异常');
+            }
+
+            if ($transaction->transaction_type !== Transaction::TRANSACTION_TYPE_PAY) {
+                throw new BusinessException('交易记录类型异常');
+            }
+
+            $payment = $transaction->payment;
+
+            if (! $payment instanceof Payment) {
+                throw new BusinessException('交易记录支付方式不存在');
+            }
+
+            if ($payment->alias !== PaymentEnum::WECHAT->value) {
+                throw new BusinessException('当前支付方式不支持退款');
+            }
+            $old_refund_amount = $transaction->children()->sum('amount');
+
+            if ($old_refund_amount == $transaction->amount) {
+                throw new BusinessException('交易记录已退款完成');
+            }
+            $refund_amount = $transaction->amount - $old_refund_amount;
+            // 请求微信退款
+            $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+
+            $out_refund_no = $transaction_dao->generateRefundNo();
+
+            $wechat_response = $wechat_pay_util->refundOrder($transaction->transaction_no, $out_refund_no, $refund_amount, $transaction->amount, '联系客服申请退款');
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('操作失败');
+        }
+
+        admin_operation_log($this->adminUser(), "针对流水号：【{$transaction->transaction_no}】申请退款");
+
+        if (isset($wechat_response['status']) && $wechat_response['status'] === 'PROCESSING') {
+            $transaction->can_refund = false;
+            $transaction->save();
+
+            return $this->success('已经提交微信退款申请，请耐心等待~');
+        }
+
+        return $this->error('退款失败');
     }
 }
