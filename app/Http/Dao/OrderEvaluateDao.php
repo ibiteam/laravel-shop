@@ -2,7 +2,7 @@
 
 namespace App\Http\Dao;
 
-use App\Http\Resources\ApiOrderEvaluateResource;
+use App\Http\Resources\Api\OrderEvaluateResource;
 use App\Models\OrderEvaluate;
 use App\Models\OrderEvaluateCount;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -30,7 +30,7 @@ class OrderEvaluateDao
     {
         $order_evaluate = $this->getListByGoodsId($goods_id, number: $number);
         $total = $order_evaluate->total();
-        $list = $order_evaluate->getCollection()->map(fn (OrderEvaluate $order_evaluate) => ApiOrderEvaluateResource::make($order_evaluate));
+        $list = $order_evaluate->getCollection()->map(fn (OrderEvaluate $order_evaluate) => OrderEvaluateResource::make($order_evaluate));
 
         return [$total, $list];
     }

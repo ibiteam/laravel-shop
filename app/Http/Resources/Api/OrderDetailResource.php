@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api;
 
 use App\Http\Dao\OrderDao;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use App\Models\ShopConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ApiOrderDetailResource extends JsonResource
+class OrderDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Manage;
 
 use App\Models\Order;
 use App\Models\Transaction;

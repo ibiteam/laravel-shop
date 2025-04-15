@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Http\Resources\TransactionResourceCollection;
+use App\Http\Resources\Manage\TransactionResourceCollection;
 use App\Models\Order;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;

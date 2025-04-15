@@ -8,7 +8,7 @@ use App\Http\Dao\GoodsDao;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Http\Dao\OrderLogDao;
-use App\Http\Resources\ApiOrderEvaluateResourceCollection;
+use App\Http\Resources\Api\OrderEvaluateResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderEvaluate;
@@ -38,7 +38,7 @@ class EvaluateController extends BaseController
 
             $list = $order_evaluate_dao->getListByGoodsId($goods->id, $validated['page'], $validated['number']);
 
-            return $this->success(new ApiOrderEvaluateResourceCollection($list));
+            return $this->success(new OrderEvaluateResourceCollection($list));
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
