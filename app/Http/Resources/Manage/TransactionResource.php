@@ -39,6 +39,7 @@ class TransactionResource extends JsonResource
             'created_at' => $this->resource->created_at->toDateTimeString(),
             'paid_at' => $this->resource->paid_at,
             'remark' => $this->resource->remark,
+            'can_refund' => $this->resource->can_refund,
         ];
     }
 }

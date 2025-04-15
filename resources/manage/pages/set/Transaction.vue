@@ -228,7 +228,7 @@ onMounted(() => {
             <el-table-column label="备注" prop="remark" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="200px">
                 <template #default="scope">
-                    <el-button link type="primary" v-if="scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="handleRefund(scope.row.id)">退款</el-button>
+                    <el-button link type="primary" v-if="scope.row.can_refund && scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="handleRefund(scope.row.id)">退款</el-button>
                 </template>
             </el-table-column>
         </PublicPageTable>
