@@ -10,8 +10,8 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\UserAddressDao;
-use App\Http\Resources\ApiOrderDetailResource;
-use App\Http\Resources\ApiOrderResourceCollection;
+use App\Http\Resources\Api\OrderDetailResource;
+use App\Http\Resources\Api\OrderResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Models\OrderEvaluate;
@@ -86,7 +86,7 @@ class IndexController extends BaseController
             })
             ->paginate($number);
 
-        return $this->success(new ApiOrderResourceCollection($order));
+        return $this->success(new OrderResourceCollection($order));
     }
 
     /**
@@ -113,7 +113,7 @@ class IndexController extends BaseController
             }
             $order->custom_status = $order_dao->getStatusByOrder($order);
 
-            return $this->success(ApiOrderDetailResource::make($order));
+            return $this->success(OrderDetailResource::make($order));
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

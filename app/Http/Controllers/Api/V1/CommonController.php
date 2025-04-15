@@ -31,7 +31,7 @@ class CommonController extends BaseController
         $current_user = $this->user();
 
         if ($current_user instanceof User) {
-            $data['cart_count'] = $cart_dao->getValidCarNumber($request->user()->id);
+            $data['cart_count'] = $cart_dao->getValidCarNumber($current_user->id);
         }
 
         // 微信公众号 APP id

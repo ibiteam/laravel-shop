@@ -13,7 +13,7 @@ use App\Http\Dao\OrderDeliveryDao;
 use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\RegionDao;
 use App\Http\Dao\ShipCompanyDao;
-use App\Http\Resources\ManageOrderResourceCollection;
+use App\Http\Resources\Manage\OrderResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\Goods;
 use App\Models\GoodsSku;
@@ -74,7 +74,7 @@ class OrderController extends BaseController
             ->latest()
             ->paginate($number);
 
-        return $this->success(new ManageOrderResourceCollection($list));
+        return $this->success(new OrderResourceCollection($list));
     }
 
     /**

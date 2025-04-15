@@ -79,8 +79,8 @@ class LabelComponent extends PageComponent
         }
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
-        $data['name'] = $validator['name'];
-        $data['component_name'] = $validator['component_name'];
+        $data['name'] = '底部标签';
+        $data['component_name'] = AppDecorationItem::COMPONENT_NAME_LABEL;
         $data['is_fixed_assembly'] = $this->fixed_assembly_yes;
 
         return $data;

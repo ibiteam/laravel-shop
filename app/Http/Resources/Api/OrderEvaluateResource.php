@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api;
 
 use App\Models\OrderEvaluate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ApiOrderEvaluateResource extends JsonResource
+class OrderEvaluateResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -40,7 +40,7 @@ export function DragTempItemField() {
 
 export const TempFixedField = {
     // 顶部搜索栏
-    'home_search': {
+    'home_nav': {
         MaxItemLength: 10,
         TempContentDataItemField: {
             title: '', // 搜索提示词
