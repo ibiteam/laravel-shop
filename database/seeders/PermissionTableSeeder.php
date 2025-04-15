@@ -103,6 +103,9 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('会员管理', Permission::USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_USER);
         $this->addPermission('会员列表', Permission::MANAGE_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::USER_MANAGE);
         $this->addPermission('会员列表新增|编辑', Permission::MANAGE_USER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::USER_MANAGE);
+
+        $this->addPermission('授权用户', Permission::AUTHORIZED_USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_USER);
+        $this->addPermission('微信服务号', Permission::MANAGE_WECHAT_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::AUTHORIZED_USER_MANAGE);
     }
 
     private function addOrderPermission(): void

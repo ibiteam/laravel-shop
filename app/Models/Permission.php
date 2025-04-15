@@ -109,6 +109,8 @@ class Permission extends SpatiePermission
     public const USER_MANAGE = 'user.manage'; // 会员管理
     public const MANAGE_USER_INDEX = 'manage.user.index'; // 会员列表
     public const MANAGE_USER_UPDATE = 'manage.user.update'; // 会员列表新增|编辑
+    public const AUTHORIZED_USER_MANAGE = 'authorized_user.manage'; // 授权用户
+    public const MANAGE_WECHAT_USER_INDEX = 'manage.wechat_user.index'; // 微信服务号
 
     // 二级 工具部分
     public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心

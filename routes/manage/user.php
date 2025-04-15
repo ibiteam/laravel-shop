@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Manage\User\WechatUserController;
 use App\Http\Controllers\Manage\UserAddressController;
 use App\Http\Controllers\Manage\UserController;
 use App\Models\Permission;
@@ -16,5 +17,8 @@ Route::prefix('user')->group(function () {
             Route::get('/', [UserAddressController::class, 'index']); // 用户地址
             Route::post('/update', [UserAddressController::class, 'update']); // 用户地址更新
         });
+    });
+    Route::prefix('wechat')->group(function () {
+        Route::get('/', [WechatUserController::class, 'index'])->name(Permission::MANAGE_WECHAT_USER_INDEX)->middleware('manage.permission');
     });
 });

@@ -30,3 +30,8 @@ export function addressUpdate(data) {
 export function getAreasData(data) {
     return $http.doPost('v1/region', data)
 }
+
+// 微信服务号
+export function wechatUserIndex(data) {
+    return $http.doGet('manage/user/wechat', data)
+}
