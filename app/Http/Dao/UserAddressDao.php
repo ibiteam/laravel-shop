@@ -56,7 +56,7 @@ class UserAddressDao
     /**
      * 获取地址详情-收货地址ID或默认地址或第一条地址
      */
-    public function showByIdOrDefault(int $user_id, int $id): array
+    public function showByIdOrDefault(int $user_id, int $id): ?array
     {
         if ($id > 0) {
             // 尝试通过ID获取地址
@@ -80,7 +80,7 @@ class UserAddressDao
             return $this->userAddressFormat($user_address);
         }
 
-        return [];
+        return null;
     }
 
     public function resetDefault(int $user_id): void
