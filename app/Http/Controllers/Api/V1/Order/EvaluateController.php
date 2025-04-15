@@ -108,7 +108,7 @@ class EvaluateController extends BaseController
                 'items' => 'required|array',
                 'items.*.id' => 'required|integer',
                 'items.*.comment' => 'required|string|max:200',
-                'items.*.images' => 'nullable|array',
+                'items.*.images' => 'nullable|array|max:5',
                 'items.*.images.*' => 'required|url',
                 'rank' => 'required|integer|between:1,5',
                 'goods_rank' => 'required|integer|between:1,5',
@@ -117,7 +117,9 @@ class EvaluateController extends BaseController
                 'delivery_rank' => 'required|integer|between:1,5',
                 'service_rank' => 'required|integer|between:1,5',
                 'is_anonymous' => 'required|boolean',
-            ], [], [
+            ], [
+                'items.*.images.max' => '评价图片最多 :max 张',
+            ], [
                 'no' => '订单编号',
                 'items' => '评价明细',
                 'items.*.id' => '评价明细ID',
