@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Manage;
 
-use App\Http\Resources\CommonResourceCollection;
 use App\Http\Resources\TransactionResourceCollection;
 use App\Models\Order;
 use App\Models\Transaction;
@@ -19,16 +18,16 @@ class TransactionController extends BaseController
         $order_no = $request->get('order_no', null);
         $user_name = $request->get('user_name', null);
         $transaction_type = $request->get('transaction_type', null);
-        $status = $request->get('status', -1);
-        $payment_id = $request->get('payment_id', null);
+        $status = $request->get('status', null);
+        $paid_start_time = $request->get('paid_start_time', null);
+        $paid_end_time = $request->get('paid_end_time', null);
         $number = (int) $request->get('number', 10);
         $list = Transaction::query()
             ->with(['typeInfo:id,no', 'user:id,user_name', 'payment:id,name'])
             ->latest()
             ->when($transaction_no, fn (Builder $query) => $query->where('transaction_no', $transaction_no))
             ->when($transaction_type, fn (Builder $query) => $query->where('transaction_type', $transaction_type))
-            ->when($payment_id, fn (Builder $query) => $query->where('payment_id', $payment_id))
-            ->when($status >= 0, fn (Builder $query) => $query->where('status', $status))
+            ->when(is_numeric($status), fn (Builder $query) => $query->where('status', $status))
             ->when($type === 'order', fn (Builder $query) => $query->where('type', Order::class))
             ->when($order_no, function (Builder $query) use ($order_no) {
                 $query->whereHasMorph('typeInfo', Order::class, fn (Builder $query) => $query->where('no', $order_no));
@@ -36,6 +35,8 @@ class TransactionController extends BaseController
             ->when($user_name, function (Builder $query) use ($user_name) {
                 $query->whereHas('user', fn (Builder $query) => $query->where('user_name', 'like', "%{$user_name}%"));
             })
+            ->when($paid_start_time, fn (Builder $query) => $query->where('paid_at', '>=', $paid_start_time))
+            ->when($paid_end_time, fn (Builder $query) => $query->where('paid_at', '<=', $paid_end_time))
             ->paginate($number);
 
         return $this->success(new TransactionResourceCollection($list));
