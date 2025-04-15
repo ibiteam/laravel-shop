@@ -23,11 +23,11 @@ class UserAddressDao
         if ($keywords) {
             if (is_numeric($keywords)) {
                 $query->where(function ($q) use ($keywords) {
-                    $q->where('recipient_phone', 'like', '%'.$keywords.'%');
+                    $q->where('phone', 'like', '%'.$keywords.'%');
                 });
             } else {
                 $query->where(function ($qe) use ($keywords) {
-                    $qe->where('recipient_name', 'like', '%'.$keywords.'%');
+                    $qe->where('consignee', 'like', '%'.$keywords.'%');
                 });
             }
         }
@@ -56,7 +56,7 @@ class UserAddressDao
     /**
      * 获取地址详情-收货地址ID或默认地址或第一条地址
      */
-    public function showByIdOrDefault(int $user_id, int $id): array
+    public function showByIdOrDefault(int $user_id, int $id): ?array
     {
         if ($id > 0) {
             // 尝试通过ID获取地址
@@ -80,7 +80,7 @@ class UserAddressDao
             return $this->userAddressFormat($user_address);
         }
 
-        return [];
+        return null;
     }
 
     public function resetDefault(int $user_id): void
@@ -146,8 +146,8 @@ class UserAddressDao
     {
         return [
             'id' => $user_address->id,
-            'recipient_name' => $user_address->recipient_name,
-            'recipient_phone' => $user_address->recipient_phone,
+            'consignee' => $user_address->consignee,
+            'phone' => $user_address->phone,
             'province' => $user_address->regionProvince?->name,
             'city' => $user_address->regionCity?->name,
             'district' => $user_address->regionDistrict?->name,

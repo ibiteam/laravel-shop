@@ -5,5 +5,7 @@
     "store",
     "detail",
     "log",
-    "revoke"
+    "revoke",
+    "ship_info",
+    "ship_add"
 ]

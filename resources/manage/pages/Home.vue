@@ -106,16 +106,18 @@
                                 </div>
                             </div>
                             <div class="more-opt s-flex flex-wrap" v-if="my_collect.length">
-                                <div class="opt-list" v-for="item in my_collect" :key="item.value" @click.stop="toPage(item)">
-                                    <div class="icon">
-                                        <el-icon :size="20">
-                                            <component :is="item.icon?item.icon:'Document'"/>
-                                        </el-icon>
+                                <template v-for="(item,index) in my_collect" :key="item.value">
+                                    <div class="opt-list" @click.stop="toPage(item)" v-if="index<12">
+                                        <div class="icon">
+                                            <el-icon :size="20">
+                                                <component :is="item.icon?item.icon:'Document'"/>
+                                            </el-icon>
+                                        </div>
+                                        <div class="titles">
+                                            <span>{{item.title}}</span>
+                                        </div>
                                     </div>
-                                    <div class="titles">
-                                        <span>{{item.title}}</span>
-                                    </div>
-                                </div>
+                                </template>
                             </div>
                             <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
                                 <span>暂无收藏</span>

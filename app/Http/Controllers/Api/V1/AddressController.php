@@ -127,8 +127,8 @@ class AddressController extends BaseController
             $address = new UserAddress;
         }
         $address->user_id = $user_id;
-        $address->recipient_name = $validated['recipient_name'];
-        $address->recipient_phone = $validated['recipient_phone'];
+        $address->consignee = $validated['consignee'];
+        $address->phone = $validated['phone'];
         $address->province = $validated['province'];
         $address->city = $validated['city'];
         $address->district = $validated['district'];

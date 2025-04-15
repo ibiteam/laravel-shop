@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Manage;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
@@ -11,7 +11,7 @@ use App\Models\ShopConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ManageOrderResource extends JsonResource
+class OrderResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -50,8 +50,8 @@ it('test address default', function () {
 
 it('test address update', function () {
     $data = [
-        'recipient_name' => 'jeck',
-        'recipient_phone' => '13322221111',
+        'consignee' => 'jeck',
+        'phone' => '13322221111',
         'province' => '2',
         'city' => '52',
         'district' => '506',

@@ -124,6 +124,7 @@ Route::prefix('set')->group(function () {
         });
         Route::prefix('transaction')->group(function () {
             Route::get('/', [TransactionController::class, 'index'])->name(Permission::MANAGE_TRANSACTION_INDEX)->middleware('manage.permission');
+            Route::post('refund', [TransactionController::class, 'refund'])->name(Permission::MANAGE_TRANSACTION_REFUND)->middleware('manage.permission');
         });
     });
 

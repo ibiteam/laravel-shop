@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('nickname')->nullable()->comment('昵称');
             $table->string('avatar')->nullable()->comment('头像');
             $table->boolean('is_subscribe')->default(1)->comment('是否关注');
-            $table->dateTime('subscribe_time')->comment('关注/取消关注时间');
+            $table->dateTime('subscribe_time')->nullable()->comment('关注/取消关注时间');
             $table->string('language')->comment('用户语言');
             $table->string('remark')->comment('备注');
             $table->timestamps();

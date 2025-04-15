@@ -3,6 +3,7 @@
 namespace App\Jobs\Order;
 
 use App\Enums\ApplyRefundStatusEnum;
+use App\Exceptions\BusinessException;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
 use App\Models\ApplyRefund;
@@ -21,7 +22,7 @@ class ApplyRefundJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public int $status;             // 退款状态：0待处理；1已拒绝退款；2退货审核成功待买家发货；3买家已发货待卖家收货
+    public int $status;             // 退款状态
     public int $apply_refund_id;    // 申请退款id
     public string $action;          // 操作行为
     public int $type;               // 类型：0买方；1卖方
@@ -107,9 +108,8 @@ class ApplyRefundJob implements ShouldQueue
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (BusinessException|\Exception $e) {
             DB::rollBack();
-            // AliLogUtil::error('关闭退款失败。申请退款状态：'.$status.'申请退款记录id:'.$apply_refund->id.$exception->getMessage());
         }
     }
 
@@ -140,43 +140,15 @@ class ApplyRefundJob implements ShouldQueue
             }
             app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
 
-            // TODO 退款操作
+            // 微信退款
+            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
 
-            // // 支付记录
-            // $order_pay_log = OrderPayLog::query()
-            //     ->whereOrderId($apply_refund->order_id)
-            //     ->whereUserId($apply_refund->user_id)
-            //     ->wherePayFrom(OrderPayLog::PAY_FROM_WECHAT)
-            //     ->wherePayStatus(OrderPayLog::PAY_STATUS_SUCCESS)
-            //     ->first();
-            // if (!$order_pay_log) {
-            //     throw new \Exception('退款失败，未查询到支付记录');
-            // }
-            //
-            // // 执行退款
-            // if ($sub_mch_id = $apply_refund->shop->sub_mch_id ?? '') {
-            //     $wechat_res = WechatServicePaymentService::refundOrderMany($sub_mch_id, $order_pay_log->pay_sn, $apply_refund->flow_sn, $order_pay_log->money, $apply_refund->money);
-            // } else {
-            //     $wechat_res = WechatPaymentService::refundOrderMany($order_pay_log->pay_sn, $apply_refund->flow_sn, $order_pay_log->money, $apply_refund->money);
-            // }
-            //
-            // if (isset($wechat_res['return_code']) && 'SUCCESS' === $wechat_res['return_code'] && isset($wechat_res['result_code']) && 'SUCCESS' === $wechat_res['result_code']) {
-            //     //更新订单退款后的状态
-            //     app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
-            //     // 更改订单支付日志LOG
-            //     $order_pay_log->refund_money += $apply_refund->money;
-            //     if ($order_pay_log->refund_money >= $order_pay_log->money) {
-            //         $order_pay_log->pay_status = OrderPayLog::PAY_STATUS_RETURN;
-            //     }
-            //     $order_pay_log->save();
-            // } else {
-            //     throw new \Exception('退款申请失败,请稍后重试~'.'订单ID：'.$order_id.'，商家：'.($apply_refund->shop->shop_name ?? ''));
-            // }
+            // 更新订单退款后的状态
+            app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
 
             DB::commit();
-        } catch (\Exception $exception) {
+        } catch (BusinessException|\Exception $e) {
             DB::rollBack();
-            // AliLogUtil::error('退款失败。申请退款状态：'.$status.'申请退款记录id:'.$apply_refund->id.$exception->getMessage());
         }
     }
 }

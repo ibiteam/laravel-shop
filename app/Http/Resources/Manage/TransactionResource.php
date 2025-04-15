@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Manage;
 
 use App\Models\Order;
 use App\Models\Transaction;
@@ -37,8 +37,9 @@ class TransactionResource extends JsonResource
             'payment_name' => $this->resource->payment?->name,
             'status' => $this->resource->status,
             'created_at' => $this->resource->created_at->toDateTimeString(),
-            'paid_at' => $this->resource->paid_at ? $this->resource->paid_at->toDateTimeString() : '',
+            'paid_at' => $this->resource->paid_at,
             'remark' => $this->resource->remark,
+            'can_refund' => $this->resource->can_refund,
         ];
     }
 }

@@ -80,7 +80,7 @@ class ApplyRefundService
                 'goods_sku_id' => $order_detail->goods_sku_id,
                 'goods_sku_value' => $order_detail->goods_sku_value,
                 'goods_unit' => $order_detail->goods_unit,
-                'is_show_after_sales' => 0,  // todo 申请售后按钮状态
+                'is_show_after_sales' => app(ApplyRefundDao::class)->showAfterSales($order_detail),  // 申请售后按钮状态
             ],
             'refund_type' => $tmp_refund_type,
         ];
@@ -296,48 +296,8 @@ class ApplyRefundService
             throw new BusinessException('申请售后失败');
         }
 
-        // todo  队列
-        // ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.default_prefix'));
-
-        // TODO  发通知
-        // if ($order->shop->is_ziying == SellerShopinfo::ZIYING) {
-        //     try {
-        //         app(\App\Services\Erp\ApplyRefundService::class)->startApproval($apply_refund);
-        //     } catch (\Exception $exception) {
-        //         AliLogUtil::error('发起申请售后同步ERP失败：'.$exception->getMessage(), $exception);
-        //     }
-        // } else {
-        //     // 仅限撮合 发送短信
-        //     try {
-        //         $temp_shop = $order->shop ?? null;
-        //         $leader_phone = $temp_shop->leader_phone ?? '';
-        //         $seller_user_phone = $order->user_seller->user->mobile_phone ?? '';
-        //         $is_send = app(SellerShopinfoDao::class)->isSend($order->seller_id, SellerShopConfig::REFUND_TIMEOUT_NO);
-        //
-        //         if ($is_send) {
-        //             if (is_phone($leader_phone)) {
-        //                 PhoneMessage::send($leader_phone, new ApplyRefundMessage($temp_shop->shop_name, $order->order_sn, $temp_shop->seller_confirm_time));
-        //             }
-        //
-        //             if (is_phone($seller_user_phone) && $seller_user_phone != $leader_phone) {
-        //                 PhoneMessage::send($seller_user_phone, new ApplyRefundMessage($temp_shop->shop_name, $order->order_sn, $temp_shop->seller_confirm_time));
-        //             }
-        //         }
-        //     } catch (\Exception $exception) {
-        //         AliLogUtil::info('申请售后发送短信失败'.$exception->getMessage());
-        //     }
-        //     // 开启任务
-        //     ApplyRefundJob::dispatch(ApplyRefund::STATUS_NOT_PROCESSED, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.default_prefix'));
-        // }
-        //
-        // try {
-        //     $wechat_message = '买家('.$order->user->user_name.'：'.$order->user->user_id.')发起了申请售后(订单id：'.$order->order_id.')(售后id：'.$apply_refund->id.')';
-        //     // 发送企业微信
-        //     // (new User)->notify(new WorkWechatMessage($wechat_message, ShopConfig::WORK_CUSTOMER_ORDER_USERS));
-        //     (new User)->notify(new MessageNotification($wechat_message, ShopConfig::WORK_CUSTOMER_ORDER_USERS));
-        // } catch (\Exception $exception) {
-        //     AliLogUtil::error($wechat_message.'--发送企业微信失败!');
-        // }
+        // 卖家超时未处理，自动退款给买家
+        ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.prefix'));
 
         return $apply_refund;
     }

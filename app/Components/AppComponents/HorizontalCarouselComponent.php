@@ -125,7 +125,6 @@ class HorizontalCarouselComponent extends PageComponent
      */
     public function getContent($data): array
     {
-        $publicData = $this->getPublicData();
         $content = $data['content'];
         $items = collect($content['data'])
             ->map(function ($item) {
@@ -145,10 +144,10 @@ class HorizontalCarouselComponent extends PageComponent
         return [
             'component_name' => $data['component_name'],
             'sort' => $data['sort'] ?? 0,
-            'width' => (int)$publicData['width'],
-            'height' => (int)$publicData['height'],
-            'interval' => (int)$publicData['interval'],
-            'style' => (int)$publicData['style'],
+            'width' => (int)$content['width'],
+            'height' => (int)$content['height'],
+            'interval' => (int)$content['interval'],
+            'style' => (int)$content['style'],
             'items' => $items,
         ];
     }

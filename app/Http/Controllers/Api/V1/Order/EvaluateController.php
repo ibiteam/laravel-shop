@@ -8,7 +8,7 @@ use App\Http\Dao\GoodsDao;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Http\Dao\OrderLogDao;
-use App\Http\Resources\ApiOrderEvaluateResourceCollection;
+use App\Http\Resources\Api\OrderEvaluateResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderEvaluate;
@@ -38,7 +38,7 @@ class EvaluateController extends BaseController
 
             $list = $order_evaluate_dao->getListByGoodsId($goods->id, $validated['page'], $validated['number']);
 
-            return $this->success(new ApiOrderEvaluateResourceCollection($list));
+            return $this->success(new OrderEvaluateResourceCollection($list));
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -108,7 +108,7 @@ class EvaluateController extends BaseController
                 'items' => 'required|array',
                 'items.*.id' => 'required|integer',
                 'items.*.comment' => 'required|string|max:200',
-                'items.*.images' => 'nullable|array',
+                'items.*.images' => 'nullable|array|max:5',
                 'items.*.images.*' => 'required|url',
                 'rank' => 'required|integer|between:1,5',
                 'goods_rank' => 'required|integer|between:1,5',
@@ -117,7 +117,9 @@ class EvaluateController extends BaseController
                 'delivery_rank' => 'required|integer|between:1,5',
                 'service_rank' => 'required|integer|between:1,5',
                 'is_anonymous' => 'required|boolean',
-            ], [], [
+            ], [
+                'items.*.images.max' => '评价图片最多 :max 张',
+            ], [
                 'no' => '订单编号',
                 'items' => '评价明细',
                 'items.*.id' => '评价明细ID',

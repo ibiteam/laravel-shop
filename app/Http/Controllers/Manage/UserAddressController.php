@@ -21,7 +21,7 @@ class UserAddressController extends BaseController
         $user_id = (int)$request->get('user_id', 0);
         $list = UserAddress::query()->latest()
             ->with('regionProvince', 'regionCity', 'regionDistrict')
-            ->when($recipient_name = $request->get('recipient_name'), fn (Builder $query) => $query->whereLike('recipient_name', "%{$recipient_name}%"))
+            ->when($consignee = $request->get('consignee'), fn (Builder $query) => $query->whereLike('consignee', "%{$consignee}%"))
             ->when($user_id, fn (Builder $query) => $query->whereUserId($user_id))
             ->orderByDesc('id')
             ->paginate((int) $request->get('number', 10));
@@ -58,8 +58,8 @@ class UserAddressController extends BaseController
             $user_address->id = $id;
             $user_address->user_id = $validated['user_id'];
             $user_address->address_detail = $validated['address_detail'];
-            $user_address->recipient_name = $validated['recipient_name'];
-            $user_address->recipient_phone = $validated['recipient_phone'];
+            $user_address->consignee = $validated['consignee'];
+            $user_address->phone = $validated['phone'];
             $user_address->province = $validated['province'];
             $user_address->city = $validated['city'];
             $user_address->district = $validated['district'];

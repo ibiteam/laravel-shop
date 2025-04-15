@@ -38,3 +38,16 @@ it('test home', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test preview', function () {
+    $data = [
+        'id' => 1
+    ];
+    $response = $this->doGet('api/v1/preview', $data);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
+    dd($response, $res);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

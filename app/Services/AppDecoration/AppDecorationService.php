@@ -157,22 +157,34 @@ class AppDecorationService
         if ($button_type === AppDecoration::OPERATE_TYPE_RELEASE) {
             // 发布，更新最新一次草稿，然后取最新草稿的数据进行发布 更新 - 记录、草稿数据
             $app_decoration_log = $app_decoration_log_service->getLatestLog($app_decoration->id);
+
             $app_decoration_log_service->saveLog($app_decoration_log, $app_decoration->id, $item_ids, $admin_user_id);
             // 发布装修
             $this->issueDecoration($app_decoration);
             $app_decoration->release_time = now();
             $app_decoration->save();
+            $this->clearCache($app_decoration);
         } else {
             // 保存草稿|预览 提交 记录 草稿数据
             $app_decoration_log_service->saveLog(null, $app_decoration->id, $item_ids, $admin_user_id);
         }
     }
 
+    private function clearCache(AppDecoration $app_decoration) {
+        switch ($app_decoration->alias) {
+            case AppDecoration::ALIAS_HOME:
+                /*清除首页缓存*/
+                Cache::forget(AppDecoration::MOBILE_HOME_BY_H5);
+
+                break;
+        }
+    }
+
     // 首页数据
-    public function homeData(Collection $items)
+    public function homeData(Collection $items, $is_preview = false)
     {
         $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
-        if (!($home_nav_item instanceof AppDecorationItem)) {
+        if (!$home_nav_item) {
             throw new BusinessException('页面导航搜索尚未装修');
         }
         // 搜索组件
@@ -180,7 +192,7 @@ class AppDecorationService
         $now = now();
         $cache_name = AppDecoration::MOBILE_HOME_BY_H5;
         // 正式环境 - 缓存到当天 23:59:59
-        if (is_pro_env()) {
+        if (is_pro_env() && !$is_preview) {
             $cache_data = Cache::remember($cache_name, $now->diffInSeconds($now->copy()->endOfDay()), function () use ($items) {
                 return $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
                     $temp_item = $item->toArray();
@@ -189,14 +201,14 @@ class AppDecorationService
                 });
             });
         } else {
-            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
+            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
                 $temp_item = $item->toArray();
 
                 return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($temp_item);
             });
         }
 
-        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem $item) {
+        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
             $info = $item->toArray();
 
             return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($info);

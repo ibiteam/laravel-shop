@@ -14,8 +14,8 @@
 | 字段 | 是否必填 | 字段类型   | 说明              |
 |:---|:-----|:-------|:----------------|
 | id   | Y    | int    | 地址id  添加时地址id传0 |
-| recipient_name   | Y    | string | 联系人             |
-| recipient_phone   | Y    | int    | 联系电话            |
+| consignee   | Y    | string | 联系人             |
+| phone   | Y    | int    | 联系电话            |
 | province   | Y    | int    | 省份id            |
 | city   | Y    | int    | 城市id            |
 | district   | Y    | int    | 区域id            |
