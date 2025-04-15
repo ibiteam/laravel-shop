@@ -2,6 +2,7 @@
     <div 
         class="free-zone-container"
         ref="containerRef"
+        :style="{padding}"
         @mousedown="startSelection"
     >
         <img class="background-image" :src="backgroundImage" ondragstart="return false;" oncontextmenu="return false;" onselect="document.selection.empty();"  alt="热区">
@@ -24,11 +25,15 @@ const cns = getCurrentInstance().appContext.config.globalProperties;
 const props = defineProps({
     backgroundImage: {
         type: String,
-        default: 'https://cdn.toodudu.com/2025/02/24/WsUjqeUNqgzY0wyHm2hvEc7aBPXamQ3t080ehmUe.jpg'
+        default: ''
     },
     data: {
         type: Array,
         default: () => []
+    },
+    padding: {
+        type: String,
+        default: ''
     }
 })
 
