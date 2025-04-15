@@ -157,6 +157,7 @@ class AppDecorationService
         if ($button_type === AppDecoration::OPERATE_TYPE_RELEASE) {
             // 发布，更新最新一次草稿，然后取最新草稿的数据进行发布 更新 - 记录、草稿数据
             $app_decoration_log = $app_decoration_log_service->getLatestLog($app_decoration->id);
+
             $app_decoration_log_service->saveLog($app_decoration_log, $app_decoration->id, $item_ids, $admin_user_id);
             // 发布装修
             $this->issueDecoration($app_decoration);
