@@ -12,7 +12,7 @@
         </el-header>
 
         <el-main>
-            <div class="box-main">
+            <template class="box-main">
                 <div class="tree-box">
                     <el-tree
                         :data="permissionData"
@@ -24,7 +24,7 @@
                     </el-tree>
                 </div>
                 <el-form v-if="submitForm.id > 0" :model="submitForm" ref="submitFormRef" :rules="submitFormRules"
-                         label-position="top" status-icon label-width="auto" size="default">
+                         label-position="top" status-icon label-width="150px" size="default">
                     <el-form-item label="所属分类" prop="parent_id">
                         <el-cascader v-model="submitForm.parent_id" placeholder="未选择默认顶级分类" style="width: 400px;"
                                      :options="permissionData" clearable
@@ -37,9 +37,34 @@
                     <el-form-item label="权限值(该权限所代表的权限值)" prop="name">
                         <el-input v-model.number="submitForm.name" disabled></el-input>
                     </el-form-item>
-                    <el-form-item label="图标地址" prop="icon">
-                        <el-input v-model.number="submitForm.icon"></el-input>
+                    <el-form-item label="icon" prop="icon">
+                        <el-radio-group v-model="submitForm.icon_type" @change="iconTypeChange">
+                            <el-radio :value="1">图片</el-radio>
+                            <el-radio :value="2">图标</el-radio>
+                        </el-radio-group>
                     </el-form-item>
+                    <template v-if="submitForm.icon_type == 1">
+                        <el-form-item label-width="150px">
+                            <FilesUpload @success="getUrl" v-if="submitForm.icon == ''"></FilesUpload>
+                            <div class="ifont_span_show" v-else>
+                                <img :src="submitForm.icon" alt="">
+                                <el-icon class="icon-img-delete" @click.stop="submitForm.icon = ''"><CircleCloseFilled /></el-icon>
+                            </div>
+                        </el-form-item>
+                    </template>
+                    <template v-if="submitForm.icon_type == 2">
+                        <el-form-item label-width="150px">
+                            <div class="ifont_span_show" v-if="submitForm.icon">
+                                <i style="font-size:60px;" class="avatar-uploader-icon iconfont" :class="submitForm.icon"></i>
+                            </div>
+                            <div style="border: 1px dashed #d9d9d9;border-radius: 6px;width:100px;height:100px;" v-else></div>
+                        </el-form-item>
+                        <el-form-item label-width="150px">
+                            <div class="iconfont-content s-flex flex-wrap">
+                                <div class="iconfont-model" v-for="item in iconList" @click.stop="selectIcon(item)"><i class="iconfont" :class="item"></i></div>
+                            </div>
+                        </el-form-item>
+                    </template>
                     <el-form-item label="排序(数字越大越靠前)" prop="sort">
                         <el-input v-model.number="submitForm.sort"></el-input>
                     </el-form-item>
@@ -47,7 +72,7 @@
                         <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
                     </el-form-item>
                 </el-form>
-            </div>
+            </template>
 
         </el-main>
 
@@ -76,9 +101,35 @@ const submitForm = reactive({
     parent_id: 0,
     name: '',
     display_name: '',
+    icon_type:1,
     icon: '',
     sort: 0
 });
+const icon_origin = ref('')
+const iconList = ref([
+    'icon-31shezhi',
+    'icon-shangpin2',
+    'icon-sousuo-m',
+    'icon-caidan',
+    'icon-manage',
+    'icon-a-lujing4',
+    'icon-a-lujing11',
+    'icon-worker',
+    'icon-word',
+    'icon-doc',
+    'icon-home',
+    'icon-luntan',
+    'icon-tongzhi',
+    'icon-quanzi',
+    'icon-project',
+    'icon-kaifa',
+    'icon-gongju',
+    'icon-a-zu297',
+    'icon-logout',
+    'icon-a-zu302',
+    'icon-a-lujing5',
+    'icon-a-zu3'
+])
 
 const submitFormRules = reactive({
     display_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -144,9 +195,40 @@ const treeChoose = (data) => {
     submitForm.parent_id = data.parent_id;
     submitForm.name = data.name;
     submitForm.display_name = data.display_name;
+    if(data.icon && data.icon.indexOf("http") < 0 && icon_origin.value.indexOf("https") < 0){
+        submitForm.icon_type = 2
+    }else{
+        submitForm.icon_type = 1
+    }
     submitForm.icon = data.icon;
+    icon_origin.value = data.icon
     submitForm.sort = data.sort;
 };
+
+const iconTypeChange = (val) =>{
+    let icon_save = submitForm.icon
+    if(val == 1){
+        if(icon_origin.value.indexOf("http") == -1 && icon_origin.value.indexOf("https") == -1) {
+            submitForm.icon = "";
+        } else {
+            submitForm.icon = icon_origin.value;
+        }
+    } else {
+        if(icon_origin.value.indexOf("http") != -1 || icon_origin.value.indexOf("https") != -1) {
+            submitForm.icon = "";
+        } else {
+            submitForm.icon = icon_origin.value;
+        }
+    }
+    icon_origin.value = icon_save
+}
+const getUrl = (val) => {
+    submitForm.icon = val[0]
+}
+
+const selectIcon = (val) => {
+    submitForm.icon = val
+}
 
 onMounted(() => {
     getData();
@@ -195,9 +277,53 @@ onMounted(() => {
 .box-main .tree-box {
     height: 800px;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .box-main .el-form .el-input {
     width: 400px;
+}
+.ifont_span_show{
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+    text-align: center;
+    position: relative;
+}
+.ifont_span_show img{
+    width: auto;
+    height: auto;
+    max-height: 100px;
+    max-width: 100px;
+}
+:deep(.custom-uploader .icon-jiahao1){
+    width: 98px!important;
+    height: 98px!important;
+    line-height: 98px!important;
+}
+.ifont_span_show .icon-img-delete{
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    right: -20px;
+    cursor: pointer;
+}
+.iconfont-content{
+    width: 250px;
+    height: 200px;
+    overflow-y: auto;
+}
+.iconfont-content .iconfont-model{
+    width:40px;
+    height:40px;
+    line-height: 40px;
+    text-align: center;
+    border: 1px solid #d9d9d9;border-radius: 6px;
+    cursor: pointer;
+    margin-right: 20px;
+    margin-bottom: 20px;
 }
 </style>
