@@ -172,7 +172,7 @@ class AppDecorationService
     public function homeData(Collection $items, $is_preview = false)
     {
         $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
-        if (!($home_nav_item instanceof AppDecorationItem)) {
+        if (!$home_nav_item) {
             throw new BusinessException('页面导航搜索尚未装修');
         }
         // 搜索组件
@@ -189,14 +189,14 @@ class AppDecorationService
                 });
             });
         } else {
-            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
+            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
                 $temp_item = $item->toArray();
 
                 return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($temp_item);
             });
         }
 
-        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem $item) {
+        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
             $info = $item->toArray();
 
             return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($info);
