@@ -125,7 +125,6 @@ class HorizontalCarouselComponent extends PageComponent
      */
     public function getContent($data): array
     {
-        $publicData = $this->getPublicData();
         $content = $data['content'];
         $items = collect($content['data'])
             ->map(function ($item) {
