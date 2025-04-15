@@ -3,6 +3,7 @@
 namespace App\Http\Dao;
 
 use App\Enums\ApplyRefundStatusEnum;
+use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
@@ -10,7 +11,10 @@ use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\ShopConfig;
+use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApplyRefundDao
 {
@@ -22,6 +26,7 @@ class ApplyRefundDao
     public function verifyApply(User $user, string $order_no, int $order_detail_id): void
     {
         $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
         }
@@ -60,6 +65,7 @@ class ApplyRefundDao
         if ($order->ship_status == ShippingStatusEnum::RECEIVED->value) {
             // 售后时效（天）
             $after_sales_timeliness = intval(shop_config(ShopConfig::AFTER_SALES_TIMELINESS));
+
             if ($after_sales_timeliness && strtotime($order->received_at) + ($after_sales_timeliness * 24 * 3600) < time()) {
                 throw new BusinessException('抱歉，由于您超出售后时间，无法申请售后');
             }
@@ -103,5 +109,104 @@ class ApplyRefundDao
         $refund_max_number = get_new_price(bcsub($order_detail->goods_number, $apply_refund_number, 3));
 
         return [$refund_max_amount, $refund_max_number];
+    }
+
+    /**
+     * 更新订单退款后的状态.
+     *
+     * @throws BusinessException
+     */
+    public function changeOrderStatus(ApplyRefund $apply_refund)
+    {
+        $order = Order::query()->with('detail')->whereId($apply_refund->order_id)->first();
+
+        if (! $order) {
+            throw new BusinessException('未找到订单记录');
+        }
+
+        $apply_refund = ApplyRefund::whereOrderId($order->id)
+            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
+            ->select(['money', 'number'])->get();
+        $success_money = $apply_refund->sum('money');
+        $success_number = $apply_refund->sum('number');
+
+        // 退款金额 大于等于 订单金额 && 退款数量大于等于 订单明细数量时 交易关闭
+        if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount) {
+            $order->order_status = OrderStatusEnum::CANCELLED->value;
+            $order->pay_status = PayStatusEnum::PAY_WAIT->value;
+            $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;
+
+            if (! $order->save()) {
+                throw new BusinessException('更新订单信息失败');
+            }
+        }
+
+        return $order;
+    }
+
+    /**
+     * 微信退款.
+     *
+     * @throws BusinessException|\Throwable
+     */
+    public function wechatRefund(ApplyRefund $apply_refund): void
+    {
+        try {
+            DB::beginTransaction();
+
+            $order = Order::query()->with(['transactions'])
+                ->whereId($apply_refund->order_id)
+                ->wherePayStatus(PayStatusEnum::PAYED->value)
+                ->first();
+
+            if (! $order instanceof Order) {
+                throw new BusinessException('订单未支付成功');
+            }
+
+            // 获取成功的支付交易记录
+            $pay_success_transaction = $order->transactions
+                ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
+                ->where('status', Transaction::STATUS_SUCCESS)
+                ->first();
+
+            if (! $pay_success_transaction instanceof Transaction) {
+                throw new BusinessException('未找到成功的交易记录');
+            }
+
+            // 查询已有的成功退款交易记录
+            $refund_success_transactions = Transaction::query()
+                ->where('parent_id', $pay_success_transaction->id)
+                ->where('transaction_type', Transaction::TRANSACTION_TYPE_REFUND)
+                ->where('status', Transaction::STATUS_SUCCESS)
+                ->get();
+
+            if ($apply_refund->money <= 0 || $pay_success_transaction->amount <= 0) {
+                throw new BusinessException('退款金额或支付金额必须为正数');
+            }
+
+            if ($refund_success_transactions->isNotEmpty()) {
+                if ($apply_refund->money > $pay_success_transaction->amount + $refund_success_transactions->sum('amount')) {
+                    throw new BusinessException('累计退款总金额超过支付金额');
+                }
+            } else {
+                if ($apply_refund->money > $pay_success_transaction->amount) {
+                    throw new BusinessException('退款金额超过支付金额');
+                }
+            }
+
+            // TODO 微信退款
+
+
+            // 创建退款流水记录
+            app(TransactionDao::class)->storeByRefund($apply_refund, $pay_success_transaction);
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+
+            Log::error('微信退款异常: '.$exception->getMessage());
+
+            throw new BusinessException('退款异常');
+        }
     }
 }

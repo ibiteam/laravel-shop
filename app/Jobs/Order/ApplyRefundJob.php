@@ -39,9 +39,10 @@ class ApplyRefundJob implements ShouldQueue
 
     /**
      * Execute the job.
+     *
      * @throws \Throwable
      */
-    public function handle()
+    public function handle(): bool
     {
         $apply_refund = ApplyRefund::query()->whereId($this->apply_refund_id)->first();
 
@@ -52,28 +53,28 @@ class ApplyRefundJob implements ShouldQueue
         switch ($this->status) {
             case ApplyRefundStatusEnum::NOT_PROCESSED->value: // 状态:待处理
                 if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED->value) {
-                    $this->apply_refund($this->action, $this->type, $this->status);
+                    $this->applyRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::REFUSE->value: // 状态: 已拒绝退款
                 if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
-                    $this->apply_refund_close($this->action, $this->type, $this->status);
+                    $this->applyRefundClose($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::REFUSE_EXAMINE->value: // 状态: 退货审核成功 待买家发货
                 if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
-                    $this->apply_refund_close($this->action, $this->type, $this->status);
+                    $this->applyRefundClose($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::BUYER_SEND_SHIP->value:  // 状态: 买家已发货 待卖家收货
                 if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
-                    $this->apply_refund($this->action, $this->type, $this->status);
+                    $this->applyRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
@@ -90,7 +91,7 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function apply_refund_close($action, $type, $status)
+    public function applyRefundClose($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
@@ -117,7 +118,7 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function apply_refund($action, $type, $status)
+    public function applyRefund($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
