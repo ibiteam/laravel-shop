@@ -10,6 +10,7 @@ use App\Models\AppDecorationItem;
 use App\Services\AppDecoration\AppDecorationService;
 use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
+use Illuminate\Http\Request;
 
 class HomeController extends BaseController
 {
@@ -40,9 +41,10 @@ class HomeController extends BaseController
     }
 
     // 预览
-    public function preview(AppDecorationService $app_decoration_service)
+    public function preview(Request $request, AppDecorationService $app_decoration_service)
     {
-        $decoration = AppDecoration::query()->whereAlias(AppDecoration::ALIAS_HOME)->with('item')->first();
+        $id = $request->get('id');
+        $decoration = AppDecoration::query()->whereId($id)->with('item')->first();
         if (!$decoration) {
             return $this->error('未找到页面');
         }
@@ -54,8 +56,14 @@ class HomeController extends BaseController
         }
 
         try {
-            // 首页主体数据
-            $data = $app_decoration_service->homeData($item_data, true);
+            switch ($decoration->alias) {
+                case AppDecoration::ALIAS_HOME:
+                    // 主体数据
+                    $data = $app_decoration_service->homeData($item_data, true);
+                    break;
+                default:
+                    return $this->error('页面尚未装修');
+            }
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage());
         }
