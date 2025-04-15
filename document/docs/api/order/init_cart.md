@@ -18,8 +18,8 @@
     "data": {
         "user_address": {
             "id": 1,
-            "recipient_name": "jeck",
-            "recipient_phone": "13322221111",
+            "consignee": "jeck",
+            "phone": "13322221111",
             "province": "北京",
             "city": "北京",
             "district": "丰台区",
@@ -64,8 +64,8 @@ data.user_address 参数说明
 | 字段              | 字段类型    | 说明           |
 |-----------------|---------|--------------|
 | id              | Integer | 用户收货地址ID     |
-| recipient_name  | String  | 用户收货人        |
-| recipient_phone | String  | 用户收货人手机号     |
+| consignee  | String  | 用户收货人        |
+| phone | String  | 用户收货人手机号     |
 | province        | String  | 用户收货省份       |
 | city            | String  | 用户收货城市       |
 | district        | String  | 用户收货区县       |

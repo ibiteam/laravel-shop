@@ -41,7 +41,7 @@ it('test home', function () {
 
 it('test preview', function () {
     $data = [
-
+        'id' => 1
     ];
     $response = $this->doGet('api/v1/preview', $data);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);

@@ -11,8 +11,8 @@ use Illuminate\Support\Carbon;
 /**
  * @property int         $id
  * @property int         $user_id         用户id
- * @property string      $recipient_name  收货人姓名
- * @property string      $recipient_phone 收货人手机号
+ * @property string      $consignee  收货人姓名
+ * @property string      $phone 收货人手机号
  * @property int         $province        省份
  * @property int         $city            城市
  * @property int         $district        区

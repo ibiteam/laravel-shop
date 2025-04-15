@@ -218,8 +218,8 @@ class IndexController extends BaseController
                 'city_id' => $user_address->city,
                 'district_id' => $user_address->district,
                 'address' => $user_address->address_detail,
-                'consignee' => $user_address->recipient_name,
-                'phone' => $user_address->recipient_phone,
+                'consignee' => $user_address->consignee,
+                'phone' => $user_address->phone,
                 'is_edit_address' => true,
             ])) {
                 throw new BusinessException('修改地址失败');

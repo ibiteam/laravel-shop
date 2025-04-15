@@ -23,11 +23,11 @@ class UserAddressDao
         if ($keywords) {
             if (is_numeric($keywords)) {
                 $query->where(function ($q) use ($keywords) {
-                    $q->where('recipient_phone', 'like', '%'.$keywords.'%');
+                    $q->where('phone', 'like', '%'.$keywords.'%');
                 });
             } else {
                 $query->where(function ($qe) use ($keywords) {
-                    $qe->where('recipient_name', 'like', '%'.$keywords.'%');
+                    $qe->where('consignee', 'like', '%'.$keywords.'%');
                 });
             }
         }
@@ -146,8 +146,8 @@ class UserAddressDao
     {
         return [
             'id' => $user_address->id,
-            'recipient_name' => $user_address->recipient_name,
-            'recipient_phone' => $user_address->recipient_phone,
+            'consignee' => $user_address->consignee,
+            'phone' => $user_address->phone,
             'province' => $user_address->regionProvince?->name,
             'city' => $user_address->regionCity?->name,
             'district' => $user_address->regionDistrict?->name,

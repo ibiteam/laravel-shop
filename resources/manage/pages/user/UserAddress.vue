@@ -11,7 +11,7 @@ const queryParams = reactive({
     page: 1,
     number: 10,
     user_id: 0, // 用户id - 从url中获取
-    recipient_name: '', // 收货人
+    consignee: '', // 收货人
 });
 
 // 添加分页相关状态
@@ -106,8 +106,8 @@ const modifyAddress = (row) => {
         user_id: queryParams.user_id,
         address_detail: row.address_detail,
         area: row.area,
-        recipient_name: row.recipient_name,
-        recipient_phone: row.recipient_phone,
+        consignee: row.consignee,
+        phone: row.phone,
         province: row.province,
         city: row.city,
         district: row.district,
@@ -122,8 +122,8 @@ const closePasswordDialog = (form) => {
         id: 0,
         address_detail: "",
         area: [],
-        recipient_name: "",
-        recipient_phone: "",
+        consignee: "",
+        phone: "",
         province: "",
         city: "",
         district: "",
@@ -158,18 +158,18 @@ const subForm = ref({
     user_id: queryParams.user_id,
     address_detail: "",
     area: [],
-    recipient_name: "",
-    recipient_phone: "",
+    consignee: "",
+    phone: "",
     province: "",
     city: "",
     district: "",
 });
 
 const rules = reactive({
-    recipient_name: [
+    consignee: [
         { required: true, message: '请输入收货人', trigger: 'blur' },
     ],
-    recipient_phone: [
+    phone: [
         { required: true, message: '请输入手机号', trigger: 'blur' },
     ],
     address_detail: [
@@ -188,9 +188,9 @@ const rules = reactive({
         <el-header style="padding: 10px 0;">
             <!-- 添加搜索表单 -->
             <el-form :inline="true" :model="queryParams" class="search-form">
-                <el-form-item label="收货人" prop="recipient_name">
+                <el-form-item label="收货人" prop="consignee">
                     <el-input
-                        v-model="queryParams.recipient_name"
+                        v-model="queryParams.consignee"
                         placeholder="请输入收货人"
                         clearable
                         @keyup.enter="handleSearch"
@@ -209,8 +209,8 @@ const rules = reactive({
             v-loading="loading"
             style="width: 100%;">
             <el-table-column label="地址ID" prop="id"></el-table-column>
-            <el-table-column label="收货人" prop="recipient_name"></el-table-column>
-            <el-table-column label="收货手机号" prop="recipient_phone"></el-table-column>
+            <el-table-column label="收货人" prop="consignee"></el-table-column>
+            <el-table-column label="收货手机号" prop="phone"></el-table-column>
             <el-table-column label="收货地址">
                 <template #default="scope">
                     {{ scope.row.province_name + scope.row.city_name + scope.row.district_name + scope.row.address_detail }}
@@ -234,11 +234,11 @@ const rules = reactive({
                    center
                    width="500">
             <el-form :model="subForm" :rules="rules" ref="subFormRef">
-                <el-form-item label="收货人" prop="recipient_name">
-                    <el-input v-model="subForm.recipient_name" autocomplete="off" />
+                <el-form-item label="收货人" prop="consignee">
+                    <el-input v-model="subForm.consignee" autocomplete="off" />
                 </el-form-item>
-                <el-form-item label="手机号" prop="recipient_phone">
-                    <el-input v-model="subForm.recipient_phone" autocomplete="off" />
+                <el-form-item label="手机号" prop="phone">
+                    <el-input v-model="subForm.phone" autocomplete="off" />
                 </el-form-item>
                 <el-form-item label="省市区" prop="area">
                     <el-cascader v-model="subForm.area" :options="areas" @change="handleChange" />

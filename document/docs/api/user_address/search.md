@@ -24,8 +24,8 @@
         {
             "id": 3,
             "user_id": 1,
-            "recipient_name": "jeck",
-            "recipient_phone": "133****1111",
+            "consignee": "jeck",
+            "phone": "133****1111",
             "province": 2,
             "city": 52,
             "district": 506,
@@ -38,8 +38,8 @@
         {
             "id": 1,
             "user_id": 1,
-            "recipient_name": "唐士鑫",
-            "recipient_phone": "151****1211",
+            "consignee": "唐士鑫",
+            "phone": "151****1211",
             "province": 2,
             "city": 52,
             "district": 506,
