@@ -173,7 +173,7 @@ class AppDecorationService
     {
         $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
         if (!($home_nav_item instanceof AppDecorationItem)) {
-            throw new BusinessException('页面导航尚未装修');
+            throw new BusinessException('页面导航搜索尚未装修');
         }
         // 搜索组件
         $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
