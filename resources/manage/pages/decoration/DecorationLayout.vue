@@ -31,7 +31,7 @@
                                 <template #default="scope">
                                     <el-popconfirm title="确定还原到当前版本吗？" placement="bottom" confirm-button-text="确定" cancel-button-text="取消" @confirm="handleResetDecoration(scope.row)">
                                         <template #reference>
-                                            <el-button link type="primary" size="large">编辑</el-button>
+                                            <el-button link type="primary" size="large">还原</el-button>
                                         </template>
                                     </el-popconfirm>
                                 </template>
