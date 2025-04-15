@@ -45,7 +45,7 @@
                     </el-form-item>
                     <template v-if="submitForm.icon_type == 1">
                         <el-form-item label-width="150px">
-                            <FilesUpload @success="getUrl" v-if="submitForm.icon == ''"></FilesUpload>
+                            <FilesUpload @success="getUrl" v-if="!submitForm.icon"></FilesUpload>
                             <div class="ifont_span_show" v-else>
                                 <img :src="submitForm.icon" alt="">
                                 <el-icon class="icon-img-delete" @click.stop="submitForm.icon = ''"><CircleCloseFilled /></el-icon>
