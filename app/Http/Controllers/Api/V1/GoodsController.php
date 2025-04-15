@@ -6,7 +6,7 @@ use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\GoodsDao;
-use App\Http\Resources\ApiGoodsDetailResource;
+use App\Http\Resources\Api\GoodsDetailResource;
 use App\Http\Resources\CommonResource;
 use App\Services\Goods\GoodsService;
 use Illuminate\Http\JsonResponse;
@@ -28,7 +28,7 @@ class GoodsController extends BaseController
             ]);
             $goods = $goods_service->show($no, $this->user(), $validated['sku_id'] ?? 0);
 
-            return $this->success(ApiGoodsDetailResource::make($goods));
+            return $this->success(GoodsDetailResource::make($goods));
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

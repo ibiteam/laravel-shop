@@ -13,4 +13,5 @@ Route::prefix('manage')->middleware([])->group(function () {
 
 Route::prefix('notify')->group(function () {
     Route::any('wechat/pay', [WechatPayController::class, 'notifyPay'])->name('notify.wechat.pay');
+    Route::any('wechat/refund', [WechatPayController::class, 'notifyRefund'])->name('notify.wechat.refund');
 });
