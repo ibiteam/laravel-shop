@@ -8,6 +8,7 @@ use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
 use App\Http\Dao\ApplyRefundShipDao;
 use App\Http\Requests\ApplyRefundStoreRequest;
+use App\Http\Resources\Api\ApplyRefundResourceCollection;
 use App\Models\ApplyRefund;
 use App\Models\ShipCompany;
 use App\Services\Order\ApplyRefundService;
@@ -117,6 +118,36 @@ class ApplyRefundController extends BaseController
     }
 
     /**
+     * 退款售后 列表.
+     */
+    public function list(Request $request, ApplyRefundDao $apply_refund_dao)
+    {
+        try {
+            $validated = $request->validate([
+                'keywords' => 'nullable|string',
+                'page' => 'required|integer|min:1',
+                'number' => 'required|integer|min:1',
+            ], [], [
+                'keywords' => '关键词',
+                'page' => '页码',
+                'number' => '每页数量',
+            ]);
+
+            $keywords = $validated['keywords'] ?? '';
+
+            $list = $apply_refund_dao->getListByUser($this->user(), $keywords, $validated['page'], $validated['number']);
+
+            return $this->success(new ApplyRefundResourceCollection($list));
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('获取退款售后列表异常~');
+        }
+    }
+
+    /**
      * 售后详情.
      */
     public function detail(Request $request, ApplyRefundService $apply_refund_service)
@@ -198,7 +229,6 @@ class ApplyRefundController extends BaseController
             return $this->error('获取协商历史异常~');
         }
     }
-
 
     /**
      * 退货物流信息.

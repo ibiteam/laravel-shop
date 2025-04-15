@@ -3,6 +3,7 @@
     "init",
     "show",
     "store",
+    "list",
     "detail",
     "log",
     "revoke",

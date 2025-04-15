@@ -52,9 +52,9 @@ class ApplyRefundController extends BaseController
             return [
                 'id' => $apply_refund->id,
                 'no' => $apply_refund->no,
-                'user_name' => $apply_refund->user->user_name,
+                'user_name' => $apply_refund->user?->user_name,
                 'goods_name' => $apply_refund->orderDetail?->goods_name,
-                'order_no' => $apply_refund->order->no,
+                'order_no' => $apply_refund->order?->no,
                 'type' => strval($apply_refund->type),
                 'status' => strval($apply_refund->status),
                 'money' => $apply_refund->money,
@@ -480,7 +480,7 @@ class ApplyRefundController extends BaseController
         return [
             'server_time' => time(),
             'goods_image' => $orderDetail->goods->image ?? '',
-            'buyer_name' => $user->user_name ?? '',
+            'buyer_name' => $user->user_name,
             'order_no' => $order->no,
             'created_at' => $order->created_at->format('Y-m-d H:i:s'),
             'goods_number' => $orderDetail->goods_number,
@@ -488,35 +488,34 @@ class ApplyRefundController extends BaseController
             'goods_sku_value' => $orderDetail->goods_sku_value,
             'goods_price' => price_format($orderDetail->goods_price),
             'goods_amount' => price_format($orderDetail->goods_amount),
-            'refund_number' => get_new_price($apply_refund->number),
+            'number' => get_new_price($apply_refund->number),
             'unit' => $temp_unit,
-            'refund_no' => $apply_refund->no,
+            'no' => $apply_refund->no,
             'type' => $apply_refund->type,
-            'certificate' => $apply_refund->certificate,
             'money' => $apply_refund->money,
             'format_money' => price_format($apply_refund->money),
-            'reason' => $apply_refund->applyRefundReason->content,
+            'reason' => $apply_refund->applyRefundReason?->content,
             'result' => $apply_refund->result,
             'description' => $apply_refund->description,
+            'certificate' => $apply_refund->certificate,
             'status' => $apply_refund->status,
             'time' => strtotime($apply_refund->job_time),
             'end_time' => $apply_refund->updated_at->toDateTimeString(),
             'isShipped' => (bool) $apply_refund->applyRefundShip,
-            // 'shopAddress' => $shopAddress ? $this->formatAddress($shopAddress) : null,
             'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) use (&$user, $temp_unit) {
                 if ($item->type === ApplyRefundLog::TYPE_BUYER) {
-                    $item->setAttribute('user_name', $user->user_name);
+                    $item->setAttribute('user_name', $user->user_name,);
                     $item->setAttribute('avatar', $user->avatar);
                 } else {
-                    $item->setAttribute('user_name', '');
+                    $item->setAttribute('user_name', $item->action_name);
                     $item->setAttribute('avatar', '');
                 }
                 $item->setAttribute('unit', $temp_unit);
                 $item->setAttribute('add_time', $item->created_at->toDateTimeString());
                 $item->setAttribute('money', price_format($item->applyRefund->money));
-                $item->setAttribute('refund_number', get_new_price($item->applyRefund->number));
+                $item->setAttribute('number', get_new_price($item->applyRefund->number));
 
-                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'refund_number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
+                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),
         ];
     }

@@ -110,6 +110,7 @@ Route::middleware('api.auth')->group(function () {
             Route::get('init', [ApplyRefundController::class, 'init']); // 初始化申请售后
             Route::get('show', [ApplyRefundController::class, 'show']); // 根据售后类型回显数据
             Route::post('store', [ApplyRefundController::class, 'store']); // 提交申请售后
+            Route::get('list', [ApplyRefundController::class, 'list']); // 退款售后列表
             Route::get('detail', [ApplyRefundController::class, 'detail']); // 售后详情
             Route::get('log', [ApplyRefundController::class, 'log']); // 协商历史
             Route::post('revoke', [ApplyRefundController::class, 'revoke']); // 撤销申请
