@@ -44,6 +44,16 @@ it('store', function () {
     dump($res);
 });
 
+it('list', function () {
+    $response = $this->doGet('api/v1/order/apply_refund/list', [
+        'keywords' => '',
+        'page' => 1,
+        'number' => 10,
+    ]);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
+    dump($res);
+});
+
 it('detail', function () {
     $response = $this->doGet('api/v1/order/apply_refund/detail', [
         // 'apply_refund_id' => 1,
