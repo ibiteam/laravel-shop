@@ -67,7 +67,7 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('角色删除', Permission::MANAGE_ROLE_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::PERMISSION_MANAGE);
         $this->addPermission('管理员日志', Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::PERMISSION_MANAGE);
 
-        $this->addPermission('配送管理', Permission::MANAGE_BASIC_SET_DISTRIBUTION, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('配送管理', Permission::MANAGE_BASIC_SET_DISTRIBUTION, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
         $this->addPermission('快递公司', Permission::MANAGE_SHIP_COMPANY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
         $this->addPermission('快递公司新增|编辑', Permission::MANAGE_SHIP_COMPANY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
 
