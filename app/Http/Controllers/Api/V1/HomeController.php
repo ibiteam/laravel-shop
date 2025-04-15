@@ -39,6 +39,34 @@ class HomeController extends BaseController
         ]));
     }
 
+    // 预览
+    public function preview(AppDecorationService $app_decoration_service)
+    {
+        $decoration = AppDecoration::query()->whereAlias(AppDecoration::ALIAS_HOME)->with('item')->first();
+        if (!$decoration) {
+            return $this->error('未找到页面');
+        }
+        // 查询历史记录中最新一条 对应的草稿数据
+        $item_data = $app_decoration_service->getLatestDraftItems($decoration);
+
+        if ($item_data->isEmpty()) {
+            return $this->error('页面尚未装修');
+        }
+
+        try {
+            // 首页主体数据
+            $data = $app_decoration_service->homeData($item_data, true);
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage());
+        }
+
+        return $this->success(array_merge($data, [
+            'title' => $decoration->title ?: $decoration->name,
+            'keywords' => $decoration->keywords,
+            'description' => $decoration->description
+        ]));
+    }
+
     // 搜索
     public function search()
     {
@@ -48,13 +76,13 @@ class HomeController extends BaseController
             },
         ])->first();
         if (!($app_decoration instanceof AppDecoration)) {
-            return $this->error('页面尚未装修!');
+            return $this->error('首页尚未装修!');
         }
         $app_decoration_item = $app_decoration->item->filter(function (AppDecorationItem $item) {
             return AppDecorationItem::COMPONENT_NAME_HOME_NAV === $item->component_name;
         })->first();
         if (!($app_decoration_item instanceof AppDecorationItem)) {
-            return $this->error('页面尚未装修');
+            return $this->error('导航搜索尚未装修');
         }
 
         try {

@@ -169,7 +169,7 @@ class AppDecorationService
     }
 
     // 首页数据
-    public function homeData(Collection $items)
+    public function homeData(Collection $items, $is_preview = false)
     {
         $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
         if (!($home_nav_item instanceof AppDecorationItem)) {
@@ -180,7 +180,7 @@ class AppDecorationService
         $now = now();
         $cache_name = AppDecoration::MOBILE_HOME_BY_H5;
         // 正式环境 - 缓存到当天 23:59:59
-        if (is_pro_env()) {
+        if (is_pro_env() && !$is_preview) {
             $cache_data = Cache::remember($cache_name, $now->diffInSeconds($now->copy()->endOfDay()), function () use ($items) {
                 return $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
                     $temp_item = $item->toArray();

@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Route;
 
 // 首页
 Route::get('home', [HomeController::class, 'home']);
+// 预览页
+Route::get('preview', [HomeController::class, 'preview']);
 // 搜索
 Route::get('search', [HomeController::class, 'search']);
 // 为您推荐
