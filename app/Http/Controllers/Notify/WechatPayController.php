@@ -59,7 +59,7 @@ class WechatPayController extends Controller
             $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
 
             if ($transaction instanceof Transaction) {
-                $transaction->update(['status' => Transaction::STATUS_SUCCESS]);
+                $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->toDateTimeString()]);
             }
 
             return $wechat_pay_util->server()->serve();
