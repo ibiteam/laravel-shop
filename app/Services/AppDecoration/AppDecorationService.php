@@ -32,7 +32,7 @@ class AppDecorationService
 
     // 不缓存数据
     private static $not_cache_component_name = [
-        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+//        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
     ];
 
 
@@ -168,13 +168,12 @@ class AppDecorationService
     // 首页数据
     public function homeData(Collection $items)
     {
-//        $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
-//        if (!($home_nav_item instanceof AppDecorationItem)) {
-//            return $this->error('页面搜索尚未装修');
-//        }
-//        // 搜索组件
-//        $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
-        $home_nav = [];
+        $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
+        if (!($home_nav_item instanceof AppDecorationItem)) {
+            throw new BusinessException('页面导航尚未装修');
+        }
+        // 搜索组件
+        $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
         $now = now();
         $cache_name = AppDecoration::MOBILE_HOME_BY_H5;
         // 正式环境 - 缓存到当天 23:59:59

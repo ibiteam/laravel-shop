@@ -25,8 +25,12 @@ class HomeController extends BaseController
         if ($items->isEmpty()) {
             return $this->error('页面尚未装修');
         }
-        // 首页主体数据
-        $data = $app_decoration_service->homeData($items);
+        try {
+            // 首页主体数据
+            $data = $app_decoration_service->homeData($items);
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage());
+        }
 
         return $this->success(array_merge($data, [
             'title' => $decoration->title ?: $decoration->name,
