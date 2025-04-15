@@ -227,21 +227,21 @@ onMounted(() => {
             @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="ID" prop="id" width="80px"></el-table-column>
-            <el-table-column label="父级流水号" prop="parent_transaction_no" width="210px"></el-table-column>
-            <el-table-column label="流水号" prop="transaction_no" width="210px"></el-table-column>
-            <el-table-column label="类型" width="80px">
-                <template #default="scope">
-                    <el-tag v-if="scope.row.transaction_type == 'pay'" type="success">支付</el-tag>
-                    <el-tag v-if="scope.row.transaction_type == 'refund'" type="danger">退款</el-tag>
-                </template>
-            </el-table-column>
+            <el-table-column label="业务单号" prop="type_no" width="180px"></el-table-column>
             <el-table-column label="业务类型" width="90px">
                 <template #default="scope">
                     <span v-if="scope.row.type == 'order'">订单</span>
                     <span v-else>--</span>
                 </template>
             </el-table-column>
-            <el-table-column label="业务单号" prop="type_no" width="180px"></el-table-column>
+            <el-table-column label="父级流水号" prop="parent_transaction_no" width="210px"></el-table-column>
+            <el-table-column label="流水号" prop="transaction_no" width="270px"></el-table-column>
+            <el-table-column label="类型" width="80px">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.transaction_type == 'pay'" type="success">支付</el-tag>
+                    <el-tag v-if="scope.row.transaction_type == 'refund'" type="danger">退款</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column label="用户名" prop="user_name" width="220px"></el-table-column>
             <el-table-column label="支付方式" prop="payment_name" width="100px"></el-table-column>
             <el-table-column label="状态" width="90px">
