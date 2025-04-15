@@ -163,9 +163,20 @@ class AppDecorationService
             $this->issueDecoration($app_decoration);
             $app_decoration->release_time = now();
             $app_decoration->save();
+            $this->clearCache($app_decoration);
         } else {
             // 保存草稿|预览 提交 记录 草稿数据
             $app_decoration_log_service->saveLog(null, $app_decoration->id, $item_ids, $admin_user_id);
+        }
+    }
+
+    private function clearCache(AppDecoration $app_decoration) {
+        switch ($app_decoration->alias) {
+            case AppDecoration::ALIAS_HOME:
+                /*清除首页缓存*/
+                Cache::forget(AppDecoration::MOBILE_HOME_BY_H5);
+
+                break;
         }
     }
 
