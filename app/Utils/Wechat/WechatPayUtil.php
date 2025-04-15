@@ -99,23 +99,29 @@ class WechatPayUtil
      * @param string    $out_refund_no 退款流水号
      * @param int|float $refund_amount 退款金额
      * @param int|float $pay_amount    支付金额
+     * @param string    $reason        退款原因
      *
      * @throws WeChatPayException
      */
-    public function refundOrder(string $out_trade_no, string $out_refund_no, int|float $refund_amount, int|float $pay_amount, string $reason): array
+    public function refundOrder(string $out_trade_no, string $out_refund_no, int|float $refund_amount, int|float $pay_amount, string $reason = ''): array
     {
+        $params = [
+            'out_trade_no' => $out_trade_no,
+            'out_refund_no' => $out_refund_no,
+            'notify_url' => route('notify.wechat.refund'),
+            'amount' => [
+                'refund' => (int) ($refund_amount * 100),
+                'total' => (int) ($pay_amount * 100),
+                'currency' => 'CNY',
+            ],
+        ];
+
+        if ($reason) {
+            $params['reason'] = $reason;
+        }
+
         try {
-            $response = $this->getApplication()->getClient()->postJson('/v3/refund/domestic/refunds', [
-                'out_trade_no' => $out_trade_no,
-                'out_refund_no' => $out_refund_no,
-                'reason' => $reason,
-                'notify_url' => route('notify.wechat.refund'),
-                'amount' => [
-                    'refund' => (int) ($refund_amount * 100),
-                    'total' => (int) ($pay_amount * 100),
-                    'currency' => 'CNY',
-                ],
-            ]);
+            $response = $this->getApplication()->getClient()->postJson('/v3/refund/domestic/refunds', $params);
             $result = $response->toArray();
 
             if ($response->getStatusCode() !== Response::HTTP_OK) {

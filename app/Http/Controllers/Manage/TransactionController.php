@@ -66,8 +66,10 @@ class TransactionController extends BaseController
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
+                'reason' => 'nullable|string|max:50',
             ], [], [
                 'id' => '交易记录ID',
+                'reason' => '退款原因',
             ]);
             $transaction = Transaction::query()->with('payment')->whereId($validated['id'])->first();
 
@@ -101,9 +103,11 @@ class TransactionController extends BaseController
             // 请求微信退款
             $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
 
-            $out_refund_no = $transaction_dao->generateRefundNo();
+            $out_refund_no = $transaction_dao->generateTransactionNo(config('app.manage_prefix').'_'.'refund');
 
-            $wechat_response = $wechat_pay_util->refundOrder($transaction->transaction_no, $out_refund_no, $refund_amount, $transaction->amount, '联系客服申请退款');
+            $reason = $validated['reason'] ?? '';
+
+            $wechat_response = $wechat_pay_util->refundOrder($transaction->transaction_no, $out_refund_no, $refund_amount, $transaction->amount, $reason);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (WeChatPayException $we_chat_pay_exception) {
@@ -125,13 +129,13 @@ class TransactionController extends BaseController
             switch ($wechat_response['status'] ?? '') {
                 case 'PROCESSING': // 退款处理中
                     $response_message = '已经提交微信退款申请，请耐心等待~';
-                    $transaction_dao->storeByManageRefund($transaction, $refund_amount);
+                    $transaction_dao->storeByManageRefund($transaction, $out_refund_no, $refund_amount, remark: $reason);
 
                     break;
 
                 case 'SUCCESS': // 退款成功
                     $response_message = '退款成功';
-                    $transaction_dao->storeByManageRefund($transaction, $refund_amount, Transaction::STATUS_SUCCESS);
+                    $transaction_dao->storeByManageRefund($transaction, $out_refund_no, $refund_amount, Transaction::STATUS_SUCCESS, remark: $validated['reason']);
 
                     break;
 

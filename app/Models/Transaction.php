@@ -29,9 +29,10 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property-read Collection<int, Transaction> $children
  * @property-read int|null $children_count
- * @property-read \App\Models\Payment|null $payment
+ * @property-read Transaction|null $parent
+ * @property-read Payment|null $payment
  * @property-read Model|\Eloquent $typeInfo
- * @property-read \App\Models\User $user
+ * @property-read User $user
  *
  * @method static Builder<static>|Transaction newModelQuery()
  * @method static Builder<static>|Transaction newQuery()
@@ -77,6 +78,11 @@ class Transaction extends Model
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
     public function payment(): BelongsTo

@@ -53,21 +53,22 @@ class TransactionDao
      * 管理员退款生成流水.
      *
      * @param Transaction $parent_transaction 父级交易流水
-     * @param int|float   $amount             退款金额
+     * @param string      $transaction_no     退款单号
+     * @param int|float   $refund_amount      退款金额
      * @param int         $status             退款状态
      * @param string      $remark             退款备注
      */
-    public function storeByManageRefund(Transaction $parent_transaction, int|float $amount, int $status = Transaction::STATUS_WAIT, string $remark = ''): Transaction
+    public function storeByManageRefund(Transaction $parent_transaction, string $transaction_no, int|float $refund_amount, int $status = Transaction::STATUS_WAIT, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
-            'transaction_no' => $this->generateRefundNo(),
+            'transaction_no' => $transaction_no,
             'user_id' => $parent_transaction->user_id,
             'transaction_type' => Transaction::TRANSACTION_TYPE_REFUND,
             'parent_id' => $parent_transaction->id,
             'type' => $parent_transaction->type,
             'type_id' => $parent_transaction->type_id,
             'payment_id' => $parent_transaction->payment_id,
-            'amount' => -$amount,  // 退款金额记负数
+            'amount' => -$refund_amount,  // 退款金额记负数
             'status' => $status,
             'remark' => $remark,
             'can_refund' => false,
@@ -85,7 +86,7 @@ class TransactionDao
     /**
      * 生成交易流水号.
      */
-    private function generateTransactionNo(string $prefix): string
+    public function generateTransactionNo(string $prefix): string
     {
         return $prefix.'_'.get_flow_sn();
     }
