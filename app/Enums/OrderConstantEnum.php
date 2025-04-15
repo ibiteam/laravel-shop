@@ -12,7 +12,7 @@ enum OrderConstantEnum: int
             self::STATUS_WAIT_PAY => '待付款',
             self::STATUS_WAIT_SHIP => '待发货',
             self::STATUS_WAIT_RECEIVE => '待收货',
-            self::STATUS_SUCCESS => '已完成',
+            self::STATUS_PART => '部分发货',
         };
     }
 
@@ -30,6 +30,7 @@ enum OrderConstantEnum: int
             4 => self::STATUS_WAIT_SHIP,
             5 => self::STATUS_WAIT_RECEIVE,
             6 => self::STATUS_SUCCESS,
+            7 => self::STATUS_PART,
         };
     }
 
@@ -39,4 +40,5 @@ enum OrderConstantEnum: int
     case STATUS_WAIT_SHIP = 4; // 待发货
     case STATUS_WAIT_RECEIVE = 5; // 待收货
     case STATUS_SUCCESS = 6; // 已完成
+    case STATUS_PART = 7; // 部分发货
 }

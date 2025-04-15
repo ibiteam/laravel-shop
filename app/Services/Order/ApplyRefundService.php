@@ -297,7 +297,7 @@ class ApplyRefundService
         }
 
         // todo  队列
-        // ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time);
+        // ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.default_prefix'));
 
         // TODO  发通知
         // if ($order->shop->is_ziying == SellerShopinfo::ZIYING) {

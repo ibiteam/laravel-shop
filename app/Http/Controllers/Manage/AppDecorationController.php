@@ -257,8 +257,8 @@ class AppDecorationController extends BaseController
 
             $temp_item = ComponentFactory::getComponent($datum['component_name'], $datum['name'])->validate($datum);
             $temp_item['sort'] = $key + 1;
-
-            if (isset($temp_item['id']) && $temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
+            $temp_item['id'] = (int)$temp_item['id'] ?? 0;
+            if ($temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
                 $update_data[] = $temp_item;
             } else {
                 $temp_item['id'] = 0;

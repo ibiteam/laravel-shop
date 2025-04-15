@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Manage;
 
 use App\Enums\ApplyRefundStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Dao\ApplyRefundDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Jobs\Order\ApplyRefundJob;
 use App\Models\ApplyRefund;
 use App\Models\ApplyRefundLog;
+use App\Models\ShopConfig;
 use App\Utils\KuaiDi100Util;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -47,9 +49,9 @@ class ApplyRefundController extends BaseController
             return [
                 'id' => $apply_refund->id,
                 'no' => $apply_refund->no,
-                'user_name' => $apply_refund->user?->user_name,
+                'user_name' => $apply_refund->user->user_name,
                 'goods_name' => $apply_refund->orderDetail?->goods_name,
-                'order_no' => $apply_refund->order?->no,
+                'order_no' => $apply_refund->order->no,
                 'type' => strval($apply_refund->type),
                 'status' => strval($apply_refund->status),
                 'money' => $apply_refund->money,
@@ -140,13 +142,12 @@ class ApplyRefundController extends BaseController
             //     return $this->error('退款金额超过支付金额');
             // }
 
-            // todo
-            $buyer_refund_time = 5;
+            $buyer_refund_time = intval(shop_config(ShopConfig::BUYER_REFUND_TIME));
+            $job_time = Carbon::now()->addDays($buyer_refund_time);
 
             DB::beginTransaction();
 
             try {
-                $job_time = Carbon::now()->addDays($buyer_refund_time);
                 $typeMsg = '退款退货';
                 $applyRefund->money = $money;   // 修改退款金额
                 $applyRefund->job_time = $job_time;
@@ -165,16 +166,16 @@ class ApplyRefundController extends BaseController
                 if (! $applyRefundLog->save()) {
                     throw new BusinessException('更新申请记录失败');
                 }
+                DB::commit();
 
                 // 添加job 等待买家在 5 天内操作退货流程
                 $action = '买家退货超时，退款流程系统自动关闭';
-                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE_EXAMINE->value, $applyRefund->id, $action, ApplyRefundLog::TYPE_BUYER)->delay($job_time)->onQueue(config('cache.default_prefix'));
+                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE_EXAMINE->value, $applyRefund->id, $action, ApplyRefundLog::TYPE_BUYER)->delay($job_time)->onQueue(config('cache.prefix'));
             } catch (\Exception $exception) {
                 DB::rollBack();
 
                 throw new BusinessException('审核退款失败');
             }
-            DB::commit();
 
             return $this->success('更新成功');
         } catch (ValidationException $validation_exception) {
@@ -182,7 +183,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('同意申请异常');
         }
     }
 
@@ -229,7 +230,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('关闭申请异常');
         }
     }
 
@@ -263,7 +264,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            $this->wechatRefund($applyRefund);
+            app(ApplyRefundDao::class)->wechatRefund($applyRefund);
 
             DB::beginTransaction();
 
@@ -314,7 +315,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('执行退款异常');
         }
     }
 
@@ -341,12 +342,12 @@ class ApplyRefundController extends BaseController
                 throw new BusinessException('申请记录不存在');
             }
 
+            $buyer_change_time = intval(shop_config(ShopConfig::BUYER_CHANGE_TIME));
+            $job_time = Carbon::now()->addHours($buyer_change_time);
+
             DB::beginTransaction();
 
             try {
-                // todo
-                $buyer_change_time = 72;
-                $job_time = Carbon::now()->addHours($buyer_change_time);
                 $applyRefund->status = ApplyRefundStatusEnum::REFUSE->value;
                 $applyRefund->result = $result;
                 $applyRefund->job_time = Carbon::now()->addHours($buyer_change_time);
@@ -363,6 +364,7 @@ class ApplyRefundController extends BaseController
                 if (! $applyRefundLog->save()) {
                     throw new BusinessException('拒绝退款记录失败');
                 }
+                DB::commit();
 
                 // 添加job 等待买家再72小时内操作关闭了流程
                 $action = '买家超时未申请，退款流程自动关闭';
@@ -372,7 +374,6 @@ class ApplyRefundController extends BaseController
 
                 throw new BusinessException('拒绝退款失败');
             }
-            DB::commit();
 
             return $this->success('拒绝退款成功');
         } catch (ValidationException $validation_exception) {
@@ -380,7 +381,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('拒绝退款异常');
         }
     }
 
@@ -406,7 +407,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            $this->wechatRefund($applyRefund);
+            app(ApplyRefundDao::class)->wechatRefund($applyRefund);
 
             DB::beginTransaction();
 
@@ -452,7 +453,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('确认收货异常');
         }
     }
 
@@ -484,7 +485,6 @@ class ApplyRefundController extends BaseController
             $data = KuaiDi100Util::queryExpress($shipping->no, $shipping->shipCompany->code, $shipping->phone);
 
             return $this->success($data);
-
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -501,10 +501,10 @@ class ApplyRefundController extends BaseController
 
         return [
             'server_time' => time(),
-            'goods_thumb' => $applyRefund->orderDetail->goods->image ?? '',
+            'goods_image' => $applyRefund->orderDetail->goods->image ?? '',
             'buyer_name' => $user->user_name ?? '',
             'order_no' => $applyRefund->order->no ?? '',
-            'add_time' => $applyRefund->order->created_at,
+            'created_at' => $applyRefund->order->created_at->format('Y-m-d H:i:s'),
             'goods_number' => $applyRefund->orderDetail->goods_number,
             'goods_name' => $applyRefund->orderDetail->goods_name,
             'goods_sku_value' => $applyRefund->orderDetail->goods_sku_value,
@@ -541,44 +541,5 @@ class ApplyRefundController extends BaseController
                 return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'refund_number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),
         ];
-    }
-
-    /**
-     * 微信退款.
-     */
-    private function wechatRefund(ApplyRefund $applyRefund)
-    {
-        // todo
-
-        // try {
-        //     $payLog = OrderPayLog::whereOrderId($applyRefund->order_id)->wherePayStatus(OrderPayLog::PAY_STATUS_SUCCESS)->first();
-        //
-        //     if (! $payLog) {
-        //         throw new BusinessException('未找到支付成功记录');
-        //     }
-        //
-        //     if ($applyRefund->money > $payLog->money) {
-        //         throw new BusinessException('退款金额超过支付金额');
-        //     }
-        //
-        //     if ($sub_mch_id = $applyRefund->shop->sub_mch_id ?? '') {
-        //         $wechat_res = WechatServicePaymentService::refundOrderMany($sub_mch_id, $payLog->pay_sn, $applyRefund->flow_sn, $payLog->money, $applyRefund->money);
-        //     } else {
-        //         $wechat_res = WechatPaymentService::refundOrderMany($payLog->pay_sn, $applyRefund->flow_sn, $payLog->money, $applyRefund->money);
-        //     }
-        //
-        //     if (isset($wechat_res['return_code']) && $wechat_res['return_code'] === 'SUCCESS' && isset($wechat_res['result_code']) && $wechat_res['result_code'] === 'SUCCESS') {
-        //         $payLog->refund_money += $applyRefund->money;
-        //
-        //         if ($payLog->refund_money >= $payLog->money) {
-        //             $payLog->pay_status = OrderPayLog::PAY_STATUS_RETURN;
-        //         }
-        //         $payLog->save();
-        //     } else {
-        //         throw new BusinessException($wechat_res['err_code_des'] ?? '请求微信退款错误');
-        //     }
-        // } catch (\Exception $exception) {
-        //     throw new BusinessException('退款失败');
-        // }
     }
 }

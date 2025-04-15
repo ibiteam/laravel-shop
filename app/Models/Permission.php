@@ -87,6 +87,7 @@ class Permission extends SpatiePermission
     public const BASIC_PAYMENT_MANAGE = 'basic.payment.manage'; // 支付管理
     public const MANAGE_PAYMENT_INDEX = 'manage.payment.index'; // 支付方式列表
     public const MANAGE_PAYMENT_UPDATE = 'manage.payment.update'; // 支付方式编辑
+    public const MANAGE_TRANSACTION_INDEX = 'manage.transaction.index'; // 交易记录
     public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
     public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
     public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
@@ -124,6 +125,7 @@ class Permission extends SpatiePermission
     public const MANAGE_APPLY_REFUND_UPDATE = 'manage.apply_refund.update'; // 退款申请编辑
     public const ORDER_DELIVERY_MANAGE = 'order_delivery.manage'; // 发货管理
     public const MANAGE_ORDER_DELIVERY_INDEX = 'manage.order_delivery.index'; // 发货列表
+    public const MANAGE_ORDER_DELIVERY_UPDATE = 'manage.order_delivery.update'; // 发货记录编辑
 
     public function __construct(array $attributes = [])
     {

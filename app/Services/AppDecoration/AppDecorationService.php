@@ -2,14 +2,40 @@
 
 namespace App\Services\AppDecoration;
 
+use App\Components\ComponentFactory;
 use App\Exceptions\BusinessException;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
 use App\Models\AppDecorationItemDraft;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Collection;
 
 class AppDecorationService
 {
+    // 缓存数据
+    private static $cache_component_name = [
+        AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
+        AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+        AppDecorationItem::COMPONENT_NAME_HORIZONTAL_CAROUSEL,
+        AppDecorationItem::COMPONENT_NAME_QUICK_LINK,
+        AppDecorationItem::COMPONENT_NAME_ADVERTISING_BANNER,
+        AppDecorationItem::COMPONENT_NAME_HOT_ZONE,
+        AppDecorationItem::COMPONENT_NAME_GOODS_RECOMMEND,
+        AppDecorationItem::COMPONENT_NAME_RECOMMEND,
+    ];
+
+    private static $special_cache_name = [
+        AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
+        AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+    ];
+
+    // 不缓存数据
+    private static $not_cache_component_name = [
+        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+    ];
+
+
     // 获取当前装修项的最新草稿数据
     public function getLatestDraftItems(AppDecoration $app_decoration)
     {
@@ -137,5 +163,60 @@ class AppDecorationService
             // 保存草稿|预览 提交 记录 草稿数据
             $app_decoration_log_service->saveLog(null, $app_decoration->id, $item_ids, $admin_user_id);
         }
+    }
+
+    // 首页数据
+    public function homeData(Collection $items)
+    {
+//        $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
+//        if (!($home_nav_item instanceof AppDecorationItem)) {
+//            return $this->error('页面搜索尚未装修');
+//        }
+//        // 搜索组件
+//        $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
+        $home_nav = [];
+        $now = now();
+        $cache_name = AppDecoration::MOBILE_HOME_BY_H5;
+        // 正式环境 - 缓存到当天 23:59:59
+        if (is_pro_env()) {
+            $cache_data = Cache::remember($cache_name, $now->diffInSeconds($now->copy()->endOfDay()), function () use ($items) {
+                return $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
+                    $temp_item = $item->toArray();
+
+                    return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($temp_item);
+                });
+            });
+        } else {
+            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
+                $temp_item = $item->toArray();
+
+                return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($temp_item);
+            });
+        }
+
+        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem $item) {
+            $info = $item->toArray();
+
+            return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($info);
+        });
+        // 特殊的组件数据
+        $special_cache_data = $cache_data->whereIn('component_name', self::$special_cache_name);
+        // 不包含特殊组件的数据
+        $new_cache_data = $cache_data->whereNotIn('component_name', self::$special_cache_name);
+        // 主体数据
+        $content = $new_cache_data->merge($not_cache_data)->filter(function ($item) {
+            return !empty($item);
+        })->sortBy('sort')->values();
+        // 弹屏广告组件
+        $danping_advertisement = $special_cache_data->where('component_name', AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT)->first();
+        // 悬浮广告组件
+        $suspended_advertisement = $special_cache_data->where('component_name', AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT)->first();
+
+        return [
+            'danping_advertisement' => $danping_advertisement,
+            'suspended_advertisement' => $suspended_advertisement,
+            'home_nav' => $home_nav,
+            'content' => $content,
+        ];
     }
 }
