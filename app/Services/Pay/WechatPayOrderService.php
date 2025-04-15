@@ -4,6 +4,8 @@ namespace App\Services\Pay;
 
 use App\Enums\PayFormEnum;
 use App\Enums\RouterEnum;
+use App\Exceptions\BusinessException;
+use App\Exceptions\WeChatPayException;
 use App\Http\Dao\TransactionDao;
 use App\Models\Order;
 use App\Models\Payment;
@@ -15,7 +17,10 @@ use App\Utils\Wechat\WechatPayUtil;
 class WechatPayOrderService implements PayOrderInterface
 {
     /**
-     * @throws \Exception
+     * 订单支付.
+     *
+     * @throws BusinessException
+     * @throws WeChatPayException
      */
     public function orderPay(Order $order, Payment $payment, PayFormEnum $pay_form_enum): array
     {
@@ -57,7 +62,7 @@ class WechatPayOrderService implements PayOrderInterface
                 break;
 
             default:
-                throw new \Exception('支付类型错误');
+                throw new BusinessException('支付类型错误');
         }
 
         return [

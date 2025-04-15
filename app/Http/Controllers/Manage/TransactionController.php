@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Manage;
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\WeChatPayException;
 use App\Http\Dao\TransactionDao;
 use App\Http\Resources\Manage\TransactionResourceCollection;
 use App\Models\Order;
@@ -12,12 +13,17 @@ use App\Models\Payment;
 use App\Models\Transaction;
 use App\Utils\Wechat\WechatPayUtil;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class TransactionController extends BaseController
 {
-    public function index(Request $request)
+    /**
+     * 退款列表.
+     */
+    public function index(Request $request): JsonResponse
     {
         // 交易记录
         $transaction_no = $request->get('transaction_no', null);
@@ -51,9 +57,11 @@ class TransactionController extends BaseController
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse|void
+     * 申请退款.
+     *
+     * @throws \Throwable
      */
-    public function refund(Request $request, TransactionDao $transaction_dao)
+    public function refund(Request $request, TransactionDao $transaction_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -98,21 +106,60 @@ class TransactionController extends BaseController
             $wechat_response = $wechat_pay_util->refundOrder($transaction->transaction_no, $out_refund_no, $refund_amount, $transaction->amount, '联系客服申请退款');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
+        } catch (WeChatPayException $we_chat_pay_exception) {
+            return $this->error($we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getCodeEnum());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }
 
-        admin_operation_log($this->adminUser(), "针对流水号：【{$transaction->transaction_no}】申请退款");
+        DB::beginTransaction();
 
-        if (isset($wechat_response['status']) && $wechat_response['status'] === 'PROCESSING') {
+        try {
+            admin_operation_log($this->adminUser(), "针对流水号：【{$transaction->transaction_no}】申请退款");
+
             $transaction->can_refund = false;
             $transaction->save();
 
-            return $this->success('已经提交微信退款申请，请耐心等待~');
-        }
+            switch ($wechat_response['status'] ?? '') {
+                case 'PROCESSING': // 退款处理中
+                    $response_message = '已经提交微信退款申请，请耐心等待~';
+                    $transaction_dao->storeByManageRefund($transaction, $refund_amount);
 
-        return $this->error('退款失败');
+                    break;
+
+                case 'SUCCESS': // 退款成功
+                    $response_message = '退款成功';
+                    $transaction_dao->storeByManageRefund($transaction, $refund_amount, Transaction::STATUS_SUCCESS);
+
+                    break;
+
+                case 'CLOSED': // 退款关闭
+                    throw new BusinessException('退款关闭，请联系管理员');
+
+                    break;
+
+                case 'ABNORMAL': // 退款异常
+                    throw new BusinessException('退款异常，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败，可前往商户平台-交易中心，手动处理此笔退款');
+
+                    break;
+
+                default:
+                    throw new BusinessException('退款状态异常，请联系管理员');
+            }
+
+            DB::commit();
+
+            return $this->success($response_message);
+        } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+
+            return $this->error('退款失败');
+        }
     }
 }
