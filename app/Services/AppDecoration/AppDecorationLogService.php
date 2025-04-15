@@ -14,7 +14,6 @@ class AppDecorationLogService
         if (! $app_decoration_log) {
             $app_decoration_log = new AppDecorationLog();
         }
-        Log::info(json_encode($app_decoration_item_ids, JSON_UNESCAPED_UNICODE));
         $app_decoration_log->app_decoration_id = $app_decoration_id;
         $app_decoration_log->app_decoration_item_ids = json_encode($app_decoration_item_ids, JSON_UNESCAPED_UNICODE);
         $app_decoration_log->admin_user_id = $admin_user_id;
