@@ -113,6 +113,8 @@ Route::middleware('api.auth')->group(function () {
             Route::get('detail', [ApplyRefundController::class, 'detail']); // 售后详情
             Route::get('log', [ApplyRefundController::class, 'log']); // 协商历史
             Route::post('revoke', [ApplyRefundController::class, 'revoke']); // 撤销申请
+            Route::get('ship_info', [ApplyRefundController::class, 'shipInfo']); // 退货物流信息
+            Route::post('ship_add', [ApplyRefundController::class, 'shipAdd']); // 填写物流单号
         });
     });
 

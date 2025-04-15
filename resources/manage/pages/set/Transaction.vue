@@ -4,7 +4,7 @@ import { Search, RefreshLeft, Upload } from '@element-plus/icons-vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
-import { transactionIndex } from '@/api/set.js';
+import { transactionIndex, transactionRefund } from '@/api/set.js';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -100,6 +100,24 @@ const getData = (page = 1) => {
         loading.value = false;
     })
 }
+
+const handleRefund = (transactionId) => {
+    cns.$confirm('确定要退款吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).then(() => {
+        transactionRefund({id: transactionId}).then(res => {
+            if (cns.$successCode(res.code)) {
+                cns.$message.success(res.message);
+                getData(pageInfo.current_page)
+            } else {
+                cns.$message.error(res.message)
+            }
+        })
+    });
+}
+
 
 onMounted(() => {
     getData();
@@ -210,7 +228,7 @@ onMounted(() => {
             <el-table-column label="备注" prop="remark" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="200px">
                 <template #default="scope">
-                    <el-button link type="primary">退款</el-button>
+                    <el-button link type="primary" v-if="scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="handleRefund(scope.row.id)">退款</el-button>
                 </template>
             </el-table-column>
         </PublicPageTable>

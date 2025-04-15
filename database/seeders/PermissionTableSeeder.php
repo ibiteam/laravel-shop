@@ -78,6 +78,7 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('支付方式', Permission::MANAGE_PAYMENT_INDEX, 99, Permission::IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
         $this->addPermission('支付方式编辑', Permission::MANAGE_PAYMENT_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
         $this->addPermission('交易记录', Permission::MANAGE_TRANSACTION_INDEX, 98, Permission::IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
+        $this->addPermission('交易记录-申请退款', Permission::MANAGE_TRANSACTION_REFUND, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::BASIC_PAYMENT_MANAGE);
 
         $this->addPermission('网站管理', Permission::WEBSITE_MANAGE, 1, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
         $this->addPermission('移动端装修', Permission::MANAGE_APP_DECORATION, 1, Permission::IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);

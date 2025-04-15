@@ -70,3 +70,23 @@ it('log', function () {
     dump($res);
 });
 
+it('ship info', function () {
+    $response = $this->doGet('api/v1/order/apply_refund/ship_info', [
+        'apply_refund_id' => 1,
+    ]);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
+    dump($res);
+});
+
+it('ship add', function () {
+    $response = $this->doPost('api/v1/order/apply_refund/ship_add', [
+        'apply_refund_id' => 1,
+        'no' => '123456789',
+        'ship_company_id' => 1,
+        'phone' => '13322221111',
+        'description' => '测试',
+        'certificate' => 'https://www.baidu.com,https://learnku.com',
+    ]);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
+    dump($res);
+});
