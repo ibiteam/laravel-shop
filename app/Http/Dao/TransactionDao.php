@@ -25,6 +25,7 @@ class TransactionDao
             'amount' => $order->order_amount,
             'status' => Transaction::STATUS_WAIT,
             'remark' => $remark,
+            'can_refund' => true,
         ]);
     }
 
@@ -44,6 +45,7 @@ class TransactionDao
             'amount' => -$apply_refund->money,  // 退款金额记负数
             'status' => Transaction::STATUS_WAIT,
             'remark' => $remark,
+            'can_refund' => false,
         ]);
     }
 
