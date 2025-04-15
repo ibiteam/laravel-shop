@@ -66,15 +66,13 @@ class ShopConfig extends Model
     public const INTEGRAL_NAME = 'integral_name'; // 积分名称
     public const SEARCH_DRIVER = 'search_driver';   // 搜索方式(1-数据库,2-MeiliSearch)
     public const IS_SHOW_SALES_VOLUME = 'is_show_sales_volume'; // 是否显示销量
-
-    public const AFTER_SALES_TIMELINESS = 'after_sales_timeliness'; // 售后时效（天）
-    public const AFTER_SALES_MAX_MONEY = 'after_sales_max_money'; // 售后最大退款金额
     public const SELLER_SHIPPED_TIME = 'seller_shipped_time'; // 卖家未发货退款申请响应时间（小时）
     public const SELLER_CONFIRM_TIME = 'seller_confirm_time'; // 卖家处理响应时间（小时）
-    public const SELLER_RECEIVE_TIME = 'seller_receive_time'; // 卖家收货响应时间（天）
     public const BUYER_CHANGE_TIME = 'buyer_change_time'; // 买家修改申请响应时间（小时）
     public const BUYER_REFUND_TIME = 'buyer_refund_time'; // 买家退货响应时间（天）
-
+    public const SELLER_RECEIVE_TIME = 'seller_receive_time'; // 卖家收货响应时间（天）
+    public const AFTER_SALES_TIMELINESS = 'after_sales_timeliness'; // 售后时效（天）
+    public const AFTER_SALES_MAX_MONEY = 'after_sales_max_money'; // 售后最大退款金额
 
     protected $guarded = [];
 

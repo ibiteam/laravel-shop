@@ -6,8 +6,10 @@ use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
+use App\Http\Dao\ApplyRefundShipDao;
 use App\Http\Requests\ApplyRefundStoreRequest;
 use App\Models\ApplyRefund;
+use App\Models\ShipCompany;
 use App\Services\Order\ApplyRefundService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -194,6 +196,76 @@ class ApplyRefundController extends BaseController
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('获取协商历史异常~');
+        }
+    }
+
+
+    /**
+     * 退货物流信息.
+     */
+    public function shipInfo(Request $request, ApplyRefundShipDao $apply_refund_ship_dao)
+    {
+        try {
+            $validated = $request->validate([
+                'apply_refund_id' => 'required|integer',
+            ], [], [
+                'apply_refund_id' => '申请售后ID',
+            ]);
+
+            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundShip'])->whereId($validated['apply_refund_id'])->whereUserId($this->user()->id)->first();
+
+            if (! $apply_refund instanceof ApplyRefund) {
+                throw new BusinessException('退款信息不存在');
+            }
+
+            $ship_companies = ShipCompany::query()->whereStatus(ShipCompany::STATUS_ENABLE)->select(['id', 'name'])->get();
+
+            $data = [
+                'mobile' => $apply_refund->order->phone,
+                'ship_companies' => $ship_companies,
+            ];
+
+            return $this->success($data);
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('用户填写退货物流异常~');
+        }
+    }
+
+    /**
+     * 用户填写退货物流.
+     */
+    public function shipAdd(Request $request, ApplyRefundShipDao $apply_refund_ship_dao)
+    {
+        try {
+            $validated = $request->validate([
+                'apply_refund_id' => 'required|integer',
+                'no' => 'required|string',
+                'ship_company_id' => 'required|integer',
+                'phone' => 'required|is_phone',
+                'description' => 'nullable|string',
+                'certificate' => 'nullable|string',
+            ], [], [
+                'apply_refund_id' => '申请售后ID',
+                'no' => '物流单号',
+                'ship_company_id' => '物流公司ID',
+                'phone' => '手机号',
+                'description' => '描述',
+                'certificate' => '凭证',
+            ]);
+
+            $apply_refund_ship_dao->addShip($this->user(), $validated['apply_refund_id'], $validated['no'], $validated['ship_company_id'], $validated['phone'], $validated['description'] ?? null, $validated['certificate'] ?? null);
+
+            return $this->success('填写成功');
+        } catch (ValidationException $validation_exception) {
+            return $this->error($validation_exception->validator->errors()->first());
+        } catch (BusinessException $business_exception) {
+            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (\Throwable $throwable) {
+            return $this->error('用户填写退货物流异常~');
         }
     }
 }

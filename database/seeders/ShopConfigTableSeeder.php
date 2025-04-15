@@ -89,12 +89,12 @@ class ShopConfigTableSeeder extends Seeder
 
     private function addRefundAfterSales(): void
     {
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_TIMELINESS, '15');
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_MAX_MONEY, '10000');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_SHIPPED_TIME, '24');
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_CONFIRM_TIME, '24');
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_RECEIVE_TIME, '1');
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_CHANGE_TIME, '24');
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_REFUND_TIME, '3');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_CONFIRM_TIME, '72');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_CHANGE_TIME, '72');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_REFUND_TIME, '5');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_RECEIVE_TIME, '10');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_TIMELINESS, '15');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_MAX_MONEY, '1000');
     }
 }
