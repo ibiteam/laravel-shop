@@ -22,9 +22,13 @@
                         @node-click="(e,data,el) => openMenu(e)">
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
-                                <el-icon v-if='data.icon'>
-                                    <component :is="data.icon"/>
-                                </el-icon>
+                                <template v-if="data.icon">
+                                    <img v-if="data.icon.indexOf('http') > -1" :src="data.icon" alt="" style="width: 20px;height: 20px">
+                                    <i v-if="data.icon.indexOf('icon-') > -1" style="font-size:20px;color: #333333" class="iconfont" :class="data.icon"></i>
+                                    <el-icon v-else :size="20">
+                                        <component :is="data.icon"/>
+                                    </el-icon>
+                                </template>
                                 <span class="ml-10">{{ data.title }}</span>
                             </div>
                         </template>
@@ -39,9 +43,13 @@
                                 <div class='menu-box'>
                                     <div class='s-flex'>
                                         <div class='menu-list s-flex jc-ct ai-ct' :class='{actived:index === menuIndex}' :key="item.index" v-for='(item,index) in menus'  @click="leftShow = true,menuIndex = index">
-                                            <el-icon v-if="item.icon" :size="20">
-                                                <component :is="item.icon"/>
-                                            </el-icon>
+                                            <template v-if="item.icon">
+                                                <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" style="width: 20px;height: 20px">
+                                                <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;color: #ffffff" class="iconfont" :class="item.icon"></i>
+                                                <el-icon v-else :size="20">
+                                                    <component :is="item.icon"/>
+                                                </el-icon>
+                                            </template>
                                             <div class="menu-first-name co-666"><span>{{item.title}}</span></div>
                                         </div>
                                     </div>

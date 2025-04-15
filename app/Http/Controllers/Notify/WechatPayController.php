@@ -44,7 +44,7 @@ class WechatPayController extends Controller
 
             Log::info('微信支付申请退款回调信息：'.$message);
 
-            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            if (! isset($message['refund_status']) || $message['refund_status'] !== 'SUCCESS') {
                 throw new BusinessException('Result Code Fail');
             }
             // 请求微信查询支付结果
@@ -98,7 +98,7 @@ class WechatPayController extends Controller
 
             Log::info('微信支付回调信息：'.$message);
 
-            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            if (! isset($message['trade_state']) || $message['trade_state'] !== 'SUCCESS') {
                 throw new BusinessException('Result Code Fail');
             }
             // 请求微信查询支付结果
