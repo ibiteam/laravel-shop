@@ -103,6 +103,9 @@ export function paymentMethodUpdate(data) {
 export function transactionIndex(data) {
     return $http.doGet('manage/set/payment/transaction',data)
 }
+export function transactionRefund(data) {
+    return $http.doPost('manage/set/payment/transaction/refund',data)
+}
 // 快递公司
 export function shipCompanyIndex(data) {
     return $http.doGet('manage/set/ship_company', data)

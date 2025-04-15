@@ -15,7 +15,7 @@ class TransactionDao
     public function storeByOrder(Order $order, Payment $payment, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
-            'transaction_no' => 'order_'.get_flow_sn(),
+            'transaction_no' => $this->generateTransactionNo('order'),
             'user_id' => $order->user_id,
             'parent_id' => 0,
             'transaction_type' => Transaction::TRANSACTION_TYPE_PAY,
@@ -34,7 +34,7 @@ class TransactionDao
     public function storeByRefund(ApplyRefund $apply_refund, Transaction $transaction, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
-            'transaction_no' => 'refund_'.get_flow_sn(),
+            'transaction_no' => $this->generateRefundNo(),
             'user_id' => $apply_refund->user_id,
             'transaction_type' => Transaction::TRANSACTION_TYPE_REFUND,
             'parent_id' => $transaction->id,
@@ -45,5 +45,21 @@ class TransactionDao
             'status' => Transaction::STATUS_WAIT,
             'remark' => $remark,
         ]);
+    }
+
+    /**
+     * 生成退款单号.
+     */
+    public function generateRefundNo(): string
+    {
+        return $this->generateTransactionNo('refund');
+    }
+
+    /**
+     * 生成交易流水号.
+     */
+    private function generateTransactionNo(string $prefix): string
+    {
+        return $prefix.'_'.get_flow_sn();
     }
 }
