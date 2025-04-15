@@ -29,14 +29,69 @@ use Throwable;
 class WechatPayController extends Controller
 {
     /**
-     * @return Response|ResponseInterface
+     * 退款回调.
      *
      * @throws InvalidArgumentException
-     * @throws RuntimeException
      * @throws ReflectionException
+     * @throws RuntimeException
      * @throws Throwable
      */
-    public function notifyPay(Request $request, PaymentDao $payment_dao)
+    public function notifyRefund(Request $request, PaymentDao $payment_dao): ServerResponse|ResponseInterface
+    {
+        // 支付回调
+        $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
+
+        if (! $payment instanceof Payment) {
+            return ServerResponse::make(new Response(
+                200,
+                [],
+                strval(json_encode(['code' => 'FAIL', 'message' => 'Not Fount Payment'], JSON_UNESCAPED_UNICODE))
+            ));
+        }
+        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+
+        $message = $wechat_pay_util->server()->getRequestMessage();
+
+        Log::info('微信支付申请退款回调信息：'.$message);
+
+        if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            return ServerResponse::make(new Response(
+                200,
+                [],
+                strval(json_encode(['code' => 'FAIL', 'message' => 'Result Code Fail'], JSON_UNESCAPED_UNICODE))
+            ));
+        }
+        // 请求微信查询支付结果
+        $order_message = $wechat_pay_util->queryRefundOrder($message['out_refund_no']);
+
+        Log::info('微信支付申请退款回调信息->请求微信获取申请退款订单信息：'.json_encode($order_message, JSON_UNESCAPED_UNICODE));
+
+        if (! isset($order_message['status']) || $order_message['status'] !== 'SUCCESS') {
+            return ServerResponse::make(new Response(
+                200,
+                [],
+                strval(json_encode(['code' => 'FAIL', 'message' => 'Query Order Trade State Fail'], JSON_UNESCAPED_UNICODE))
+            ));
+        }
+        // 退款处理
+        $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
+
+        if ($transaction instanceof Transaction) {
+            $transaction->update(['status' => Transaction::STATUS_SUCCESS]);
+        }
+
+        return $wechat_pay_util->server()->serve();
+    }
+
+    /**
+     * 支付回调.
+     *
+     * @throws InvalidArgumentException
+     * @throws ReflectionException
+     * @throws RuntimeException
+     * @throws Throwable
+     */
+    public function notifyPay(Request $request, PaymentDao $payment_dao): ServerResponse|ResponseInterface
     {
         // 支付回调
         $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
@@ -82,6 +137,24 @@ class WechatPayController extends Controller
         return $wechat_pay_util->server()->serve();
     }
 
+    private function getRequestMessage()
+    {
+        $payment = app(PaymentDao::class)->getInfoByAlias(PaymentEnum::WECHAT);
+
+        if (! $payment instanceof Payment) {
+            throw new \Exception(strval(json_encode(['code' => 'FAIL', 'message' => 'Not Fount Payment'], JSON_UNESCAPED_UNICODE)));
+        }
+        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+
+        $message = $wechat_pay_util->server()->getRequestMessage();
+
+        Log::info('微信支付回调信息：'.$message);
+
+        if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            throw new \Exception(strval(json_encode(['code' => 'FAIL', 'message' => 'Result Code Fail'], JSON_UNESCAPED_UNICODE)));
+        }
+    }
+
     /**
      * 处理订单支付回调.
      *
@@ -92,7 +165,7 @@ class WechatPayController extends Controller
         DB::beginTransaction();
 
         try {
-            $transaction = Transaction::query()->whereTransactionNo($order_message['out_trade_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
+            $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_PAY)->whereTransactionNo($order_message['out_trade_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
 
             if (! $transaction instanceof Transaction) {
                 throw new \Exception('未找到支付流水记录');
