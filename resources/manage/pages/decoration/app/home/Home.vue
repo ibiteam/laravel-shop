@@ -20,7 +20,7 @@
             <div class="decoration-app-container">
                 <main class="decoration-app-main" id="decorationAppMain">
                     <div class="app-wrapper">
-                        <search v-if="findNotForData('home_search')" ref="homeSearchRef" v-bind="{component: findNotForData('home_search'), temp_index: decoration.temp_index}" ></search>
+                        <search v-if="findNotForData('home_nav')" ref="homeSearchRef" v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}" ></search>
                         <VueDraggable
                             class="app-wrapper-content"
                             v-model="decoration.data"
