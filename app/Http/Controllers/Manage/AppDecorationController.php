@@ -11,6 +11,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
 use App\Models\AppDecorationItemDraft;
+use App\Models\AppDecorationLog;
 use App\Models\Goods;
 use App\Models\ShopConfig;
 use App\Services\AppDecoration\AppDecorationLogService;
@@ -20,6 +21,7 @@ use App\Utils\Constant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class AppDecorationController extends BaseController
@@ -86,6 +88,7 @@ class AppDecorationController extends BaseController
             if ($exception instanceof BusinessException) {
                 return $this->error($exception->getMessage());
             }
+            Log::error($exception->getMessage());
 
             return $this->error('初始化失败');
         }
@@ -159,10 +162,40 @@ class AppDecorationController extends BaseController
         return $this->success([]);
     }
 
+    // 历史记录
+    public function decorationHistory(Request $request, AppDecorationLogService $app_decoration_log_service)
+    {
+        $log_data = $app_decoration_log_service->getAllLogsPaginate((int)$request->get('id')); // 装修页面id
+
+        return $this->success($log_data);
+    }
+
+    // 还原历史记录
+    public function historyRestore(Request $request)
+    {
+        $log_id = $request->get('log_id'); // 装修记录id
+
+        if (!AppDecorationLog::whereId($log_id)->update(['updated_at' => now()])) {
+            return $this->error('还原失败');
+        }
+
+        return $this->success('保存成功');
+    }
+
     // 为您推荐组件数据
     public function recommendData(GoodsService $goods_service)
     {
         return $this->success($goods_service->getRecommendData());
+    }
+
+    // 商品推荐组件 - 智能推荐数据
+    public function goodsForIntelligent(Request $request, GoodsService $goods_service)
+    {
+        $sort_type = $request->get('sort_type') ?: AppDecorationItem::SORT_SALES;
+        $number = (int)$request->get('number') ?: 3;
+        $goods_data = $goods_service->getRecommendGoods(limit:$number, sort_type:$sort_type);
+
+        return $this->success($goods_data);
     }
 
     // 推荐商品列表
@@ -191,12 +224,17 @@ class AppDecorationController extends BaseController
     public function importGoods(Request $request)
     {
         $goods_ids = $request->get('goods_ids', []);
+        $goods_nos = $request->get('goods_nos', []);
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
-            ->when($goods_ids, fn ($query) => $query->whereIn('id', $goods_ids))
+            ->where(fn ($query) => $query->whereIn('id', $goods_ids)->orWhereIn('no', $goods_nos))
             ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
-            ->latest()->limit(20)->get();
+            ->latest()->get();
+
+        if (count($data) > 20) {
+            return $this->error('导入商品加上已选商品不能超过 20 个');
+        }
 
         return $this->success($data);
     }
@@ -219,8 +257,8 @@ class AppDecorationController extends BaseController
 
             $temp_item = ComponentFactory::getComponent($datum['component_name'], $datum['name'])->validate($datum);
             $temp_item['sort'] = $key + 1;
-
-            if (isset($temp_item['id']) && $temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
+            $temp_item['id'] = (int)$temp_item['id'] ?? 0;
+            if ($temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
                 $update_data[] = $temp_item;
             } else {
                 $temp_item['id'] = 0;

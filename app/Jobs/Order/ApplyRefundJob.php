@@ -39,9 +39,10 @@ class ApplyRefundJob implements ShouldQueue
 
     /**
      * Execute the job.
+     *
      * @throws \Throwable
      */
-    public function handle()
+    public function handle(): bool
     {
         $apply_refund = ApplyRefund::query()->whereId($this->apply_refund_id)->first();
 
@@ -50,30 +51,30 @@ class ApplyRefundJob implements ShouldQueue
         }
 
         switch ($this->status) {
-            case ApplyRefundStatusEnum::NOT_PROCESSED: // 状态:待处理
-                if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED) {
-                    $this->apply_refund($this->action, $this->type, $this->status);
+            case ApplyRefundStatusEnum::NOT_PROCESSED->value: // 状态:待处理
+                if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED->value) {
+                    $this->applyRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::REFUSE: // 状态: 已拒绝退款
-                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE) {
-                    $this->apply_refund_close($this->action, $this->type, $this->status);
+            case ApplyRefundStatusEnum::REFUSE->value: // 状态: 已拒绝退款
+                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
+                    $this->applyRefundClose($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::REFUSE_EXAMINE: // 状态: 退货审核成功 待买家发货
-                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE) {
-                    $this->apply_refund_close($this->action, $this->type, $this->status);
+            case ApplyRefundStatusEnum::REFUSE_EXAMINE->value: // 状态: 退货审核成功 待买家发货
+                if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
+                    $this->applyRefundClose($this->action, $this->type, $this->status);
                 }
 
                 break;
 
-            case ApplyRefundStatusEnum::BUYER_SEND_SHIP:  // 状态: 买家已发货 待卖家收货
-                if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP) {
-                    $this->apply_refund($this->action, $this->type, $this->status);
+            case ApplyRefundStatusEnum::BUYER_SEND_SHIP->value:  // 状态: 买家已发货 待卖家收货
+                if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
+                    $this->applyRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
@@ -90,11 +91,11 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function apply_refund_close($action, $type, $status)
+    public function applyRefundClose($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE;
+        $apply_refund->status = ApplyRefundStatusEnum::REFUND_CLOSE->value;
 
         DB::beginTransaction();
 
@@ -102,7 +103,7 @@ class ApplyRefundJob implements ShouldQueue
             $apply_refund->save();
 
             // 买家超时未申请，不记录日志
-            if ($status === ApplyRefundStatusEnum::REFUSE_EXAMINE) {
+            if ($status === ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
@@ -117,11 +118,11 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function apply_refund($action, $type, $status)
+    public function applyRefund($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
-        $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS;
+        $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
         $apply_refund->result = '卖家超时未处理，退款成功';
 
         DB::beginTransaction();
@@ -130,11 +131,11 @@ class ApplyRefundJob implements ShouldQueue
             $apply_refund->save();
 
             // 发起申请售后 超时未处理 增加2条记录
-            if ($status === ApplyRefundStatusEnum::NOT_PROCESSED) {
+            if ($status === ApplyRefundStatusEnum::NOT_PROCESSED->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未处理', ApplyRefundLog::TYPE_SELLER);
             }
 
-            if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP) {
+            if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未确认收货', ApplyRefundLog::TYPE_SELLER);
             }
             app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);

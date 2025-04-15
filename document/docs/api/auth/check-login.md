@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/v1/auth/check-login
+* /api/v1/auth/check_login
 
 ### 请求方式
 * GET

@@ -84,7 +84,7 @@ const handleDragClone = (item) => {
         );
     }
     let {component_name} = item
-    let component = props.component_value.find(item => item.component_name === component_name)
+    let component = JSON.parse(JSON.stringify(props.component_value.find(item => item.component_name === component_name)))
     component.id = generateUUID() + '-add'
     component.data = {}
     return component

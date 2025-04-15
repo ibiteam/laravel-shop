@@ -23,6 +23,12 @@ class GoodsCategoryController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $data = Category::query()->whereParentId(0)->with('allChildren')->get();
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
+        $data = $data->map(function (Category $category) use ($vue_app_url) {
+            $category->setAttribute('h5_url', $vue_app_url.'/category?cat_id='.$category->id);  // 分类h5地址
+
+            return $category;
+        })->toArray();
 
         return $this->success($data);
     }
@@ -198,11 +204,11 @@ class GoodsCategoryController extends BaseController
             }
 
             $log = "更改商品分类显示隐藏[id:{$validated['id']}]".implode(
-                    ',',
-                    array_map(function ($k, $v) {
-                        return sprintf('%s=`%s`', $k, $v);
-                    }, array_keys($category->getChanges()), $category->getChanges())
-                );
+                ',',
+                array_map(function ($k, $v) {
+                    return sprintf('%s=`%s`', $k, $v);
+                }, array_keys($category->getChanges()), $category->getChanges())
+            );
             admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');

@@ -11,6 +11,10 @@ enum RouterCategoryEnum: string
             self::CUSTOM_LINK => '自定义链接',
             self::GOODS_LINK => '商品链接',
             self::ARTICLE_LINK => '文章链接',
+            self::GOODS_CATEGORY => '商品分类',
+            self::GOODS_LIST => '商品',
+            self::ARTICLE_CATEGORY => '文章分类',
+            self::ARTICLE_LIST => '文章',
         };
     }
 
@@ -26,6 +30,10 @@ enum RouterCategoryEnum: string
             'custom_link' => self::CUSTOM_LINK,
             'goods_link' => self::GOODS_LINK,
             'article_link' => self::ARTICLE_LINK,
+            'goods_category' => self::GOODS_CATEGORY,
+            'goods_list' => self::GOODS_LIST,
+            'article_category' => self::ARTICLE_CATEGORY,
+            'article_list' => self::ARTICLE_LIST,
         };
     }
 
@@ -33,4 +41,9 @@ enum RouterCategoryEnum: string
     case CUSTOM_LINK = 'custom_link';  // 自定义链接
     case GOODS_LINK = 'goods_link';  // 商品链接
     case ARTICLE_LINK = 'article_link';  // 文章链接
+
+    case GOODS_CATEGORY = 'goods_category';  // 商品分类
+    case GOODS_LIST = 'goods_list';  // 商品
+    case ARTICLE_CATEGORY = 'article_category';  // 文章分类
+    case ARTICLE_LIST = 'article_list';  // 文章
 }

@@ -3,7 +3,6 @@
 namespace App\Components\AppComponents;
 
 use App\Components\PageComponent;
-use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
 use App\Services\AppDecoration\AppDecorationItemService;
@@ -12,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AdvertisingBannerComponent extends PageComponent
 {
-
     public function icon(): array
     {
         return [
@@ -37,7 +35,7 @@ class AdvertisingBannerComponent extends PageComponent
                 'column' => AppDecorationItem::NUMBER_COLUMN_TWO, // 每行显示
                 'background' => AppDecorationItem::BACKGROUND_COLOR_SHOW, // 是否展示背景色 1、有 0、无
                 'background_color' => '#ffffff', // 背景色 默认 白色
-                'width' => 350, // 宽度：默认330 不可修改 2个330,3个220,4个160
+                'width' => 340, // 宽度：默认330 不可修改 2个330,3个220,4个160
                 'height' => 190, // 高度：默认240（最高250）；2个240,3个150，4个150
                 'title' => [
                     'image' => '', // 图片地址
@@ -59,7 +57,7 @@ class AdvertisingBannerComponent extends PageComponent
                         'date_type' => AppDecorationItem::LONG_TIME, // 1、长期 0、时间范围
                         'time' => [], //
                         'image' => '', // 图片地址
-                        'sort' => 1, // 排序
+                        //                        'sort' => 1, // 排序
                         'is_show' => Constant::ONE, // 是否展示
                     ],
                 ],
@@ -97,14 +95,16 @@ class AdvertisingBannerComponent extends PageComponent
             'content.data.*.image' => 'required',
             'content.data.*.url.name' => 'present|nullable',
             'content.data.*.url.value' => 'present|nullable',
-            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+            //            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.data.*.is_show' => 'required|in:'.$is_show_validate_string,
             'content.data.*.date_type' => 'present|in:'.$is_show_validate_string,
             'content.data.*.time' => 'array',
         ], $this->messages());
+
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
+
         // 检查 每行固定展示个数的时候，宽度和高度是否达标
         if ($msg = $this->checkColumn($data['content'])) {
             throw new ProcessDataException($this->getName().'：'.$msg, ['id' => $data['id']]);
@@ -113,7 +113,8 @@ class AdvertisingBannerComponent extends PageComponent
         foreach ($data['content']['data'] as $index => $item) {
             $date_type = $item['date_type'] ?? null;
             $time = $item['time'] ?? null;
-            if (AppDecorationItem::CUSTOM_TIME == $date_type) {
+
+            if ($date_type == AppDecorationItem::CUSTOM_TIME) {
                 app(AppDecorationItemService::class)->validateTimeFields($this->getName(), $time, $data['id'], $index);
             }
         }
@@ -132,19 +133,21 @@ class AdvertisingBannerComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $items = collect($content['data'])->sortByDesc('sort')->map(function ($item) use (&$items) {
-            $data['image'] = $item['image'] ?? '';
-            $data['url'] = $item['url'];
-            $data['date_type'] = $item['date_type'];
-            $data['time'] = $item['time'];
-            $data['sort'] = $item['sort'];
+        $items = collect($content['data'])
+//            ->sortByDesc('sort')
+            ->map(function ($item) use (&$items) {
+                $data['image'] = $item['image'] ?? '';
+                $data['url'] = $item['url'];
+                $data['date_type'] = $item['date_type'];
+                $data['time'] = $item['time'];
+                $data['sort'] = $item['sort'] ?? 0;
 
-            if ($item['is_show']) {
-                return $data;
-            }
+                if ($item['is_show']) {
+                    return $data;
+                }
 
-            return null;
-        })->filter()->values()->toArray();
+                return null;
+            })->filter()->values()->toArray();
 
         return [
             'component_name' => $data['component_name'],
@@ -174,7 +177,7 @@ class AdvertisingBannerComponent extends PageComponent
             'component_name' => $data['component_name'],
             'is_show' => $data['is_show'],
             'is_fixed_assembly' => $data['is_fixed_assembly'],
-            'sort' => $data['sort'],
+            'sort' => $data['sort'] ?? 0,
             'content' => $data['content'] ?? null, // 表单提交数据
             'data' => $this->getContent($data), // 战术数据
         ];
@@ -191,13 +194,13 @@ class AdvertisingBannerComponent extends PageComponent
 
         switch ($column) {
             case AppDecorationItem::NUMBER_COLUMN_TWO:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 340) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是340";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 350) {
-                    return "每行显示 {$column}，无背景图的情况下，款度只能是350";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 340) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是340";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 350) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是350";
+//                }
 
                 if ($height < 190 || $height > 250) {
                     return "每行显示 {$column}，高度范围 190 - 250";
@@ -211,13 +214,13 @@ class AdvertisingBannerComponent extends PageComponent
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_THREE:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 220) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是220";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 230) {
-                    return "每行显示 {$column}，无背景图的情况下，宽度只能是230";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 220) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是220";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 230) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是230";
+//                }
 
                 if ($height < 280 || $height > 400) {
                     return "每行显示 {$column}，高度范围 280 - 400";
@@ -231,13 +234,13 @@ class AdvertisingBannerComponent extends PageComponent
                 break;
 
             case AppDecorationItem::NUMBER_COLUMN_FOUR:
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
-                    return "每行显示 {$column}，有背景图的情况下，宽度只能是160";
-                }
-
-                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 170) {
-                    return "每行显示 {$column}，无背景图的情况下，宽度只能是170";
-                }
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_SHOW && $width !== 160) {
+//                    return "每行显示 {$column}，有背景图的情况下，宽度只能是160";
+//                }
+//
+//                if ($background == AppDecorationItem::BACKGROUND_COLOR_NOT_SHOW && $width !== 170) {
+//                    return "每行显示 {$column}，无背景图的情况下，宽度只能是170";
+//                }
 
                 if ($height < 220 || $height > 350) {
                     return "每行显示 {$column}，高度范围 220 - 350";

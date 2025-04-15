@@ -19,6 +19,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addIntegralSettings(); // 积分设置
         $this->addSearchSettings(); // 搜索设置
         $this->addGoodsSettings(); // 商品设置
+        $this->addRefundAfterSales(); // 退款售后
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -84,5 +85,16 @@ class ShopConfigTableSeeder extends Seeder
     private function addGoodsSettings(): void
     {
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_SALES_VOLUME, '0');
+    }
+
+    private function addRefundAfterSales(): void
+    {
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_TIMELINESS, '15');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_MAX_MONEY, '10000');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_SHIPPED_TIME, '24');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_CONFIRM_TIME, '24');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_RECEIVE_TIME, '1');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_CHANGE_TIME, '24');
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_REFUND_TIME, '3');
     }
 }

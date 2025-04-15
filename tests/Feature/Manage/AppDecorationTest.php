@@ -86,3 +86,29 @@ it('test recommend data', function () {
     $response = $this->doGet('api/manage/set/app_decoration/recommend/data', $data);
     dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
 });
+
+it('test import goods', function () {
+    $data = [
+        'goods_ids' => ['1','2','3','4'],
+        'goods_nos' => ['cbda6ddf-0c08-4c82-a777-c73121b9698d', '5769f804-94ea-4564-ac33-65857eeb6629'],
+    ];
+    $response = $this->doPost('api/manage/set/app_decoration/goods/import', $data);
+    dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
+});
+
+it('test goods intelligent', function () {
+    $data = [
+        'number' => '',
+        'sort_type' => '',
+    ];
+    $response = $this->doPost('api/manage/set/app_decoration/goods/intelligent', $data);
+    dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
+});
+
+it('test history', function () {
+    $data = [
+        'id' => 1,
+    ];
+    $response = $this->doPost('api/manage/set/app_decoration/history', $data);
+    dd($response, json_encode($response, JSON_UNESCAPED_UNICODE));
+});

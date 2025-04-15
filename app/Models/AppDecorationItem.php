@@ -44,7 +44,7 @@ class AppDecorationItem extends Model
     public const CUSTOM_TIME = 0; // 时间 - 自定义
 
     // 轮播图
-    public const COMPONENT_NAME_HORIZONTAL_CAROUSEL = 'horizontal_carousel'; // 组件名称
+    public const COMPONENT_NAME_HORIZONTAL_CAROUSEL = 'horizontal_carousel'; // 轮播图
     public const STYLE_TILED = 1; // 显示样式 - 平铺
     public const STYLE_TRANSITION = 2; // 显示样式 - 过渡
     public const COMPONENT_NAME_DANPING_ADVERTISEMENT = 'danping_advertisement'; // 弹屏广告

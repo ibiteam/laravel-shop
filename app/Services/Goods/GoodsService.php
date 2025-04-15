@@ -404,18 +404,20 @@ class GoodsService
     }
 
     // 获取商品推荐数据
-    public function getRecommendGoods(?array $goods_nos, int $rule, int $limit, int $sort_type): array
+    public function getRecommendGoods(int $limit, int $sort_type, ?array $goods_nos = null, int $rule = AppDecorationItem::RULE_INTELLIGENT): array
     {
         // 是否展示销量
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name')
+        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
         switch ($rule) {
             case AppDecorationItem::RULE_INTELLIGENT:
                 $sort = Goods::$sorts[$sort_type] ?? null;
                 $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}") )->limit($limit);
+                break;
             case AppDecorationItem::RULE_MANUAL:
                 $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
+                break;
         }
 
         return $query->get()->toArray();

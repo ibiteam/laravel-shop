@@ -2,26 +2,26 @@
 
 namespace App\Services;
 
-use App\Enums\RouteEnum;
+use App\Enums\RouterEnum;
 use App\Models\Router;
 
-class RouteService
+class RouterService
 {
     /**
      * 获取完整请求地址
      */
-    public function getRoutePath(RouteEnum $mobile_route_enum, array $params = []): string
+    public function getRouterPath(RouterEnum $router_enum, array $params = []): string
     {
-        $route = Router::query()->whereAlias($mobile_route_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
+        $router = Router::query()->whereAlias($router_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
 
-        if (! $route instanceof Router) {
+        if (! $router instanceof Router) {
             return '';
         }
 
-        $path = $route->h5_url;
+        $path = rtrim(config('host.vue_app_url'), '/').'/'.ltrim($router->h5_url, '/');
         $set_data = [];
 
-        foreach ($route->params as $key => $value) {
+        foreach ($router->params as $key => $value) {
             if (isset($params[$key])) {
                 $set_data[$key] = $params[$key];
             } else {

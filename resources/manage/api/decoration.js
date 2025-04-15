@@ -66,3 +66,36 @@ export function decorationRecommendData() {
     return $http.doGet('manage/set/app_decoration/recommend/data')
 }
 
+/**
+ * 移动端装修 商品智能推荐获取商品列表
+ * @param {
+ *      "sort_type": 1,//排序类型 1、销量 2、好评 3、低价 4、新品
+ *      "number": 3,//数量限制 1 ~ 20
+ * }
+ * @returns 
+ */
+export function decorationIntelligentRecommendData(data) {
+    return $http.doPost('manage/set/app_decoration/goods/intelligent', data)
+}
+
+/**
+ * 移动端装修 获取装修历史记录 
+ * @param {
+ *      id: '1', // 页面id
+ * }
+ * @returns 
+ */
+export function appDecorationHistory(data) {
+    return $http.doGet('manage/set/app_decoration/history', data)
+}
+
+/**
+ * 移动端装修 还原历史
+ * @param {
+ *      log_id: '1',
+ * }
+ * @returns 
+ */
+export function appDecorationHistoryRestore(data) {
+    return $http.doPost('manage/set/app_decoration/history/restore', data)
+}

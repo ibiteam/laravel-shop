@@ -3,11 +3,11 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="hot-zone-wrapper" @click="handleChooseDragItem">
-                    <template v-if="!form.data.image">
+                    <template v-if="form.content.image == ''">
                         <image-wrapper v-bind="{width: '100%', height: '100px', radius: '10px'}" />
                     </template>
                     <template v-else>
-                        <image-wrapper v-bind="{src: form.data.image, width: '100%', height: 'auto', radius: '10px'}" />
+                        <image-wrapper v-bind="{src: form.content.image, width: '100%', height: 'auto', radius: '10px'}" />
                     </template>
                 </div>
             </template>
@@ -18,23 +18,23 @@
                     <div class="setting-bar-item" v-if="slotProps.type == 0">
                         <div class="item-title">内容设置 </div>
                         <p class="item-title-info">建议：请先选择图片，图片宽度750px，高度不限</p>
-                        <div class="placeholder s-flex ai-ct jc-ct" v-if="!form.content.image">
-                            <span class="fs12">750*高度不限</span>
-                        </div>
-                        <ImageUpload v-else width="100%" height="100%" :src="form.content.image" @material="handleOpenUpload" @local="(image) => form.content.image = image" @remove="form.content.image = ''" />
-                        <!--<div class="placeholder s-flex ai-ct jc-ct">
-                            <image-wrapper v-bind="{src: form.content.image, width: '100%', height: '100%'}" />
-                            <div class="add-btn s-flex ai-ct jc-ct" @click="showDialog = true">
-                                <Icon name="plus" size="24px" />
-                                <p>添加热区</p>
-                            </div>
-                        </div>-->
-                        <el-button type="primary" style="width: 100%; margin-top: 20px;" :disabled="form.content.areas.length >= MaxItemLength" @click="showDialog = true">编辑热区({{form.content.areas.length}}/10)</el-button>
+                        <ImageUpload 
+                            v-bind="{src: form.content.image, width: '100%', height: '160px', iconSize: '24px'}" 
+                            @material="handleOpenUpload"
+                            @local="(image) => {
+                                form.content.image = image
+                            }"
+                            @remove="() => {
+                                form.content.image = ''
+                                form.content.areas = []
+                            }" 
+                        />
+                        <el-button type="primary" style="width: 100%; margin-top: 20px;" :disabled="form.content.areas.length >= MaxItemLength || !form.content.image" @click="showDialog = true">编辑热区({{form.content.areas.length}}/10)</el-button>
                     </div>
                 </template>
             </setting-bar>
         </teleport>
-        <HotZoneDialog v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas, temp_index}" @close="showDialog = false" />
+        <HotZoneDialog v-if="showDialog" v-bind="{show: showDialog, title: '编辑热区', data: form.content.areas, temp_index, background_image: form.content.image}" ref="hotZoneDialogRef" @save="handleHotZoneSelectSave" @close="showDialog = false" />
     </section>
 </template>
 <script setup>
@@ -45,6 +45,7 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import { ref, reactive, watch, getCurrentInstance, defineExpose } from 'vue'
 import HotZoneDialog from './HotZoneDialog.vue'
 import { MaxItemLength } from '@/pages/decoration/app/home/dataField/HotZone.js'
+import { updateNested } from '@/pages/decoration/utils/common.js'
 
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -81,6 +82,7 @@ const form = reactive({
 })
 
 const showDialog = ref(false)
+const hotZoneDialogRef = ref(null)
 
 // 通知打开选择图片弹窗
 const handleOpenUpload = (index) => {
@@ -91,6 +93,18 @@ const updateUploadComponentData = (res) => {
     form.content.image = res.file[0].file_path
 }
 
+// 更新选择路由数据
+const updateLinkComponentData = (res) => {
+    hotZoneDialogRef.value.updateLinkComponentData(res)
+    // form.content = updateNested(form.content, res.keys, res.link)
+}
+
+// 更新热区选择
+const handleHotZoneSelectSave = (data) => {
+    form.content.areas = data
+    showDialog.value = false
+}
+
 const handleChooseDragItem = () => {
     cns.$bus.emit('chooseDragItem', {temp_index: form.id})
 }
@@ -99,7 +113,8 @@ defineExpose({
     getComponentData() {
         return form
     },
-    updateUploadComponentData
+    updateUploadComponentData,
+    updateLinkComponentData
 })
 
 watch([() => props.component], (newValue) => {

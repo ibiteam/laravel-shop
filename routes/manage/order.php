@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\Manage\ApplyRefundController;
 use App\Http\Controllers\Manage\ApplyRefundReasonController;
-use App\Http\Controllers\Manage\OrderController;
+use App\Http\Controllers\Manage\Order\OrderController;
+use App\Http\Controllers\Manage\Order\OrderDeliveryController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +45,15 @@ Route::prefix('order')->group(function () {
             Route::post('refuse_refund', [ApplyRefundController::class, 'refuseRefund']);   // 拒绝退款
             Route::post('confirm_receipt', [ApplyRefundController::class, 'confirmReceipt']);  // 确认收货
             Route::post('query_express', [ApplyRefundController::class, 'queryExpress']);   // 查询快递信息
+        });
+    });
+
+    // 发货管理
+    Route::prefix('delivery')->group(function () {
+        Route::get('/', [OrderDeliveryController::class, 'index'])->name(Permission::MANAGE_ORDER_DELIVERY_INDEX)->middleware('manage.permission');
+        Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_DELIVERY_UPDATE)->group(function () {
+            Route::post('import', [OrderDeliveryController::class, 'import']);
+            Route::post('destroy', [OrderDeliveryController::class, 'destroy']);
         });
     });
 });

@@ -50,7 +50,6 @@ import GoodsPrice from '@/pages/decoration/components/GoodsPrice.vue'
 import { Tag } from 'vant';
 import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
 import { TempField, TempContentField } from '@/pages/decoration/app/home/dataField/Recommend.js'
-import { decorationRecommendData } from '@/api/decoration.js'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -71,6 +70,10 @@ const props = defineProps({
     parent_index: {
         type: Number,
         default: 0
+    },
+    default_data: {
+        type: Array,
+        default: []
     }
 })
 
@@ -111,9 +114,9 @@ watch([() => props.component], (newValue) => {
             if (key == 'content') {
                 form['content'] = {
                     title: temp[key].title ? temp[key].title : '为您推荐',
-                    goods: {
-                        goods_data: defaultRecommendData.value
-                    }
+                    // goods: {
+                    //     goods_data: props.default_data
+                    // }
                 }
             } else {
                 form[key] = temp[key]
@@ -126,14 +129,17 @@ watch([() => props.component], (newValue) => {
     deep: true
 })
 
-onMounted(() => {
-    decorationRecommendData().then(res => {
-        if (cns.$successCode(res.code)) {
-            defaultRecommendData.value = res.data.list
-            updateRecommendComponentData(res.data.list)
+watch(() => props.default_data, (newValue) => {
+    if (newValue) {
+        form['content'].goods = {
+            goods_data: newValue
         }
-    })
+    }
+}, {
+    immediate: true,
+    deep: true
 })
+
 
 </script>
 

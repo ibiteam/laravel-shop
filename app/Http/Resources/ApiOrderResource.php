@@ -48,7 +48,7 @@ class ApiOrderResource extends JsonResource
             }),
             'order_amount' => price_number_format($this->resource->order_amount),
             'logistics' => $last_logistics,
-            'evaluate' => ! $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
+            'evaluate' => $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
             'buttons' => $this->getButtons(
                 $order_constant_enum,
                 is_array($last_logistics),
@@ -102,6 +102,19 @@ class ApiOrderResource extends JsonResource
 
                 if (app(OrderDao::class)->canEditAddress($this->resource)) {
                     $buttons[] = ['text' => '修改地址', 'action' => 'edit_address'];
+                }
+
+                break;
+
+            case OrderConstantEnum::STATUS_PART:
+                $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+
+                if ($has_logistics) {
+                    $buttons[] = ['text' => '查看物流', 'action' => 'logistics'];
+                }
+
+                if ($this->resource->detail_count === 1) {
+                    $buttons[] = ['text' => '再次购买', 'action' => 'again'];
                 }
 
                 break;

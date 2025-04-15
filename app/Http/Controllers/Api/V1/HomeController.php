@@ -7,16 +7,32 @@ use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;
+use App\Services\AppDecoration\AppDecorationService;
 use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
-use Illuminate\Http\Request;
 
 class HomeController extends BaseController
 {
     // 首页
-    public function home()
+    public function home(AppDecorationService $app_decoration_service)
     {
+        $decoration = AppDecoration::query()->whereAlias(AppDecoration::ALIAS_HOME)->with('item')->first();
+        if (!$decoration) {
+            return $this->error('未找到页面');
+        }
+        $items = $decoration->item()->where('is_show', Constant::ONE)->orderBy('sort')->get();
 
+        if ($items->isEmpty()) {
+            return $this->error('页面尚未装修');
+        }
+        // 首页主体数据
+        $data = $app_decoration_service->homeData($items);
+
+        return $this->success(array_merge($data, [
+            'title' => $decoration->title ?: $decoration->name,
+            'keywords' => $decoration->keywords,
+            'description' => $decoration->description
+        ]));
     }
 
     // 搜索

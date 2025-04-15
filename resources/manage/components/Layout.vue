@@ -453,6 +453,9 @@ onMounted(() => {
     getConfig()
     addViewTags()
     routerActived.value = route.name
+    cns.$bus.on('layoutReload', () => {
+        dropRefresh()
+    })
 })
 
 onUnmounted(() => {

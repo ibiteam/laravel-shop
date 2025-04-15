@@ -3,12 +3,13 @@
 namespace App\Services\Pay;
 
 use App\Enums\PayFormEnum;
-use App\Enums\RouteEnum;
+use App\Enums\RouterEnum;
 use App\Http\Dao\TransactionDao;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\ShopConfig;
-use App\Services\RouteService;
+use App\Models\WechatUser;
+use App\Services\RouterService;
 use App\Utils\Wechat\WechatPayUtil;
 
 class WechatPayOrderService implements PayOrderInterface
@@ -33,22 +34,9 @@ class WechatPayOrderService implements PayOrderInterface
 
                 break;
 
-            case PayFormEnum::PAY_FORM_MINI:
-                // todo operate: 如何获取 openid
-                $openid = 'xxxxx';
-                $pay_info = $wechat_pay_util->jsPay(
-                    $openid,
-                    shop_config(ShopConfig::SHOP_NAME).'订单支付',
-                    $transaction->transaction_no,
-                    $order->order_amount
-                );
-
-                break;
-
             case PayFormEnum::PAY_FORM_WECHAT:
-                // todo operate: 如何获取 openid
-                $openid = '';
-
+            case PayFormEnum::PAY_FORM_MINI:
+                $openid = WechatUser::query()->whereUserId($order->user_id)->value('openid') ?: false;
                 $pay_info = $wechat_pay_util->jsPay(
                     $openid,
                     shop_config(ShopConfig::SHOP_NAME).'订单支付',
@@ -63,7 +51,7 @@ class WechatPayOrderService implements PayOrderInterface
                     shop_config(ShopConfig::SHOP_NAME).'订单支付',
                     $transaction->transaction_no,
                     $order->order_amount,
-                    app(RouteService::class)->getRoutePath(RouteEnum::PAY_SUCCESS, ['no' => $order->no])
+                    app(RouterService::class)->getRouterPath(RouterEnum::ORDER_SUCCESS)
                 );
 
                 break;

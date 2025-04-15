@@ -60,7 +60,7 @@ class HorizontalCarouselComponent extends PageComponent
                             'value' => '', // 链接
                         ],
                         'image' => '', // 图片地址
-                        'sort' => Constant::ONE, // 排序 （1~100）
+//                        'sort' => Constant::ONE, // 排序 （1~100）
                         'is_show' => Constant::ONE, // 是否显示 1展示 0隐藏
                         'date_type' => AppDecorationItem::LONG_TIME, // 时间类型： 1 长期  0：时间范围
                         'time' => [],
@@ -93,7 +93,7 @@ class HorizontalCarouselComponent extends PageComponent
             'content.data.*.url.name' => 'present|nullable',
             'content.data.*.url.value' => 'present|nullable',
             'content.data.*.image' => 'required',
-            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
+//            'content.data.*.sort' => 'nullable|sometimes|integer|min:1|max:100',
             'content.data.*.is_show' => 'required|in:'.$is_show_validate_string,
             'content.data.*.date_type' => 'present|in:'.$is_show_validate_string,
             'content.data.*.time' => 'array',
@@ -139,7 +139,7 @@ class HorizontalCarouselComponent extends PageComponent
 
                 return $item;
             })
-            ->sortByDesc('sort')
+//            ->sortByDesc('sort')
             ->filter()->values()->toArray();
 
         return [

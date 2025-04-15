@@ -3,14 +3,14 @@
         <drag-wrapper v-bind="{component: form, select: temp_index == form.id, show_select: true, parent, parent_index}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="ad-wrapper" @click="handleChooseDragItem">
-                    <div class="ad-item s-flex ai-ct jc-bt" :style="{minHeight: ColumnWidthHeight['2'].maxHeight / 2 + 'px', backgroundColor: '#fff', padding: '10px', borderRadius: '10px'}"  v-if="!form.content.data || form.content.data.length == 0">
-                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
-                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].width / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
+                    <div class="ad-item s-flex ai-ct jc-bt" :style="{ backgroundColor: '#fff', padding: '10px', borderRadius: '10px'}"  v-if="!form.content.data || form.content.data.length == 0">
+                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].minWidth / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
+                        <image-wrapper v-bind="{width: ColumnWidthHeight['2'].minWidth / 2 + 'px', height: ColumnWidthHeight['2'].maxHeight / 2 + 'px'}" />
                     </div>
                     <div class="ad-item"
                         v-else
                         :style="{
-                            minHeight: ColumnWidthHeight[form.content.column].maxHeight / 2 + 'px', 
+                            minHeight: ColumnWidthHeight[form.content.column].minHeight / 2 + 'px', 
                             backgroundColor: form.content.background && form.content.background_color ? form.content.background_color : '',
                             padding: form.content.background ? '10px 10px 0 10px' : '',
                             borderRadius: form.content.background ? '10px' : '',
@@ -56,10 +56,13 @@
                                 <el-radio-group v-model="form.content.column" fill="var(--main-color)" @change="() => {
                                     form.content.width = ColumnWidthHeight[form.content.column].width
                                     if (form.content.column == 2) {
+                                        form.content.width = form.content.background ? ColumnWidthHeight['2'].minWidth : ColumnWidthHeight['2'].maxWidth
                                         form.content.height = ColumnWidthHeight['2'].maxHeight
                                     } else if (form.content.column == 3) {
+                                        form.content.width = form.content.background ? ColumnWidthHeight['3'].minWidth : ColumnWidthHeight['3'].maxWidth
                                         form.content.height = ColumnWidthHeight['3'].maxHeight
                                     } else if (form.content.column == 4) {
+                                        form.content.width = form.content.background ? ColumnWidthHeight['4'].minWidth : ColumnWidthHeight['4'].maxWidth
                                         form.content.height = ColumnWidthHeight['4'].maxHeight
                                     }
                                 }">
@@ -69,7 +72,9 @@
                             <el-form-item label="背景色" label-position="top" :prop="'background'" required>
                                 <div>
                                     <div>
-                                        <el-radio-group v-model="form.content.background" fill="var(--main-color)">
+                                        <el-radio-group v-model="form.content.background" fill="var(--main-color)" @change="() => {
+                                            form.content.width = form.content.background ? ColumnWidthHeight[form.content.column].minWidth : ColumnWidthHeight[form.content.column].maxWidth
+                                        }">
                                             <el-radio v-for="bg in BackgroundOption" :value="bg.value" :key="bg.value">{{bg.label}}</el-radio>
                                         </el-radio-group>
                                     </div>
@@ -347,9 +352,7 @@ watch([() => props.component], (newValue) => {
         let temp = JSON.parse(JSON.stringify(newValue[0]))
         Object.keys(temp).forEach(key => {
             form[key] = temp[key]
-
         })
-        console.log(form)
     }
 }, {
     immediate: true,

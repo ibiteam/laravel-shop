@@ -24,6 +24,18 @@ export function orderQueryExpress(data) {
     return $http.doGet('manage/order/info/express/query', data)
 }
 
+export function orderDeliveryIndex(data) {
+    return $http.doGet('manage/order/delivery', data)
+}
+
+export function orderDeliveryImport(data) {
+    return $http.doPost('manage/order/delivery/import', data)
+}
+
+export function orderDeliveryDestroy(data) {
+    return $http.doPost('manage/order/delivery/destroy', data)
+}
+
 // 退款原因
 export function applyRefundReasonIndex(data) {
     return $http.doGet('manage/order/apply_refund_reason', data)

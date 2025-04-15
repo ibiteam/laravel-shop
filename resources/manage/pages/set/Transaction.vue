@@ -1,0 +1,193 @@
+<script setup lang="ts">
+
+import { Search, RefreshLeft, Upload } from '@element-plus/icons-vue';
+import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import PublicPageTable from '@/components/common/PublicPageTable.vue';
+import { transactionIndex } from '@/api/set.js';
+const cns = getCurrentInstance().appContext.config.globalProperties
+const router = useRouter()
+
+const tableData = ref([]);
+const loading = ref(false);
+
+const queryParams = reactive({
+    delivery_no: '',
+    order_no: '',
+    created_start_time: '',
+    created_end_time: '',
+    page: 1,
+    number: 10,
+});
+
+// 搜索方法
+const handleSearch = () => {
+    getData(1);
+};
+
+// 重置搜索条件
+const resetSearch = () => {
+    queryParams.delivery_no = '';
+    queryParams.order_no = '';
+    queryParams.created_start_time = '';
+    queryParams.created_end_time = '';
+    queryParams.page = 1;
+    queryParams.number = 10;
+    getData(1);
+};
+
+// 添加分页相关状态
+const pageInfo = reactive({
+    per_page: 10,
+    total: 0,
+    current_page: 1,
+})
+
+// 页码改变
+const handleCurrentChange = (val) => {
+    getData(val);
+}
+
+// 每页条数改变
+const handleSizeChange = (val) => {
+    pageInfo.per_page = val;
+    getData(1);
+}
+
+// 设置分页数据
+const setPageInfo = (meta) => {
+    pageInfo.total = meta.total;
+    pageInfo.per_page = Number(meta.per_page);
+    pageInfo.current_page = meta.current_page;
+}
+
+const getData = (page = 1) => {
+    loading.value = true;
+    // 更新当前页码
+    queryParams.page = page;
+    queryParams.number = pageInfo.per_page;
+
+    transactionIndex(queryParams).then(res => {
+        loading.value = false;
+        if (cns.$successCode(res.code)) {
+            tableData.value = res.data.list;
+            // 更新分页信息
+            setPageInfo(res.data.meta);
+        } else {
+            cns.$message.error(res.message)
+        }
+    }).catch(() => {
+        loading.value = false;
+    })
+}
+
+onMounted(() => {
+    getData();
+})
+</script>
+
+<template>
+    <div class="common-wrap">
+        <el-header style="padding: 10px 0;height: auto;">
+            <!-- 添加搜索表单 -->
+            <el-form :inline="true" :model="queryParams" class="search-form">
+                <el-form-item label="运单号" prop="delivery_no">
+                    <el-input
+                        v-model="queryParams.delivery_no"
+                        placeholder="请输入运单号搜索"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item label="订单编号" prop="order_no">
+                    <el-input
+                        v-model="queryParams.order_no"
+                        placeholder="请输入订单编号搜索"
+                        clearable
+                        @keyup.enter="handleSearch"
+                    />
+                </el-form-item>
+                <el-form-item label="发货开始时间" prop="created_start_time">
+                    <el-date-picker
+                        v-model="queryParams.created_start_time"
+                        type="datetime"
+                        placeholder="请选择发货开始时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                    >
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="发货结束时间" prop="created_end_time">
+                    <el-date-picker
+                        v-model="queryParams.created_end_time"
+                        type="datetime"
+                        placeholder="请选择发货结束时间"
+                        value-format="YYYY-MM-DD HH:mm:ss"
+                    >
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item>
+                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
+                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
+                    <el-button :icon="Upload" type="warning" @click="openImportDialog">导入发货</el-button>
+                </el-form-item>
+            </el-form>
+        </el-header>
+        <PublicPageTable
+            :data="tableData"
+            v-loading="loading"
+            :pageInfo="pageInfo"
+            @sizeChange="handleSizeChange"
+            @currentChange="handleCurrentChange"
+            style="width: 100%;">
+            <el-table-column label="ID" prop="id" width="80px"></el-table-column>
+            <el-table-column label="流水号" prop="transaction_no" width="210px"></el-table-column>
+            <el-table-column label="类型" width="80px">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.transaction_type == 'pay'" type="success">支付</el-tag>
+                    <el-tag v-if="scope.row.transaction_type == 'refund'" type="danger">退款</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="业务类型" width="90px">
+                <template #default="scope">
+                    <span v-if="scope.row.type == 'order'">订单</span>
+                    <span v-else>--</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="业务单号" prop="type_no" width="180px"></el-table-column>
+            <el-table-column label="用户名" prop="user_name" width="220px"></el-table-column>
+            <el-table-column label="支付方式" prop="payment_name" width="100px"></el-table-column>
+            <el-table-column label="支付状态" width="90px">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.pay_status == 1" type="success">已支付</el-tag>
+                    <el-tag v-else type="danger">未支付</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="金额" prop="amount"></el-table-column>
+            <el-table-column label="支付成功时间" prop="paid_at" width="160px"></el-table-column>
+            <el-table-column label="创建时间" prop="created_at" width="160px"></el-table-column>
+            <el-table-column label="备注" prop="remark" show-overflow-tooltip></el-table-column>
+            <el-table-column label="操作" width="200px">
+                <template #default="scope">
+                    <el-button link type="primary">退款</el-button>
+                </template>
+            </el-table-column>
+        </PublicPageTable>
+    </div>
+
+</template>
+
+<style scoped lang="scss">
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+
+    :deep(.el-select) {
+        width: 200px;
+    }
+
+    :deep(.el-input) {
+        width: 200px;
+    }
+}
+</style>

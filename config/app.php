@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -16,11 +15,10 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /**
-    |--------------------------------------------------------------------------
-    | Manage Route Prefix
-    |--------------------------------------------------------------------------
+     * |--------------------------------------------------------------------------
+     * | Manage Route Prefix
+     * |--------------------------------------------------------------------------.
      */
-
     'manage_prefix' => env('VITE_MANAGE_PREFIX', 'manage'),
     'foreground_prefix' => env('VITE_FOREGROUND_PREFIX', 'foreground'),
 
@@ -131,5 +129,4 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
 ];

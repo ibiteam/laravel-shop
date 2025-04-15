@@ -25,6 +25,12 @@
 ### 返回示例
 
 ```json
-
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "apply_refund_id": 1
+  }
+}
 ```
 

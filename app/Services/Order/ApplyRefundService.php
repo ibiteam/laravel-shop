@@ -5,15 +5,18 @@ namespace App\Services\Order;
 use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
+use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
+use App\Jobs\Order\ApplyRefundJob;
 use App\Models\ApplyRefund;
 use App\Models\ApplyRefundLog;
 use App\Models\ApplyRefundReason;
 use App\Models\ApplyRefundShip;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\ShopConfig;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +36,7 @@ class ApplyRefundService
             throw new BusinessException('订单未找到');
         }
 
-        if ($order->order_status != OrderStatusEnum::UNCONFIRMED->value || $order->pay_status != PayStatusEnum::PAYED->value) {
+        if ($order->order_status != OrderStatusEnum::CONFIRMED->value || $order->pay_status != PayStatusEnum::PAYED->value) {
             // 未确认订单或未付款订单 不能申请售后
             throw new BusinessException('订单状态不允许申请售后');
         }
@@ -54,7 +57,7 @@ class ApplyRefundService
             ],
         ];
 
-        if ($order->pay_status != PayStatusEnum::PAY_WAIT->value) {
+        if ($order->ship_status != ShippingStatusEnum::UNSHIPPED->value) {
             $tmp_refund_type[] = [
                 'label' => '我要退货退款',
                 'value' => ApplyRefund::TYPE_REFUND_GOODS,
@@ -90,10 +93,6 @@ class ApplyRefundService
      */
     public function getInfoByTypeAndOrder(User $user, string $order_no, int $order_detail_id, int $type): array
     {
-        if (! in_array($type, [ApplyRefund::TYPE_REFUND_MONEY, ApplyRefund::TYPE_REFUND_GOODS])) {
-            throw new BusinessException('售后类型错误');
-        }
-
         $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
@@ -124,12 +123,13 @@ class ApplyRefundService
             'goods_name' => $order_detail->goods_name,
             'goods_image' => $order_detail->goods?->image,
             'goods_price' => price_format($order_detail->goods_price),
+            'goods_integral' => $order_detail->goods_integral,
             'goods_number' => get_new_price($order_detail->goods_number),
             'goods_unit' => $order_detail->goods_unit,
             'goods_sku_id' => $order_detail->goods_sku_id,
-            'money_total' => $order_detail->goods_amount > 0 ? price_format($order_detail->goods_amount) : price_format($order_detail->goods_price * $order_detail->goods_number),
-            'goods_amount_format' => price_format($order_detail->goods_amount),
+            'goods_sku_value' => $order_detail->goods_sku_value,
             'goods_amount' => get_new_price($order_detail->goods_amount),
+            'goods_amount_format' => price_format($order_detail->goods_amount),
             'order_no' => $order->no,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
@@ -186,13 +186,13 @@ class ApplyRefundService
 
             $order = $apply_refund->order;
 
-            if (! ($order instanceof Order) || $order->pay_status != PayStatusEnum::PAYED->value) {
+            if (! $order instanceof Order || $order->pay_status != PayStatusEnum::PAYED->value) {
                 throw new BusinessException('订单已不支持退款');
             }
 
             $order_detail = $apply_refund->orderDetail;
 
-            if (! ($order_detail instanceof OrderDetail)) {
+            if (! $order_detail instanceof OrderDetail) {
                 throw new BusinessException('订单明细不存在');
             }
 
@@ -213,6 +213,7 @@ class ApplyRefundService
             }
 
             $exists_apply_refund = ApplyRefund::query()
+                ->whereUserId($user->id)
                 ->whereOrderId($order->id)
                 ->whereOrderDetailId($order_detail->id)
                 ->whereIn('status', ApplyRefund::$statusInProgressMap)
@@ -231,11 +232,11 @@ class ApplyRefundService
         // 售后超时检测
         app(ApplyRefundDao::class)->checkTimeliness($order);
 
-        // TODO 配置项：最大退款金额
-        $max_after_sales_order_money = 10000;
+        // 售后最大退款金额
+        $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
 
-        if ($money > $max_after_sales_order_money) {
-            throw new BusinessException('退款金额不能超过'.$max_after_sales_order_money);
+        if ($after_sales_max_money && $money > $after_sales_max_money) {
+            throw new BusinessException('退款金额不能超过'.$after_sales_max_money);
         }
 
         [$refund_max_amount, $refund_max_number] = app(ApplyRefundDao::class)->getMaxAmountAndNumber($order_detail, $order, $user, $apply_refund_id);
@@ -256,9 +257,8 @@ class ApplyRefundService
             throw new BusinessException('最多退款数量为'.$refund_max_number);
         }
 
-        // TODO 配置项：卖家发货响应时间 卖家处理响应时间
-        $seller_shipped_time = 24; // 卖家未发货退款申请响应时间（小时）
-        $seller_confirm_time = 3; // 卖家处理响应时间（小时）
+        $seller_shipped_time = intval(shop_config(ShopConfig::SELLER_SHIPPED_TIME)); // 卖家未发货退款申请响应时间（小时）
+        $seller_confirm_time = intval(shop_config(ShopConfig::SELLER_CONFIRM_TIME)); // 卖家处理响应时间（小时）
 
         if ($type == ApplyRefund::TYPE_REFUND_GOODS) {
             $delayed_time = Carbon::now()->addHours($seller_shipped_time);
@@ -296,7 +296,10 @@ class ApplyRefundService
             throw new BusinessException('申请售后失败');
         }
 
-        // TODO
+        // todo  队列
+        // ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.default_prefix'));
+
+        // TODO  发通知
         // if ($order->shop->is_ziying == SellerShopinfo::ZIYING) {
         //     try {
         //         app(\App\Services\Erp\ApplyRefundService::class)->startApproval($apply_refund);
@@ -426,22 +429,12 @@ class ApplyRefundService
 
         // 添加日志
         app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->user_name, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
-
-        // 判断是不是撮合
-        // if ($seller_shop_info->is_ziying == SellerShopinfo::ZIYING) {
-        //     // 同步erp关闭
-        //     try {
-        //         (new ApplyRefundService)->stopApproval($apply_refund);
-        //     } catch (\Exception $exception) {
-        //         AliLogUtil::error($exception->getMessage(), $exception->getTrace());
-        //     }
-        // }
     }
 
     private function detailFormat(ApplyRefund $apply_refund, Order $order, OrderDetail $order_detail, User $user): array
     {
         $temp_order_detail = [
-            'goods_id' => $order_detail->goods_id,
+            'goods_no' => $order_detail->goods_no,
             'goods_name' => $order_detail->goods_name,
             'goods_image' => $order_detail->goods?->image,
             'goods_price' => price_format($order_detail->goods_price),
@@ -450,9 +443,8 @@ class ApplyRefundService
             'goods_unit' => $order_detail->goods_unit,
             'goods_sku_id' => $order_detail->goods_sku_id,
             'goods_sku_value' => $order_detail->goods_sku_value,
-            'money_total' => $order_detail->goods_amount > 0 ? price_format($order_detail->goods_amount) : price_format($order_detail->goods_price * $order_detail->goods_number),
-            'goods_amount_format' => price_format($order_detail->goods_amount),
             'goods_amount' => get_new_price($order_detail->goods_amount),
+            'goods_amount_format' => price_format($order_detail->goods_amount),
             'order_no' => $order->no,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
@@ -493,9 +485,9 @@ class ApplyRefundService
                 'id' => $apply_refund->id,
                 'no' => $apply_refund->no,
                 'status' => $apply_refund->status,
-                'money' => price_format($apply_refund->money),
-                'refund_money' => get_new_price($apply_refund->money),
-                'refund_number' => get_new_price($apply_refund->number),
+                'money_format' => price_format($apply_refund->money),
+                'money' => get_new_price($apply_refund->money),
+                'number' => get_new_price($apply_refund->number),
                 'reason_id' => $apply_refund->reason_id,
                 'is_revoke' => $apply_refund->is_revoke,
                 'description' => $apply_refund->description,
@@ -503,9 +495,9 @@ class ApplyRefundService
                 'apply_refund_shipping_id' => $apply_refund->applyRefundShip?->id,
                 'apply_refund_shipping_no' => $apply_refund->applyRefundShip?->no,
                 'updated_at' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
-                'comment' => $temp_comment,
-                'system_time' => time(),
+                'result' => $temp_comment,
                 'job_time' => $apply_refund->job_time ? strtotime($apply_refund->job_time) : '',
+                'system_time' => time(),
             ],
             'type' => $apply_refund->type,
             'address' => $address,

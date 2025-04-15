@@ -19,4 +19,5 @@ export default defineConfig({
             refresh: true,                  // 启用热更新
         }),
     ],
+    assetsInclude: ['**/*.xlsx'],
 });

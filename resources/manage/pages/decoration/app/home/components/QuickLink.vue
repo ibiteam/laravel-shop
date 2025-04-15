@@ -79,7 +79,7 @@
                                             <el-form-item label="名称" :prop="['data', index, 'title']" :rules="{ required: true, message: '请填写名称', trigger: 'blur' }">
                                                 <el-input v-model="item.title"/>
                                             </el-form-item>
-                                            <el-form-item label="链接" :prop="['data', index, 'value']" :rules="{ required: true, message: '请填写链接', trigger: 'blur' }">
+                                            <el-form-item label="链接" :prop="['data', index, 'url' ,'value']" :rules="{ required: true, message: '请填写链接', trigger: 'change' }">
                                                 <LinkInput
                                                     :name="item.url.name"
                                                     :value="item.url.value"

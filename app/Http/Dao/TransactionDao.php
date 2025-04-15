@@ -2,6 +2,7 @@
 
 namespace App\Http\Dao;
 
+use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Transaction;
@@ -22,6 +23,25 @@ class TransactionDao
             'type_id' => $order->id,
             'payment_id' => $payment->id,
             'amount' => $order->order_amount,
+            'status' => Transaction::STATUS_WAIT,
+            'remark' => $remark,
+        ]);
+    }
+
+    /**
+     * 退款订单生成流水.
+     */
+    public function storeByRefund(ApplyRefund $apply_refund, Transaction $transaction, string $remark = ''): Transaction
+    {
+        return Transaction::query()->create([
+            'transaction_no' => 'refund_'.get_flow_sn(),
+            'user_id' => $apply_refund->user_id,
+            'transaction_type' => Transaction::TRANSACTION_TYPE_REFUND,
+            'parent_id' => $transaction->id,
+            'type' => $transaction->type,
+            'type_id' => $transaction->type_id,
+            'payment_id' => $transaction->payment_id,
+            'amount' => -$apply_refund->money,  // 退款金额记负数
             'status' => Transaction::STATUS_WAIT,
             'remark' => $remark,
         ]);

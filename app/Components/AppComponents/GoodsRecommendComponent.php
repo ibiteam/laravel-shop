@@ -5,8 +5,6 @@ namespace App\Components\AppComponents;
 use App\Components\PageComponent;
 use App\Exceptions\ProcessDataException;
 use App\Models\AppDecorationItem;
-use App\Models\Category;
-use App\Models\Goods;
 use App\Services\Goods\GoodsService;
 use App\Utils\Constant;
 use Illuminate\Support\Facades\Validator;
@@ -44,13 +42,13 @@ class GoodsRecommendComponent extends PageComponent
                     'url' => [
                         'name' => '',
                         'value' => '',
-                    ]
+                    ],
                 ], // 图片设置
                 'goods' => [
                     'rule' => 1, // 推荐规则 1、智能推荐 2、手动推荐
                     'sort_type' => 1, // 排序类型 1、销量 2、好评 3、低价 4、新品
                     'number' => 3, // 数量限制 1 ~ 20
-                    'goods_nos' => []
+                    'goods_nos' => [],
                 ], // 商品设置
             ],
         ];
@@ -68,21 +66,22 @@ class GoodsRecommendComponent extends PageComponent
             'name' => 'required|max:100',
             'component_name' => 'required|in:'.AppDecorationItem::COMPONENT_NAME_GOODS_RECOMMEND,
             'is_show' => 'required|integer|in:'.Constant::ONE.','.Constant::ZERO,
-            'content.layout' => 'required|in:' . AppDecorationItem::LAYOUT_ONE.','.AppDecorationItem::LAYOUT_TWO.','.AppDecorationItem::LAYOUT_THREE, // 商品布局
+            'content.layout' => 'required|in:'.AppDecorationItem::LAYOUT_ONE.','.AppDecorationItem::LAYOUT_TWO.','.AppDecorationItem::LAYOUT_THREE, // 商品布局
             'content.recommend' => 'required|in:'.Constant::ONE.','.Constant::ZERO, // 智能推荐 1、开启 0、关闭
             'content.title' => 'required|array',
-            'content.title.icon' => 'required|int',
+            'content.title.icon' => 'present|nullable',
             'content.title.name' => 'present|nullable',
-            'content.title.align' => 'required|in:' . AppDecorationItem::ALIGN_LEFT.','.AppDecorationItem::ALIGN_CENTER,
+            'content.title.align' => 'required|in:'.AppDecorationItem::ALIGN_LEFT.','.AppDecorationItem::ALIGN_CENTER,
             'content.title.suffix' => 'present|nullable',
-            'content.title.*.url.name' => 'present|nullable',
-            'content.title.*.url.value' => 'present|nullable',
+            'content.title.url.name' => 'present|nullable',
+            'content.title.url.value' => 'present|nullable',
             'content.goods' => 'required|array',
             'content.goods.rule' => 'required|in:'.AppDecorationItem::RULE_INTELLIGENT.','.AppDecorationItem::RULE_MANUAL,
-            'content.goods.sort_type' => 'required_if:content.goods.rule,1|in:' . AppDecorationItem::SORT_SALES.','.AppDecorationItem::SORT_HIGH_PRAISE.','.AppDecorationItem::SORT_LOW_PRICE.','.AppDecorationItem::SORT_NEW_PRODUCT,
-            'content.goods.number' => 'required_if:content.goods.rule,1|min:1|max:20',
+            'content.goods.sort_type' => 'required_if:content.goods.rule,1|in:'.AppDecorationItem::SORT_SALES.','.AppDecorationItem::SORT_HIGH_PRAISE.','.AppDecorationItem::SORT_LOW_PRICE.','.AppDecorationItem::SORT_NEW_PRODUCT,
+            'content.goods.number' => 'required_if:content.goods.rule,1|int|min:1|max:20',
             'content.goods.goods_nos' => 'required_if:content.goods.rule,2|array',
         ], $this->messages());
+
         if ($validator->fails()) {
             throw new ProcessDataException($this->getName().'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
@@ -100,16 +99,8 @@ class GoodsRecommendComponent extends PageComponent
     public function getContent($data): array
     {
         $content = $data['content'];
-        $goodsService = new GoodsService();
-        $items = collect($content['goods'])->sortByDesc('sort')->map(function ($item) use (&$items, $goodsService) {
-            $data['rule'] = $item['rule'];
-            $data['number'] = $item['number'] ?? Constant::ZERO;
-            $data['sort_type'] = $item['sort_type'] ?? Constant::ZERO;
-            $data['goods_nos'] = $item['goods_nos'] ?? [];
-            $data['goods_data'] = $goodsService->getRecommendGoods($data['goods_nos'], $data['rule'], $data['number'], $data['sort_type']);
-
-            return $data;
-        })->filter()->values()->toArray();
+        $goods = $content['goods'];
+        $goods['goods_data'] = app(GoodsService::class)->getRecommendGoods($goods['number'], $goods['sort_type'], $goods['goods_nos'], $goods['rule']);
 
         return [
             'component_name' => $data['component_name'],
@@ -117,7 +108,7 @@ class GoodsRecommendComponent extends PageComponent
             'layout' => $content['layout'],
             'recommend' => $content['recommend'],
             'title' => $content['title'],
-            'items' => $items,
+            'items' => $goods,
         ];
     }
 
@@ -162,8 +153,7 @@ class GoodsRecommendComponent extends PageComponent
             'content.recommend.in' => '智能推荐的值无效，请选择正确的设置',
             'content.title.required' => '标题数据不能为空',
             'content.title.array' => '标题数据必须是一个数组',
-            'content.title.icon.required' => '小图标不能为空',
-            'content.title.icon.int' => '小图标必须是整数',
+            'content.title.icon.present' => '小图标字段不能为空',
             'content.title.name.present' => '标题名称参数未设置',
             'content.title.align.required' => '对齐方式不能为空',
             'content.title.align.in' => '对齐方式的值无效，请选择正确的对齐方式',
@@ -177,11 +167,11 @@ class GoodsRecommendComponent extends PageComponent
             'content.goods.sort_type.required_if' => '排序类型不能为空（当推荐规则为智能推荐时）',
             'content.goods.sort_type.in' => '排序类型的值无效，请选择正确的排序类型',
             'content.goods.number.required_if' => '数量限制不能为空（当推荐规则为智能推荐时）',
+            'content.goods.number.int' => '数量限制必须为整数',
             'content.goods.number.min' => '数量限制最小值是 1',
             'content.goods.number.max' => '数量限制最大值是 20',
             'content.goods.goods_nos.required_if' => '商品编号列表不能为空（当推荐规则为手动推荐时）',
             'content.goods.goods_nos.array' => '商品编号列表必须是一个数组',
         ];
     }
-
 }

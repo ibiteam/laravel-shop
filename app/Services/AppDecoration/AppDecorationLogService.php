@@ -2,6 +2,7 @@
 
 namespace App\Services\AppDecoration;
 
+use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecorationLog;
 
 class AppDecorationLogService
@@ -22,6 +23,25 @@ class AppDecorationLogService
     // 获取最新一条记录
     public function getLatestLog(int $app_decoration_id)
     {
-        return AppDecorationLog::whereAppDecorationId($app_decoration_id)->orderByDesc('id')->first();
+        return AppDecorationLog::whereAppDecorationId($app_decoration_id)->orderByDesc('updated_at')->first();
     }
+
+    // 获取所有记录 - 带分页
+    public function getAllLogsPaginate(int $app_decoration_id, int $page_size = 10): CommonResourceCollection
+    {
+        $data = AppDecorationLog::whereAppDecorationId($app_decoration_id)
+            ->with('admin_user:id,user_name')
+            ->orderByDesc('id')->paginate($page_size);
+
+        $data->getCollection()->transform(function (AppDecorationLog $item) {
+            return [
+                'log_id' => $item->id,
+                'admin_user_name' => $item->admin_user?->user_name,
+                'created_at' => date('Y-m-d H:i:s', strtotime($item->created_at)),
+            ];
+        });
+
+        return new CommonResourceCollection($data);
+    }
+
 }

@@ -22,6 +22,8 @@ import Order from '@/pages/order/Order.vue';
 import OrderDetail from '@/pages/order/Detail.vue';
 import ApplyRefundReason from '@/pages/order/ApplyRefundReason.vue';
 import ApplyRefund from '@/pages/order/ApplyRefund.vue';
+import OrderDelivery from '@/pages/order/OrderDelivery.vue';
+import Transaction from '@/pages/set/Transaction.vue';
 import ArticleCategory from '@/pages/article/ArticleCategory.vue';
 import Article from '@/pages/article/Article.vue';
 import ArticleForm from '@/pages/article/ArticleForm.vue';
@@ -46,6 +48,7 @@ const router = createRouter({
                 { path: '/set/permission', component: SetPermission, name: 'manage.permission.index',meta:{title:'权限菜单'} },
                 { path: '/set/admin_operation_log', component: SetAdminOperationLog, name: 'manage.admin_operation_log.index',meta:{title:'管理员日志'} },
                 { path: '/set/payment', component: Payment, name: 'manage.payment.index',meta:{title:'支付方式'} },
+                { path: '/set/transaction', component: Transaction, name: 'manage.transaction.index',meta:{title:'交易记录'} },
                 { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
                 // 商品
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},
@@ -56,6 +59,7 @@ const router = createRouter({
                 { path: '/order/detail/:no', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
                 { path: '/order/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
                 { path: '/order/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
+                { path: '/order/delivery', component: OrderDelivery, name: 'manage.order_delivery.index',meta:{title:'发货列表'} },
                 // 用户
                 { path: '/user/index', component: UserIndex , name: 'manage.user.index',meta:{title:'用户'} },
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },

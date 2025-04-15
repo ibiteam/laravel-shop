@@ -10,6 +10,7 @@ use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
 use App\Http\Controllers\Manage\ShipCompanyController;
 use App\Http\Controllers\Manage\ShopConfigController;
+use App\Http\Controllers\Manage\TransactionController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
@@ -52,7 +53,6 @@ Route::prefix('set')->group(function () {
             Route::post('change_show', [RouterController::class, 'changeShow']);
         });
     });
-
 
     // 外部服务
     Route::prefix('app_service')->group(function () {
@@ -122,6 +122,9 @@ Route::prefix('set')->group(function () {
             Route::post('update', [PaymentController::class, 'update']);
             Route::post('change/field', [PaymentController::class, 'changeField']);
         });
+        Route::prefix('transaction')->group(function () {
+            Route::get('/', [TransactionController::class, 'index'])->name(Permission::MANAGE_TRANSACTION_INDEX)->middleware('manage.permission');
+        });
     });
 
     // 配送管理-快递公司
@@ -136,14 +139,17 @@ Route::prefix('set')->group(function () {
 
     // 移动端装修
     Route::prefix('app_decoration')->group(function () {
-        Route::middleware(['manage.permission:' . Permission::MANAGE_APP_DECORATION])->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_DECORATION])->group(function () {
             Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
             Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
             Route::post('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
             Route::post('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
             Route::get('/recommend/data', [AppDecorationController::class, 'recommendData']); // 为您推荐组件数据
+            Route::post('/goods/intelligent', [AppDecorationController::class, 'goodsForIntelligent']); // 商品推荐组件 - 智能推荐数据
+            Route::get('/history', [AppDecorationController::class, 'decorationHistory']); // 装修历史记录
+            Route::post('/history/restore', [AppDecorationController::class, 'historyRestore']); // 还原装修历史
         });
-        Route::middleware(['manage.permission:' . Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
+        Route::middleware(['manage.permission:'.Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
             Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
         });
     });

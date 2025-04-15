@@ -38,6 +38,10 @@ class OrderDao
             return OrderConstantEnum::STATUS_WAIT_SHIP;
         }
 
+        if ($order->ship_status === ShippingStatusEnum::PART->value) {
+            return OrderConstantEnum::STATUS_PART;
+        }
+
         if ($order->ship_status === ShippingStatusEnum::SHIPPED->value) {
             return OrderConstantEnum::STATUS_WAIT_RECEIVE;
         }
