@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Notify;
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Enums\PayStatusEnum;
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Http\Dao\PaymentDao;
 use App\Models\Goods;
@@ -15,143 +16,120 @@ use App\Models\Payment;
 use App\Models\Transaction;
 use App\Utils\Wechat\WechatPayUtil;
 use Carbon\Carbon;
-use EasyWeChat\Kernel\Exceptions\InvalidArgumentException;
-use EasyWeChat\Kernel\Exceptions\RuntimeException;
 use EasyWeChat\Kernel\ServerResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
-use ReflectionException;
 use Throwable;
 
 class WechatPayController extends Controller
 {
     /**
      * 退款回调.
-     *
-     * @throws InvalidArgumentException
-     * @throws ReflectionException
-     * @throws RuntimeException
-     * @throws Throwable
      */
     public function notifyRefund(Request $request, PaymentDao $payment_dao): ServerResponse|ResponseInterface
     {
-        // 支付回调
-        $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
+        try {
+            // 支付回调
+            $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
 
-        if (! $payment instanceof Payment) {
+            if (! $payment instanceof Payment) {
+                throw new BusinessException('Not Fount Payment');
+            }
+            $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+
+            $message = $wechat_pay_util->server()->getRequestMessage();
+
+            Log::info('微信支付申请退款回调信息：'.$message);
+
+            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+                throw new BusinessException('Result Code Fail');
+            }
+            // 请求微信查询支付结果
+            $order_message = $wechat_pay_util->queryRefundOrder($message['out_refund_no']);
+
+            Log::info('微信支付申请退款回调信息->请求微信获取申请退款订单信息：'.json_encode($order_message, JSON_UNESCAPED_UNICODE));
+
+            if (! isset($order_message['status']) || $order_message['status'] !== 'SUCCESS') {
+                throw new BusinessException('Query Order Trade State Fail');
+            }
+            // 退款处理
+            $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
+
+            if ($transaction instanceof Transaction) {
+                $transaction->update(['status' => Transaction::STATUS_SUCCESS]);
+            }
+
+            return $wechat_pay_util->server()->serve();
+        } catch (BusinessException $business_exception) {
             return ServerResponse::make(new Response(
                 200,
                 [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Not Fount Payment'], JSON_UNESCAPED_UNICODE))
+                strval(json_encode(['code' => 'FAIL', 'message' => $business_exception->getMessage()], JSON_UNESCAPED_UNICODE))
             ));
-        }
-        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+        } catch (\Throwable $throwable) {
+            Log::error('wechat notify refund throwable:'.$throwable->getMessage(), $throwable->getTrace());
 
-        $message = $wechat_pay_util->server()->getRequestMessage();
-
-        Log::info('微信支付申请退款回调信息：'.$message);
-
-        if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
             return ServerResponse::make(new Response(
                 200,
                 [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Result Code Fail'], JSON_UNESCAPED_UNICODE))
+                strval(json_encode(['code' => 'FAIL', 'message' => 'data error'], JSON_UNESCAPED_UNICODE))
             ));
         }
-        // 请求微信查询支付结果
-        $order_message = $wechat_pay_util->queryRefundOrder($message['out_refund_no']);
-
-        Log::info('微信支付申请退款回调信息->请求微信获取申请退款订单信息：'.json_encode($order_message, JSON_UNESCAPED_UNICODE));
-
-        if (! isset($order_message['status']) || $order_message['status'] !== 'SUCCESS') {
-            return ServerResponse::make(new Response(
-                200,
-                [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Query Order Trade State Fail'], JSON_UNESCAPED_UNICODE))
-            ));
-        }
-        // 退款处理
-        $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
-
-        if ($transaction instanceof Transaction) {
-            $transaction->update(['status' => Transaction::STATUS_SUCCESS]);
-        }
-
-        return $wechat_pay_util->server()->serve();
     }
 
     /**
      * 支付回调.
-     *
-     * @throws InvalidArgumentException
-     * @throws ReflectionException
-     * @throws RuntimeException
-     * @throws Throwable
      */
     public function notifyPay(Request $request, PaymentDao $payment_dao): ServerResponse|ResponseInterface
     {
-        // 支付回调
-        $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
+        try {
+            // 支付回调
+            $payment = $payment_dao->getInfoByAlias(PaymentEnum::WECHAT);
 
-        if (! $payment instanceof Payment) {
+            if (! $payment instanceof Payment) {
+                throw new BusinessException('Not Fount Payment');
+            }
+            $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+
+            $message = $wechat_pay_util->server()->getRequestMessage();
+
+            Log::info('微信支付回调信息：'.$message);
+
+            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+                throw new BusinessException('Result Code Fail');
+            }
+            // 请求微信查询支付结果
+            $order_message = $wechat_pay_util->queryOrder($message['out_trade_no']);
+
+            Log::info('微信支付回调信息->请求微信获取订单信息：'.json_encode($order_message, JSON_UNESCAPED_UNICODE));
+
+            if (! isset($order_message['trade_state']) || $order_message['trade_state'] !== 'SUCCESS') {
+                throw new BusinessException('Query Order Trade State Fail');
+            }
+
+            // 判断是否为订单支付
+            if (str_starts_with($order_message['out_trade_no'], 'order_')) {
+                $this->notifyOrderPayInfo($order_message);
+            }
+
+            return $wechat_pay_util->server()->serve();
+        } catch (BusinessException $business_exception) {
             return ServerResponse::make(new Response(
                 200,
                 [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Not Fount Payment'], JSON_UNESCAPED_UNICODE))
+                strval(json_encode(['code' => 'FAIL', 'message' => $business_exception->getMessage()], JSON_UNESCAPED_UNICODE))
             ));
-        }
-        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
+        } catch (\Throwable $throwable) {
+            Log::error('wechat notify pay throwable:'.$throwable->getMessage(), $throwable->getTrace());
 
-        $message = $wechat_pay_util->server()->getRequestMessage();
-
-        Log::info('微信支付回调信息：'.$message);
-
-        if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
             return ServerResponse::make(new Response(
                 200,
                 [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Result Code Fail'], JSON_UNESCAPED_UNICODE))
+                strval(json_encode(['code' => 'FAIL', 'message' => 'data error'], JSON_UNESCAPED_UNICODE))
             ));
-        }
-        // 请求微信查询支付结果
-        $order_message = $wechat_pay_util->queryOrder($message['out_trade_no']);
-
-        Log::info('微信支付回调信息->请求微信获取订单信息：'.json_encode($order_message, JSON_UNESCAPED_UNICODE));
-
-        if (! isset($order_message['trade_state']) || $order_message['trade_state'] !== 'SUCCESS') {
-            return ServerResponse::make(new Response(
-                200,
-                [],
-                strval(json_encode(['code' => 'FAIL', 'message' => 'Query Order Trade State Fail'], JSON_UNESCAPED_UNICODE))
-            ));
-        }
-
-        // 判断是否为订单支付
-        if (str_starts_with($order_message['out_trade_no'], 'order_')) {
-            $this->notifyOrderPayInfo($order_message);
-        }
-
-        return $wechat_pay_util->server()->serve();
-    }
-
-    private function getRequestMessage()
-    {
-        $payment = app(PaymentDao::class)->getInfoByAlias(PaymentEnum::WECHAT);
-
-        if (! $payment instanceof Payment) {
-            throw new \Exception(strval(json_encode(['code' => 'FAIL', 'message' => 'Not Fount Payment'], JSON_UNESCAPED_UNICODE)));
-        }
-        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
-
-        $message = $wechat_pay_util->server()->getRequestMessage();
-
-        Log::info('微信支付回调信息：'.$message);
-
-        if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
-            throw new \Exception(strval(json_encode(['code' => 'FAIL', 'message' => 'Result Code Fail'], JSON_UNESCAPED_UNICODE)));
         }
     }
 

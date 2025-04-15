@@ -91,7 +91,7 @@ class WechatPayUtil
      *
      * @throws \Exception
      */
-    public function refundOrder(string $out_trade_no, string $out_refund_no, int|float $refund_amount, int|float $pay_amount, string $reason = ''): array
+    public function refundOrder(string $out_trade_no, string $out_refund_no, int|float $refund_amount, int|float $pay_amount, string $reason): array
     {
         try {
             return $this->getApplication()->getClient()->postJson('/v3/refund/domestic/refunds', [
