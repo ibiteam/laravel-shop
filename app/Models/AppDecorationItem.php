@@ -63,7 +63,7 @@ class AppDecorationItem extends Model
     public const BACKGROUND_COLOR_SHOW = 1; // 展示背景色
     public const BACKGROUND_COLOR_NOT_SHOW = 0; // 不展示背景色
     public const COMPONENT_NAME_HOT_ZONE = 'hot_zone'; // 热区
-    public const COMPONENT_NAME_HOME_NAV = 'home_nav'; // 搜索
+    public const COMPONENT_NAME_HOME_NAV = 'home_nav'; // 导航搜索
     public const COMPONENT_NAME_LABEL = 'label'; // 底部标签栏
     public const COMPONENT_NAME_GOODS_RECOMMEND = 'goods_recommend'; // 商品推荐
     public const LAYOUT_ONE = 1; // 单列布局

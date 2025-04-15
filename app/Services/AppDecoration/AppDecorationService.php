@@ -81,6 +81,7 @@ class AppDecorationService
             AppDecoration::ALIAS_HOME => [
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
             ],
         ];
         $only_names = $page_only_names[$app_decoration->alias] ?? [];
@@ -99,12 +100,14 @@ class AppDecorationService
             AppDecoration::ALIAS_HOME => [
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
             ],
         ];
         /* 组件中文名称 */
         $component_chinese_name = [
             AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT => '弹屏广告',
             AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT => '悬浮广告',
+            AppDecorationItem::COMPONENT_NAME_HOME_NAV => '导航搜索',
         ];
         $temp_fixed_component_must = $fixed_component_must[$app_decoration->alias] ?? [];
 
