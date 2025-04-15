@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\CacheNameEnum;
 use App\Http\Dao\AdminUserLoginLogDao;
 use App\Models\AdminUser;
 use App\Models\AdminUserLoginLog;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class AdminUserService
 {
@@ -25,6 +27,8 @@ class AdminUserService
             AdminUserLoginLog::STATUS_SUCCESS,
             '账号密码登录成功~'
         );
+
+        Cache::forget(CacheNameEnum::ADMIN_PERMISSION_MENUS->value.'_'.$admin_user->id);
 
         return [
             'token' => $token,

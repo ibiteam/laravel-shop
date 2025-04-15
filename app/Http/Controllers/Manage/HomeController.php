@@ -96,7 +96,7 @@ class HomeController extends BaseController
 
         // 收藏的权限菜单
         $collect_permission_ids = array_column($collect_permissions, 'id');
-        $menus = $permission_dao->fetchAndFormatPermissions($admin_user, config('auth.manage.guard'), $collect_permission_ids);
+        $menus = $permission_dao->fetchAndFormatPermissions($admin_user, $collect_permission_ids);
 
         return $this->success(['collect_permissions' => $collect_permissions, 'menus' => $permission_dao->buildTree($menus, 'index')]);
     }
@@ -133,11 +133,7 @@ class HomeController extends BaseController
      */
     public function clearCache()
     {
-        $admin_user = $this->adminUser();
-
         Cache::forget(CacheNameEnum::SHOP_CONFIG_ALL->value);
-
-        Cache::tags(config('auth.manage.guard').'_permission_menus')->forget('permission_menus_'.$admin_user->id);
 
         return $this->success('清除成功');
     }

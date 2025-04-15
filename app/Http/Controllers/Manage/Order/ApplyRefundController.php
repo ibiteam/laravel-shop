@@ -468,19 +468,26 @@ class ApplyRefundController extends BaseController
     private function transformer(ApplyRefund $apply_refund): array
     {
         $user = $apply_refund->user;
-        $temp_unit = $apply_refund->orderDetail->goods_unit ?? ($apply_refund->orderDetail->goods->unit ?? '');
+        $order = $apply_refund->order;
+        $orderDetail = $apply_refund->orderDetail;
+
+        if (! $order || ! $orderDetail || ! $user) {
+            return [];
+        }
+
+        $temp_unit = $orderDetail->goods_unit ?? ($orderDetail->goods->unit ?? '');
 
         return [
             'server_time' => time(),
-            'goods_image' => $apply_refund->orderDetail->goods->image ?? '',
+            'goods_image' => $orderDetail->goods->image ?? '',
             'buyer_name' => $user->user_name ?? '',
-            'order_no' => $apply_refund->order->no ?? '',
-            'created_at' => $apply_refund->order->created_at->format('Y-m-d H:i:s'),
-            'goods_number' => $apply_refund->orderDetail->goods_number,
-            'goods_name' => $apply_refund->orderDetail->goods_name,
-            'goods_sku_value' => $apply_refund->orderDetail->goods_sku_value,
-            'goods_price' => price_format($apply_refund->orderDetail->goods_price),
-            'goods_amount' => price_format($apply_refund->orderDetail->goods_amount),
+            'order_no' => $order->no,
+            'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+            'goods_number' => $orderDetail->goods_number,
+            'goods_name' => $orderDetail->goods_name,
+            'goods_sku_value' => $orderDetail->goods_sku_value,
+            'goods_price' => price_format($orderDetail->goods_price),
+            'goods_amount' => price_format($orderDetail->goods_amount),
             'refund_number' => get_new_price($apply_refund->number),
             'unit' => $temp_unit,
             'refund_no' => $apply_refund->no,
