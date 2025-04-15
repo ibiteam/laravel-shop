@@ -185,7 +185,7 @@ class GoodsFormatter
             'goods_price' => $goods->price,
             'goods_integral' => $goods->integral,
             'goods_amount' => $this->getGoodsAmount(),
-            'goods_unit' => $goods->unit,
+            'goods_unit' => $goods->unit ?: '',
             'goods_sku_id' => $this->getSkuId(),
             'goods_sku_value' => $this->getSkuData(),
         ];
