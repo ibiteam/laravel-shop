@@ -19,13 +19,23 @@ class RouterService
         }
 
         $path = rtrim(config('host.vue_app_url'), '/').'/'.ltrim($router->h5_url, '/');
+
+        foreach ($params as $k => $v) {
+            $search = "/:{$k}";
+            if (str_contains($path, $search)) {
+                $path = str_replace($search, "/{$v}", $path);
+            }
+        }
+
         $set_data = [];
 
-        foreach ($router->params as $key => $value) {
-            if (isset($params[$key])) {
-                $set_data[$key] = $params[$key];
-            } else {
-                $set_data[$key] = $value;
+        if ($router->params) {
+            foreach ($router->params as $key => $value) {
+                if (isset($params[$key])) {
+                    $set_data[$key] = $params[$key];
+                } else {
+                    $set_data[$key] = $value;
+                }
             }
         }
 

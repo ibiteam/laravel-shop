@@ -17,6 +17,7 @@ use App\Models\ShopConfig;
 use App\Services\AppDecoration\AppDecorationLogService;
 use App\Services\AppDecoration\AppDecorationService;
 use App\Services\Goods\GoodsService;
+use App\Services\RouterService;
 use App\Utils\Constant;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -43,7 +44,7 @@ class AppDecorationController extends BaseController
         return $this->success(new CommonResourceCollection($list));
     }
 
-    public function decoration(Request $request, AppDecorationService $app_decoration_service)
+    public function decoration(Request $request, AppDecorationService $app_decoration_service, RouterService $router_service)
     {
         $id = $request->input('id');
         $app_decoration = AppDecoration::query()->whereId($id)->first();
@@ -61,7 +62,7 @@ class AppDecorationController extends BaseController
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_HOME_NAV,
-//                AppDecorationItem::COMPONENT_NAME_LABEL,
+                //                AppDecorationItem::COMPONENT_NAME_LABEL,
             ],
         ];
 
@@ -82,8 +83,10 @@ class AppDecorationController extends BaseController
             $data = $temp_data->whereNotIn('component_name', $not_for_names[$app_decoration->alias] ?? [])->values()->toArray();
             // 不可多个组件的数据
             $not_for_data = $temp_data->whereIn('component_name', $not_for_names[$app_decoration->alias] ?? [])->values()->toArray();
+            // 预览地址
+            $preview_path = $router_service->getRouterPath(AppDecoration::$path[$app_decoration->alias], ['id' => $id]);
 
-            return $this->success(compact('component_icon', 'data', 'component_value', 'not_for_data', 'app_website_data'));
+            return $this->success(compact('component_icon', 'data', 'component_value', 'not_for_data', 'app_website_data', 'preview_path'));
         } catch (\Exception $exception) {
             if ($exception instanceof BusinessException) {
                 return $this->error($exception->getMessage());
@@ -98,6 +101,7 @@ class AppDecorationController extends BaseController
     public function decorationSave(Request $request, AppDecorationLogService $app_decoration_log_service, AppDecorationService $app_decoration_service)
     {
         $admin_user_id = $this->adminUser()?->id ?: 0;
+
         try {
             // 获取请求参数
             $validated = $request->validate([
@@ -105,7 +109,7 @@ class AppDecorationController extends BaseController
                 'title' => 'required|string',
                 'keywords' => 'required|string',
                 'description' => 'required|string',
-                'button_type' => 'required|integer|in:' . AppDecoration::OPERATE_TYPE_RELEASE . ',' . AppDecoration::OPERATE_TYPE_PREVIEW . ',' . AppDecoration::OPERATE_TYPE_SAVE_DRAFT,
+                'button_type' => 'required|integer|in:'.AppDecoration::OPERATE_TYPE_RELEASE.','.AppDecoration::OPERATE_TYPE_PREVIEW.','.AppDecoration::OPERATE_TYPE_SAVE_DRAFT,
             ], [], [
                 'id' => '装修页面ID',
                 'title' => 'TDK标题',
@@ -165,7 +169,7 @@ class AppDecorationController extends BaseController
     // 历史记录
     public function decorationHistory(Request $request, AppDecorationLogService $app_decoration_log_service)
     {
-        $log_data = $app_decoration_log_service->getAllLogsPaginate((int)$request->get('id')); // 装修页面id
+        $log_data = $app_decoration_log_service->getAllLogsPaginate((int) $request->get('id')); // 装修页面id
 
         return $this->success($log_data);
     }
@@ -175,7 +179,7 @@ class AppDecorationController extends BaseController
     {
         $log_id = $request->get('log_id'); // 装修记录id
 
-        if (!AppDecorationLog::whereId($log_id)->update(['updated_at' => now()])) {
+        if (! AppDecorationLog::whereId($log_id)->update(['updated_at' => now()])) {
             return $this->error('还原失败');
         }
 
@@ -192,8 +196,8 @@ class AppDecorationController extends BaseController
     public function goodsForIntelligent(Request $request, GoodsService $goods_service)
     {
         $sort_type = $request->get('sort_type') ?: AppDecorationItem::SORT_SALES;
-        $number = (int)$request->get('number') ?: 3;
-        $goods_data = $goods_service->getRecommendGoods(limit:$number, sort_type:$sort_type);
+        $number = (int) $request->get('number') ?: 3;
+        $goods_data = $goods_service->getRecommendGoods(limit: $number, sort_type: $sort_type);
 
         return $this->success($goods_data);
     }
@@ -207,12 +211,12 @@ class AppDecorationController extends BaseController
         $number = $request->get('number', 10);
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
-            ->when($goods_id, fn ($query) => $query->whereId($goods_id) )
-            ->when($category_id, fn ($query) => $query->whereCategoryId($category_id) )
-            ->when($keywords, fn ($query) => $query->where(function($query)use($keywords){
+            ->when($goods_id, fn ($query) => $query->whereId($goods_id))
+            ->when($category_id, fn ($query) => $query->whereCategoryId($category_id))
+            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
                 $query->where('no', 'like', "%{$keywords}%")
                     ->orWhere('name', 'like', "%{$keywords}%");
-            }) )
+            }))
             ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->paginate($number);
@@ -240,10 +244,7 @@ class AppDecorationController extends BaseController
     }
 
     /**
-     * 处理组件数据，区分插入和更新
-     *
-     * @param array $data
-     * @return array
+     * 处理组件数据，区分插入和更新.
      */
     private function processComponentData(array $data, int $button_type): array
     {
@@ -251,13 +252,14 @@ class AppDecorationController extends BaseController
         $update_data = [];
 
         foreach ($data as $key => $datum) {
-            if (!isset($datum['component_name'])) {
+            if (! isset($datum['component_name'])) {
                 continue;
             }
 
             $temp_item = ComponentFactory::getComponent($datum['component_name'], $datum['name'])->validate($datum);
             $temp_item['sort'] = $key + 1;
             $temp_item['id'] = is_numeric($temp_item['id']) ? $temp_item['id'] : 0;
+
             if ($temp_item['id'] > 0 && $button_type == AppDecoration::OPERATE_TYPE_RELEASE) {
                 $update_data[] = $temp_item;
             } else {
@@ -270,11 +272,7 @@ class AppDecorationController extends BaseController
     }
 
     /**
-     * 处理新增数据
-     *
-     * @param AppDecoration $app_decoration
-     * @param array $insert_data
-     * @return array
+     * 处理新增数据.
      */
     private function handleInserts(AppDecoration $app_decoration, array $insert_data): array
     {
@@ -289,11 +287,7 @@ class AppDecorationController extends BaseController
     }
 
     /**
-     * 处理更新数据
-     *
-     * @param AppDecoration $app_decoration
-     * @param array $update_data
-     * @return array
+     * 处理更新数据.
      */
     private function handleUpdates(AppDecoration $app_decoration, array $update_data): array
     {

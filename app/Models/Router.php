@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\RouterCategory|null $routerCategory
  *
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Router newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Router newModelQuezry()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Router newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Router query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Router whereAlias($value)

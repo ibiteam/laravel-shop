@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RouterEnum;
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 
@@ -52,6 +53,11 @@ class AppDecoration extends Model
     use DatetimeTrait;
 
     protected $guarded = [];
+
+
+    public static array $path = [
+        self::ALIAS_HOME => RouterEnum::HOME_PREVIEW
+    ];
 
     // 操作类型 - 发布
     public const OPERATE_TYPE_RELEASE = 3;
