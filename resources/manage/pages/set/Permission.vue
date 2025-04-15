@@ -56,6 +56,7 @@
                         <el-form-item label-width="150px">
                             <div class="ifont_span_show" v-if="submitForm.icon">
                                 <i style="font-size:60px;" class="avatar-uploader-icon iconfont" :class="submitForm.icon"></i>
+                                <el-icon class="icon-img-delete" @click.stop="submitForm.icon = ''"><CircleCloseFilled /></el-icon>
                             </div>
                             <div style="border: 1px dashed #d9d9d9;border-radius: 6px;width:100px;height:100px;" v-else></div>
                         </el-form-item>
