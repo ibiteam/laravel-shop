@@ -253,8 +253,8 @@ onMounted(() => {
             <el-table-column label="金额" prop="amount"></el-table-column>
             <el-table-column label="成功时间" prop="paid_at" width="160px"></el-table-column>
             <el-table-column label="创建时间" prop="created_at" width="160px"></el-table-column>
-            <el-table-column label="备注" prop="remark" show-overflow-tooltip></el-table-column>
-            <el-table-column label="操作" width="200px">
+            <el-table-column label="备注" prop="remark" width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column label="操作" width="160px" fixed="right">
                 <template #default="scope">
                     <el-button link type="primary" v-if="scope.row.can_refund && scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="openRefundDialog(scope.row.id)">退款</el-button>
                 </template>
