@@ -186,7 +186,7 @@ const handlematerialCenterDialogConfirm = (res) => {
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateUploadComponentData(updateData)
         }
-        if (not_for_data == 'home_search') {
+        if (not_for_data == 'home_nav') {
             homeSearchRef.value.updateUploadComponentData(updateData)
         }
         // if (not_for_data == 'label') {
@@ -213,7 +213,7 @@ const handleLinkCenterDialogConfirm = (res) => {
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateLinkComponentData(updateData)
         }
-        if (not_for_data == 'home_search') {
+        if (not_for_data == 'home_nav') {
             homeSearchRef.value.updateLinkComponentData(updateData)
         }
         // if (not_for_data == 'label') {
@@ -265,6 +265,7 @@ const decorationSave = (params) => {
             decoration_data.push(temp_data)
         })
         const save_decoration_data = [
+            homeSearchRef.value.getComponentData(),
             danping_advertisement,
             suspended_advertisement,
             ...decoration_data
