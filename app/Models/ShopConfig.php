@@ -66,6 +66,7 @@ class ShopConfig extends Model
     public const INTEGRAL_NAME = 'integral_name'; // 积分名称
     public const SEARCH_DRIVER = 'search_driver';   // 搜索方式(1-数据库,2-MeiliSearch)
     public const IS_SHOW_SALES_VOLUME = 'is_show_sales_volume'; // 是否显示销量
+    public const IS_SHOW_AFTER_SALES = 'is_show_after_sales';    // 是否显示售后申请
     public const SELLER_SHIPPED_TIME = 'seller_shipped_time'; // 卖家未发货退款申请响应时间（小时）
     public const SELLER_CONFIRM_TIME = 'seller_confirm_time'; // 卖家处理响应时间（小时）
     public const BUYER_CHANGE_TIME = 'buyer_change_time'; // 买家修改申请响应时间（小时）

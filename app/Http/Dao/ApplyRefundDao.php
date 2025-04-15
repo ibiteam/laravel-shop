@@ -73,6 +73,55 @@ class ApplyRefundDao
     }
 
     /**
+     * 申请售后 按钮状态.
+     */
+    public function showAfterSales(OrderDetail $order_detail): int
+    {
+        // 按钮状态：0不显示，1显示售后按钮，2售后退款中，3售后退款成功
+        $after_sales_button_status = 0;
+
+        $is_show_after_sales = intval(shop_config(ShopConfig::IS_SHOW_AFTER_SALES));
+
+        if ($is_show_after_sales) {
+            $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
+
+            $order = Order::query()->whereId($order_detail->order_id)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
+
+            if ($order->order_amount <= $after_sales_max_money) {
+                // 成功支付记录
+                $pay_success_transaction = $order->transactions()
+                    ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
+                    ->where('status', Transaction::STATUS_SUCCESS)
+                    ->first();
+
+                if ($pay_success_transaction) {
+                    $after_sales_button_status = 1;
+
+                    $apply_refunding = ApplyRefund::query()->whereOrderId($order->id)
+                        ->whereIn('status', ApplyRefund::$statusInProgressMap)
+                        ->orderByDesc('created_at')->first();
+
+                    if ($apply_refunding) {
+                        $after_sales_button_status = 2;
+                    } else {
+                        $apply_refund = ApplyRefund::query()->whereOrderId($order->id)
+                            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
+                            ->select(['money', 'number'])->get();
+                        $success_money = $apply_refund->sum('money');
+                        $success_number = $apply_refund->sum('number');
+
+                        if ($success_number >= $order->detail()->sum('goods_number') && $success_money >= $order->order_amount) {
+                            $after_sales_button_status = 3;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $after_sales_button_status;
+    }
+
+    /**
      * 获取最大退款金额与数量.
      */
     public function getMaxAmountAndNumber(OrderDetail $order_detail, Order $order, User $user, int $apply_refund_id = 0): array
@@ -112,69 +161,7 @@ class ApplyRefundDao
     }
 
     /**
-     * 更新订单退款后的状态.
-     *
-     * @throws BusinessException
-     */
-    public function changeOrderStatus(ApplyRefund $apply_refund)
-    {
-        $order = Order::query()->with('detail')->whereId($apply_refund->order_id)->first();
-
-        if (! $order instanceof Order) {
-            throw new BusinessException('未找到订单记录');
-        }
-
-        $apply_refund = ApplyRefund::whereOrderId($order->id)
-            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
-            ->select(['money', 'number'])->get();
-
-        $success_money = $apply_refund->sum('money');
-        $success_number = $apply_refund->sum('number');
-
-        // 退款金额 大于等于 订单金额 && 退款数量大于等于 订单明细数量时 交易关闭
-        if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount) {
-            $order->order_status = OrderStatusEnum::CANCELLED->value;
-            $order->pay_status = PayStatusEnum::PAY_WAIT->value;
-            $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;
-
-            if (! $order->save()) {
-                throw new BusinessException('更新订单信息失败');
-            }
-        }
-
-        return $order;
-    }
-
-    /**
-     * 微信退款.
-     *
-     * @throws BusinessException|\Throwable
-     */
-    public function wechatRefund(ApplyRefund $apply_refund): void
-    {
-        try {
-            DB::beginTransaction();
-
-            $pay_success_transaction = $this->refundTransactionCheck($apply_refund);
-
-            // TODO 微信退款
-
-
-            // 创建退款流水记录
-            app(TransactionDao::class)->storeByRefund($apply_refund, $pay_success_transaction);
-
-            DB::commit();
-        } catch (\Throwable $exception) {
-            DB::rollBack();
-
-            Log::error('微信退款异常: '.$exception->getMessage());
-
-            throw new BusinessException('退款异常');
-        }
-    }
-
-    /**
-     * 退款交易检测
+     * 退款交易检测.
      *
      * @throws BusinessException
      */
@@ -222,5 +209,66 @@ class ApplyRefundDao
         }
 
         return $pay_success_transaction;
+    }
+
+    /**
+     * 退款后 更新订单状态.
+     *
+     * @throws BusinessException
+     */
+    public function changeOrderStatus(ApplyRefund $apply_refund)
+    {
+        $order = Order::query()->with('detail')->whereId($apply_refund->order_id)->first();
+
+        if (! $order instanceof Order) {
+            throw new BusinessException('未找到订单记录');
+        }
+
+        $apply_refund = ApplyRefund::whereOrderId($order->id)
+            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
+            ->select(['money', 'number'])->get();
+
+        $success_money = $apply_refund->sum('money');
+        $success_number = $apply_refund->sum('number');
+
+        // 退款金额 大于等于 订单金额 && 退款数量大于等于 订单明细数量时 交易关闭
+        if ($success_number >= $order->detail()->sum('goods_number') && $success_money >= $order->order_amount) {
+            $order->order_status = OrderStatusEnum::CANCELLED->value;
+            $order->pay_status = PayStatusEnum::PAY_WAIT->value;
+            $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;
+
+            if (! $order->save()) {
+                throw new BusinessException('更新订单信息失败');
+            }
+        }
+
+        return $order;
+    }
+
+    /**
+     * 微信退款.
+     *
+     * @throws BusinessException|\Throwable
+     */
+    public function wechatRefund(ApplyRefund $apply_refund): void
+    {
+        try {
+            DB::beginTransaction();
+
+            $pay_success_transaction = $this->refundTransactionCheck($apply_refund);
+
+            // TODO 微信退款逻辑
+
+            // 创建退款流水记录
+            app(TransactionDao::class)->storeByRefund($apply_refund, $pay_success_transaction);
+
+            DB::commit();
+        } catch (\Throwable $exception) {
+            DB::rollBack();
+
+            Log::error('微信退款异常: '.$exception->getMessage());
+
+            throw new BusinessException('退款异常');
+        }
     }
 }

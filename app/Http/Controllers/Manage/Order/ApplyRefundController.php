@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Order;
 
 use App\Enums\ApplyRefundStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
 use App\Http\Resources\CommonResourceCollection;
@@ -262,13 +263,9 @@ class ApplyRefundController extends BaseController
 
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
-                // todo 更新订单退款后的状态
-                $order_info = app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+                // 更新订单退款后的状态
+                app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
 
-                // 记录操作日志
-                // if (! app(OrderActionDao::class)->log($order_info, get_seller_user()->user_name ?? OrderAction::ACTION_SELLER, '卖家主动同意退款给买家')) {
-                //     throw new BusinessException('订单退款成功，买家申请退款:订单记录日志失败');
-                // }
                 DB::commit();
             } catch (\Exception $exception) {
                 DB::rollBack();

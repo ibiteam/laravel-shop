@@ -89,6 +89,7 @@ class ShopConfigTableSeeder extends Seeder
 
     private function addRefundAfterSales(): void
     {
+        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::IS_SHOW_AFTER_SALES, '1');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_SHIPPED_TIME, '24');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_CONFIRM_TIME, '72');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_CHANGE_TIME, '72');

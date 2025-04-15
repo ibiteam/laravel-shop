@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Manage\ApplyRefundController;
-use App\Http\Controllers\Manage\ApplyRefundReasonController;
+use App\Http\Controllers\Manage\Order\ApplyRefundController;
+use App\Http\Controllers\Manage\Order\ApplyRefundReasonController;
 use App\Http\Controllers\Manage\Order\OrderController;
 use App\Http\Controllers\Manage\Order\OrderDeliveryController;
 use App\Models\Permission;
