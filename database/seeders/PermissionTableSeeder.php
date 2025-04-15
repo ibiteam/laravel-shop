@@ -124,6 +124,9 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('发货管理', Permission::ORDER_DELIVERY_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
         $this->addPermission('发货列表', Permission::MANAGE_ORDER_DELIVERY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_DELIVERY_MANAGE);
         $this->addPermission('发货导入|删除', Permission::MANAGE_ORDER_DELIVERY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ORDER_DELIVERY_MANAGE);
+
+        $this->addPermission('评价管理', Permission::ORDER_EVALUATE_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
+        $this->addPermission('评价列表', Permission::MANAGE_ORDER_EVALUATE_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_EVALUATE_MANAGE);
     }
 
     private function addArticlePermission(): void
