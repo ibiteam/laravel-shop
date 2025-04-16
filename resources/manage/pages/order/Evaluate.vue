@@ -19,7 +19,7 @@ const statusOptions = [
 ]
 
 const queryParams = reactive({
-    order_no: '',
+    order_sn: '',
     goods_name: '',
     user_name: '',
     evaluate_start_time: '',
@@ -36,7 +36,7 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const resetSearch = () => {
-    queryParams.order_no = '';
+    queryParams.order_sn = '';
     queryParams.goods_name = '';
     queryParams.user_name = '';
     queryParams.evaluate_start_time = '';
@@ -142,9 +142,9 @@ onMounted(() => {
         <el-header style="padding: 10px 0;height: auto;">
             <!-- 添加搜索表单 -->
             <el-form :inline="true" :model="queryParams" class="search-form" label-width="100px">
-                <el-form-item label="订单编号" prop="order_no">
+                <el-form-item label="订单编号" prop="order_sn">
                     <el-input
-                        v-model="queryParams.order_no"
+                        v-model="queryParams.order_sn"
                         placeholder="请输入订单编号搜索"
                         clearable
                         @keyup.enter="handleSearch"
@@ -203,7 +203,7 @@ onMounted(() => {
             @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="ID" prop="id" width="80px"></el-table-column>
-            <el-table-column label="订单编号" prop="order.no" width="150px"></el-table-column>
+            <el-table-column label="订单编号" prop="order.order_sn" width="150px"></el-table-column>
             <el-table-column label="商品名称" width="220px" show-overflow-tooltip>
                 <template #default="scope">
                     <img :src="scope.row.goods.image" width="50px" height="50px" alt="">
@@ -247,7 +247,7 @@ onMounted(() => {
         <el-dialog v-model="detailVisible" title="评价详情" width="600"  center :before-close="closeDetailDialog">
             <div v-loading="detailInitLoading">
                 <el-form label-width="100px">
-                    <el-form-item label="订单编号"><span>{{detailData.order.no}}</span></el-form-item>
+                    <el-form-item label="订单编号"><span>{{detailData.order.order_sn}}</span></el-form-item>
                     <el-form-item label="用户名"><span>{{detailData.user.user_name}}</span></el-form-item>
                     <el-form-item label="商品信息">
                         <div>
