@@ -139,7 +139,7 @@ class OrderDao
 
     public function refundActionByOrderDetail(OrderDetail $order_detail): int
     {
-        // todo operate: 订单详情申请售后按钮状态
-        return 0;
+        // 订单详情申请售后按钮状态
+        return app(ApplyRefundDao::class)->showAfterSales($order_detail);
     }
 }

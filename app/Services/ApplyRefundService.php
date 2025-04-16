@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Order;
+namespace App\Services;
 
 use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\OrderStatusEnum;

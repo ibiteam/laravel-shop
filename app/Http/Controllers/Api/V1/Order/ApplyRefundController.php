@@ -11,7 +11,7 @@ use App\Http\Requests\ApplyRefundStoreRequest;
 use App\Http\Resources\Api\ApplyRefundResourceCollection;
 use App\Models\ApplyRefund;
 use App\Models\ShipCompany;
-use App\Services\Order\ApplyRefundService;
+use App\Services\ApplyRefundService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 

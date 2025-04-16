@@ -29,7 +29,7 @@ class CartController extends BaseController
 
             return $this->success($data);
         } catch (\Throwable $throwable) {
-            return $this->error('获取购物车商品列表异常~'.$throwable->getMessage());
+            return $this->error('获取购物车商品列表异常~');
         }
     }
 
