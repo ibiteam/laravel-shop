@@ -113,6 +113,7 @@ class AdvertComponent extends PageComponent
         $data['name'] = $publicData['name'];
         $data['component_name'] = $publicData['component_name'];
         $data['is_fixed_assembly'] = $this->fixed_assembly_yes;
+
         return $data;
     }
 

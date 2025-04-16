@@ -48,4 +48,9 @@ class ApplyRefundShip extends Model
     {
         return $this->belongsTo(ShipCompany::class, 'ship_company_id', 'id');
     }
+
+    public function getCertificateAttribute($value): array
+    {
+        return $value ? explode(',', $value) : [];
+    }
 }

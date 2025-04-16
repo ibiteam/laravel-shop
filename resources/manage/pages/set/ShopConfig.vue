@@ -327,6 +327,12 @@ onMounted(() => {
                         <el-tab-pane label="退款售后" name="group_refund_after_sales">
                             <el-form :model="inputFrom" ref="inputFromRef">
                                 <div style="margin:0 auto 0 50px;" >
+                                    <div style="padding: 10px 20px; margin-bottom: 30px; max-width: 1100px; background: #f6e8d5;color: #666;">
+                                        <p>注：</p>
+                                        <p>
+                                            用户提交售后申请后需要商家处理退款订单，请提前协商好填写，核实之前需要注意3个时间点的设定，核实后将不能更改。 此设定防止买家来不及付款而导致订单过期自动取消；给自己预留足够时间放货，防止买家在放货时间到达后没有货权发生纠纷；同时预留买家足够的时间来确认货权。
+                                        </p>
+                                    </div>
                                     <div class="refund-item">
                                         卖家发货：未发货状态下，如买家申请退款，但卖家实际已发货，卖家须在买家申请退款之时起
                                         <el-input v-model="inputFrom.seller_shipped_time"></el-input>
@@ -340,7 +346,7 @@ onMounted(() => {
                                     <div class="refund-item">
                                         买家修改申请：买家在卖家拒绝退款后
                                         <el-input v-model="inputFrom.buyer_change_time"></el-input>
-                                        小时内，微操作修改申请，退款流程关闭，交易正常进行。
+                                        小时内，未操作修改申请，退款流程关闭，交易正常进行。
                                     </div>
                                     <div class="refund-item">
                                         买家退货：卖家同意退货退款后，买家须在
@@ -356,6 +362,11 @@ onMounted(() => {
                                         售后时效：买家自收货后
                                         <el-input v-model="inputFrom.after_sales_timeliness"></el-input>
                                         天内将超过申请售后最长时效，超时将不能申请。
+                                    </div>
+                                    <div class="refund-item">
+                                        退款限制：买家申请售后支持的最大退款金额
+                                        <el-input v-model="inputFrom.after_sales_max_money"></el-input>
+                                        元
                                     </div>
                                     <div>
                                         <el-button type="primary" :class="{disable:loading}" :loading="loading"

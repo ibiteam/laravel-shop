@@ -1,9 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use \App\Models\User;
 
 return new class extends Migration
 {
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('remark')->comment('支付备注');
             $table->tinyInteger('status')->comment('状态:0待处理,1处理成功');
             $table->dateTime('paid_at')->nullable()->comment('支付完成时间');
+            $table->boolean('can_refund')->default(0)->comment('是否允许退款');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on((new User)->getTable());

@@ -1,61 +1,3 @@
-<!-- <template>
-    <el-drawer
-        header-class="custom-drawer-header"
-        body-class="custom-drawer-body"
-        v-model="hotZoneDialog.drawer"
-        :show-close="false"
-        :append-to="targetElement"
-        :modal="false"
-        direction="rtl"
-        size="100%"
-    >
-        <template #header>
-            <div class="hot-zone-header s-flex ai-ct jc-bt">
-                <p>{{ hotZoneDialog.title }}</p>
-                <div>
-                    <el-button type="primary" @click="handleSave(formRef)">保存</el-button>
-                    <el-button @click="handleClose">返回</el-button>
-                </div>
-            </div>
-        </template>
-        <div class="hot-zone-body s-flex">
-            <FreeZoneSelect
-                style="margin: 0 auto;"
-                :backgroundImage="background_image"
-                :data="hotZoneDialog.data"
-                @update="handleAreaUpdate"
-            >
-            </FreeZoneSelect>
-            <setting-bar v-bind="{name: '热区'}" v-if="hotZoneDialog.drawer">
-                <template #content>
-                    <div class="setting-bar-item">
-                        <el-form :model="hotZoneDialog" label-width="auto" ref="formRef">
-                            <el-form-item :label="`热区${index+1}`" :prop="['data', index, 'url', 'name']" v-for="(area, index) in hotZoneDialog.data" :key="index"
-                                :rules="{ required: true, message: '请输入热区链接', trigger: 'change' }"
-                            >
-                                <div class="s-flex ai-ct">
-                                    <LinkInput
-                                        :name="area.url.name"
-                                        :value="area.url.value"
-                                        @select="handleOpenLink(['areas', index, 'url'])"
-                                        @input="(res) => {
-                                            hotZoneDialog.data[index].url = res
-                                        }"
-                                        @clear="(res) => {
-                                            hotZoneDialog.data[index].url = res
-                                        }"
-                                    />
-                                    <em class="iconfont icon-shanchu" style="margin-left: 10px;" @click.stop="hotZoneDialog.data.splice(index, 1)" title="删除热区"></em>
-                                </div>
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                </template>
-            </setting-bar>
-        </div>
-    </el-drawer>
-</template> -->
-
 <template>
     <teleport to="#decorationAppMain">
         <div class="hot-zone-dialog-wrapper" :style="{width: clientWidth + 'px',height: clientHeight+ 'px', right: computedStyle?.getPropertyValue('padding-right'), bottom: computedStyle?.getPropertyValue('padding-bottom')}">
@@ -72,6 +14,7 @@
                     style="margin: 0 auto;"
                     :backgroundImage="background_image"
                     :data="hotZoneDialog.data"
+                    :padding="'20px'"
                     @update="handleAreaUpdate"
                 >
                 </FreeZoneSelect>

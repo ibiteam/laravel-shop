@@ -51,3 +51,7 @@ export function applyRefundReasonDestroy(data) {
 export function applyRefundIndex(data) {
     return $http.doGet('manage/order/apply_refund', data)
 }
+// 订单评价
+export function orderEvaluateIndex(data) {
+    return $http.doGet('manage/order/evaluate', data)
+}

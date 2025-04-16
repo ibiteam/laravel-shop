@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api;
 
 use App\Models\Goods;
 use App\Models\GoodsImage;
@@ -8,7 +8,7 @@ use App\Models\GoodsParameter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ApiGoodsDetailResource extends JsonResource
+class GoodsDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

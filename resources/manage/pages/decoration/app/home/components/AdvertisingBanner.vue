@@ -16,7 +16,7 @@
                             borderRadius: form.content.background ? '10px' : '',
                         }"  
                     >
-                        <div class="ad-title-wrapper s-flex" v-if="form.content.title.name" :class="form.content.title.align == 'center' ? 'jc-ct' : 'jc-fs'" style="margin-bottom: 10px;">
+                        <div class="ad-title-wrapper s-flex" v-if="form.content.title.name || form.content.title.image || form.content.title.suffix || form.content.title.url.value" :class="form.content.title.align == 'center' ? 'jc-ct' : 'jc-fs'" style="margin-bottom: 10px;">
                             <div class="ad-title s-flex ai-ct jc-ct" >
                                 <image-wrapper v-if="form.content.title.image" v-bind="{ src: form.content.title.image, width: '16px', height: '16px', radius: '0' }" style="margin-right: 6px;"/>
                                 <span class="fs14 fw-b" :style="{color: form.content.title.color}">{{form.content.title.name}}</span>

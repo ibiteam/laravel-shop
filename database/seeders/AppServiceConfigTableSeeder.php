@@ -9,12 +9,11 @@ class AppServiceConfigTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         $this->ibi_chat();       // 国联云客服
+        $this->geo_amap();       // 地理位置
     }
 
     /**
@@ -49,11 +48,31 @@ class AppServiceConfigTableSeeder extends Seeder
                 'platform_id' => '',
                 'platform_secret' => '',
             ], JSON_UNESCAPED_UNICODE);
-        }  else {
+        } else {
             $config = json_encode([
                 'host' => 'https://testchat.ptdplat.com/#/client',
                 'platform_id' => '174417042419',
                 'platform_secret' => '76bad80526f1e149f78051db34f7c9eb',
+            ], JSON_UNESCAPED_UNICODE);
+        }
+
+        $this->addConfig($alias, $name, $config);
+    }
+
+    private function geo_amap()
+    {
+        $alias = AppServiceConfig::GEO_AMAP;
+        $name = '地理位置';
+
+        if (is_pro_env()) {
+            $config = json_encode([
+                'host' => '',
+                'key' => '',
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            $config = json_encode([
+                'host' => 'https://restapi.amap.com',
+                'key' => '46060c0ad9f9298490e225bcb4f7549b',
             ], JSON_UNESCAPED_UNICODE);
         }
 

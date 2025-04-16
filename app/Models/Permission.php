@@ -88,6 +88,7 @@ class Permission extends SpatiePermission
     public const MANAGE_PAYMENT_INDEX = 'manage.payment.index'; // 支付方式列表
     public const MANAGE_PAYMENT_UPDATE = 'manage.payment.update'; // 支付方式编辑
     public const MANAGE_TRANSACTION_INDEX = 'manage.transaction.index'; // 交易记录
+    public const MANAGE_TRANSACTION_REFUND = 'manage.transaction.refund'; // 申请退款
     public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
     public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
     public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
@@ -108,6 +109,8 @@ class Permission extends SpatiePermission
     public const USER_MANAGE = 'user.manage'; // 会员管理
     public const MANAGE_USER_INDEX = 'manage.user.index'; // 会员列表
     public const MANAGE_USER_UPDATE = 'manage.user.update'; // 会员列表新增|编辑
+    public const AUTHORIZED_USER_MANAGE = 'authorized_user.manage'; // 授权用户
+    public const MANAGE_WECHAT_USER_INDEX = 'manage.wechat_user.index'; // 微信服务号
 
     // 二级 工具部分
     public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心
@@ -126,6 +129,8 @@ class Permission extends SpatiePermission
     public const ORDER_DELIVERY_MANAGE = 'order_delivery.manage'; // 发货管理
     public const MANAGE_ORDER_DELIVERY_INDEX = 'manage.order_delivery.index'; // 发货列表
     public const MANAGE_ORDER_DELIVERY_UPDATE = 'manage.order_delivery.update'; // 发货记录编辑
+    public const ORDER_EVALUATE_MANAGE = 'order_evaluate.manage'; // 订单评价管理
+    public const MANAGE_ORDER_EVALUATE_INDEX = 'manage.order_evaluate.index'; // 订单评价
 
     // 二级 文章部分
     public const ARTICLE_MANAGE = 'article.manage'; // 文章管理

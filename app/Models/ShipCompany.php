@@ -31,6 +31,9 @@ class ShipCompany extends Model
 {
     use DatetimeTrait;
 
+    public const STATUS_ENABLE = 1;
+    public const STATUS_DISABLE = 0;
+
     protected $guarded = [];
 
     protected function casts(): array

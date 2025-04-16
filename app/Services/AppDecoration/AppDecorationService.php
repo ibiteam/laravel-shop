@@ -32,7 +32,7 @@ class AppDecorationService
 
     // 不缓存数据
     private static $not_cache_component_name = [
-        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
+//        AppDecorationItem::COMPONENT_NAME_HOME_NAV,
     ];
 
 
@@ -81,6 +81,7 @@ class AppDecorationService
             AppDecoration::ALIAS_HOME => [
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
             ],
         ];
         $only_names = $page_only_names[$app_decoration->alias] ?? [];
@@ -99,12 +100,14 @@ class AppDecorationService
             AppDecoration::ALIAS_HOME => [
                 AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT,
                 AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT,
+                AppDecorationItem::COMPONENT_NAME_HOME_NAV,
             ],
         ];
         /* 组件中文名称 */
         $component_chinese_name = [
             AppDecorationItem::COMPONENT_NAME_DANPING_ADVERTISEMENT => '弹屏广告',
             AppDecorationItem::COMPONENT_NAME_SUSPENDED_ADVERTISEMENT => '悬浮广告',
+            AppDecorationItem::COMPONENT_NAME_HOME_NAV => '导航搜索',
         ];
         $temp_fixed_component_must = $fixed_component_must[$app_decoration->alias] ?? [];
 
@@ -154,31 +157,42 @@ class AppDecorationService
         if ($button_type === AppDecoration::OPERATE_TYPE_RELEASE) {
             // 发布，更新最新一次草稿，然后取最新草稿的数据进行发布 更新 - 记录、草稿数据
             $app_decoration_log = $app_decoration_log_service->getLatestLog($app_decoration->id);
+
             $app_decoration_log_service->saveLog($app_decoration_log, $app_decoration->id, $item_ids, $admin_user_id);
             // 发布装修
             $this->issueDecoration($app_decoration);
             $app_decoration->release_time = now();
             $app_decoration->save();
+            $this->clearCache($app_decoration);
         } else {
             // 保存草稿|预览 提交 记录 草稿数据
             $app_decoration_log_service->saveLog(null, $app_decoration->id, $item_ids, $admin_user_id);
         }
     }
 
+    private function clearCache(AppDecoration $app_decoration) {
+        switch ($app_decoration->alias) {
+            case AppDecoration::ALIAS_HOME:
+                /*清除首页缓存*/
+                Cache::forget(AppDecoration::MOBILE_HOME_BY_H5);
+
+                break;
+        }
+    }
+
     // 首页数据
-    public function homeData(Collection $items)
+    public function homeData(Collection $items, $is_preview = false)
     {
-//        $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
-//        if (!($home_nav_item instanceof AppDecorationItem)) {
-//            return $this->error('页面搜索尚未装修');
-//        }
-//        // 搜索组件
-//        $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
-        $home_nav = [];
+        $home_nav_item = $items->where('component_name', AppDecorationItem::COMPONENT_NAME_HOME_NAV)->first();
+        if (!$home_nav_item) {
+            throw new BusinessException('页面导航搜索尚未装修');
+        }
+        // 搜索组件
+        $home_nav = ComponentFactory::getComponent($home_nav_item->component_name, $home_nav_item->name)->getContent($home_nav_item->toArray());
         $now = now();
         $cache_name = AppDecoration::MOBILE_HOME_BY_H5;
         // 正式环境 - 缓存到当天 23:59:59
-        if (is_pro_env()) {
+        if (is_pro_env() && !$is_preview) {
             $cache_data = Cache::remember($cache_name, $now->diffInSeconds($now->copy()->endOfDay()), function () use ($items) {
                 return $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
                     $temp_item = $item->toArray();
@@ -187,14 +201,14 @@ class AppDecorationService
                 });
             });
         } else {
-            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem $item) {
+            $cache_data = $items->whereIn('component_name', self::$cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
                 $temp_item = $item->toArray();
 
                 return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($temp_item);
             });
         }
 
-        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem $item) {
+        $not_cache_data = $items->whereIn('component_name', self::$not_cache_component_name)->map(function (AppDecorationItem|AppDecorationItemDraft $item) {
             $info = $item->toArray();
 
             return ComponentFactory::getComponent($item->component_name, $item->name)->getContent($info);

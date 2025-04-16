@@ -20,7 +20,7 @@
             <div class="decoration-app-container">
                 <main class="decoration-app-main" id="decorationAppMain">
                     <div class="app-wrapper">
-                        <search v-if="findNotForData('home_search')" ref="homeSearchRef" v-bind="{component: findNotForData('home_search'), temp_index: decoration.temp_index}" ></search>
+                        <search v-if="findNotForData('home_nav')" ref="homeSearchRef" v-bind="{component: findNotForData('home_nav'), temp_index: decoration.temp_index}" ></search>
                         <VueDraggable
                             class="app-wrapper-content"
                             v-model="decoration.data"
@@ -186,7 +186,7 @@ const handlematerialCenterDialogConfirm = (res) => {
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateUploadComponentData(updateData)
         }
-        if (not_for_data == 'home_search') {
+        if (not_for_data == 'home_nav') {
             homeSearchRef.value.updateUploadComponentData(updateData)
         }
         // if (not_for_data == 'label') {
@@ -213,7 +213,7 @@ const handleLinkCenterDialogConfirm = (res) => {
         if (['danping_advertisement', 'suspended_advertisement'].includes(not_for_data)) {
             pageSettingRef.value.updateLinkComponentData(updateData)
         }
-        if (not_for_data == 'home_search') {
+        if (not_for_data == 'home_nav') {
             homeSearchRef.value.updateLinkComponentData(updateData)
         }
         // if (not_for_data == 'label') {
@@ -265,6 +265,7 @@ const decorationSave = (params) => {
             decoration_data.push(temp_data)
         })
         const save_decoration_data = [
+            homeSearchRef.value.getComponentData(),
             danping_advertisement,
             suspended_advertisement,
             ...decoration_data
@@ -451,7 +452,8 @@ export default {
     }
 }
 // 公用swiper分页样式
-.swiper-pagination.decoration-swiper-pagination{
+.swiper-pagination.decoration-swiper-pagination,
+.swiper-pagination{
     .swiper-pagination-bullet{
         width: 6px;
         height: 6px;

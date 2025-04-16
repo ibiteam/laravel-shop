@@ -24,8 +24,8 @@ class UserAddressRequest extends FormRequest
     {
         return [
             'id' => 'nullable|exists:user_addresses,id',
-            'recipient_name' => 'required',
-            'recipient_phone' => 'required',
+            'consignee' => 'required',
+            'phone' => 'required',
             'province' => 'required|int',
             'city' => 'required|int',
             'district' => 'required|int',
@@ -38,8 +38,8 @@ class UserAddressRequest extends FormRequest
     {
         return [
             'id.exists' => 'ID 不存在',
-            'recipient_name.required' => '请填写联系人信息',
-            'recipient_phone.required' => '请填写联系人手机号信息',
+            'consignee.required' => '请填写联系人信息',
+            'phone.required' => '请填写联系人手机号信息',
             'province.required' => '请填写省份信息',
             'province.int' => '省份信息格式不正确',
             'city.required' => '请填写城市信息',

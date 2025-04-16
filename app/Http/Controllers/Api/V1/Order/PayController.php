@@ -6,6 +6,7 @@ use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\WeChatPayException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\PaymentDao;
@@ -111,6 +112,8 @@ class PayController extends BaseController
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
+        } catch (WeChatPayException $we_chat_pay_exception) {
+            return $this->error($we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getCodeEnum());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {

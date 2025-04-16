@@ -65,6 +65,7 @@ class HomeNavComponent extends PageComponent
             'content.keywords' => 'present|nullable',
             'content.button_color' => 'present|nullable',
             'content.interval' => 'required|min:1|max:10',
+            'content.data' => 'present|nullable|array',
             'content.data.*.title' => 'present|nullable',
             'content.data.*.url.name' => 'present|nullable',
             'content.data.*.url.value' => 'present|nullable',
@@ -73,10 +74,11 @@ class HomeNavComponent extends PageComponent
         if ($validator->fails()) {
             throw new ProcessDataException('搜索组件'.'：'.$validator->errors()->first(), ['id' => $data['id']]);
         }
+
         $validator->excludeUnvalidatedArrayKeys = true;
         $data = $validator->validated();
-        $data['name'] = $validator['name'];
-        $data['component_name'] = $validator['component_name'];
+        $data['name'] = '搜索';
+        $data['component_name'] = AppDecorationItem::COMPONENT_NAME_HOME_NAV;
         $data['is_fixed_assembly'] = $this->fixed_assembly_yes;
 
         return $data;
@@ -144,6 +146,7 @@ class HomeNavComponent extends PageComponent
             'content.interval.required' => '请设置关键词轮播时间',
             'content.interval.min' => '关键词轮播时间不能小于 1 秒',
             'content.interval.max' => '关键词轮播时间不能大于 10 秒',
+            'content.data.present' => '内容板块不存在',
             'content.data.array' => '内容数据格式不正确',
             'content.data.*.title.present' => '搜索提示词 参数未设置',
             'content.data.*.url.name.present' => 'url链接别名 参数未设置',

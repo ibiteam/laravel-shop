@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('avatar')->nullable()->comment('头像');
             $table->string('register_ip', 20)->comment('注册IP');
             $table->boolean('is_modify')->default(0)->comment('是否已修改用户名');
+            $table->bigInteger('integral')->default(0)->comment('积分总数');
             $table->string('source', 30)->comment('来源')->index();
             $table->timestamps();
         });

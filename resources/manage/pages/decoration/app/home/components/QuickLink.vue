@@ -7,7 +7,7 @@
                         slidesPerView: form.content.column,
                         slidesPerGroup: form.content.column,
                         pagination: {
-                            'el': '.swiper-pagination.decoration-swiper-pagination',
+                            // 'el': '.swiper-pagination.decoration-swiper-pagination',
                             'clickable': false,
                         },
                         grid: {
@@ -25,7 +25,6 @@
                             </div>
                         </swiper-slide>
                     </swiper>
-                    <div class="swiper-pagination decoration-swiper-pagination"></div>
                 </div>
             </template>
         </drag-wrapper>

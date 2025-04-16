@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
 use App\Http\Controllers\Api\V1\Order\EvaluateController;
 use App\Http\Controllers\Api\V1\Order\IndexController as MyOrderIndexController;
+use App\Http\Controllers\Api\V1\Order\OrderDeliveryController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 // 首页
 Route::get('home', [HomeController::class, 'home']);
+// 预览页
+Route::get('preview', [HomeController::class, 'preview']);
 // 搜索
 Route::get('search', [HomeController::class, 'search']);
 // 为您推荐
@@ -108,9 +111,18 @@ Route::middleware('api.auth')->group(function () {
             Route::get('init', [ApplyRefundController::class, 'init']); // 初始化申请售后
             Route::get('show', [ApplyRefundController::class, 'show']); // 根据售后类型回显数据
             Route::post('store', [ApplyRefundController::class, 'store']); // 提交申请售后
+            Route::get('list', [ApplyRefundController::class, 'list']); // 退款售后列表
             Route::get('detail', [ApplyRefundController::class, 'detail']); // 售后详情
             Route::get('log', [ApplyRefundController::class, 'log']); // 协商历史
             Route::post('revoke', [ApplyRefundController::class, 'revoke']); // 撤销申请
+            Route::get('ship_info', [ApplyRefundController::class, 'shipInfo']); // 退货物流信息
+            Route::post('ship_add', [ApplyRefundController::class, 'shipAdd']); // 填写物流单号
+        });
+
+        // 发货物流
+        Route::prefix('delivery')->group(function () {
+            Route::get('list', [OrderDeliveryController::class, 'list']);
+            Route::get('logistics', [OrderDeliveryController::class, 'logistics']);
         });
     });
 

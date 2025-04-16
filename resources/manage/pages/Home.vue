@@ -106,16 +106,25 @@
                                 </div>
                             </div>
                             <div class="more-opt s-flex flex-wrap" v-if="my_collect.length">
-                                <div class="opt-list" v-for="item in my_collect" :key="item.value" @click.stop="toPage(item)">
-                                    <div class="icon">
-                                        <el-icon :size="20">
-                                            <component :is="item.icon?item.icon:'Document'"/>
-                                        </el-icon>
+                                <template v-for="(item,index) in my_collect" :key="item.value">
+                                    <div class="opt-list" @click.stop="toPage(item)" v-if="index<12">
+                                        <div class="icon">
+                                            <template v-if="item.icon">
+                                                <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" style="width: 20px;height: 20px">
+                                                <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;" class="iconfont" :class="item.icon"></i>
+                                                <el-icon v-else :size="20">
+                                                    <component :is="item.icon"/>
+                                                </el-icon>
+                                            </template>
+                                            <el-icon :size="20" v-else>
+                                                <Document/>
+                                            </el-icon>
+                                        </div>
+                                        <div class="titles">
+                                            <span>{{item.title}}</span>
+                                        </div>
                                     </div>
-                                    <div class="titles">
-                                        <span>{{item.title}}</span>
-                                    </div>
-                                </div>
+                                </template>
                             </div>
                             <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
                                 <span>暂无收藏</span>
@@ -131,8 +140,15 @@
                             <div class="more-opt s-flex flex-wrap" v-if="access_record.length > 0">
                                 <div class="opt-list" v-for="item in access_record" @click.stop="toPage(item)">
                                     <div class="icon">
-                                        <el-icon :size="20">
-                                            <component :is="item.icon?item.icon:'Document'"/>
+                                        <template v-if="item.icon">
+                                            <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" style="width: 20px;height: 20px">
+                                            <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;" class="iconfont" :class="item.icon"></i>
+                                            <el-icon v-else :size="20">
+                                                <component :is="item.icon"/>
+                                            </el-icon>
+                                        </template>
+                                        <el-icon :size="20" v-else>
+                                            <Document/>
                                         </el-icon>
                                     </div>
                                     <div class="titles">

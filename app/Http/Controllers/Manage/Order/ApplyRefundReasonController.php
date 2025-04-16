@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Order;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\ApplyRefundReason;
@@ -22,7 +23,7 @@ class ApplyRefundReasonController extends BaseController
 
         $data = ApplyRefundReason::query()
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
-            ->orderByDesc('created_at')->paginate($number);
+            ->orderByDesc('sort')->orderByDesc('created_at')->paginate($number);
         $data->getCollection()->transform(function (ApplyRefundReason $apply_refund_reason) {
             return [
                 'id' => $apply_refund_reason->id,

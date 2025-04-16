@@ -31,6 +31,12 @@
     },
     {
         "type": "file",
+        "name": "search",
+        "label": "导航搜索",
+        "collapsed": true
+    },
+    {
+        "type": "file",
         "name": "check_action_code",
         "label": "校验短信验证码",
         "collapsed": true
@@ -93,6 +99,12 @@
         "type": "dir",
         "name": "apply_refund",
         "label": "申请售后/退款",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "delivery",
+        "label": "发货物流",
         "collapsed": true
     },
     {

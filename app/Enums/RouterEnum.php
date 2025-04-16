@@ -9,6 +9,7 @@ enum RouterEnum: string
         return match ($this) {
             self::PAY_SUCCESS => '支付成功',
             self::ORDER_SUCCESS => '下单成功',
+            self::HOME_PREVIEW => '首页预览',
         };
     }
 
@@ -22,9 +23,12 @@ enum RouterEnum: string
         return match ($source) {
             'pay_success' => self::PAY_SUCCESS,
             'order_success' => self::ORDER_SUCCESS,
+            'home_preview' => self::HOME_PREVIEW,
         };
     }
 
     case PAY_SUCCESS = 'pay_success';
     case ORDER_SUCCESS = 'order_success';
+
+    case HOME_PREVIEW = 'home_preview'; // 首页预览
 }
