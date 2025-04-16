@@ -248,12 +248,12 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByOrderSnAndUserId($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -301,12 +301,12 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByOrderSnAndUserId($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -364,15 +364,15 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
             $order = Order::query()
                 ->with(['orderDelivery'])
                 ->whereUserId($current_user->id)
-                ->whereOrderSn($validated['no'])
+                ->whereOrderSn($validated['order_sn'])
                 ->first();
 
             if (! $order instanceof Order) {
