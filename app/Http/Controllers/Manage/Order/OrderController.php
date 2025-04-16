@@ -35,7 +35,7 @@ class OrderController extends BaseController
 {
     public function index(Request $request)
     {
-        $no = $request->get('no');
+        $order_sn = $request->get('order_sn');
         $user_keywords = $request->get('user_keywords');
         $goods_id = $request->get('goods_id');
         $goods_name = $request->get('goods_name');
@@ -50,7 +50,7 @@ class OrderController extends BaseController
 
         $list = Order::query()
             ->with('user:id,user_name')
-            ->when(! is_null($no), fn (Builder $query) => $query->where('order_sn', $no))
+            ->when(! is_null($order_sn), fn (Builder $query) => $query->where('order_sn', $order_sn))
             ->when(! is_null($order_status), fn (Builder $query) => $query->where('order_status', $order_status))
             ->when(! is_null($pay_status), fn (Builder $query) => $query->where('pay_status', $pay_status))
             ->when(! is_null($shipping_status), fn (Builder $query) => $query->where('ship_status', $shipping_status))
@@ -115,7 +115,7 @@ class OrderController extends BaseController
                 }),
                 'order_info' => [
                     'order_id' => $order->id,
-                    'no' => $order->order_sn,
+                    'order_sn' => $order->order_sn,
                     'order_status' => $order->order_status,
                     'order_status_message' => OrderStatusEnum::getLabelBySource($order->order_status),
                     'pay_status' => $order->pay_status,
@@ -202,7 +202,7 @@ class OrderController extends BaseController
                 'ship_company' => $ship_company_dao->getListByEnable(),
                 'order_info' => [
                     'id' => $order->id,
-                    'no' => $order->order_sn,
+                    'order_sn' => $order->order_sn,
                     'ship_status' => $order->ship_status,
                 ],
             ]);

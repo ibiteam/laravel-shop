@@ -26,7 +26,7 @@ class OrderResource extends JsonResource
 
         return [
             'id' => $this->resource->id,
-            'no' => $this->resource->order_sn,
+            'order_sn' => $this->resource->order_sn,
             'payer' => [
                 'user_name' => $this->resource->user?->user_name,
                 'done_time' => $this->resource->created_at->toDateTimeString(),
