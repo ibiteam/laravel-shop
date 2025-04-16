@@ -176,7 +176,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding-top: 10px;">
             <el-form :inline="true" :model="searchForm" class="search-form">
                 <el-form-item label="名称" prop="name">

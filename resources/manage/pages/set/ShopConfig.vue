@@ -123,7 +123,7 @@ onMounted(() => {
 <template>
     <div class="common-wrap shopConfig-wrap">
         <el-main>
-            <el-tabs v-model="firstActiveName" type="card" @tab-click="firstHandleClick" class="shopConfig-tab">
+            <el-tabs v-model="firstActiveName" type="border-card" @tab-click="firstHandleClick" class="shopConfig-tab">
                 <el-tab-pane label="站点设置" name="site_setup">
                     <el-tabs v-model="secondActiveName" :tab-position="tabPosition" type="card"
                              @tab-click="secondHandleClick" class="childConfig-tab">
@@ -413,6 +413,9 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .shopConfig-wrap {
+    :deep(.el-tabs--left.el-tabs--card .el-tabs__item.is-left.is-active){
+        border-right: 1px solid var(--el-border-color-light);
+    }
     :deep(.shopConfig-tab) {
         width: 1300px;
     }

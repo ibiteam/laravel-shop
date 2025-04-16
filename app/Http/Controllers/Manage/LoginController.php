@@ -22,7 +22,7 @@ class LoginController extends BaseController
      */
     public function showLoginForm(Request $request, ShopConfigDao $shop_config_dao): JsonResponse|RedirectResponse
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         if ($current_user instanceof AdminUser) {
             return $this->success(['is_login' => true, 'config' => []]);
@@ -93,7 +93,7 @@ class LoginController extends BaseController
     public function logout()
     {
         try {
-            $admin_user = $this->adminUser();
+            $admin_user = get_admin_user();
 
             if (! $admin_user instanceof AdminUser) {
                 throw new BusinessException('用户未登录');

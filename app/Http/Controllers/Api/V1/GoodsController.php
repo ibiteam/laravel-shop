@@ -27,7 +27,7 @@ class GoodsController extends BaseController
             ], [], [
                 'sku_id' => 'sku ID',
             ]);
-            $goods = $goods_service->show($no, $this->user(), $validated['sku_id'] ?? 0);
+            $goods = $goods_service->show($no, get_user(), $validated['sku_id'] ?? 0);
 
             return $this->success(GoodsDetailResource::make($goods));
         } catch (ValidationException $validation_exception) {
@@ -74,7 +74,7 @@ class GoodsController extends BaseController
             ]);
             $goods = $goods_dao->getInfoByNo($no);
 
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $data = $goods_service->checkGoodsNumber($goods, $current_user, $validated['sku_id'] ?? 0, $validated['number']);
 

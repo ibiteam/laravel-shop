@@ -59,7 +59,7 @@ class EvaluateController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $order = Order::query()->with('evaluate')->whereUserId($current_user->id)->whereOrderSn($validated['order_sn'])->first();
 
@@ -134,7 +134,7 @@ class EvaluateController extends BaseController
                 'service_rank' => '服务评分',
                 'is_anonymous' => '是否匿名',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()->with(['evaluate', 'detail'])->whereUserId($current_user->id)->whereOrderSn($validated['order_sn'])->first();
 
             if (! $order instanceof Order) {

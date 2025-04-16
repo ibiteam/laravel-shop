@@ -36,7 +36,7 @@ class DoneController extends BaseController
                 'user_address_id' => '用户地址ID',
             ]);
 
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $current_goods_format = $goods_formatter
                 ->setUser($current_user)
@@ -86,7 +86,7 @@ class DoneController extends BaseController
                 'remark' => '备注',
             ]);
 
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $user_address = $user_address_dao->getUserAddressById($current_user->id, $validated['user_address_id']);
 
@@ -132,7 +132,7 @@ class DoneController extends BaseController
                 'user_address_id' => '用户地址ID',
             ]);
 
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
                 return app(GoodsFormatter::class)
@@ -184,7 +184,7 @@ class DoneController extends BaseController
                 'remark' => '备注',
             ]);
 
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $user_address = $user_address_dao->getUserAddressById($current_user->id, $validated['user_address_id']);
 

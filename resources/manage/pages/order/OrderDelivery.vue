@@ -1,17 +1,145 @@
+<template>
+    <search-form :model="query" :label-width="100">
+        <el-form-item label="运单号" prop="delivery_no">
+            <el-input
+                v-model="query.delivery_no"
+                placeholder="请输入运单号搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="订单编号" prop="order_sn">
+            <el-input
+                v-model="query.order_sn"
+                placeholder="请输入订单编号搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="发货开始时间" prop="created_start_time">
+            <el-date-picker
+                v-model="query.created_start_time"
+                type="datetime"
+                placeholder="请选择发货开始时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item label="发货结束时间" prop="created_end_time">
+            <el-date-picker
+                v-model="query.created_end_time"
+                type="datetime"
+                placeholder="请选择发货结束时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button @click="resetSearch">重置</el-button>
+            <el-button type="warning" @click="openImportDialog">导入发货</el-button>
+        </el-form-item>
+    </search-form>
+    <page-table
+        :data="tableData"
+        v-loading="loading"
+        @change="handleChange"
+    >
+        <el-table-column label="ID" prop="id" width="80px"></el-table-column>
+        <el-table-column label="运单号" prop="delivery_no" width="180px"></el-table-column>
+        <el-table-column label="订单编号" prop="order.order_sn" width="180px"></el-table-column>
+        <el-table-column label="快递公司" prop="ship_company.name"></el-table-column>
+        <el-table-column label="快递单号" width="240px">
+            <template #default="scope">
+                <span>{{ scope.row.ship_no }}</span>
+                <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
+            </template>
+        </el-table-column>
+        <el-table-column label="状态">
+            <template #default="scope">
+                <span v-if="scope.row.status === 0">待收货</span>
+                <span v-else-if="scope.row.status === 1">已收货</span>
+                <span v-else>--</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="操作人" prop="admin_user.nickname"></el-table-column>
+        <el-table-column label="备注">
+            <template #default="scope">
+                <span v-if="scope.row.remark">{{ scope.row.remark }}</span>
+                <span v-else>无</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
+        <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
+        <el-table-column label="操作"width="160px">
+            <template #default="scope">
+                <el-button link type="primary" size="large" @click="handleDelete(scope.row.id)">删除</el-button>
+            </template>
+        </el-table-column>
+    </page-table>
+    <!-- 查看物流 -->
+    <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
+        <div style="height: 60vh;overflow: auto" v-loading="logisticsInitLoading">
+            <el-timeline :reverse="false">
+                <el-timeline-item v-for="(shipItem, index) in logisticsData" :key="index" :timestamp="shipItem.time">
+                    {{ shipItem.context }}
+                </el-timeline-item>
+            </el-timeline>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button type="info" @click="closeLogisticsDialog()">关闭</el-button>
+            </div>
+        </template>
+    </el-dialog>
+    <!-- 导入发货 -->
+    <el-dialog v-model="importVisible" title="导入发货" width="600" center :before-close="closeImportDialog">
+        <div class="detail-item">
+            <div class="detail-title">下载模板</div>
+            <el-button @click="downloadFile">点击下载模板</el-button>
+        </div>
+        <div class="detail-item">
+            <div class="detail-title">导入发货</div>
+            <el-upload
+                accept=".xlsx"
+                action=""
+                :show-file-list="false"
+                :http-request="(request) => submitImport(request)"
+                :with-credentials="true">
+                <el-button :loading="importFileLoading" type="primary">选择文件</el-button>
+            </el-upload>
+        </div>
+        <div class="detail-item">
+            <div class="detail-title">导入结果</div>
+            <div v-if="importSuccessNumber > 0">
+                <span class="import-response import-response-success">导入成功 {{ importSuccessNumber }} 条数据</span>
+            </div>
+            <div v-if="importErrorData.length > 0">
+                <div>
+                    <span class="import-response import-response-error">导入失败 {{ importErrorData.length }} 条数据</span>
+                </div>
+                <el-table :data="importErrorData" stripe border style="width: 100%;">
+                    <el-table-column label="错误行数" prop="line"></el-table-column>
+                    <el-table-column label="错误信息" prop="message"></el-table-column>
+                </el-table>
+            </div>
+        </div>
+    </el-dialog>
+</template>
 <script setup lang="ts">
-import { Search, RefreshLeft, Upload } from '@element-plus/icons-vue';
 import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import PublicPageTable from '@/components/common/PublicPageTable.vue';
 import importFilePath from '@/assets/xlsx/发货模板.xlsx'
-const cns = getCurrentInstance().appContext.config.globalProperties
-const router = useRouter()
+import SearchForm from '@/components/common/SearchForm.vue';
+import PageTable from '@/components/common/PageTable.vue';
 
+const cns = getCurrentInstance().appContext.config.globalProperties
+
+/* 定义表格数据 */
 const tableData = ref([]);
 const loading = ref(false);
-
-const queryParams = reactive({
+/* 定义搜索参数 */
+const defaultQuery = reactive({
     delivery_no: '',
     order_sn: '',
     created_start_time: '',
@@ -19,60 +147,31 @@ const queryParams = reactive({
     page: 1,
     number: 10,
 });
-
-// 搜索方法
-const handleSearch = () => {
-    getData(1);
-};
-
-// 重置搜索条件
-const resetSearch = () => {
-    queryParams.delivery_no = '';
-    queryParams.order_sn = '';
-    queryParams.created_start_time = '';
-    queryParams.created_end_time = '';
-    queryParams.page = 1;
-    queryParams.number = 10;
-    getData(1);
-};
-
-// 添加分页相关状态
-const pageInfo = reactive({
+const query = reactive({...defaultQuery})
+/* 定义默认分页参数 */
+const defaultPage = {
+    page: 1,
     per_page: 10,
-    total: 0,
-    current_page: 1,
-})
-
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
 }
-
-// 每页条数改变
-const handleSizeChange = (val) => {
-    pageInfo.per_page = val;
-    getData(1);
+const pagination = reactive({...defaultPage})
+/* 重置搜索条件 */
+const resetSearch = () => {
+    Object.assign(query, defaultQuery)
+    Object.assign(pagination, defaultPage)
+    getData()
 }
-
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
-
-const getData = (page = 1) => {
+/* 获取分页数据 */
+const getData = (page:number = defaultPage.page) => {
     loading.value = true;
-    // 更新当前页码
-    queryParams.page = page;
-    queryParams.number = pageInfo.per_page;
-
-    orderDeliveryIndex(queryParams).then(res => {
+    const params = {
+        ...query,
+        page: page,
+        per_page: pagination.per_page
+    }
+    orderDeliveryIndex(params).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
-            tableData.value = res.data.list;
-            // 更新分页信息
-            setPageInfo(res.data.meta);
+            tableData.value = res.data
         } else {
             cns.$message.error(res.message)
         }
@@ -80,7 +179,11 @@ const getData = (page = 1) => {
         loading.value = false;
     })
 }
-
+/* 点击分页触发方法 */
+const handleChange = (page:number,per_page:number) => {
+    pagination.per_page = per_page
+    getData(page)
+}
 /* 物流轨迹开始 */
 const logisticsVisible = ref(false)
 const logisticsData = ref([])
@@ -175,157 +278,7 @@ onMounted(() => {
     getData();
 })
 </script>
-
-<template>
-    <div class="common-wrap">
-        <el-header style="padding: 10px 0;height: auto;">
-            <!-- 添加搜索表单 -->
-            <el-form :inline="true" :model="queryParams" class="search-form">
-                <el-form-item label="运单号" prop="delivery_no">
-                    <el-input
-                        v-model="queryParams.delivery_no"
-                        placeholder="请输入运单号搜索"
-                        clearable
-                        @keyup.enter="handleSearch"
-                    />
-                </el-form-item>
-                <el-form-item label="订单编号" prop="order_sn">
-                    <el-input
-                        v-model="queryParams.order_sn"
-                        placeholder="请输入订单编号搜索"
-                        clearable
-                        @keyup.enter="handleSearch"
-                    />
-                </el-form-item>
-                <el-form-item label="发货开始时间" prop="created_start_time">
-                    <el-date-picker
-                        v-model="queryParams.created_start_time"
-                        type="datetime"
-                        placeholder="请选择发货开始时间"
-                        value-format="YYYY-MM-DD HH:mm:ss"
-                    >
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item label="发货结束时间" prop="created_end_time">
-                    <el-date-picker
-                        v-model="queryParams.created_end_time"
-                        type="datetime"
-                        placeholder="请选择发货结束时间"
-                        value-format="YYYY-MM-DD HH:mm:ss"
-                    >
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                    <el-button :icon="Upload" type="warning" @click="openImportDialog">导入发货</el-button>
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <PublicPageTable
-            :data="tableData"
-            v-loading="loading"
-            :pageInfo="pageInfo"
-            @sizeChange="handleSizeChange"
-            @currentChange="handleCurrentChange"
-            style="width: 100%;">
-            <el-table-column label="ID" prop="id" width="80px"></el-table-column>
-            <el-table-column label="运单号" prop="delivery_no" width="180px"></el-table-column>
-            <el-table-column label="订单编号" prop="order.order_sn" width="180px"></el-table-column>
-            <el-table-column label="快递公司" prop="ship_company.name"></el-table-column>
-            <el-table-column label="快递单号" width="240px">
-                <template #default="scope">
-                    <span>{{ scope.row.ship_no }}</span>
-                    <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
-                </template>
-            </el-table-column>
-            <el-table-column label="状态">
-                <template #default="scope">
-                    <span v-if="scope.row.status === 0">待收货</span>
-                    <span v-else-if="scope.row.status === 1">已收货</span>
-                    <span v-else>--</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作人" prop="admin_user.nickname"></el-table-column>
-            <el-table-column label="备注">
-                <template #default="scope">
-                    <span v-if="scope.row.remark">{{ scope.row.remark }}</span>
-                    <span v-else>无</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
-            <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
-            <el-table-column label="操作"width="160px">
-                <template #default="scope">
-                    <el-button link type="primary" size="large" @click="handleDelete(scope.row.id)">删除</el-button>
-                </template>
-            </el-table-column>
-        </PublicPageTable>
-        <!-- 查看物流 -->
-        <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
-            <div style="height: 60vh;overflow: auto" v-loading="logisticsInitLoading">
-                <el-timeline :reverse="false">
-                    <el-timeline-item v-for="(shipItem, index) in logisticsData" :key="index" :timestamp="shipItem.time">
-                        {{ shipItem.context }}
-                    </el-timeline-item>
-                </el-timeline>
-            </div>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button type="info" @click="closeLogisticsDialog()">关闭</el-button>
-                </div>
-            </template>
-        </el-dialog>
-        <!-- 导入发货 -->
-        <el-dialog v-model="importVisible" title="导入发货" width="600" center :before-close="closeImportDialog">
-            <div class="detail-item">
-                <div class="detail-title">下载模板</div>
-                <el-button @click="downloadFile">点击下载模板</el-button>
-            </div>
-            <div class="detail-item">
-                <div class="detail-title">导入发货</div>
-                <el-upload
-                    accept=".xlsx"
-                    action=""
-                    :show-file-list="false"
-                    :http-request="(request) => submitImport(request)"
-                    :with-credentials="true">
-                    <el-button :loading="importFileLoading" type="primary">选择文件</el-button>
-                </el-upload>
-            </div>
-            <div class="detail-item">
-                <div class="detail-title">导入结果</div>
-                <div v-if="importSuccessNumber > 0">
-                    <span class="import-response import-response-success">导入成功 {{ importSuccessNumber }} 条数据</span>
-                </div>
-                <div v-if="importErrorData.length > 0">
-                    <div>
-                        <span class="import-response import-response-error">导入失败 {{ importErrorData.length }} 条数据</span>
-                    </div>
-                    <el-table :data="importErrorData" stripe border style="width: 100%;">
-                        <el-table-column label="错误行数" prop="line"></el-table-column>
-                        <el-table-column label="错误信息" prop="message"></el-table-column>
-                    </el-table>
-                </div>
-            </div>
-        </el-dialog>
-    </div>
-</template>
-
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
 .detail-item{
     padding: 15px 0;
     .detail-cont{

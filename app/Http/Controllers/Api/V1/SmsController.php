@@ -40,7 +40,7 @@ class SmsController extends BaseController
                 'phone' => '手机号',
             ]);
 
-            $sms_service->sendOtp($validated['action'], $validated['phone'] ?? 0, $this->user());
+            $sms_service->sendOtp($validated['action'], $validated['phone'] ?? 0, get_user());
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -85,7 +85,7 @@ class SmsController extends BaseController
             if (in_array($validated['action'], [SmsService::ACTION_LOGIN, SmsService::ACTION_FORGET_PASSWORD, SmsService::ACTION_EDIT_PHONE ])) {
                 $phone = $validated['phone'] ?? 0;
             } else {
-                $phone = $this->user()?->phone ?: 0;
+                $phone = get_user()?->phone ?: 0;
             }
             if (!$phone) {
                 throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);

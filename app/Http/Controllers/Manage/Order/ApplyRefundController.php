@@ -108,7 +108,7 @@ class ApplyRefundController extends BaseController
      */
     public function agreeApply(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -156,7 +156,7 @@ class ApplyRefundController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, "卖家同意了{$typeMsg}");
 
-                admin_operation_log($current_user, "同意了{$typeMsg}申请记录：{$apply_refund->id}");
+                admin_operation_log("同意了{$typeMsg}申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -183,7 +183,7 @@ class ApplyRefundController extends BaseController
      */
     public function closeApply(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -213,7 +213,7 @@ class ApplyRefundController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '关闭了售后申请');
 
-                admin_operation_log($current_user, "关闭了退款申请记录：{$apply_refund->id}");
+                admin_operation_log("关闭了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -237,7 +237,7 @@ class ApplyRefundController extends BaseController
      */
     public function executeRefund(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -283,7 +283,7 @@ class ApplyRefundController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $order, '卖家同意了退款');
 
-                admin_operation_log($current_user, "同意了退款申请记录：{$apply_refund->id}");
+                admin_operation_log("同意了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -307,7 +307,7 @@ class ApplyRefundController extends BaseController
      */
     public function refuseRefund(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -342,7 +342,7 @@ class ApplyRefundController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家拒绝了退款');
 
-                admin_operation_log($current_user, "拒绝了退款申请记录：{$apply_refund->id}");
+                admin_operation_log("拒绝了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -369,7 +369,7 @@ class ApplyRefundController extends BaseController
      */
     public function confirmReceipt(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -408,7 +408,7 @@ class ApplyRefundController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $order, '卖家确认收货，已退款给买家');
 
-                admin_operation_log($current_user, "确认收货退款给买家，退款申请记录：{$apply_refund->id}");
+                admin_operation_log("确认收货退款给买家，退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {

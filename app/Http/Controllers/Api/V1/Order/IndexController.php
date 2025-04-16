@@ -39,7 +39,7 @@ class IndexController extends BaseController
         $keywords = $request->get('keywords');
         $type = $request->get('type', self::SEARCH_ALL);
         $number = (int) $request->get('number', 10);
-        $current_user = $this->user();
+        $current_user = get_user();
         $order = Order::query()
             ->withCount('detail')
             ->with(['detail', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
@@ -52,38 +52,15 @@ class IndexController extends BaseController
                     });
                 });
             })
-            ->when($type === self::SEARCH_NOT_PAY, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAY_WAIT);
-            })
-            ->when($type === self::SEARCH_WAIT_SHIP, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::UNSHIPPED);
-            })
-            ->when($type === self::SEARCH_WAIT_RECEIVE, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::SHIPPED);
-            })
+            ->when($type === self::SEARCH_NOT_PAY, fn (Builder $query) => $query->searchWaitPay())
+            ->when($type === self::SEARCH_WAIT_SHIP, fn (Builder $query) => $query->searchWaitShip())
+            ->when($type === self::SEARCH_WAIT_RECEIVE, fn (Builder $query) => $query->searchWaitReceive())
             ->when($type === self::SEARCH_WAIT_EVALUATE, function (Builder $query) use ($current_user) {
                 $evaluate_ids = OrderEvaluate::query()->whereUserId($current_user->id)->pluck('order_id')->unique()->filter()->toArray();
 
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::RECEIVED)
-                    ->whereNotIn('id', $evaluate_ids);
+                $query->searchWaitEvaluate($evaluate_ids);
             })
-            ->when($type === self::SEARCH_SUCCESS, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::RECEIVED);
-            })
+            ->when($type === self::SEARCH_SUCCESS, fn (Builder $query) => $query->searchComplete())
             ->paginate($number);
 
         return $this->success(new OrderResourceCollection($order));
@@ -100,7 +77,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->withCount('orderDelivery')
                 ->with(['detail', 'province', 'city', 'district'])
@@ -134,7 +111,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
@@ -181,7 +158,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
@@ -252,7 +229,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
@@ -305,7 +282,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
@@ -326,6 +303,10 @@ class IndexController extends BaseController
         DB::beginTransaction();
 
         try {
+            if ($order->pay_status !== PayStatusEnum::PAY_WAIT) {
+                // todo operate: 退积分以及退优惠券以及退金钱以及退库存
+            }
+
             if (! $order->update([
                 'order_status' => OrderStatusEnum::CANCELLED,
                 'pay_status' => PayStatusEnum::PAY_WAIT,
@@ -338,8 +319,6 @@ class IndexController extends BaseController
             }
 
             $order_log_dao->storeByUser($current_user, $order, '取消订单');
-
-            // todo operate: 退积分以及退优惠券以及退金钱以及退库存
 
             DB::commit();
 
@@ -368,7 +347,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->with(['orderDelivery'])
                 ->whereUserId($current_user->id)

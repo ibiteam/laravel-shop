@@ -17,7 +17,7 @@ class AccessRecord
      */
     public function handle(Request $request, \Closure $next): Response
     {
-        $admin_user = Auth::guard(config('auth.manage.guard'))->user();
+        $admin_user = get_admin_user();
 
         if (! ($admin_user instanceof AdminUser)) {
             throw new BusinessException('用户未登录或用户异常', ConstantEnum::UNAUTHORIZED);

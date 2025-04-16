@@ -50,7 +50,7 @@ class Payment extends Model
         return [
             'is_enabled' => 'boolean',
             'is_recommend' => 'boolean',
-            'config' => 'json',
+            'config' => 'array',
         ];
     }
 }

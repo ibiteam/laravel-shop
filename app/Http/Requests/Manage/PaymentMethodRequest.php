@@ -13,7 +13,13 @@ class PaymentMethodRequest extends FormRequest
     {
         return true;
     }
-
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_enabled' => filter_var($this->is_enabled, FILTER_VALIDATE_BOOLEAN),
+            'is_recommend' => filter_var($this->is_enabled, FILTER_VALIDATE_BOOLEAN),
+        ]);
+    }
     /**
      * Get the validation rules that apply to the request.
      *

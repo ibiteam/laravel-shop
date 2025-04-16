@@ -7,7 +7,8 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './resources/manage/')
-        }
+        },
+        extensions: ['.js', '.ts', '.vue', '.json'],
     },
     server: {
         cors: true, // Enable CORS

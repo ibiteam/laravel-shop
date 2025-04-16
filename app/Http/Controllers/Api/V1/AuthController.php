@@ -27,7 +27,7 @@ class AuthController extends BaseController
      */
     public function checkLogin(Request $request, UserService $user_service): JsonResponse
     {
-        return $this->success($user_service->checkIsLogin($this->user(), $request->bearerToken()));
+        return $this->success($user_service->checkIsLogin(get_user(), $request->bearerToken()));
     }
 
     /**
@@ -138,7 +138,7 @@ class AuthController extends BaseController
     public function logout(Request $request, UserService $user_service): JsonResponse
     {
         try {
-            $user = $this->user();
+            $user = get_user();
 
             if (! $user instanceof User) {
                 throw new BusinessException('用户未登录');
@@ -210,7 +210,7 @@ class AuthController extends BaseController
                 'new_password_confirmation' => '确认密码',
             ]);
 
-            $user = $this->user();
+            $user = get_user();
 
             if (! $user instanceof User) {
                 throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);

@@ -51,7 +51,7 @@ const openStoreDialog = (row = {}) => {
         submitForm.router_category_id = row.router_category_id;
         submitForm.name = row.name;
         submitForm.alias = row.alias;
-        submitForm.h5_url = row.h5_url;
+        submitForm.h5_url = row.h5_url_show;
         submitForm.params = row.params;
         submitForm.sort = row.sort;
         submitForm.is_show = row.is_show;
@@ -168,7 +168,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding-top: 10px;">
             <el-form :inline="true" :model="searchForm" class="search-form">
                 <el-form-item label="名称" prop="name">
@@ -206,7 +206,7 @@ onMounted(() => {
             <el-table-column label="名称" prop="name"></el-table-column>
             <el-table-column label="所属分类" prop="category_name"></el-table-column>
             <el-table-column label="别名" prop="alias"></el-table-column>
-            <el-table-column label="H5地址" prop="h5_url"></el-table-column>
+            <el-table-column label="H5地址" prop="h5_url_show"></el-table-column>
             <el-table-column label="排序" prop="sort"></el-table-column>
             <el-table-column label="额外参数" prop="params"></el-table-column>
             <el-table-column label="是否显示" prop="is_show">
@@ -249,7 +249,7 @@ onMounted(() => {
                         <el-input v-model="submitForm.h5_url" />
                     </el-form-item>
                     <el-form-item label="额外参数" prop="params">
-                        <el-input v-model="submitForm.params" placeholder="json格式" />
+                        <el-input type="textarea" rows="3" v-model="submitForm.params" placeholder="json格式" />
                     </el-form-item>
                     <el-form-item label="排序" prop="sort">
                         <el-input v-model="submitForm.sort" />

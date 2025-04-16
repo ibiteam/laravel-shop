@@ -5,6 +5,8 @@ namespace App\Http\Dao;
 use App\Models\Category;
 use App\Models\Goods;
 use App\Models\ShopConfig;
+use App\Utils\Constant;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchDao
 {
@@ -16,18 +18,17 @@ class SearchDao
     /**
      * 执行搜索并返回分页结果.
      */
-    public function searchGoods(array $params, int $user_id): \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Pagination\LengthAwarePaginator
+    public function searchGoods(array $params, int $user_id, int $is_record_search = Constant::ONE): LengthAwarePaginator
     {
         $params['page'] = max(1, (int) ($params['page'] ?? 1));
         $params['number'] = max(1, (int) ($params['number'] ?? 15));
 
-        if (shop_config(ShopConfig::SEARCH_DRIVER) == 2) {
+        if (intval(shop_config(ShopConfig::SEARCH_DRIVER)) == 2) {
             // MeiliSearch搜索
             $options = [
                 'attributesToSearchOn' => ['name'],
                 'filter' => ['status = '.Goods::STATUS_ON_SALE], // 上架商品
                 'sort' => ['sort:desc'], // 默认排序
-                'attributesToRetrieve' => ['no', 'name', 'sub_name', 'label', 'price', 'unit', 'integral', 'image', 'sales_volume', 'created_at'], // 指定返回的字段
             ];
 
             if (! empty($params['category_id'])) {
@@ -47,8 +48,7 @@ class SearchDao
             $query = Goods::search($params['keywords'] ?? '')->options($options);
         } else {
             // 数据库搜索
-
-            $query = Goods::query()->show()->select(['no', 'name', 'sub_name', 'label', 'price', 'unit', 'integral', 'image', 'sales_volume', 'created_at']);
+            $query = Goods::query()->show();
 
             if (! empty($params['keywords'])) {
                 $query->where('name', 'like', '%'.$params['keywords'].'%');
@@ -105,7 +105,26 @@ class SearchDao
         }
 
         // 记录用户搜索
-        $this->addUserKeyword($user_id, $add_keywords, $list->pluck('id')->toArray());
+        if ($is_record_search) {
+            $this->addUserKeyword($user_id, $add_keywords, $list->pluck('id')->toArray());
+        }
+
+        // 只返回指定字段
+        $list->transform(function ($item) {
+            return [
+                'no' => $item->no,
+                'category_id' => $item->category_id,
+                'name' => $item->name,
+                'sub_name' => $item->sub_name,
+                'label' => $item->label,
+                'price' => $item->price,
+                'unit' => $item->unit,
+                'integral' => $item->integral,
+                'image' => $item->image,
+                'sales_volume' => $item->sales_volume,
+               'created_at' => $item->created_at,
+            ];
+        });
 
         return $list;
     }

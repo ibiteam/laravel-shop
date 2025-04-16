@@ -86,10 +86,10 @@ class ApplyRefundReasonController extends BaseController
                 $log = "编辑退款原因[id:{$apply_refund_reason->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($apply_refund_reason->getChanges()), $apply_refund_reason->getChanges()));
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增退款原因[id:{$apply_refund_reason->id}]";
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_STORE);
+                admin_operation_log( $log, AdminOperationLog::TYPE_STORE);
             }
 
             return $this->success('保存成功');
@@ -121,7 +121,7 @@ class ApplyRefundReasonController extends BaseController
 
             if ($apply_refund_reason->delete()) {
                 // 记录日志
-                admin_operation_log($this->adminUser(), "删除了退款原因:{$apply_refund_reason->content}[{$apply_refund_reason->id}]", AdminOperationLog::TYPE_DESTROY);
+                admin_operation_log( "删除了退款原因:{$apply_refund_reason->content}[{$apply_refund_reason->id}]", AdminOperationLog::TYPE_DESTROY);
 
                 return $this->success('删除成功');
             }

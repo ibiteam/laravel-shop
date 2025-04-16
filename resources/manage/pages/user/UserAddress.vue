@@ -184,7 +184,7 @@ const rules = reactive({
 </script>
 
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding: 10px 0;">
             <!-- 添加搜索表单 -->
             <el-form :inline="true" :model="queryParams" class="search-form">

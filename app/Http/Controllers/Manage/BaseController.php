@@ -10,9 +10,4 @@ use Illuminate\Support\Facades\Auth;
 class BaseController extends Controller
 {
     use ApiResponse;
-
-    final public function adminUser(): ?AdminUser
-    {
-        return Auth::guard(config('auth.manage.guard'))->user();
-    }
 }

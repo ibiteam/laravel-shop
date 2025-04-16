@@ -8,13 +8,13 @@
                 <div class="top-icon">
                     <div class="top-icon-line"></div>
                 </div>
-                <div class="top-title">后台管理系统</div>
+                <div class="top-title">{{ pageData.shop_name}}管理系统</div>
             </div>
             <div class="manage-shop">
                 <img :src="pageData.shop_manage_login_image || defaultImages.bgImage" style="width:420px;height: 560px;"/>
                 <div style="width:480px;">
                     <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
-                        <div class="login-title" style="width:300px;margin: 0px auto;margin-bottom: 36px;">欢迎来到 {{ pageData.shop_name}}</div>
+                        <div class="login-title" style="width:300px;margin: 0px auto;margin-bottom: 36px;">欢迎来到{{ pageData.shop_name}}</div>
                         <el-form-item label="" prop="username">
                             <el-input v-model="loginForm.username" placeholder="请输入用户名" maxlength="20"/>
                         </el-form-item>

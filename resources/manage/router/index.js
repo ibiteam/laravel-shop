@@ -18,7 +18,7 @@ import Payment from '@/pages/set/Payment.vue';
 import AppDecoration from '@/pages/decoration/app/Index.vue';
 import Refresh from '@/pages/refresh/refresh.vue';
 import ShipCompany from '@/pages/set/ShipCompany.vue';
-import Order from '@/pages/order/Order.vue';
+import Order from '@/pages/order/Index.vue';
 import OrderDetail from '@/pages/order/Detail.vue';
 import ApplyRefundReason from '@/pages/order/ApplyRefundReason.vue';
 import ApplyRefund from '@/pages/order/ApplyRefund.vue';

@@ -2,17 +2,18 @@
 
 namespace App\Http\Dao;
 
-use App\Models\AdminUser;
+use App\Models\AdminOperationLog;
 
 class AdminOperationLogDao
 {
     /**
      * 添加后台操作日志.
      */
-    public function addOperationLogByAdminUser(AdminUser $admin_user, string $description, int $type): void
+    public function addOperationLogByAdminUser(int $admin_user_id, string $description, int $type): AdminOperationLog
     {
-        $admin_user->operationLog()->create([
+        return AdminOperationLog::create([
             'description' => $description,
+            'admin_user_id' => $admin_user_id,
             'type' => $type,
             'ip' => get_request_ip(),
         ]);

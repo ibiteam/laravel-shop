@@ -16,6 +16,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 
 /**
+ *
+ *
  * @property int         $id
  * @property string      $user_name   用户名
  * @property string      $password    密码
@@ -37,7 +39,6 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read int|null $tokens_count
  * @property-read Collection<int, UserLog> $userLogs
  * @property-read int|null $user_logs_count
- *
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User query()
@@ -52,7 +53,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder<static>|User whereSource($value)
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @method static Builder<static>|User whereUserName($value)
- *
+ * @property int $integral 积分总数
+ * @method static Builder<static>|User whereIntegral($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable

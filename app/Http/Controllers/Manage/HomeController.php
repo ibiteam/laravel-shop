@@ -29,7 +29,7 @@ class HomeController extends BaseController
      */
     public function config(PermissionDao $permission_dao, ShopConfigDao $shop_config_dao)
     {
-        $admin_user = $this->adminUser();
+        $admin_user = get_admin_user();
 
         $menus = $permission_dao->getTreePermissionByAdminUser($admin_user);
 
@@ -51,7 +51,7 @@ class HomeController extends BaseController
      */
     public function dashboard(AccessRecordDao $access_record_dao, CollectDao $collect_dao)
     {
-        $admin_user = $this->adminUser();
+        $admin_user = get_admin_user();
 
         // 数量统计
         $number_data['user_number'] = User::query()->count();  // 用户数
@@ -90,7 +90,7 @@ class HomeController extends BaseController
      */
     public function collectManage(PermissionDao $permission_dao, CollectDao $collect_dao)
     {
-        $admin_user = $this->adminUser();
+        $admin_user = get_admin_user();
 
         // 收藏列表
         $collect_permissions = $collect_dao->getListByAdminUserId($admin_user->id);
@@ -107,7 +107,7 @@ class HomeController extends BaseController
      */
     public function collectMenu(Request $request, CollectDao $collect_dao)
     {
-        $admin_user = $this->adminUser();
+        $admin_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -165,7 +165,7 @@ class HomeController extends BaseController
         $this->todoList = [];
 
         try {
-            $permission_codes = $this->adminUser()->getAllPermissions()->pluck('name')->flip();
+            $permission_codes = get_admin_user()->getAllPermissions()->pluck('name')->flip();
         } catch (\Exception $e) {
             $permission_codes = [];
         }

@@ -97,7 +97,7 @@ class OrderDeliveryController extends BaseController
                 if (! empty($area_lng_list)) {
                     // 获取起点 市名
                     $start_lng_lat = $area_lng_list[0];
-                    $startRegeoData = (new GeoUtil($this->user()->id))->getRegeoByLocation($start_lng_lat);
+                    $startRegeoData = (new GeoUtil(get_user()->id))->getRegeoByLocation($start_lng_lat);
                     $city = $startRegeoData['regeocode']['addressComponent']['city'] ?? '';
                     $province = $startRegeoData['regeocode']['addressComponent']['province'] ?? '';
                     $start_area = $city ?: $province;
@@ -109,7 +109,7 @@ class OrderDeliveryController extends BaseController
                         // 当前运输状态
                         $current_status = $ship_list[0]['status'] ?? '';
                         // 当前节点市名
-                        $endRegeoData = (new GeoUtil($this->user()->id))->getRegeoByLocation($current_lng_lat);
+                        $endRegeoData = (new GeoUtil(get_user()->id))->getRegeoByLocation($current_lng_lat);
                         $city = $endRegeoData['regeocode']['addressComponent']['city'] ?? '';
                         $province = $endRegeoData['regeocode']['addressComponent']['province'] ?? '';
                         $current_area = $city ?: ($province ?: '未知');
@@ -121,7 +121,7 @@ class OrderDeliveryController extends BaseController
             $address = $user_address_dao->replaceAddressByRegionId($order->province_id, $order->city_id, $order->district_id, $order->address);
 
             if ($address) {
-                $geocoding = (new GeoUtil($this->user()->id))->getGeocodingByAddress($address);
+                $geocoding = (new GeoUtil(get_user()->id))->getGeocodingByAddress($address);
                 $end_area = $geocoding['geocodes'][0]['city'] ?? '';
                 $end_lng_lat = $geocoding['geocodes'][0]['location'] ?? '';
             }

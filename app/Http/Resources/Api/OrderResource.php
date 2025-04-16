@@ -36,6 +36,7 @@ class OrderResource extends JsonResource
             'status' => $order_constant_enum->value,
             'items' => $this->resource->detail->map(function (OrderDetail $item) {
                 return [
+                    'id' => $item->id,
                     'goods_no' => $item->goods_no,
                     'goods_unit' => $item->goods_unit,
                     'goods_name' => $item->goods_name,

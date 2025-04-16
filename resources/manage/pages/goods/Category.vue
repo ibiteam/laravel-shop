@@ -161,7 +161,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding-top: 10px;">
             <el-button :icon="Plus" type="warning" @click="openDetailDialog()">添加</el-button>
         </el-header>

@@ -7,6 +7,7 @@ use App\Exceptions\ProcessDataException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
+use App\Http\Dao\GoodsViewDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
@@ -17,15 +18,16 @@ use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
+use App\Models\GoodsView;
 use App\Models\ShopConfig;
 use App\Models\User;
+use App\Services\HTMLPurifierService;
 use App\Services\Order\GoodsFormatter;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class GoodsService
 {
@@ -33,7 +35,7 @@ class GoodsService
      * @throws BusinessException
      * @throws \Throwable
      */
-    public function storeOrUpdate(AdminUser $admin_user, array $params, int $goods_id = 0): void
+    public function storeOrUpdate(array $params, int $goods_id = 0): void
     {
         $settings_is_open_integral = shop_config(ShopConfig::IS_OPEN_INTEGRAL);
 
@@ -109,6 +111,7 @@ class GoodsService
                 throw new BusinessException('商品价格不能为空~');
             }
         }
+        $content = app(HTMLPurifierService::class)->purify($params['content']);
 
         // 修改商品
         if ($goods_id) {
@@ -127,7 +130,7 @@ class GoodsService
                 }
 
                 /* 商品详情内容 */
-                if (! $goods->detail()->update(['content' => $params['content']])) {
+                if (! $goods->detail()->update(['content' => $content])) {
                     throw new BusinessException('商品详情更新失败');
                 }
                 /* 商品图片信息 */
@@ -148,7 +151,7 @@ class GoodsService
                 /* 商品 SKU 处理 */
                 (new ManageSkusService($goods, $request_sku_data))->exec();
 
-                admin_operation_log($admin_user, "修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log("修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
                 DB::commit();
 
                 return;
@@ -168,7 +171,7 @@ class GoodsService
         DB::beginTransaction();
 
         try {
-            $store_data['no'] = Str::uuid()->toString();
+            $store_data['no'] = $this->generateGoodsNo();
             $store_data['sales_volume'] = 0;
             $store_data['sort'] = 0;
             /* 商品信息 */
@@ -179,7 +182,7 @@ class GoodsService
             }
 
             /* 商品详情内容 */
-            if (! $goods->detail()->create(['content' => $params['content']])) {
+            if (! $goods->detail()->create(['content' => $content])) {
                 throw new BusinessException('商品详情新增失败');
             }
 
@@ -197,7 +200,7 @@ class GoodsService
             /* 商品 SKU 处理 */
             (new ManageSkusService($goods, $request_sku_data))->exec();
 
-            admin_operation_log($admin_user, "新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log("新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
             DB::commit();
         } catch (BusinessException $business_exception) {
             DB::rollBack();
@@ -270,8 +273,11 @@ class GoodsService
         }
         $goods->evaluate = $tmp_evaluate;
 
-        // 购物车数量以及是否收藏处理
+        // 购物车数量以及是否收藏处理|访问记录
         if ($user instanceof User) {
+            // 访问记录
+            app(GoodsViewDao::class)->store($goods->id, $user->id);
+
             $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
 
             $tmp_collect = app(GoodsCollectDao::class)->getInfoByUserAndGoodsId($goods->id, $user->id);
@@ -418,5 +424,14 @@ class GoodsService
                 })->values(),
             ];
         });
+    }
+
+    private function generateGoodsNo(): string
+    {
+        do {
+            $no = time().mt_rand(10, 99);
+        } while (Goods::query()->where('no', $no)->exists());
+
+        return $no;
     }
 }

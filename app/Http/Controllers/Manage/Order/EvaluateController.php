@@ -65,7 +65,7 @@ class EvaluateController extends BaseController
             if ($order_evaluate->status === $tmp_status) {
                 throw new BusinessException('评价无需重新审核');
             }
-            $current_user = $this->adminUser();
+            $current_user = get_admin_user();
 
             if ($tmp_status === OrderEvaluate::STATUS_SUCCESS) {
                 $tmp_message = "将订单评价[{$order_evaluate->id}],审核通过";
@@ -76,7 +76,7 @@ class EvaluateController extends BaseController
             if (! $order_evaluate->update(['status' => $validated['status']])) {
                 throw new BusinessException('审核失败');
             }
-            admin_operation_log($current_user, $tmp_message);
+            admin_operation_log($tmp_message);
 
             return $this->success('操作审核成功');
         } catch (ValidationException $validation_exception) {

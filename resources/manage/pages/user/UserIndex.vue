@@ -187,9 +187,7 @@ const rules = reactive({
 </script>
 
 <template>
-    <div class="common-wrap">
-        <el-header style="padding: 10px 0;">
-            <!-- 添加搜索表单 -->
+        <el-header>
             <el-form :inline="true" :model="queryParams" class="search-form">
                 <el-form-item label="用户名" prop="user_name">
                     <el-input
@@ -200,9 +198,8 @@ const rules = reactive({
                     />
                 </el-form-item>
                 <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                    <el-button :icon="Plus" @click="addUser()" type="warning">添加</el-button>
+                    <el-button type="primary" @click="handleSearch()">搜索</el-button>
+                    <el-button type="danger" @click="addUser()" >添加</el-button>
                 </el-form-item>
             </el-form>
         </el-header>
@@ -269,7 +266,6 @@ const rules = reactive({
                 </div>
             </template>
         </el-dialog>
-    </div>
 </template>
 
 <style scoped lang="scss">

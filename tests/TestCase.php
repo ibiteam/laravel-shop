@@ -11,7 +11,7 @@ abstract class TestCase extends BaseTestCase
 
     public string $password = 'laravel-shop-1';
 
-    public int $phone = 13100000000;
+    public int $phone = 13111112222;
 
     public string $code = '000000';
 

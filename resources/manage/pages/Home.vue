@@ -9,22 +9,22 @@
                             <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
                         <div class="quick-view-box s-flex">
-                            <div class="quick-view s-flex ai-ct">
+                            <div class="quick-view s-flex ai-ct" @click="openUser()">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/user.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info" >
                                     <span class="fs12">用户数</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.user_number?number_data.user_number:'--' }}</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.user_number??0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct">
+                            <div class="quick-view s-flex ai-ct" @click="openOrder()">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/order.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info" >
                                     <span class="fs12">订单数</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.order_number?number_data.order_number:'--' }}</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.order_number??0 }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct">
@@ -33,10 +33,10 @@
                                 </div>
                                 <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">总交易额</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.total_transaction_value?number_data.total_transaction_value:'--' }}</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.total_transaction_value??0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct">
+                            <div class="quick-view s-flex ai-ct"  @click="openLog()">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/log.png" alt="">
                                 </div>
@@ -495,7 +495,15 @@ const toPage = (item) => {
         router.push({name:item.name})
     }
 }
-
+const openUser = () => {
+    router.push({name: 'manage.user.index'})
+}
+const openOrder = () => {
+    router.push({name: 'manage.order.index'})
+}
+const openLog = () => {
+    router.push({name: 'manage.admin_operation_log.index'})
+}
 const clearCache = () => {
     clearCacheAxios().then(res => {
         if (cns.$successCode(res.code)) {
