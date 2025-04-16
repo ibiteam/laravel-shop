@@ -33,7 +33,7 @@ class GoodsService
      * @throws BusinessException
      * @throws \Throwable
      */
-    public function storeOrUpdate(AdminUser $admin_user, array $params, int $goods_id = 0): void
+    public function storeOrUpdate(array $params, int $goods_id = 0): void
     {
         $settings_is_open_integral = shop_config(ShopConfig::IS_OPEN_INTEGRAL);
 
@@ -149,7 +149,7 @@ class GoodsService
                 /* 商品 SKU 处理 */
                 (new ManageSkusService($goods, $request_sku_data))->exec();
 
-                admin_operation_log($admin_user, "修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log("修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
                 DB::commit();
 
                 return;
@@ -198,7 +198,7 @@ class GoodsService
             /* 商品 SKU 处理 */
             (new ManageSkusService($goods, $request_sku_data))->exec();
 
-            admin_operation_log($admin_user, "新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log("新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
             DB::commit();
         } catch (BusinessException $business_exception) {
             DB::rollBack();
