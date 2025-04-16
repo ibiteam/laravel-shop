@@ -80,7 +80,7 @@ class ApplyRefundService
                 'goods_sku_id' => $order_detail->goods_sku_id,
                 'goods_sku_value' => $order_detail->goods_sku_value,
                 'goods_unit' => $order_detail->goods_unit,
-                'is_show_after_sales' => app(ApplyRefundDao::class)->showAfterSales($order_detail),  // 申请售后按钮状态
+                'is_show_after_sales' => app(ApplyRefundDao::class)->showAfterSales($order, $order_detail),  // 申请售后按钮状态
             ],
             'refund_type' => $tmp_refund_type,
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api;
 
+use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\OrderDao;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -50,7 +51,7 @@ class OrderDetailResource extends JsonResource
                     'number' => $item->goods_number,
                     'sku_value' => $item->skuValue(),
                     'sku_id' => $item->goods_sku_id,
-                    'refund_action' => app(OrderDao::class)->refundActionByOrderDetail($item),
+                    'refund_action' => app(ApplyRefundDao::class)->showAfterSales($this->resource, $item),
                 ];
             }),
             'amounts' => [
