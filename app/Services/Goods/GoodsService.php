@@ -19,6 +19,7 @@ use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
 use App\Models\ShopConfig;
 use App\Models\User;
+use App\Services\HTMLPurifierService;
 use App\Services\Order\GoodsFormatter;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
@@ -108,6 +109,7 @@ class GoodsService
                 throw new BusinessException('商品价格不能为空~');
             }
         }
+        $content = app(HTMLPurifierService::class)->purify($params['content']);
 
         // 修改商品
         if ($goods_id) {
@@ -126,7 +128,7 @@ class GoodsService
                 }
 
                 /* 商品详情内容 */
-                if (! $goods->detail()->update(['content' => $params['content']])) {
+                if (! $goods->detail()->update(['content' => $content])) {
                     throw new BusinessException('商品详情更新失败');
                 }
                 /* 商品图片信息 */
@@ -178,7 +180,7 @@ class GoodsService
             }
 
             /* 商品详情内容 */
-            if (! $goods->detail()->create(['content' => $params['content']])) {
+            if (! $goods->detail()->create(['content' => $content])) {
                 throw new BusinessException('商品详情新增失败');
             }
 
