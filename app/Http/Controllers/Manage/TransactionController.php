@@ -28,7 +28,7 @@ class TransactionController extends BaseController
         // 交易记录
         $transaction_no = $request->get('transaction_no', null);
         $type = $request->get('type', null);
-        $order_no = $request->get('order_no', null);
+        $order_sn = $request->get('order_sn', null);
         $user_name = $request->get('user_name', null);
         $transaction_type = $request->get('transaction_type', null);
         $status = $request->get('status', null);
@@ -36,15 +36,15 @@ class TransactionController extends BaseController
         $paid_end_time = $request->get('paid_end_time', null);
         $number = (int) $request->get('number', 10);
         $list = Transaction::query()
-            ->with(['typeInfo:id,no', 'user:id,user_name', 'payment:id,name'])
+            ->with(['typeInfo', 'user:id,user_name', 'payment:id,name'])
             ->latest()
             ->latest('id')
             ->when($transaction_no, fn (Builder $query) => $query->where('transaction_no', $transaction_no))
             ->when($transaction_type, fn (Builder $query) => $query->where('transaction_type', $transaction_type))
             ->when(is_numeric($status), fn (Builder $query) => $query->where('status', $status))
             ->when($type === 'order', fn (Builder $query) => $query->where('type', Order::class))
-            ->when($order_no, function (Builder $query) use ($order_no) {
-                $query->whereHasMorph('typeInfo', Order::class, fn (Builder $query) => $query->where('order_sn', $order_no));
+            ->when($order_sn, function (Builder $query) use ($order_sn) {
+                $query->whereHasMorph('typeInfo', Order::class, fn (Builder $query) => $query->where('order_sn', $order_sn));
             })
             ->when($user_name, function (Builder $query) use ($user_name) {
                 $query->whereHas('user', fn (Builder $query) => $query->where('user_name', 'like', "%{$user_name}%"));

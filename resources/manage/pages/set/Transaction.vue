@@ -26,7 +26,7 @@ const transactionTypeOptions = [
 
 const queryParams = reactive({
     transaction_no: '',
-    order_no: '',
+    order_sn: '',
     type: '',
     user_name: '',
     transaction_type: '',
@@ -45,7 +45,7 @@ const handleSearch = () => {
 // 重置搜索条件
 const resetSearch = () => {
     queryParams.transaction_no = '';
-    queryParams.order_no = '';
+    queryParams.order_sn = '';
     queryParams.type = '';
     queryParams.user_name = '';
     queryParams.transaction_type = '';
@@ -187,9 +187,9 @@ onMounted(() => {
                         <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="订单编号" prop="order_no">
+                <el-form-item label="订单编号" prop="order_sn">
                     <el-input
-                        v-model="queryParams.order_no"
+                        v-model="queryParams.order_sn"
                         placeholder="请输入订单编号搜索"
                         clearable
                         @keyup.enter="handleSearch"
