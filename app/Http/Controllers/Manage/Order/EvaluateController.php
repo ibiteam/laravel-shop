@@ -76,7 +76,7 @@ class EvaluateController extends BaseController
             if (! $order_evaluate->update(['status' => $validated['status']])) {
                 throw new BusinessException('审核失败');
             }
-            admin_operation_log($current_user, $tmp_message);
+            admin_operation_log($tmp_message);
 
             return $this->success('操作审核成功');
         } catch (ValidationException $validation_exception) {

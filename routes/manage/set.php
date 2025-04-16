@@ -118,7 +118,6 @@ Route::prefix('set')->group(function () {
     Route::prefix('payment')->group(function () {
         Route::get('/', [PaymentController::class, 'index'])->name(Permission::MANAGE_PAYMENT_INDEX)->middleware('manage.permission');
         Route::middleware('manage.permission:'.Permission::MANAGE_PAYMENT_UPDATE)->group(function () {
-            Route::get('edit', [PaymentController::class, 'edit']);
             Route::post('update', [PaymentController::class, 'update']);
             Route::post('change/field', [PaymentController::class, 'changeField']);
         });

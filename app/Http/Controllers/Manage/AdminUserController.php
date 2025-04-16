@@ -6,10 +6,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
-use App\Models\ModelHasRole;
 use App\Models\Role;
-use App\Models\ShopConfig;
-use App\Utils\RsaUtil;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -34,7 +31,6 @@ class AdminUserController extends BaseController
             }))
             ->paginate($number);
         $data->getCollection()->transform(function (AdminUser $admin_user) {
-
             $role_names = $admin_user->modelHasRole->filter(function ($modelHasRole) {
                 return $modelHasRole->role && $modelHasRole->role->is_show === Role::SHOW;
             })->map(function ($modelHasRole) {
@@ -119,6 +115,7 @@ class AdminUserController extends BaseController
                 if (AdminUser::where('id', '!=', $validated['id'])->whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
+
                 if ($job_no && AdminUser::where('id', '!=', $validated['id'])->whereJobNo($job_no)->first()) {
                     throw new BusinessException('管理员工号已存在');
                 }
@@ -128,6 +125,7 @@ class AdminUserController extends BaseController
                 if (AdminUser::whereUserName($validated['user_name'])->first()) {
                     throw new BusinessException('管理员用户名已存在');
                 }
+
                 if ($job_no && AdminUser::whereJobNo($job_no)->first()) {
                     throw new BusinessException('管理员工号已存在');
                 }
@@ -158,6 +156,7 @@ class AdminUserController extends BaseController
             // 角色处理
             $old_roles = $admin_user->roles->pluck('id')->toArray();
             $role_info = Role::whereIn('id', $validated['role_ids'])->get();
+
             if ($role_info->isNotEmpty()) {
                 $admin_user->syncRoles($role_info);
             }
@@ -168,18 +167,18 @@ class AdminUserController extends BaseController
                     return $item->display_name;
                 })->toArray();
 
-                $role_log = "更新管理员[id:{$admin_user->id}]角色为[" . implode(',', $role_names) . "]";
-                admin_operation_log($this->adminUser(), $role_log, AdminOperationLog::TYPE_UPDATE);
+                $role_log = "更新管理员[id:{$admin_user->id}]角色为[".implode(',', $role_names).']';
+                admin_operation_log($role_log, AdminOperationLog::TYPE_UPDATE);
             }
 
             if ($validated['id']) {
                 $log = "编辑管理员[id:{$admin_user->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($admin_user->getChanges()), $admin_user->getChanges()));
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增管理员[id:{$admin_user->id}]";
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_STORE);
+                admin_operation_log($log, AdminOperationLog::TYPE_STORE);
             }
 
             return $this->success('保存成功');
@@ -220,7 +219,7 @@ class AdminUserController extends BaseController
             $log = "更改管理员状态[id:{$validated['id']}]".implode(',', array_map(function ($k, $v) {
                 return sprintf('%s=`%s`', $k, $v);
             }, array_keys($admin_user->getChanges()), $admin_user->getChanges()));
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (BusinessException $business_exception) {

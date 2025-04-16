@@ -93,9 +93,6 @@ export function paymentMethodIndex(data) {
 export function paymentMethodChangeField(data) {
     return $http.doPost('manage/set/payment/change/field', data)
 }
-export function paymentMethodEdit(data) {
-    return $http.doGet('manage/set/payment/edit', data)
-}
 export function paymentMethodUpdate(data) {
     return $http.doPost('manage/set/payment/update', data)
 }

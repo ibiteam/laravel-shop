@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Manage;
 use App\Enums\PaymentEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Requests\Manage\PaymentMethodRequest;
-use App\Http\Resources\CommonResource;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\Payment;
@@ -25,45 +24,13 @@ class PaymentController extends BaseController
         $name = $request->get('name');
         $is_enabled = $request->get('is_enabled', null);
         $number = (int) $request->get('number', 10);
-
         $list = Payment::query()
             ->latest()
             ->when($name, fn (Builder $query) => $query->whereLike('name', "%{$name}%"))
             ->when(! is_null($is_enabled), fn (Builder $query) => $query->whereIsEnabled($is_enabled))
-            ->select(['id', 'name', 'alias', 'is_enabled', 'icon', 'description', 'limit', 'is_recommend', 'sort', 'created_at', 'updated_at'])
             ->paginate($number);
 
         return $this->success(new CommonResourceCollection($list));
-    }
-
-    /**
-     * 支付方式编辑回显.
-     */
-    public function edit(Request $request): JsonResponse
-    {
-        try {
-            $validated = $request->validate([
-                'id' => 'required|integer',
-            ], [], [
-                'id' => '支付方式ID',
-            ]);
-            $payment = Payment::query()
-                ->whereId($validated['id'])
-                ->select(['id', 'name', 'alias', 'is_enabled', 'icon', 'description', 'limit', 'is_recommend', 'sort', 'config'])
-                ->first();
-
-            if (! $payment instanceof Payment) {
-                throw new BusinessException('支付方式不存在');
-            }
-
-            return $this->success(CommonResource::make($payment));
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
-        }
     }
 
     /**
@@ -97,7 +64,7 @@ class PaymentController extends BaseController
                 throw new BusinessException('更新失败！');
             }
 
-            admin_operation_log($this->adminUser(), "更新了支付方式:{$payment->name}[{$payment->alias}]", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "更新了支付方式:{$payment->name}[{$payment->alias}]", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {
@@ -114,50 +81,27 @@ class PaymentController extends BaseController
      */
     public function changeField(Request $request): JsonResponse
     {
-        try {
-            $validated = $request->validate([
-                'id' => 'required|integer',
-                'field' => 'required|string|in:,is_enabled,is_recommend',
-            ], [], [
-                'id' => '支付方式ID',
-                'field' => '字段',
-            ]);
-            $payment = Payment::query()->whereId($validated['id'])->first();
+        $validated = $request->validate([
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'field' => 'required|string|in:is_enabled,is_recommend',
+        ], [], [
+            'id' => '支付方式ID',
+            'field' => '字段',
+            'name' => '名称',
+        ]);
+        $payment = Payment::findOrFail($validated['id']);
+        $field = (string) $validated['field'];
+        $value = ! $payment->$field;
+        $message = '修改了支付方式id='.$payment->id.'的'.$validated['name'].'['.$field.']变更为'.json_encode($value, JSON_THROW_ON_ERROR);
+        $payment->$field = $value;
 
-            if (! $payment instanceof Payment) {
-                throw new BusinessException('支付方式不存在');
-            }
-
-            switch ($validated['field']) {
-                case 'is_enabled':
-                    $data = ['is_enabled' => ! $payment->is_enabled];
-                    $tmp_message = '将是否启用由'.($payment->is_enabled ? '启用变更为禁用' : '禁用变更为启用');
-
-                    break;
-
-                case 'is_recommend':
-                    $data = ['is_recommend' => ! $payment->is_recommend];
-                    $tmp_message = '将是否推荐由'.($payment->is_recommend ? '推荐变更为不推荐' : '不推荐变更为推荐');
-
-                    break;
-
-                default:
-                    throw new BusinessException('字段错误！');
-            }
-
-            if (! $payment->update($data)) {
-                throw new BusinessException('修改失败！');
-            }
-            admin_operation_log($this->adminUser(), "修改了支付方式:{$payment->name}[{$payment->alias}]；{$tmp_message}", AdminOperationLog::TYPE_UPDATE);
-
-            return $this->success('修改成功');
-        } catch (ValidationException $validation_exception) {
-            return $this->error($validation_exception->validator->errors()->first());
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+        if (! $payment->save()) {
+            return $this->error('修改失败');
         }
+        admin_operation_log( $message, AdminOperationLog::TYPE_UPDATE);
+
+        return $this->success('修改成功');
     }
 
     /**

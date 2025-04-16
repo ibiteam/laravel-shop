@@ -58,7 +58,7 @@ class ShopConfigController extends BaseController
         // 重新更新缓存
         $shop_config_dao->getAll();
 
-        admin_operation_log($this->adminUser(), '更新了商店设置的【'.$tab_label.'】', AdminOperationLog::TYPE_UPDATE);
+        admin_operation_log( '更新了商店设置的【'.$tab_label.'】', AdminOperationLog::TYPE_UPDATE);
 
         return $this->success('更新成功');
     }

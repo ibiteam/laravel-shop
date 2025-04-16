@@ -89,7 +89,7 @@ class GoodsController extends BaseController
             if (! $goods->update(['status' => $tmp_status, 'status_datetime' => Carbon::now()->toDateTimeString()])) {
                 throw new BusinessException('修改上下架状态失败');
             }
-            admin_operation_log($this->adminUser(), "修改商品：{$goods->name}[{$goods->id}] 上下架状态：{$tmp_message}", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "修改商品：{$goods->name}[{$goods->id}] 上下架状态：{$tmp_message}", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {

@@ -10,7 +10,6 @@ use App\Rules\PhoneRule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 
 class UserController extends BaseController
@@ -86,7 +85,7 @@ class UserController extends BaseController
                 throw new BusinessException('保存失败');
             }
             // 记录日志
-            admin_operation_log($this->adminUser(), "{$operation}了用户:{$user->user_name}[{$user->id}]", $operation_type);
+            admin_operation_log( "{$operation}了用户:{$user->user_name}[{$user->id}]", $operation_type);
 
             return $this->success('保存成功');
         } catch (ValidationException $validation_exception) {

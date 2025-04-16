@@ -150,7 +150,7 @@ class RouterController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($router->getChanges()), $router->getChanges()));
             }
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('保存成功');
         } catch (ValidationException $validation_exception) {
@@ -193,7 +193,7 @@ class RouterController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($router->getChanges()), $router->getChanges())
             );
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (BusinessException $business_exception) {

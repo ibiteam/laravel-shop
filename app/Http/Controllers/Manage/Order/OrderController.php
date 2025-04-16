@@ -275,7 +275,7 @@ class OrderController extends BaseController
 
                 $order_log_dao->storeByAdminUser($current_user, $order, '添加了发货');
 
-                admin_operation_log($current_user, "添加订单发货记录：{$order_delivery->id}");
+                admin_operation_log("添加订单发货记录：{$order_delivery->id}");
 
                 DB::commit();
 
@@ -286,7 +286,7 @@ class OrderController extends BaseController
 
             $order_log_dao->storeByAdminUser($current_user, $order, '删除了发货', OrderLog::TYPE_ADMIN_USER);
 
-            admin_operation_log($current_user, '删除订单发货记录：'.$order_delivery->implode(','));
+            admin_operation_log('删除订单发货记录：'.$order_delivery->implode(','));
 
             DB::commit();
 
@@ -395,7 +395,7 @@ class OrderController extends BaseController
             // 添加订单操作日志
             $order_log_dao->storeByAdminUser($current_user, $order, '修改订单收货地址');
             // 添加管理员操作日志
-            admin_operation_log($current_user, "修改了订单：{$order->order_sn} 的收货地址", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log("修改了订单：{$order->order_sn} 的收货地址", AdminOperationLog::TYPE_UPDATE);
 
             DB::commit();
 

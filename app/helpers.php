@@ -9,6 +9,7 @@ use App\Models\ShopConfig;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 
 if (! function_exists('is_local_env')) {
     /**
@@ -186,9 +187,20 @@ if (! function_exists('admin_operation_log')) {
     /**
      * 记录后台管理员操作日志.
      */
-    function admin_operation_log(AdminUser $admin_user, string $description, int $type = 0): void
+    function admin_operation_log(string $description, int $type = 0): void
     {
-        app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user, $description, $type);
+        $admin_user_id = get_admin_user()->id??0;
+        app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user_id, $description, $type);
+    }
+}
+
+if (! function_exists('get_admin_user')) {
+    /**
+     * 获取管理员信息
+     */
+    function get_admin_user(): ?AdminUser
+    {
+        return Auth::guard(config('auth.manage.guard'))->user();
     }
 }
 

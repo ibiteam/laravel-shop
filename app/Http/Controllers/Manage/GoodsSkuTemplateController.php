@@ -43,7 +43,7 @@ class GoodsSkuTemplateController extends BaseController
                 'name' => $validated['name'],
                 'values' => $validated['values'],
             ]);
-            admin_operation_log($this->adminUser(), "添加了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log( "添加了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_STORE);
 
             return $this->success('添加成功');
         } catch (ValidationException $validation_exception) {
@@ -96,7 +96,7 @@ class GoodsSkuTemplateController extends BaseController
                 throw new BusinessException('修改失败');
             }
 
-            admin_operation_log($this->adminUser(), "修改了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "修改了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {
@@ -128,7 +128,7 @@ class GoodsSkuTemplateController extends BaseController
             if (! $goods_sku_template->delete()) {
                 throw new BusinessException('删除失败');
             }
-            admin_operation_log($this->adminUser(), "删除了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_DESTROY);
+            admin_operation_log( "删除了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_DESTROY);
 
             return $this->success('删除成功');
         } catch (ValidationException $validation_exception) {

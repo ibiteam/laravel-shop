@@ -146,10 +146,10 @@ class RoleController extends BaseController
                 $log = "编辑角色[id:{$role->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($role->getChanges()), $role->getChanges()));
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增角色[id:{$role->id}]";
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_STORE);
+                admin_operation_log( $log, AdminOperationLog::TYPE_STORE);
             }
 
             return $this->success('保存成功');
@@ -188,7 +188,7 @@ class RoleController extends BaseController
                 RoleHasPermission::whereRoleId($validated['id'])->delete();
 
                 // 记录日志
-                admin_operation_log($this->adminUser(), "删除了角色:{$role->display_name}[{$role->id}]", AdminOperationLog::TYPE_DESTROY);
+                admin_operation_log( "删除了角色:{$role->display_name}[{$role->id}]", AdminOperationLog::TYPE_DESTROY);
 
                 return $this->success('删除成功');
             }
@@ -235,7 +235,7 @@ class RoleController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($role->getChanges()), $role->getChanges())
             );
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (BusinessException $business_exception) {

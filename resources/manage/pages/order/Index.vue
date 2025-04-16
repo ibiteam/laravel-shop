@@ -1,8 +1,8 @@
 <template>
     <search-form :model="query">
-            <el-form-item label="订单编号" prop="no">
+            <el-form-item label="订单编号" prop="order_sn">
                 <el-input
-                    v-model="query.no"
+                    v-model="query.order_sn"
                     placeholder="请输入订单编号搜索"
                     clearable
                     @keyup.enter="getData()"
@@ -81,7 +81,7 @@
         @change="handleChange"
     >
         <el-table-column label="订单ID" prop="id"></el-table-column>
-        <el-table-column label="订单编号" prop="no"></el-table-column>
+        <el-table-column label="订单编号" prop="order_sn"></el-table-column>
         <el-table-column label="下单时间" width="400px">
             <template #default="{ row }">
                 <div>{{ row.payer.user_name }}</div>
@@ -152,7 +152,7 @@ const sourceOptions = [
     {label: '微信小程序', value: 'wechat_mini'},
 ]
 const defaultQuery = {
-    no: '',
+    order_sn: '',
     user_keywords: '',
     goods_id: '',
     goods_name: '',
@@ -198,7 +198,7 @@ const handleChange = (page:number,per_page:number) => {
     getData(page)
 }
 const openDetail = (row:any) => {
-    router.push({name:'manage.order.detail', query: {id: row.id},params:{no: row.no}})
+    router.push({name:'manage.order.detail', query: {id: row.id},params:{order_sn: row.order_sn}})
 }
 
 onMounted( () => {

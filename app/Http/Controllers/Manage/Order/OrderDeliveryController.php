@@ -245,7 +245,7 @@ class OrderDeliveryController extends BaseController
             });
 
             if (! empty($res['success_data'])) {
-                admin_operation_log($current_user, '导入发货信息：发货单ID'.implode(',', $res['success_data']));
+                admin_operation_log('导入发货信息：发货单ID'.implode(',', $res['success_data']));
             }
 
             return $this->success([
@@ -332,7 +332,7 @@ class OrderDeliveryController extends BaseController
 
             $order_log_dao->storeByAdminUser($current_user, $order, '调整发货信息', OrderLog::TYPE_ADMIN_USER);
 
-            admin_operation_log($current_user, "删除发货单,发货单ID：$order_delivery->id");
+            admin_operation_log("删除发货单,发货单ID：$order_delivery->id");
 
             DB::commit();
 

@@ -41,7 +41,7 @@ class GoodsParameterTemplateController extends BaseController
                 'name' => $validated['name'],
                 'values' => $validated['values'],
             ]);
-            admin_operation_log($this->adminUser(), "添加了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log( "添加了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_STORE);
 
             return $this->success(['id' => $goods_parameter_template->id]);
         } catch (ValidationException $validation_exception) {
@@ -92,7 +92,7 @@ class GoodsParameterTemplateController extends BaseController
                 throw new BusinessException('修改失败');
             }
 
-            admin_operation_log($this->adminUser(), "修改了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "修改了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {
@@ -124,7 +124,7 @@ class GoodsParameterTemplateController extends BaseController
             if (! $goods_parameter_template->delete()) {
                 throw new BusinessException('删除失败');
             }
-            admin_operation_log($this->adminUser(), "删除了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_DESTROY);
+            admin_operation_log( "删除了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_DESTROY);
 
             return $this->success('删除成功');
         } catch (ValidationException $validation_exception) {

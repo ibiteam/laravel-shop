@@ -121,7 +121,7 @@ class TransactionController extends BaseController
         DB::beginTransaction();
 
         try {
-            admin_operation_log($this->adminUser(), "针对流水号：【{$transaction->transaction_no}】申请退款");
+            admin_operation_log( "针对流水号：【{$transaction->transaction_no}】申请退款");
 
             $transaction->can_refund = false;
             $transaction->save();

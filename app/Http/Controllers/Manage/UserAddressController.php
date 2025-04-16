@@ -67,7 +67,7 @@ class UserAddressController extends BaseController
                 throw new BusinessException('保存失败');
             }
             // 记录日志
-            admin_operation_log($this->adminUser(), "{$operation}了地址:[{$user_address->id}]", $operation_type);
+            admin_operation_log( "{$operation}了地址:[{$user_address->id}]", $operation_type);
 
             return $this->success('保存成功');
         } catch (BusinessException $business_exception) {

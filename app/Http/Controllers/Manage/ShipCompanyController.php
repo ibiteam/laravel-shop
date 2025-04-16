@@ -95,7 +95,7 @@ class ShipCompanyController extends BaseController
                     throw new BusinessException('快递公司更新失败');
                 }
 
-                admin_operation_log($this->adminUser(), "更新了快递公司：{$ship_company->name}[$ship_company->id]");
+                admin_operation_log( "更新了快递公司：{$ship_company->name}[$ship_company->id]");
 
                 return $this->success('快递公司更新成功');
             }
@@ -109,7 +109,7 @@ class ShipCompanyController extends BaseController
             }
             $ship_company = ShipCompany::query()->create($store_data);
 
-            admin_operation_log($this->adminUser(), "创建了快递公司：{$ship_company->name}[$ship_company->id]");
+            admin_operation_log( "创建了快递公司：{$ship_company->name}[$ship_company->id]");
 
             return $this->success('快递公司创建成功');
         } catch (ValidationException $validation_exception) {
@@ -143,7 +143,7 @@ class ShipCompanyController extends BaseController
             if (! $ship_company->update(['status' => ! $ship_company->status])) {
                 throw new BusinessException('修改失败！');
             }
-            admin_operation_log($this->adminUser(), "修改了支付方式:{$ship_company->name}[{$ship_company->id}]；{$tmp_message}", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "修改了支付方式:{$ship_company->name}[{$ship_company->id}]；{$tmp_message}", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {

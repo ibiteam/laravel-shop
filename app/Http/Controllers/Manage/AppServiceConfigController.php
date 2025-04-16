@@ -60,7 +60,7 @@ class AppServiceConfigController extends BaseController
                 }
 
                 // 记录日志
-                admin_operation_log($this->adminUser(), "{$msg},三方服务名:【{$res->name}】", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log( "{$msg},三方服务名:【{$res->name}】", AdminOperationLog::TYPE_UPDATE);
                 break;
 
             case 'is_record':
@@ -69,7 +69,7 @@ class AppServiceConfigController extends BaseController
                 } else {
                     $msg = '更改三方服务配置为不记录日志';
                 }
-                admin_operation_log($this->adminUser(), "{$msg},三方服务名:【{$res->name}】", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log( "{$msg},三方服务名:【{$res->name}】", AdminOperationLog::TYPE_UPDATE);
 
                 break;
         }
@@ -103,7 +103,7 @@ class AppServiceConfigController extends BaseController
         $query->desc = $desc;
 
         if ($query->save()) {
-            admin_operation_log($this->adminUser(), "更新了别名:【{$alias}】的配置", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "更新了别名:【{$alias}】的配置", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('操作成功');
         }

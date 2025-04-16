@@ -116,7 +116,7 @@ class GoodsCategoryController extends BaseController
                 }
 
                 // 记录日志
-                admin_operation_log($this->adminUser(), "修改了商品分类:{$goods_category->name}[{$goods_category->id}]", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log( "修改了商品分类:{$goods_category->name}[{$goods_category->id}]", AdminOperationLog::TYPE_UPDATE);
 
                 return $this->success([]);
             }
@@ -124,7 +124,7 @@ class GoodsCategoryController extends BaseController
             $goods_category = Category::query()->create($tmp_data);
 
             // 记录日志
-            admin_operation_log($this->adminUser(), "添加了商品分类:{$goods_category->name}[{$goods_category->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log( "添加了商品分类:{$goods_category->name}[{$goods_category->id}]", AdminOperationLog::TYPE_STORE);
 
             return $this->success([]);
         } catch (ValidationException $validation_exception) {
@@ -163,7 +163,7 @@ class GoodsCategoryController extends BaseController
 
             if ($category->delete()) {
                 // 记录日志
-                admin_operation_log($this->adminUser(), "删除了商品分类:{$category->name}[{$category->id}]", AdminOperationLog::TYPE_DESTROY);
+                admin_operation_log( "删除了商品分类:{$category->name}[{$category->id}]", AdminOperationLog::TYPE_DESTROY);
 
                 return $this->success('删除成功');
             }
@@ -209,7 +209,7 @@ class GoodsCategoryController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($category->getChanges()), $category->getChanges())
             );
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( $log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (BusinessException $business_exception) {
