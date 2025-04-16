@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
-use App\Models\ModelHasRole;
 use App\Models\Role;
-use App\Models\ShopConfig;
-use App\Utils\RsaUtil;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 

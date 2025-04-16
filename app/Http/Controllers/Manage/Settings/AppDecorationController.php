@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
 use App\Components\ComponentFactory;
 use App\Components\PageDefaultDict;
 use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppDecoration;
 use App\Models\AppDecorationItem;

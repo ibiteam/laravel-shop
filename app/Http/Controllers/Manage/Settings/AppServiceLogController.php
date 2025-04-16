@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
+use App\Http\Controllers\Manage\BaseController;
 use App\Models\AppServiceConfig;
 use App\Models\AppServiceLog;
 use Illuminate\Http\Request;
