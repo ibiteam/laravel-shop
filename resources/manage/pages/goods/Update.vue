@@ -206,13 +206,13 @@
                                                             <span>名称</span>
                                                         </div>
                                                         <div class="specifications-input">
-                                                            <template v-for="(its,ids) in item.values">
+                                                            <template v-for="(its,ids) in item.values" :key="ids">
                                                                 <el-form-item :prop="'values.' + index + '.values.' + ids + '.name'" style="margin: 3px 0;">
                                                                     <el-input v-model="its.name"
                                                                               placeholder="请输入规格值"
                                                                               maxlength="10"
                                                                               style="width: 150px;margin-right: 10px;"
-                                                                              :key="ids">
+                                                                              >
                                                                         <template #suffix>
                                                                             <i style="font-size: 12px;cursor: pointer;" class="iconfont" @click="delSpecs(index,ids)">&#xe79b;</i>
                                                                         </template>
@@ -298,6 +298,7 @@
                                     v-for="(its,ids) in goodsSkuTemplate.values"
                                     :prop="`template_${ids + 1}`"
                                     :label="its.name?its.name:'--'"
+                                    :key="ids"
                                     align="center"
                                     :width="100">
                                     <template #default="scope">
@@ -461,7 +462,7 @@
 
 </template>
 
-<script setup>
+<script setup lang="ts">
 import Editor from '@/components/good/Editor.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
@@ -471,7 +472,10 @@ import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
 import 'vue-cropper/dist/index.css'
 import { VueDraggable } from 'vue-draggable-plus'
-import { useRoute,useRouter } from 'vue-router';
+import { tabRemove } from '@/router/tabs'
+import { useRoute,useRouter } from 'vue-router'
+import { useCommonStore } from '@/store'
+const commonStore = useCommonStore()
 const router = useRouter()
 const route = useRoute();
 
@@ -505,8 +509,8 @@ const selectParameterTemplateRef = ref(null)
 const currentParameterTemplate = ref('')
 const parameterTemplateArr = ref([])
 const updateParameterTemplate = (item,i,type) => {
-    if(type == 'edit'){
-        cns.$dialog.prompt({message: '修改属性模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+    if(type === 'edit'){
+        cns.$dialog.prompt({message: '修改产品参数模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('修改产品参数模板成功')
@@ -533,16 +537,16 @@ const updateParameterTemplate = (item,i,type) => {
 }
 const selectedParameterTemplate = (value) => {
     if(value){
-        parameterTemplateArr.value.forEach((item,i) => {
-            if(item.id == value){
+        parameterTemplateArr.value.forEach((item) => {
+            if(item.id === value){
                 updateForm.value.parameters = item.values
             }
         })
     }
 }
 const ctrlParameterTemplate = (type) => {
-    if(type == 'save'){
-        cns.$dialog.prompt({message: '存为新属性模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
+    if(type === 'save'){
+        cns.$dialog.prompt({message: '添加产品参数模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
             goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
                 if (cns.$successCode(res.code)) {
                     getParameterTemplate(res.data.id)
@@ -552,7 +556,7 @@ const ctrlParameterTemplate = (type) => {
                 }
             })
         })
-    }else if(type == 'update'){
+    }else if(type === 'update'){
         goodsParameterTemplateUpdate({ id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success('更新产品参数模板成功')
@@ -1096,7 +1100,7 @@ const cropImageConfirm = () => {
         uploadImage({file:blobToFile(data)}, 'images-cropper')
     })
 }
-const uploadImage = async (file, type, name) => {
+const uploadImage = async (file, type, name='') => {
     if(type === 'images'){
         const dataUrl = await loadFile(file.file);
         currentFileCropBlob.value = dataUrl
@@ -1105,7 +1109,7 @@ const uploadImage = async (file, type, name) => {
         fileUpload(file).then((res) => {
             if (res.code == 200) {
                 if (type === 'thumb') {
-                    let sku_data = JSON.parse(JSON.stringify(updateForm.value.sku_data))
+                    const sku_data = JSON.parse(JSON.stringify(updateForm.value.sku_data))
                     sku_data.map(a => {
                         if (a.template_1 === name) {
                             a.thumb = res.data.url
@@ -1124,7 +1128,7 @@ const uploadImage = async (file, type, name) => {
                     currentChangeImageIndex.value = -1
                 }
             }
-        }).catch((err)=>{
+        }).catch(()=>{
             cns.$message.error("上传失败");
         })
     }
@@ -1229,7 +1233,7 @@ const submitGoods = () => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('保存商品成功')
                     loading.value = false
-                    router.push({name: 'manage.goods.index'})
+                    tabRemove(String(router.currentRoute.value.name),{name: 'manage.goods.index'})
                 } else {
                     cns.$message.error(res.message)
                     loading.value = false
@@ -1244,6 +1248,11 @@ const submitGoods = () => {
 }
 
 onMounted(() => {
+    let title = '添加商品'
+    if (Number(route.params.id)>0){
+        title = "编辑商品-" + route.params.id
+    }
+    commonStore.updateVisitedViewsTitle(route, title)
     goodsDetailInit({id:route.params.id}).then(res => {
         if (cns.$successCode(res.code)) {
             updateForm.value = {...res.data.info}

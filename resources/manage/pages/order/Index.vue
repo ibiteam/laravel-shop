@@ -78,7 +78,7 @@
     <page-table
         :data="tableData"
         v-loading="loading"
-        @change="handleChange"
+        @change="handlePageChange"
     >
         <el-table-column label="订单ID" prop="id"></el-table-column>
         <el-table-column label="订单编号" prop="order_sn"></el-table-column>
@@ -193,7 +193,7 @@ const getData = (page=defaultPage.page) => {
         loading.value = false
     })
 }
-const handleChange = (page:number,per_page:number) => {
+const handlePageChange = (page:number,per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }

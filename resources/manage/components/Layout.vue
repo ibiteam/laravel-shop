@@ -172,6 +172,7 @@ import { ArrowRight } from '@element-plus/icons-vue'
 import {getConfigAxios} from "../api/home.js";
 
 import { useCommonStore } from '@/store'
+import { tabRemove } from '@/router/tabs'
 import {accountLogout} from "../api/user.js";
 const commonStore = useCommonStore()
 
@@ -328,9 +329,6 @@ const generateRoute = () => {
     }
     return false
 }
-const isActive = (view) => {
-    return view.path === route.path
-}
 const moveToCurrentTag = () => {
     routerActived.value = route.name
 }
@@ -338,22 +336,6 @@ const moveToCurrentTag = () => {
 const tabChange = (name) =>{
     const view = commonStore.visitedViews.filter((ite) => ite.name == name)
     router.push({ name:view[0].name,query: view[0].query,params:view[0].params})
-}
-
-const tabRemove = (name) =>{
-    const view = commonStore.visitedViews.filter((ite) => ite.name == name)
-    if (name == 'manage.home.index' && commonStore.visitedViews.length == 1) return
-    commonStore.delVisitedViews(view[0]).then((views) => {
-        if (isActive(view[0])) {
-            const latestView = views.slice(-1)[0]
-            if (latestView) {
-                router.push({name: latestView.name,query:latestView.query,params:latestView.params})
-            } else {
-                router.push({name: 'manage.home.index'})
-            }
-        }
-    })
-
 }
 
 const openTabMenu = (tag, e) => {
@@ -381,17 +363,7 @@ const closeSelectedTag = (view) => {
     if (route.meta.keepAlive) {
         route.meta.keepAlive = false
     }
-    if (view.name == 'manage.home.index' && commonStore.visitedViews.length == 1) return
-    commonStore.delVisitedViews(view).then((views) => {
-        if (isActive(view)) {
-            const latestView = views.slice(-1)[0]
-            if (latestView) {
-                router.push({name: latestView.name,query:latestView.query,params:latestView.params})
-            } else {
-                router.push({name: 'manage.home.index'})
-            }
-        }
-    })
+    tabRemove(view.name)
 }
 
 const closeOthersTags = (view) =>{
