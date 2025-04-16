@@ -232,7 +232,7 @@ class OrderService
             DB::commit();
 
             return [
-                'no' => $order->order_sn,
+                'order_sn' => $order->order_sn,
                 'can_pay' => $order->pay_status === PayStatusEnum::PAY_WAIT,
             ];
         } catch (BusinessException $business_exception) {
