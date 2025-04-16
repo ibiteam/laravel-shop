@@ -1,17 +1,20 @@
 <template>
     <el-header>
-        <el-form :inline="true" :model="model" class="search-form">
+        <el-form :inline="true" :model="model" class="search-form" :label-width="`${labelWidth}px`">
             <slot></slot>
         </el-form>
     </el-header>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
+import { defineProps, withDefaults } from 'vue';
 
-defineProps<{
-    model: Record<string, any>
-}>()
+withDefaults(defineProps<{
+    model: Record<string, any>;
+    labelWidth?: number; // 注意这里使用可选属性
+}>(), {
+    labelWidth: 120
+});
 </script>
 
 <style scoped lang="scss">
