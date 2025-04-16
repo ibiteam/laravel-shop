@@ -108,7 +108,7 @@ class ApplyRefundController extends BaseController
      */
     public function agreeApply(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -183,7 +183,7 @@ class ApplyRefundController extends BaseController
      */
     public function closeApply(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -237,7 +237,7 @@ class ApplyRefundController extends BaseController
      */
     public function executeRefund(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -307,7 +307,7 @@ class ApplyRefundController extends BaseController
      */
     public function refuseRefund(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([
@@ -369,7 +369,7 @@ class ApplyRefundController extends BaseController
      */
     public function confirmReceipt(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         try {
             $validated = $request->validate([

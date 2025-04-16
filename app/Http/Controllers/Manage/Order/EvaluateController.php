@@ -65,7 +65,7 @@ class EvaluateController extends BaseController
             if ($order_evaluate->status === $tmp_status) {
                 throw new BusinessException('评价无需重新审核');
             }
-            $current_user = $this->adminUser();
+            $current_user = get_admin_user();
 
             if ($tmp_status === OrderEvaluate::STATUS_SUCCESS) {
                 $tmp_message = "将订单评价[{$order_evaluate->id}],审核通过";

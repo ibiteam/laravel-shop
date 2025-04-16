@@ -101,7 +101,7 @@ class AppDecorationController extends BaseController
     // 保存草稿
     public function decorationSave(Request $request, AppDecorationLogService $app_decoration_log_service, AppDecorationService $app_decoration_service)
     {
-        $admin_user_id = $this->adminUser()?->id ?: 0;
+        $admin_user_id = get_admin_user()?->id ?: 0;
 
         try {
             // 获取请求参数

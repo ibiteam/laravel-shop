@@ -189,14 +189,14 @@ if (! function_exists('admin_operation_log')) {
      */
     function admin_operation_log(string $description, int $type = 0): void
     {
-        $admin_user_id = get_admin_user()->id??0;
+        $admin_user_id = get_admin_user()->id ?? 0;
         app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user_id, $description, $type);
     }
 }
 
 if (! function_exists('get_admin_user')) {
     /**
-     * 获取管理员信息
+     * 获取管理员信息.
      */
     function get_admin_user(): ?AdminUser
     {

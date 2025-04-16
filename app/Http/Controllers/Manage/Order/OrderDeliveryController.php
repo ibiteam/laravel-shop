@@ -61,7 +61,7 @@ class OrderDeliveryController extends BaseController
         if ($file->getClientOriginalExtension() != 'xlsx') {
             return $this->error('文件格式错误');
         }
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         $order_delivery_dao = app(OrderDeliveryDao::class);
         $order_log_dao = app(OrderLogDao::class);
@@ -313,7 +313,7 @@ class OrderDeliveryController extends BaseController
             return $this->error('操作失败');
         }
 
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         DB::beginTransaction();
 

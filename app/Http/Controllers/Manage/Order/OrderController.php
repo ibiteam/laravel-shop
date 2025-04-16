@@ -260,7 +260,7 @@ class OrderController extends BaseController
             if (! $order->update(['ship_status' => $validated['ship_status']])) {
                 throw new BusinessException('修改订单发货状态失败');
             }
-            $current_user = $this->adminUser();
+            $current_user = get_admin_user();
 
             if ($order->ship_status == ShippingStatusEnum::SHIPPED->value) {
                 $ship_company = ShipCompany::query()->whereId($validated['ship_company_id'])->first();
@@ -377,7 +377,7 @@ class OrderController extends BaseController
             return $this->error('操作失败');
         }
 
-        $current_user = $this->adminUser();
+        $current_user = get_admin_user();
 
         DB::beginTransaction();
 
