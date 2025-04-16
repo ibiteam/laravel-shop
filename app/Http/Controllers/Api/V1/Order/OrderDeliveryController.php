@@ -23,16 +23,16 @@ class OrderDeliveryController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'order_no' => 'required|string',
+                'order_sn' => 'required|string',
                 'page' => 'required|integer|min:1',
                 'number' => 'required|integer|min:1',
             ], [], [
-                'keywords' => '订单编号',
+                'order_sn' => '订单编号',
                 'page' => '页码',
                 'number' => '每页数量',
             ]);
 
-            $list = $order_delivery_dao->getListByOrder($validated['order_no'], $validated['page'], $validated['number']);
+            $list = $order_delivery_dao->getListByOrder($validated['order_sn'], $validated['page'], $validated['number']);
 
             return $this->success(new CommonResourceCollection($list));
         } catch (ValidationException $validation_exception) {

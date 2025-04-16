@@ -34,7 +34,7 @@
                 "created_at": "2025-04-14 16:43:52",
                 "deal_end_time": 1745552646,
                 "now_time": 1744716228,
-                "order_no": "2025041096246684",
+                "order_sn": "2025041096246684",
                 "order_detail_id": 1,
                 "goods_no": "cbda6ddf-0c08-4c82-a777-c73121b9698d",
                 "goods_name": "华为老年机",

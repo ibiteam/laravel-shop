@@ -15,7 +15,7 @@
 | 字段              | 字段类型    | 是否必须 | 说明                                         |
 |-----------------|---------|------|--------------------------------------------|
 | apply_refund_id | integer | N    | 申请售后ID，order_no和order_detail_id 不存在时 该参数必有 |
-| order_no        | string  | N    | 订单编号，apply_refund_id不存在时 该参数必有             |
+| order_sn        | string  | N    | 订单编号，apply_refund_id不存在时 该参数必有             |
 | order_detail_id | integer | N    | 订单明细ID，apply_refund_id不存在时 该参数必有           |
 
 ### 返回示例
@@ -81,7 +81,7 @@
       ],
       "goods_amount": "13998",
       "goods_amount_format": "￥13998.00",
-      "order_no": "2025041096246684",
+      "order_sn": "2025041096246684",
       "shipping_fee": "0.00",
       "pay_time": "2025-04-11T05:50:00.000000Z"
     },

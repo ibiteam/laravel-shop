@@ -39,7 +39,7 @@ type_enum 枚举说明
     "data": {
         "list": [
             {
-                "no": "2025040918889931",
+                "order_sn": "2025040918889931",
                 "status": 3,
                 "items": [
                     {
@@ -87,7 +87,7 @@ data.list 返回参数说明
 
 | 字段               | 字段类型    | 字段说明                                  |
 |------------------|---------|---------------------------------------|
-| no               | String  | 订单编号                                  |
+| order_sn         | String  | 订单编号                                  |
 | status           | Integer | 订单状态，详见 `status_enum`枚举               |
 | items            | Array   | 订单商品数据，详见 `data.list.*.items`返回参数说明   |
 | order_amount     | String  | 订单总金额                                 |

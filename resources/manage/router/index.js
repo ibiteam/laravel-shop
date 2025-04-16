@@ -58,7 +58,7 @@ const router = createRouter({
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'manage.category.index',meta:{title:'商品分类'} },
                 // 订单
                 { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },
-                { path: '/order/detail/:no', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
+                { path: '/order/detail/:order_sn', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
                 { path: '/order/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
                 { path: '/order/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
                 { path: '/order/delivery', component: OrderDelivery, name: 'manage.order_delivery.index',meta:{title:'发货列表'} },

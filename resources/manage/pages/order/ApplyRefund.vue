@@ -9,7 +9,7 @@ const cns = getCurrentInstance().appContext.config.globalProperties;
 const searchForm = reactive({
     user_name: '',
     goods_name: '',
-    order_no: '',
+    order_sn: '',
     no: '',
     type: null,
     status: null,
@@ -80,7 +80,7 @@ onMounted(() => {
                     <el-input v-model="searchForm.goods_name" clearable placeholder="请输入"></el-input>
                 </el-form-item>
                 <el-form-item label="订单号">
-                    <el-input v-model="searchForm.order_no" clearable placeholder="请输入"></el-input>
+                    <el-input v-model="searchForm.order_sn" clearable placeholder="请输入"></el-input>
                 </el-form-item>
                 <el-form-item label="退款单号">
                     <el-input v-model="searchForm.no" clearable placeholder="请输入"></el-input>
@@ -132,7 +132,7 @@ onMounted(() => {
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="用户名称" prop="user_name"></el-table-column>
             <el-table-column label="商品名称" prop="goods_name"></el-table-column>
-            <el-table-column label="订单号" prop="order_no"></el-table-column>
+            <el-table-column label="订单号" prop="order_sn"></el-table-column>
             <el-table-column label="退款单号" prop="no"></el-table-column>
             <el-table-column label="退款金额" prop="money"></el-table-column>
             <el-table-column label="退款数量" prop="number"></el-table-column>

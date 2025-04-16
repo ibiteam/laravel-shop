@@ -17,12 +17,12 @@ class OrderDeliveryDao
     /**
      * 根据订单获取发货列表(分页).
      */
-    public function getListByOrder(string $order_no, int $page = 1, int $number = 10): LengthAwarePaginator
+    public function getListByOrder(string $order_sn, int $page = 1, int $number = 10): LengthAwarePaginator
     {
-        $order_id = Order::query()->whereNo($order_no)->first()->id ?? 0;
+        $order_id = Order::query()->whereOrderSn($order_sn)->first()->id ?? 0;
 
         $list = OrderDelivery::query()
-            ->with(['order:id,no', 'shipCompany:id,name', 'adminUser:id,nickname'])
+            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,nickname'])
             ->whereOrderId($order_id)
             ->orderByDesc('shipped_at')
             ->orderByDesc('created_at')
@@ -31,7 +31,7 @@ class OrderDeliveryDao
             return [
                 'id' => $order_delivery->id,
                 'delivery_no' => $order_delivery->delivery_no,
-                'order_no' => $order_delivery->order->no,
+                'order_sn' => $order_delivery->order->order_sn,
                 'ship_company_name' => $order_delivery->shipCompany?->name,
                 'ship_no' => $order_delivery->ship_no,
                 'status' => $order_delivery->status,

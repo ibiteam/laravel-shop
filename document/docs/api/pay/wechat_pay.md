@@ -10,7 +10,7 @@
 
 | 字段       | 字段类型    | 是否必须 | 说明                       |
 |----------|---------|------|--------------------------|
-| no       | String  | Y    | 订单编号                     |
+| order_sn | String  | Y    | 订单编号                     |
 | pay_form | String  | Y    | 请求来源，详见`pay_form_enum`枚举 |
 
 #### pay_form_enum 枚举

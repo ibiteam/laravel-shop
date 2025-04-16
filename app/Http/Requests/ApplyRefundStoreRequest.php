@@ -27,8 +27,8 @@ class ApplyRefundStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'apply_refund_id' => 'required_without_all:order_no,order_detail_id|integer',
-            'order_no' => 'required_without:apply_refund_id|string',
+            'apply_refund_id' => 'required_without_all:order_sn,order_detail_id|integer',
+            'order_sn' => 'required_without:apply_refund_id|string',
             'order_detail_id' => 'required_without:apply_refund_id|integer',
             'number' => 'required|numeric',
             'money' => 'required|numeric',
@@ -44,8 +44,8 @@ class ApplyRefundStoreRequest extends FormRequest
         return [
             'apply_refund_id.required_without_all' => '申请售后参数错误',
             'apply_refund_id.integer' => '申请售后参数格式错误',
-            'order_no.required_without' => '订单参数有误',
-            'order_no.string' => '订单参数有误',
+            'order_sn.required_without' => '订单参数有误',
+            'order_sn.string' => '订单参数有误',
             'order_detail_id.required_without' => '订单明细参数有误',
             'order_detail_id.integer' => '订单明细参数有误',
             'number.required' => '申请售后数量不能为空',

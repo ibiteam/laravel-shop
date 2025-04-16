@@ -235,8 +235,8 @@ const closeLogisticsDialog = () => {
 
 onMounted(() => {
     let title = '订单详情'
-    if (route.params.no){
-        title = "订单详情-" + route.params.no
+    if (route.params.order_sn){
+        title = "订单详情-" + route.params.order_sn
         commonStore.updateVisitedViewsTitle(route, title)
     }
     getData(route.query.id)
@@ -248,7 +248,7 @@ onMounted(() => {
 
 <template>
     <div class="order-detail bg-fff manage-public-wrap pd20">
-        <p class="tip-title"><a @click="router.push({name:'manage.order.index'})">订单列表 </a><span> > </span>订单详情<span> > </span><span>{{ orderInfo.no }}</span></p>
+        <p class="tip-title"><a @click="router.push({name:'manage.order.index'})">订单列表 </a><span> > </span>订单详情<span> > </span><span>{{ orderInfo.order_sn }}</span></p>
         <div class="detail-item">
             <div class="detail-title">商品信息</div>
             <el-table :data="orderItems" stripe border style="width: 100%;">

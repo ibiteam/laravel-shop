@@ -163,7 +163,7 @@ class WechatPayController extends Controller
             $order->pay_status = PayStatusEnum::PAYED;
 
             if ($order->money_paid != $order->order_amount) {
-                Log::error("订单编号：{$order->no}，支付金额与订单总金额不一致，请前往后台查看！");
+                Log::error("订单编号：{$order->order_sn}，支付金额与订单总金额不一致，请前往后台查看！");
             }
 
             $order->save();

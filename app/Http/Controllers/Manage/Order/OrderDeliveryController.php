@@ -31,15 +31,15 @@ class OrderDeliveryController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $delivery_no = $request->get('delivery_no', null);
-        $order_no = $request->get('order_no', null);
+        $order_sn = $request->get('order_sn', null);
         $created_start_time = $request->get('created_start_time', null);
         $created_end_time = $request->get('created_end_time', null);
         $number = (int) $request->get('number', 10);
         $list = OrderDelivery::query()
             ->latest()
-            ->with(['order:id,no', 'shipCompany:id,name', 'adminUser:id,nickname'])
+            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,nickname'])
             ->when(! is_null($delivery_no), fn (Builder $query) => $query->where('delivery_no', $delivery_no))
-            ->when(! is_null($order_no), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('no', $order_no)))
+            ->when(! is_null($order_sn), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', $order_sn)))
             ->when(! is_null($created_start_time), fn (Builder $query) => $query->where('shipped_at', '>=', $created_start_time))
             ->when(! is_null($created_end_time), fn (Builder $query) => $query->where('shipped_at', '<=', $created_end_time))
             ->paginate($number);
@@ -82,7 +82,7 @@ class OrderDeliveryController extends BaseController
                     if ($key === 0) {
                         continue;
                     }
-                    $order_no = $datum[0];
+                    $order_sn = $datum[0];
                     $goods_name = $datum[1] ?? '';
                     $send_number = $datum[2] ?? 0;
                     $ship_company_name = $datum[3];
@@ -92,7 +92,7 @@ class OrderDeliveryController extends BaseController
 
                     $line = $key + 1;
 
-                    if (! $order_no || ! $ship_company_name || ! $ship_no || ! $shipped_at) {
+                    if (! $order_sn || ! $ship_company_name || ! $ship_no || ! $shipped_at) {
                         $error_data[] = ['line' => $line, 'message' => '数据错误缺少必填数据'];
 
                         continue;
@@ -113,7 +113,7 @@ class OrderDeliveryController extends BaseController
 
                     $import_data[] = [
                         'line' => $line,
-                        'order_no' => $order_no,
+                        'order_sn' => $order_sn,
                         'goods_name' => $goods_name,
                         'send_number' => $send_number,
                         'ship_company_id' => $ship_company_id,
@@ -127,13 +127,13 @@ class OrderDeliveryController extends BaseController
                     ->where('order_status', OrderStatusEnum::CONFIRMED)
                     ->where('pay_status', PayStatusEnum::PAYED)
                     ->where('ship_status', ShippingStatusEnum::UNSHIPPED)
-                    ->whereIn('no', array_column($import_data, 'order_no'))
-                    ->select(['id', 'no', 'order_status', 'pay_status', 'ship_status'])
+                    ->whereIn('order_sn', array_column($import_data, 'order_sn'))
+                    ->select(['id', 'order_sn', 'order_status', 'pay_status', 'ship_status'])
                     ->get()
-                    ->keyBy('no');
+                    ->keyBy('order_sn');
 
                 foreach ($import_data as $import_datum) {
-                    $order = $orders[$import_datum['order_no']] ?? null;
+                    $order = $orders[$import_datum['order_sn']] ?? null;
 
                     if (! $order instanceof Order) {
                         $error_data[] = ['line' => $import_datum['line'], 'message' => '未查询到已确认已付款未发货订单信息'];

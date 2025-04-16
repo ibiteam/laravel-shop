@@ -12,7 +12,7 @@
 
 | 字段              | 字段类型    | 是否必须 | 说明     |
 |-----------------|---------|------|--------|
-| order_no        | string  | Y    | 订单编号   |
+| order_sn        | string  | Y    | 订单编号   |
 | order_detail_id | integer | Y    | 订单明细ID |
 
 ### 返回示例

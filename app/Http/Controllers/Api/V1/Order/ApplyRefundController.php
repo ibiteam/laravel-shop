@@ -11,7 +11,7 @@ use App\Http\Requests\ApplyRefundStoreRequest;
 use App\Http\Resources\Api\ApplyRefundResourceCollection;
 use App\Models\ApplyRefund;
 use App\Models\ShipCompany;
-use App\Services\Order\ApplyRefundService;
+use App\Services\ApplyRefundService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -24,14 +24,14 @@ class ApplyRefundController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'order_no' => 'required|string',
+                'order_sn' => 'required|string',
                 'order_detail_id' => 'required|integer',
             ], [], [
-                'order_no' => '订单编号',
+                'order_sn' => '订单编号',
                 'order_detail_id' => '订单明细ID',
             ]);
 
-            $apply_refund_dao->verifyApply($this->user(), $validated['order_no'], $validated['order_detail_id']);
+            $apply_refund_dao->verifyApply($this->user(), $validated['order_sn'], $validated['order_detail_id']);
 
             return $this->success('允许申请售后');
         } catch (ValidationException $validation_exception) {
@@ -50,14 +50,14 @@ class ApplyRefundController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'order_no' => 'required|string',
+                'order_sn' => 'required|string',
                 'order_detail_id' => 'required|integer',
             ], [], [
-                'order_no' => '订单编号',
+                'order_sn' => '订单编号',
                 'order_detail_id' => '订单明细ID',
             ]);
 
-            $data = $apply_refund_service->init($this->user(), $validated['order_no'], $validated['order_detail_id']);
+            $data = $apply_refund_service->init($this->user(), $validated['order_sn'], $validated['order_detail_id']);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -76,16 +76,16 @@ class ApplyRefundController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'order_no' => 'required|string',
+                'order_sn' => 'required|string',
                 'order_detail_id' => 'required|integer',
                 'type' => 'required|integer|in:'.implode(',', [ApplyRefund::TYPE_REFUND_MONEY, ApplyRefund::TYPE_REFUND_GOODS]),
             ], [], [
-                'order_no' => '订单编号',
+                'order_sn' => '订单编号',
                 'order_detail_id' => '订单明细ID',
                 'type' => '售后类型',
             ]);
 
-            $data = $apply_refund_service->getInfoByTypeAndOrder($this->user(), $validated['order_no'], $validated['order_detail_id'], $validated['type']);
+            $data = $apply_refund_service->getInfoByTypeAndOrder($this->user(), $validated['order_sn'], $validated['order_detail_id'], $validated['type']);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -103,7 +103,7 @@ class ApplyRefundController extends BaseController
     public function store(ApplyRefundStoreRequest $request, ApplyRefundService $apply_refund_service)
     {
         try {
-            $params = $request->only(['apply_refund_id', 'type', 'order_no', 'order_detail_id', 'number', 'money', 'reason_id', 'description', 'certificate']);
+            $params = $request->only(['apply_refund_id', 'type', 'order_sn', 'order_detail_id', 'number', 'money', 'reason_id', 'description', 'certificate']);
 
             $apply_refund = $apply_refund_service->launchRefund($this->user(), $params);
 
@@ -154,23 +154,23 @@ class ApplyRefundController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'apply_refund_id' => 'required_without:order_no,order_detail_id|integer',
-                'order_no' => 'required_without:apply_refund_id|string',
+                'apply_refund_id' => 'required_without:order_sn,order_detail_id|integer',
+                'order_sn' => 'required_without:apply_refund_id|string',
                 'order_detail_id' => 'required_without:apply_refund_id|integer',
             ], [], [
                 'apply_refund_id.required_without' => '申请售后ID参数错误',
                 'apply_refund_id.integer' => '申请售后ID格式不正确',
-                'order_no.required_without' => '订单编号参数错误',
-                'order_no.string' => '订单编号格式不正确',
+                'order_sn.required_without' => '订单编号参数错误',
+                'order_sn.string' => '订单编号格式不正确',
                 'order_detail_id.required_without' => '订单明细ID参数错误',
                 'order_detail_id.integer' => '订单明细ID格式不正确',
             ]);
 
-            $order_no = $validated['order_no'] ?? '';
+            $order_sn = $validated['order_sn'] ?? '';
             $order_detail_id = $validated['order_detail_id'] ?? 0;
             $apply_refund_id = $validated['apply_refund_id'] ?? 0;
 
-            $data = $apply_refund_service->getDetailByOrderOrId($this->user(), $apply_refund_id, $order_no, $order_detail_id, false);
+            $data = $apply_refund_service->getDetailByOrderOrId($this->user(), $apply_refund_id, $order_sn, $order_detail_id, false);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {

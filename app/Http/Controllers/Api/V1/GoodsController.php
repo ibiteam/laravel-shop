@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
 use App\Http\Controllers\Api\BaseController;
@@ -73,7 +74,9 @@ class GoodsController extends BaseController
             ]);
             $goods = $goods_dao->getInfoByNo($no);
 
-            $data = $goods_service->checkGoodsNumber($goods, $validated['sku_id'] ?? 0, $validated['number']);
+            $current_user = $this->user();
+
+            $data = $goods_service->checkGoodsNumber($goods, $current_user, $validated['sku_id'] ?? 0, $validated['number']);
 
             return $this->success(CommonResource::make($data));
         } catch (ValidationException $validation_exception) {
@@ -81,7 +84,7 @@ class GoodsController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (ProcessDataException $custom_exception) {
-            return $this->failed($custom_exception->getData(), $custom_exception->getMessage(), $custom_exception->getCodeEnum());
+            return $this->failed($custom_exception->getData(), $custom_exception->getMessage(), ConstantEnum::SUCCESS);
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }

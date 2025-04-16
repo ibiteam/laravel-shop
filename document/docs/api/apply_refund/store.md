@@ -12,8 +12,8 @@
 
 | 字段              | 字段类型    | 是否必须 | 说明                                         |
 |-----------------|---------|------|--------------------------------------------|
-| apply_refund_id | integer | N    | 申请售后ID，order_no和order_detail_id 不存在时 该参数必有 |
-| order_no        | string  | N    | 订单编号，apply_refund_id不存在时 该参数必有             |
+| apply_refund_id | integer | N    | 申请售后ID，order_sn和order_detail_id 不存在时 该参数必有 |
+| order_sn        | string  | N    | 订单编号，apply_refund_id不存在时 该参数必有             |
 | order_detail_id | integer | N    | 订单明细ID，apply_refund_id不存在时 该参数必有           |
 | number          | integer | Y    | 申请售后数量                                     |
 | money           | float   | Y    | 退款金额                                       |

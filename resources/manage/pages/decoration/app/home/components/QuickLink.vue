@@ -222,6 +222,9 @@ watch([() => props.component], (newValue) => {
 <style lang='scss' scoped>
 .quick-link-wrapper{
     padding: 5px 10px 5px;
+    :deep(.swiper-pagination-bullets.swiper-pagination-horizontal) {
+        bottom: 0;
+    }
     .scroll-wrapper {
         width: 100%;
         background: #fff;

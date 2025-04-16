@@ -34,7 +34,7 @@ const sourceOptions = [
 
 // 添加查询参数对象，增加搜索条件
 const queryParams = reactive({
-    no: '',
+    order_sn: '',
     user_keywords: '',
     goods_id: '',
     goods_name: '',
@@ -56,7 +56,7 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const resetSearch = () => {
-    queryParams.no = '';
+    queryParams.order_sn = '';
     queryParams.user_keywords = '';
     queryParams.goods_id = '';
     queryParams.goods_name = '';
@@ -118,7 +118,7 @@ const getData = (page = 1) => {
 }
 
 const openDetailTab = (order) => {
-  router.push({name:'manage.order.detail', query: {id: order.id},params:{no: order.no}})
+  router.push({name:'manage.order.detail', query: {id: order.id},params:{order_sn: order.order_sn}})
 }
 
 onMounted( () => {
@@ -131,9 +131,9 @@ onMounted( () => {
         <el-header style="padding: 10px 0;height: auto;">
             <!-- 添加搜索表单 -->
             <el-form :inline="true" :model="queryParams" class="search-form" label-width="120px">
-                <el-form-item label="订单编号" prop="no">
+                <el-form-item label="订单编号" prop="order_sn">
                     <el-input
-                        v-model="queryParams.no"
+                        v-model="queryParams.order_sn"
                         placeholder="请输入订单编号搜索"
                         clearable
                         @keyup.enter="handleSearch"
@@ -215,7 +215,7 @@ onMounted( () => {
             @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="订单ID" prop="id"></el-table-column>
-            <el-table-column label="订单编号" prop="no"></el-table-column>
+            <el-table-column label="订单编号" prop="order_sn"></el-table-column>
             <el-table-column label="下单时间" width="400px">
                 <template #default="scope">
                     <div>{{ scope.row.payer.user_name }}</div>

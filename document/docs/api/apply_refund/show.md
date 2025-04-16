@@ -14,7 +14,7 @@
 
 | 字段              | 字段类型    | 是否必须 | 说明              |
 |-----------------|---------|------|-----------------|
-| order_no        | string  | Y    | 订单编号            |
+| order_sn        | string  | Y    | 订单编号            |
 | order_detail_id | integer | Y    | 订单明细ID          |
 | type            | integer | Y    | 售后类型（0退款；1退货退款） |
 
@@ -36,7 +36,7 @@
             "goods_sku_id": 4,
             "goods_amount": "13998",
             "goods_amount_format": "￥13998.00",
-            "order_no": "2025041096246684",
+            "order_sn": "2025041096246684",
             "shipping_fee": "0.00",
             "pay_at": "2025-04-11 13:50:00",
             "refund_max_amount": "13998",

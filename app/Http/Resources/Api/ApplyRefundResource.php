@@ -33,7 +33,7 @@ class ApplyRefundResource extends JsonResource
             'created_at' => $this->resource->created_at->toDateTimeString(),
             'deal_end_time' => strtotime($this->resource->job_time), // 计算待处理结束时间戳（未发货申请响应时间 已发货申请响应时间）
             'now_time' => time(),
-            'order_no' => $order?->no,
+            'order_sn' => $order?->order_sn,
             'order_detail_id' => $orderDetail?->id,
             'goods_no' => $orderDetail?->goods_no,
             'goods_name' => $orderDetail?->goods_name,

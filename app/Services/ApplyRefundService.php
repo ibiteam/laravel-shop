@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Order;
+namespace App\Services;
 
 use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\OrderStatusEnum;
@@ -28,9 +28,9 @@ class ApplyRefundService
      *
      * @throws BusinessException
      */
-    public function init(User $user, string $order_no, int $order_detail_id): array
+    public function init(User $user, string $order_sn, int $order_detail_id): array
     {
-        $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_sn)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
@@ -68,7 +68,7 @@ class ApplyRefundService
         return [
             'goods_info' => [
                 'order_detail_id' => $order_detail->id,
-                'order_no' => $order_no,
+                'order_sn' => $order_sn,
                 'goods_no' => $order_detail->goods_no,
                 'goods_name' => $order_detail->goods_name,
                 'goods_image' => $order_detail->goods?->image,
@@ -91,9 +91,9 @@ class ApplyRefundService
      *
      * @throws BusinessException
      */
-    public function getInfoByTypeAndOrder(User $user, string $order_no, int $order_detail_id, int $type): array
+    public function getInfoByTypeAndOrder(User $user, string $order_sn, int $order_detail_id, int $type): array
     {
-        $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_sn)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
@@ -130,7 +130,7 @@ class ApplyRefundService
             'goods_sku_value' => $order_detail->goods_sku_value,
             'goods_amount' => get_new_price($order_detail->goods_amount),
             'goods_amount_format' => price_format($order_detail->goods_amount),
-            'order_no' => $order->no,
+            'order_sn' => $order->order_sn,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
         ];
@@ -163,7 +163,7 @@ class ApplyRefundService
     public function launchRefund(User $user, array $params)
     {
         $apply_refund_id = $params['apply_refund_id'] ?? 0;
-        $order_no = $params['order_no'];
+        $order_sn = $params['order_sn'];
         $order_detail_id = $params['order_detail_id'];
         $type = $params['type'];
         $money = $params['money'];
@@ -200,7 +200,7 @@ class ApplyRefundService
             $count = $apply_refund->count + 1;
         } else {
             // 新增申请售后
-            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
+            $order = Order::query()->with('user')->whereUserId($user->id)->whereOrderSn($order_sn)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
 
             if (! $order) {
                 throw new BusinessException('订单已不支持退款');
@@ -307,7 +307,7 @@ class ApplyRefundService
      *
      * @throws BusinessException
      */
-    public function getDetailByOrderOrId(User $user, int $apply_refund_id, string $order_no, int $order_detail_id): array
+    public function getDetailByOrderOrId(User $user, int $apply_refund_id, string $order_sn, int $order_detail_id): array
     {
         if ($apply_refund_id) {
             $apply_refund = ApplyRefund::query()
@@ -333,7 +333,7 @@ class ApplyRefundService
                 throw new BusinessException('订单明细不存在');
             }
         } else {
-            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->first();
+            $order = Order::query()->with('user')->whereUserId($user->id)->whereOrderSn($order_sn)->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -405,7 +405,7 @@ class ApplyRefundService
             'goods_sku_value' => $order_detail->goods_sku_value,
             'goods_amount' => get_new_price($order_detail->goods_amount),
             'goods_amount_format' => price_format($order_detail->goods_amount),
-            'order_no' => $order->no,
+            'order_sn' => $order->order_sn,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
         ];

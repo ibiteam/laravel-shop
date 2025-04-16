@@ -55,3 +55,9 @@ export function applyRefundIndex(data) {
 export function orderEvaluateIndex(data) {
     return $http.doGet('manage/order/evaluate', data)
 }
+export function orderEvaluateCheck(data) {
+    return $http.doPost('manage/order/evaluate/check', data)
+}
+export function orderEvaluateDetail(data) {
+    return $http.doGet('manage/order/evaluate/detail', data)
+}
