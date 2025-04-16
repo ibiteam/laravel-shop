@@ -7,6 +7,7 @@ use App\Exceptions\ProcessDataException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\GoodsCollectDao;
 use App\Http\Dao\GoodsDao;
+use App\Http\Dao\GoodsViewDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
@@ -17,6 +18,7 @@ use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
+use App\Models\GoodsView;
 use App\Models\ShopConfig;
 use App\Models\User;
 use App\Services\HTMLPurifierService;
@@ -271,8 +273,11 @@ class GoodsService
         }
         $goods->evaluate = $tmp_evaluate;
 
-        // 购物车数量以及是否收藏处理
+        // 购物车数量以及是否收藏处理|访问记录
         if ($user instanceof User) {
+            // 访问记录
+            app(GoodsViewDao::class)->store($goods->id, $user->id);
+
             $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
 
             $tmp_collect = app(GoodsCollectDao::class)->getInfoByUserAndGoodsId($goods->id, $user->id);

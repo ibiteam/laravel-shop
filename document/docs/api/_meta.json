@@ -112,5 +112,11 @@
         "name": "decoration",
         "label": "装修",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "my",
+        "label": "我的",
+        "collapsed": true
     }
 ]

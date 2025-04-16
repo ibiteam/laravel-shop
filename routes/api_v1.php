@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\CommonController;
 use App\Http\Controllers\Api\V1\GoodsCollectController;
 use App\Http\Controllers\Api\V1\GoodsController;
+use App\Http\Controllers\Api\V1\GoodsViewController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
@@ -19,6 +20,9 @@ use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
 use App\Http\Controllers\Api\V1\UploadController;
+use App\Http\Controllers\Api\V1\UserBonusController;
+use App\Http\Controllers\Api\V1\UserCouponController;
+use App\Http\Controllers\Api\V1\UserIntegralController;
 use App\Http\Controllers\Api\V1\WechatController;
 use Illuminate\Support\Facades\Route;
 
@@ -158,4 +162,15 @@ Route::middleware('api.auth')->group(function () {
         Route::post('move_collect', [CartController::class, 'moveCollect']);    // 移入收藏
         Route::post('place_order', [CartController::class, 'placeOrder']);      // 去结算
     });
+
+    // 我的页面
+    Route::prefix('my')->group(function(){
+        Route::get('coupons', [UserCouponController::class, 'index']);// 我的优惠券
+        Route::get('bonuses', [UserBonusController::class, 'index']);// 我的红包
+        Route::get('integrals', [UserIntegralController::class, 'index']);// 我的积分
+        Route::get('collect', [GoodsCollectController::class, 'myCollect']);// 收藏列表
+        Route::post('batch/unfollow', [GoodsCollectController::class, 'batchUnfollow']); // 批量取消关注商品
+        Route::get('views', [GoodsViewController::class, 'index']);// 浏览记录
+    });
+
 });
