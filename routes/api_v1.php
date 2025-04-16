@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Order\OrderDeliveryController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
+use App\Http\Controllers\Api\V1\SupermarketController;
 use App\Http\Controllers\Api\V1\UploadController;
 use App\Http\Controllers\Api\V1\UserBonusController;
 use App\Http\Controllers\Api\V1\UserCouponController;
@@ -49,6 +50,9 @@ Route::prefix('auth')->group(function () {
     Route::post('forget/password', [AuthController::class, 'forgetPassword']); // 忘记密码
     Route::post('wechat', [WechatController::class, 'auth']); // 微信公众号授权
 });
+
+// 超市
+Route::get('supermarket', [SupermarketController::class, 'index']); // 获取超市页数据
 
 // 搜索
 Route::prefix('search')->group(function () {
