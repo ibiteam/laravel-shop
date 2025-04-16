@@ -59,6 +59,12 @@ Route::prefix('order')->group(function () {
     });
     // 订单评价
     Route::prefix('evaluate')->group(function () {
-        Route::get('/', [EvaluateController::class, 'index'])->name(Permission::MANAGE_ORDER_EVALUATE_INDEX)->middleware('manage.permission');
+        Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_INDEX)->group(function () {
+            Route::get('/', [EvaluateController::class, 'index'])->name(Permission::MANAGE_ORDER_EVALUATE_INDEX);
+            Route::get('detail', [EvaluateController::class, 'detail']);
+        });
+        Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_UPDATE)->group(function () {
+            Route::post('check', [EvaluateController::class, 'check']);
+        });
     });
 });
