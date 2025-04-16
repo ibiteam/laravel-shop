@@ -12,9 +12,9 @@ use App\Models\OrderDetail;
 
 class OrderDao
 {
-    public function getInfoByNo(string $no, int $user_id): ?Order
+    public function getInfoByOrderSnAndUserId(string $order_sn, int $user_id): ?Order
     {
-        return Order::query()->whereUserId($user_id)->whereOrderSn($no)->first();
+        return Order::query()->whereUserId($user_id)->whereOrderSn($order_sn)->first();
     }
 
     /**

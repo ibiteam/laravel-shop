@@ -26,12 +26,12 @@ class PayController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByNo($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -65,7 +65,7 @@ class PayController extends BaseController
 
             return $this->success([
                 'order' => [
-                    'no' => $order->order_sn,
+                    'order_sn' => $order->order_sn,
                     'order_amount' => $order->order_amount,
                     'created_at' => $order->created_at->toDateTimeString(),
                 ],
@@ -84,15 +84,15 @@ class PayController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
                 'pay_form' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
                 'pay_form' => '支付类型',
             ]);
             $wechat_pay_form_enum = PayFormEnum::formSource($validated['pay_form']);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByNo($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');

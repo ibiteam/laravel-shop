@@ -253,7 +253,7 @@ class IndexController extends BaseController
                 'no' => '订单编号',
             ]);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByNo($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['no'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -306,7 +306,7 @@ class IndexController extends BaseController
                 'no' => '订单编号',
             ]);
             $current_user = $this->user();
-            $order = $order_dao->getInfoByNo($validated['no'], $current_user->id);
+            $order = $order_dao->getInfoByOrderSnAndUserId($validated['no'], $current_user->id);
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
