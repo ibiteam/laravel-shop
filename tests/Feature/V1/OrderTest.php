@@ -49,7 +49,7 @@ it('test cart done api interface', function () {
 
 it('test pay cash desk api interface', function () {
     $response = $this->doGet('api/v1/order/cash', [
-        'no' => '2025040741365428',
+        'order_sn' => '2025040741365428',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -59,7 +59,7 @@ it('test pay cash desk api interface', function () {
 
 it('test wechat pay api interface', function () {
     $response = $this->doPost('api/v1/order/cash/wechat/pay', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
         'pay_form' => 'h5',
     ]);
     $this->assertIsArray($response);
@@ -80,7 +80,7 @@ it('test my order list interface', function () {
 
 it('test my order detail interface', function () {
     $response = $this->doGet('api/v1/order/my/detail', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -90,7 +90,7 @@ it('test my order detail interface', function () {
 
 it('test edit order address interface', function () {
     $response = $this->doGet('api/v1/order/my/address/edit', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -100,7 +100,7 @@ it('test edit order address interface', function () {
 
 it('test update order address interface', function () {
     $response = $this->doPost('api/v1/order/my/address/update', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
         'user_address_id' => 2,
     ]);
     $this->assertIsArray($response);
@@ -111,7 +111,7 @@ it('test update order address interface', function () {
 
 it('test destroy order api interface', function () {
     $response = $this->doPost('api/v1/order/my/destroy', [
-        'no' => '2025040866420167',
+        'order_sn' => '2025040866420167',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -121,7 +121,7 @@ it('test destroy order api interface', function () {
 
 it('test cancel order api interface', function () {
     $response = $this->doPost('api/v1/order/my/cancel', [
-        'no' => '2025040893942456',
+        'order_sn' => '2025040893942456',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -143,7 +143,7 @@ it('test goods evaluate api interface', function () {
 
 it('test order evaluate init api interface', function () {
     $response = $this->doGet('api/v1/order/my/evaluate/init', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
     ]);
     dump($response);
     $this->assertIsArray($response);
@@ -154,7 +154,7 @@ it('test order evaluate init api interface', function () {
 
 it('test order evaluate store api interface', function () {
     $response = $this->doPost('api/v1/order/my/evaluate/store', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
         'items' => [
             [
                 'id' => 22,
@@ -180,7 +180,7 @@ it('test order evaluate store api interface', function () {
 
 it('test order receive api interface', function () {
     $response = $this->doPost('api/v1/order/my/receive', [
-        'no' => '2025040918889931',
+        'order_sn' => '2025040918889931',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);

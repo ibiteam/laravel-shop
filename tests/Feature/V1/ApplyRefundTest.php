@@ -2,7 +2,7 @@
 
 it('verify', function () {
     $response = $this->doGet('api/v1/order/apply_refund/verify', [
-        'order_no' => '2025041096246684',
+        'order_sn' => '2025041096246684',
         'order_detail_id' => 1,
     ]);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
@@ -11,7 +11,7 @@ it('verify', function () {
 
 it('init', function () {
     $response = $this->doGet('api/v1/order/apply_refund/init', [
-        'order_no' => '2025041096246684',
+        'order_sn' => '2025041096246684',
         'order_detail_id' => 1,
     ]);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);
@@ -20,7 +20,7 @@ it('init', function () {
 
 it('show', function () {
     $response = $this->doGet('api/v1/order/apply_refund/show', [
-        'order_no' => '2025041096246684',
+        'order_sn' => '2025041096246684',
         'order_detail_id' => 1,
         'type' => 1,
     ]);
@@ -31,7 +31,7 @@ it('show', function () {
 it('store', function () {
     $response = $this->doPost('api/v1/order/apply_refund/store', [
         // 'apply_refund_id' => 1,
-        'order_no' => '2025041096246684',
+        'order_sn' => '2025041096246684',
         'order_detail_id' => 1,
         'type' => 1,
         'number' => 2,
@@ -57,7 +57,7 @@ it('list', function () {
 it('detail', function () {
     $response = $this->doGet('api/v1/order/apply_refund/detail', [
         // 'apply_refund_id' => 1,
-        'order_no' => '2025041096246684',
+        'order_sn' => '2025041096246684',
         'order_detail_id' => 1,
     ]);
     $res = json_encode($response, JSON_UNESCAPED_UNICODE);

@@ -12,7 +12,7 @@
 
 | 字段       | 字段类型    | 是否必须 | 说明   |
 |----------|---------|------|------|
-| order_no | integer | Y    | 订单编号 |
+| order_sn | integer | Y    | 订单编号 |
 | page     | integer | Y    | 页码   |
 | number   | integer | Y    | 每页条数 |
 
@@ -27,7 +27,7 @@
       {
         "id": 16,
         "delivery_no": "D123456789",
-        "order_no": "2025041560493453",
+        "order_sn": "2025041560493453",
         "ship_company_name": "圆通快递",
         "ship_no": "S123456789",
         "status": 1,
