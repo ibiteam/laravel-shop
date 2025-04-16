@@ -1,27 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Goods;
 
 use App\Exceptions\BusinessException;
-use App\Http\Dao\GoodsParameterTemplateDao;
+use App\Http\Controllers\Manage\BaseController;
+use App\Http\Dao\GoodsSkuTemplateDao;
 use App\Models\AdminOperationLog;
-use App\Models\GoodsParameterTemplate;
+use App\Models\GoodsSkuTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class GoodsParameterTemplateController extends BaseController
+class GoodsSkuTemplateController extends BaseController
 {
     /**
-     * 下拉获取商品参数模板列表.
+     * 下拉商品规格模板列表.
      */
-    public function smallIndex(Request $request, GoodsParameterTemplateDao $goods_parameter_template_dao): JsonResponse
+    public function smallIndex(Request $request, GoodsSkuTemplateDao $goods_sku_template_dao): JsonResponse
     {
-        return $this->success($goods_parameter_template_dao->list());
+        return $this->success($goods_sku_template_dao->list());
     }
 
     /**
-     * 添加商品参数模板
+     * 添加商品规格模板
      */
     public function store(Request $request): JsonResponse
     {
@@ -30,20 +31,22 @@ class GoodsParameterTemplateController extends BaseController
                 'name' => 'required|string',
                 'values' => 'required|array',
                 'values.*.name' => 'required|string',
-                'values.*.value' => 'required|string',
+                'values.*.values' => 'required|array',
+                'values.*.values.*.name' => 'required|string',
             ], [], [
                 'name' => '名称',
-                'values' => '商品参数',
+                'values' => '商品规格',
                 'values.*.name' => '参数名称',
-                'values.*.value' => '参数值',
+                'values.*.values' => '参数值',
+                'values.*.values.*.name' => '参数名称',
             ]);
-            $goods_parameter_template = GoodsParameterTemplate::query()->create([
+            $goods_sku_template = GoodsSkuTemplate::query()->create([
                 'name' => $validated['name'],
                 'values' => $validated['values'],
             ]);
-            admin_operation_log( "添加了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log( "添加了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_STORE);
 
-            return $this->success(['id' => $goods_parameter_template->id]);
+            return $this->success('添加成功');
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -54,7 +57,7 @@ class GoodsParameterTemplateController extends BaseController
     }
 
     /**
-     * 修改商品参数模板
+     * 修改商品规格模板
      */
     public function update(Request $request): JsonResponse
     {
@@ -64,19 +67,21 @@ class GoodsParameterTemplateController extends BaseController
                 'name' => 'nullable|string',
                 'values' => 'nullable|array',
                 'values.*.name' => 'required|string',
-                'values.*.value' => 'required|string',
+                'values.*.values' => 'required|array',
+                'values.*.values.*.name' => 'required|string',
             ], [], [
-                'id' => '商品参数模板ID',
+                'id' => '商品规格模板ID',
                 'name' => '名称',
-                'values' => '商品参数',
+                'values' => '商品规格',
                 'values.*.name' => '参数名称',
-                'values.*.value' => '参数值',
+                'values.*.values' => '参数值',
+                'values.*.values.*.name' => '参数名称',
             ]);
 
-            $goods_parameter_template = GoodsParameterTemplate::query()->whereId($validated['id'])->first();
+            $goods_sku_template = GoodsSkuTemplate::query()->whereId($validated['id'])->first();
 
-            if (! $goods_parameter_template instanceof GoodsParameterTemplate) {
-                throw new BusinessException('商品参数模板不存在');
+            if (! $goods_sku_template instanceof GoodsSkuTemplate) {
+                throw new BusinessException('商品规格模板不存在');
             }
             $update_data = [];
 
@@ -88,11 +93,11 @@ class GoodsParameterTemplateController extends BaseController
                 $update_data['values'] = $validated['values'];
             }
 
-            if (! $goods_parameter_template->update($update_data)) {
+            if (! $goods_sku_template->update($update_data)) {
                 throw new BusinessException('修改失败');
             }
 
-            admin_operation_log( "修改了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log( "修改了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('修改成功');
         } catch (ValidationException $validation_exception) {
@@ -105,7 +110,7 @@ class GoodsParameterTemplateController extends BaseController
     }
 
     /**
-     * 删除商品参数模板
+     * 删除商品规格模板
      */
     public function destroy(Request $request): JsonResponse
     {
@@ -113,18 +118,18 @@ class GoodsParameterTemplateController extends BaseController
             $validated = $request->validate([
                 'id' => 'required|integer',
             ], [], [
-                'id' => '商品参数模板ID',
+                'id' => '商品规格模板ID',
             ]);
-            $goods_parameter_template = GoodsParameterTemplate::query()->whereId($validated['id'])->first();
+            $goods_sku_template = GoodsSkuTemplate::query()->whereId($validated['id'])->first();
 
-            if (! $goods_parameter_template instanceof GoodsParameterTemplate) {
-                throw new BusinessException('商品参数模板不存在');
+            if (! $goods_sku_template instanceof GoodsSkuTemplate) {
+                throw new BusinessException('商品规格模板不存在');
             }
 
-            if (! $goods_parameter_template->delete()) {
+            if (! $goods_sku_template->delete()) {
                 throw new BusinessException('删除失败');
             }
-            admin_operation_log( "删除了商品参数模板：{$goods_parameter_template->name}[{$goods_parameter_template->id}]", AdminOperationLog::TYPE_DESTROY);
+            admin_operation_log( "删除了商品规格模板：{$goods_sku_template->name}[{$goods_sku_template->id}]", AdminOperationLog::TYPE_DESTROY);
 
             return $this->success('删除成功');
         } catch (ValidationException $validation_exception) {

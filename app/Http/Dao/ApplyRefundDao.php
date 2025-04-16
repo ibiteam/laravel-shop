@@ -95,7 +95,7 @@ class ApplyRefundDao
     /**
      * 申请售后 按钮状态.
      */
-    public function showAfterSales(OrderDetail $order_detail): int
+    public function showAfterSales(Order $order, OrderDetail $order_detail): int
     {
         // 按钮状态：0不显示，1显示售后按钮，2售后退款中，3售后退款成功
         $after_sales_button_status = 0;
@@ -105,7 +105,6 @@ class ApplyRefundDao
         if ($is_show_after_sales) {
             $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
 
-            $order = Order::query()->whereId($order_detail->order_id)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
 
             if ($order->order_amount <= $after_sales_max_money) {
                 // 成功支付记录
@@ -117,20 +116,23 @@ class ApplyRefundDao
                 if ($pay_success_transaction) {
                     $after_sales_button_status = 1;
 
-                    $apply_refunding = ApplyRefund::query()->whereOrderId($order->id)
+                    // 这里看订单下指定明细的
+                    $apply_refunding = ApplyRefund::query()
+                        ->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
                         ->whereIn('status', ApplyRefund::$statusInProgressMap)
                         ->orderByDesc('created_at')->first();
 
                     if ($apply_refunding) {
                         $after_sales_button_status = 2;
                     } else {
-                        $apply_refund = ApplyRefund::query()->whereOrderId($order->id)
+                        $apply_refund = ApplyRefund::query()
+                            ->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
                             ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
                             ->select(['money', 'number'])->get();
                         $success_money = $apply_refund->sum('money');
                         $success_number = $apply_refund->sum('number');
 
-                        if ($success_number >= $order->detail()->sum('goods_number') && $success_money >= $order->order_amount) {
+                        if ($success_number >= $order_detail->goods_number && $success_money >= $order_detail->goods_amount) {
                             $after_sales_button_status = 3;
                         }
                     }
@@ -244,6 +246,7 @@ class ApplyRefundDao
             throw new BusinessException('未找到订单记录');
         }
 
+        // 这里看订单下所有明细的
         $apply_refund = ApplyRefund::whereOrderId($order->id)
             ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
             ->select(['money', 'number'])->get();
@@ -251,8 +254,8 @@ class ApplyRefundDao
         $success_money = $apply_refund->sum('money');
         $success_number = $apply_refund->sum('number');
 
-        // 退款金额 大于等于 订单金额 && 退款数量大于等于 订单明细数量时 交易关闭
-        if ($success_number >= $order->detail()->sum('goods_number') && $success_money >= $order->order_amount) {
+        // 交易关闭：退款数量大于等于 订单明细数量时 && 退款金额 大于等于 订单金额
+        if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount) {
             $order->order_status = OrderStatusEnum::CANCELLED->value;
             $order->pay_status = PayStatusEnum::PAY_WAIT->value;
             $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
 use App\Enums\PaymentEnum;
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Requests\Manage\PaymentMethodRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;

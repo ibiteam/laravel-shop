@@ -2,7 +2,7 @@
 
 it('test order delivery list', function () {
     $data = [
-        'order_no' => '2025041560493453',
+        'order_sn' => '2025041560493453',
         'page' => 1,
         'number' => 10,
     ];

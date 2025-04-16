@@ -1,24 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\User;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Requests\Manage\UserAddressRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
-use App\Models\User;
 use App\Models\UserAddress;
-use App\Rules\PhoneRule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 
 class UserAddressController extends BaseController
 {
     public function index(Request $request)
     {
-        $user_id = (int)$request->get('user_id', 0);
+        $user_id = (int) $request->get('user_id', 0);
         $list = UserAddress::query()->latest()
             ->with('regionProvince', 'regionCity', 'regionDistrict')
             ->when($consignee = $request->get('consignee'), fn (Builder $query) => $query->whereLike('consignee', "%{$consignee}%"))
@@ -43,6 +41,7 @@ class UserAddressController extends BaseController
             $validated = $request->validated();
             $operation = '添加';
             $operation_type = AdminOperationLog::TYPE_STORE;
+
             if ($id = $validated['id']) {
                 $user_address = UserAddress::query()->find($id);
 
@@ -53,7 +52,7 @@ class UserAddressController extends BaseController
                 $operation = '修改';
                 $operation_type = AdminOperationLog::TYPE_UPDATE;
             } else {
-                $user_address = new UserAddress();
+                $user_address = new UserAddress;
             }
             $user_address->id = $id;
             $user_address->user_id = $validated['user_id'];
@@ -63,6 +62,7 @@ class UserAddressController extends BaseController
             $user_address->province = $validated['province'];
             $user_address->city = $validated['city'];
             $user_address->district = $validated['district'];
+
             if (! $user_address->save()) {
                 throw new BusinessException('保存失败');
             }

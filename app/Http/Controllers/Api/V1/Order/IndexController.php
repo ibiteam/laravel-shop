@@ -52,38 +52,15 @@ class IndexController extends BaseController
                     });
                 });
             })
-            ->when($type === self::SEARCH_NOT_PAY, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAY_WAIT);
-            })
-            ->when($type === self::SEARCH_WAIT_SHIP, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::UNSHIPPED);
-            })
-            ->when($type === self::SEARCH_WAIT_RECEIVE, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::SHIPPED);
-            })
+            ->when($type === self::SEARCH_NOT_PAY, fn (Builder $query) => $query->searchWaitPay())
+            ->when($type === self::SEARCH_WAIT_SHIP, fn (Builder $query) => $query->searchWaitShip())
+            ->when($type === self::SEARCH_WAIT_RECEIVE, fn (Builder $query) => $query->searchWaitReceive())
             ->when($type === self::SEARCH_WAIT_EVALUATE, function (Builder $query) use ($current_user) {
                 $evaluate_ids = OrderEvaluate::query()->whereUserId($current_user->id)->pluck('order_id')->unique()->filter()->toArray();
 
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::RECEIVED)
-                    ->whereNotIn('id', $evaluate_ids);
+                $query->searchWaitEvaluate($evaluate_ids);
             })
-            ->when($type === self::SEARCH_SUCCESS, function (Builder $query) {
-                $query
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::RECEIVED);
-            })
+            ->when($type === self::SEARCH_SUCCESS, fn (Builder $query) => $query->searchComplete())
             ->paginate($number);
 
         return $this->success(new OrderResourceCollection($order));

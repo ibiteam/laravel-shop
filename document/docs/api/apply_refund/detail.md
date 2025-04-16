@@ -33,6 +33,7 @@
       "money": "5",
       "number": "2",
       "reason_id": 1,
+      "reason_content": '七天无理由',
       "is_revoke": 0,
       "description": "测试",
       "certificate": [

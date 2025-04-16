@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\User;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\User;
@@ -33,11 +34,11 @@ class UserController extends BaseController
             $validated = $request->validate([
                 'id' => 'required|integer',
                 'user_name' => 'required',
-                'phone' => [ 'required', new PhoneRule ],
+                'phone' => ['required', new PhoneRule],
                 'avatar' => 'required|string',
                 'password' => [
                     function ($attribute, $value, $fail) use ($request) {
-                        if (!($request->id ?? 0)) {
+                        if (! ($request->id ?? 0)) {
                             if (empty($value)) {
                                 $fail('密码不能为空');
                             } elseif (strlen($value) < 6) {
@@ -59,6 +60,7 @@ class UserController extends BaseController
             ]);
             $operation = '添加';
             $operation_type = AdminOperationLog::TYPE_STORE;
+
             if ($id = $validated['id']) {
                 $user = User::query()->find($id);
 
@@ -69,11 +71,12 @@ class UserController extends BaseController
                 $operation = '修改';
                 $operation_type = AdminOperationLog::TYPE_UPDATE;
             } else {
-                $user = new User();
+                $user = new User;
                 $user->nickname = $validated['user_name'];
             }
             $user->id = $id;
-            if (!empty($validated['password'])) {
+
+            if (! empty($validated['password'])) {
                 $user->password = $validated['password'];
             }
             $user->user_name = $validated['user_name'];
@@ -81,6 +84,7 @@ class UserController extends BaseController
             $user->avatar = $validated['avatar'];
             $user->register_ip = '';
             $user->source = 'manage';
+
             if (! $user->save()) {
                 throw new BusinessException('保存失败');
             }

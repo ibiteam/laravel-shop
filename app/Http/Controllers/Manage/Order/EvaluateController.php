@@ -19,7 +19,7 @@ class EvaluateController extends BaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $order_no = $request->get('order_no');
+        $order_sn = $request->get('order_sn');
         $goods_name = $request->get('goods_name');
         $user_name = $request->get('user_name');
         $evaluate_start_time = $request->get('evaluate_start_time');
@@ -31,7 +31,7 @@ class EvaluateController extends BaseController
             ->latest()
             ->latest('id')
             ->with(['order:id,order_sn', 'goods:id,name,image', 'user:id,user_name'])
-            ->when($order_no, fn (Builder $query) => $query->whereHas('order', fn (Builder $query) => $query->where('order_sn', $order_no)))
+            ->when($order_sn, fn (Builder $query) => $query->whereHas('order', fn (Builder $query) => $query->where('order_sn', $order_sn)))
             ->when($goods_name, fn (Builder $query) => $query->whereHas('goods', fn (Builder $query) => $query->where('name', $goods_name)))
             ->when($user_name, fn (Builder $query) => $query->whereHas('user', fn (Builder $query) => $query->where('user_name', 'like', "%{$user_name}%")))
             ->when(! is_null($status), fn (Builder $query) => $query->where('status', $status))

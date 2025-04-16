@@ -80,7 +80,7 @@ class ApplyRefundService
                 'goods_sku_id' => $order_detail->goods_sku_id,
                 'goods_sku_value' => $order_detail->goods_sku_value,
                 'goods_unit' => $order_detail->goods_unit,
-                'is_show_after_sales' => app(ApplyRefundDao::class)->showAfterSales($order_detail),  // 申请售后按钮状态
+                'is_show_after_sales' => app(ApplyRefundDao::class)->showAfterSales($order, $order_detail),  // 申请售后按钮状态
             ],
             'refund_type' => $tmp_refund_type,
         ];
@@ -449,6 +449,7 @@ class ApplyRefundService
                 'money' => get_new_price($apply_refund->money),
                 'number' => get_new_price($apply_refund->number),
                 'reason_id' => $apply_refund->reason_id,
+                'reason_content' => $apply_refund->applyRefundReason?->content,
                 'is_revoke' => $apply_refund->is_revoke,
                 'description' => $apply_refund->description,
                 'certificate' => $apply_refund->certificate,

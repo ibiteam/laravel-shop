@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\WeChatPayException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\TransactionDao;
 use App\Http\Resources\Manage\TransactionResourceCollection;
 use App\Models\Order;

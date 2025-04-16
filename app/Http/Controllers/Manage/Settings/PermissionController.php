@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Settings;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\PermissionDao;
 use App\Models\Permission;
 use Illuminate\Http\Request;

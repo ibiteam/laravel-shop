@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Tools;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\MaterialFile;
 use App\Services\MaterialFileService;
