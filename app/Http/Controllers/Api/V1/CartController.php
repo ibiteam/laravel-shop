@@ -25,7 +25,7 @@ class CartController extends BaseController
     public function list(CartDao $cart_dao)
     {
         try {
-            $data = $cart_dao->cartGoodsList($this->user());
+            $data = $cart_dao->cartGoodsList(get_user());
 
             return $this->success($data);
         } catch (\Throwable $throwable) {
@@ -38,7 +38,7 @@ class CartController extends BaseController
      */
     public function number(CartDao $cart_dao)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $data['number'] = $cart_dao->getValidCarNumber($user->id);
@@ -54,7 +54,7 @@ class CartController extends BaseController
      */
     public function store(Request $request, CartDao $cart_dao)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([
@@ -126,7 +126,7 @@ class CartController extends BaseController
      */
     public function destroy(Request $request)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([
@@ -158,7 +158,7 @@ class CartController extends BaseController
      */
     public function changeNumber(Request $request)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([
@@ -222,7 +222,7 @@ class CartController extends BaseController
      */
     public function changeCheck(Request $request)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([
@@ -284,7 +284,7 @@ class CartController extends BaseController
      */
     public function emptyInvalid(CartDao $cart_dao)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $data = $cart_dao->cartGoodsList($user);
@@ -313,7 +313,7 @@ class CartController extends BaseController
      */
     public function moveCollect(Request $request)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([
@@ -364,7 +364,7 @@ class CartController extends BaseController
      */
     public function placeOrder()
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             // 获取可以结算的商品数据

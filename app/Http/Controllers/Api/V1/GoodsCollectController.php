@@ -26,7 +26,7 @@ class GoodsCollectController extends BaseController
 
             $goods = $goods_dao->getInfoByNo($validated['no']);
 
-            $goods_collect_service->follow($goods, $this->user());
+            $goods_collect_service->follow($goods, get_user());
 
             return $this->success('关注成功');
         } catch (ValidationException $validation_exception) {
@@ -51,7 +51,7 @@ class GoodsCollectController extends BaseController
             ]);
             $goods = $goods_dao->getInfoByNo($validated['no']);
 
-            $goods_collect_service->unfollow($goods, $this->user());
+            $goods_collect_service->unfollow($goods, get_user());
 
             return $this->success('取消关注成功');
         } catch (ValidationException $validation_exception) {

@@ -17,7 +17,7 @@ class SearchController extends BaseController
      */
     public function searchGoods(Request $request, SearchDao $search_dao)
     {
-        $user = $this->user();
+        $user = get_user();
 
         try {
             $validated = $request->validate([

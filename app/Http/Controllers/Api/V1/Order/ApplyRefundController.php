@@ -31,7 +31,7 @@ class ApplyRefundController extends BaseController
                 'order_detail_id' => '订单明细ID',
             ]);
 
-            $apply_refund_dao->verifyApply($this->user(), $validated['order_sn'], $validated['order_detail_id']);
+            $apply_refund_dao->verifyApply(get_user(), $validated['order_sn'], $validated['order_detail_id']);
 
             return $this->success('允许申请售后');
         } catch (ValidationException $validation_exception) {
@@ -57,7 +57,7 @@ class ApplyRefundController extends BaseController
                 'order_detail_id' => '订单明细ID',
             ]);
 
-            $data = $apply_refund_service->init($this->user(), $validated['order_sn'], $validated['order_detail_id']);
+            $data = $apply_refund_service->init(get_user(), $validated['order_sn'], $validated['order_detail_id']);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -85,7 +85,7 @@ class ApplyRefundController extends BaseController
                 'type' => '售后类型',
             ]);
 
-            $data = $apply_refund_service->getInfoByTypeAndOrder($this->user(), $validated['order_sn'], $validated['order_detail_id'], $validated['type']);
+            $data = $apply_refund_service->getInfoByTypeAndOrder(get_user(), $validated['order_sn'], $validated['order_detail_id'], $validated['type']);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -105,7 +105,7 @@ class ApplyRefundController extends BaseController
         try {
             $params = $request->only(['apply_refund_id', 'type', 'order_sn', 'order_detail_id', 'number', 'money', 'reason_id', 'description', 'certificate']);
 
-            $apply_refund = $apply_refund_service->launchRefund($this->user(), $params);
+            $apply_refund = $apply_refund_service->launchRefund(get_user(), $params);
 
             return $this->success(['apply_refund_id' => $apply_refund->id]);
         } catch (ValidationException $validation_exception) {
@@ -135,7 +135,7 @@ class ApplyRefundController extends BaseController
 
             $keywords = $validated['keywords'] ?? '';
 
-            $list = $apply_refund_dao->getListByUser($this->user(), $keywords, $validated['page'], $validated['number']);
+            $list = $apply_refund_dao->getListByUser(get_user(), $keywords, $validated['page'], $validated['number']);
 
             return $this->success(new ApplyRefundResourceCollection($list));
         } catch (ValidationException $validation_exception) {
@@ -170,7 +170,7 @@ class ApplyRefundController extends BaseController
             $order_detail_id = $validated['order_detail_id'] ?? 0;
             $apply_refund_id = $validated['apply_refund_id'] ?? 0;
 
-            $data = $apply_refund_service->getDetailByOrderOrId($this->user(), $apply_refund_id, $order_sn, $order_detail_id, false);
+            $data = $apply_refund_service->getDetailByOrderOrId(get_user(), $apply_refund_id, $order_sn, $order_detail_id, false);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -194,7 +194,7 @@ class ApplyRefundController extends BaseController
                 'apply_refund_id' => '申请售后ID',
             ]);
 
-            $apply_refund_service->revoke($this->user(), $validated['apply_refund_id']);
+            $apply_refund_service->revoke(get_user(), $validated['apply_refund_id']);
 
             return $this->success('撤销成功');
         } catch (ValidationException $validation_exception) {
@@ -218,7 +218,7 @@ class ApplyRefundController extends BaseController
                 'apply_refund_id' => '申请售后ID',
             ]);
 
-            $data = $apply_refund_log_dao->logList($this->user(), $validated['apply_refund_id']);
+            $data = $apply_refund_log_dao->logList(get_user(), $validated['apply_refund_id']);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -242,7 +242,7 @@ class ApplyRefundController extends BaseController
                 'apply_refund_id' => '申请售后ID',
             ]);
 
-            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundShip'])->whereId($validated['apply_refund_id'])->whereUserId($this->user()->id)->first();
+            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundShip'])->whereId($validated['apply_refund_id'])->whereUserId(get_user()->id)->first();
 
             if (! $apply_refund instanceof ApplyRefund) {
                 throw new BusinessException('退款信息不存在');
@@ -287,7 +287,7 @@ class ApplyRefundController extends BaseController
                 'certificate' => '凭证',
             ]);
 
-            $apply_refund_ship_dao->addShip($this->user(), $validated['apply_refund_id'], $validated['no'], $validated['ship_company_id'], $validated['phone'], $validated['description'] ?? null, $validated['certificate'] ?? null);
+            $apply_refund_ship_dao->addShip(get_user(), $validated['apply_refund_id'], $validated['no'], $validated['ship_company_id'], $validated['phone'], $validated['description'] ?? null, $validated['certificate'] ?? null);
 
             return $this->success('填写成功');
         } catch (ValidationException $validation_exception) {

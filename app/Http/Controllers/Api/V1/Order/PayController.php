@@ -30,7 +30,7 @@ class PayController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
@@ -91,7 +91,7 @@ class PayController extends BaseController
                 'pay_form' => '支付类型',
             ]);
             $wechat_pay_form_enum = PayFormEnum::formSource($validated['pay_form']);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {

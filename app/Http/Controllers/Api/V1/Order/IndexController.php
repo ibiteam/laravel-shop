@@ -39,7 +39,7 @@ class IndexController extends BaseController
         $keywords = $request->get('keywords');
         $type = $request->get('type', self::SEARCH_ALL);
         $number = (int) $request->get('number', 10);
-        $current_user = $this->user();
+        $current_user = get_user();
         $order = Order::query()
             ->withCount('detail')
             ->with(['detail', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
@@ -77,7 +77,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->withCount('orderDelivery')
                 ->with(['detail', 'province', 'city', 'district'])
@@ -111,7 +111,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
@@ -158,7 +158,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
 
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
@@ -229,7 +229,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
@@ -282,7 +282,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = $order_dao->getInfoByOrderSnAndUserId($validated['order_sn'], $current_user->id);
 
             if (! $order instanceof Order) {
@@ -345,7 +345,7 @@ class IndexController extends BaseController
             ], [], [
                 'order_sn' => '订单编号',
             ]);
-            $current_user = $this->user();
+            $current_user = get_user();
             $order = Order::query()
                 ->with(['orderDelivery'])
                 ->whereUserId($current_user->id)

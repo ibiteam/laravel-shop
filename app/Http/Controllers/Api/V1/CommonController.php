@@ -28,7 +28,7 @@ class CommonController extends BaseController
         );
         $data['cart_count'] = 0;
 
-        $current_user = $this->user();
+        $current_user = get_user();
 
         if ($current_user instanceof User) {
             $data['cart_count'] = $cart_dao->getValidCarNumber($current_user->id);

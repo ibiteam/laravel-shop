@@ -6,6 +6,7 @@ use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminUser;
 use App\Models\SensitiveWord;
 use App\Models\ShopConfig;
+use App\Models\User as UserModel;
 use App\Utils\Constant;
 use App\Utils\Sensitive\Helper as SensitiveHelper;
 use Illuminate\Support\Facades\App;
@@ -201,6 +202,16 @@ if (! function_exists('get_admin_user')) {
     function get_admin_user(): ?AdminUser
     {
         return Auth::guard(config('auth.manage.guard'))->user();
+    }
+}
+
+if (! function_exists('get_user')) {
+    /**
+     * 获取前台用户.
+     */
+    function get_user(): ?UserModel
+    {
+        return Auth::guard(config('auth.api.guard'))->user();
     }
 }
 
