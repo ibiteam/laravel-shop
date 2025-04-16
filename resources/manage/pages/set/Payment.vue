@@ -1,5 +1,5 @@
 <template>
-        <search-form :model="query">
+        <search-form :model="query" :label-width="40">
             <el-form-item label="名称" prop="name">
                 <el-input
                     v-model="query.name"
@@ -20,7 +20,7 @@
         <page-table
             :data="tableData"
             v-loading="loading"
-            @change="handlePageChange"
+            @change="handleChange"
         >
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="名称" prop="name">
@@ -162,25 +162,34 @@ import SearchForm from '@/components/common/SearchForm.vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
-const tableData = ref([]);
-const loading = ref(false);
-
+/* 定义搜索下拉数据 */
 const enabledOptions = [
     { value: 1, label: '启用' },
     { value: 0, label: '禁用' }
 ];
-
-const query = reactive({
+/* 定义表格数据 */
+const tableData = ref([]);
+const loading = ref(false);
+/* 定义搜索参数 */
+const defaultQuery = reactive({
     name: '',      // 商品名称搜索
     is_enabled: null
 });
+const query = reactive({...defaultQuery})
+/* 定义默认分页参数 */
 const defaultPage = {
     page: 1,
     per_page: 10,
 }
 const pagination = reactive({...defaultPage})
-
-const getData = (page =defaultPage.page) => {
+/* 重置搜索条件 */
+const resetSearch = () => {
+    Object.assign(query, defaultQuery)
+    Object.assign(pagination, defaultPage)
+    getData()
+}
+/* 获取分页数据 */
+const getData = (page:number = defaultPage.page) => {
     loading.value = true;
     const params = {
         ...query,
@@ -198,12 +207,12 @@ const getData = (page =defaultPage.page) => {
         loading.value = false;
     })
 }
-const handlePageChange = (page:number,per_page:number) => {
+/* 点击分页触发方法 */
+const handleChange = (page:number,per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }
-
-// 表格修改字段
+/* 表格修改字段 */
 const handleFieldChange = (id:number,field:any,name:string) => {
     paymentMethodChangeField({ id: id, field: field,name:name }).then((res:any) => {
         if (cns.$successCode(res.code)) {
@@ -214,7 +223,7 @@ const handleFieldChange = (id:number,field:any,name:string) => {
         }
     });
 }
-
+/* 详情弹窗 */
 const detailDialogVisible = ref(false);
 const detailFormRef = ref(null);
 const detailSubmitLoading = ref(false);

@@ -13,7 +13,7 @@ withDefaults(defineProps<{
     model: Record<string, any>;
     labelWidth?: number; // 注意这里使用可选属性
 }>(), {
-    labelWidth: 120
+    labelWidth: 100
 });
 </script>
 

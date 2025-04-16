@@ -1,5 +1,5 @@
 <template>
-    <search-form :model="query">
+    <search-form :model="query" :label-width="120">
             <el-form-item label="订单编号" prop="order_sn">
                 <el-input
                     v-model="query.order_sn"
@@ -71,8 +71,8 @@
                 </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button  type="primary" @click="getData()">搜索</el-button>
-                <el-button  @click="resetSearch">重置</el-button>
+                <el-button type="primary" @click="getData()">搜索</el-button>
+                <el-button @click="resetSearch">重置</el-button>
             </el-form-item>
     </search-form>
     <page-table
@@ -122,14 +122,7 @@ import { OrderStatus,PayStatus,ShipStatus } from '@/enums/model'
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
-const tableData = ref({})
-const defaultPage = {
-    page: 1,
-    per_page: 10,
-}
-const pagination = reactive({...defaultPage})
-const loading = ref(false)
-
+/* 定义搜索下拉数据 */
 const orderStatusOptions = [
     {label: '未确认', value: OrderStatus.Unconfirmed},
     {label: '已确认', value: OrderStatus.Confirmed},
@@ -144,13 +137,16 @@ const shipStatusOptions = [
     {label: '已发货', value: ShipStatus.Shipped},
     {label: '已收货', value: ShipStatus.Received},
 ]
-
 const sourceOptions = [
     {label: 'PC端', value: 'pc'},
     {label: 'H5端', value: 'h5'},
     {label: 'APP端', value: 'app'},
     {label: '微信小程序', value: 'wechat_mini'},
 ]
+/* 定义表格数据 */
+const tableData = ref({})
+const loading = ref(false);
+/* 定义搜索参数 */
 const defaultQuery = {
     order_sn: '',
     user_keywords: '',
@@ -164,19 +160,22 @@ const defaultQuery = {
     done_end_time: null,
     source: null,
 }
-// 添加查询参数对象，增加搜索条件
 const query = reactive({...defaultQuery})
-
-// 重置搜索条件
+/* 定义默认分页参数 */
+const defaultPage = {
+    page: 1,
+    per_page: 10,
+}
+const pagination = reactive({...defaultPage})
+/* 重置搜索条件 */
 const resetSearch = () => {
     Object.assign(query, defaultQuery)
     Object.assign(pagination, defaultPage)
     getData()
 }
-
-const getData = (page=defaultPage.page) => {
+/* 获取分页数据 */
+const getData = (page:number = defaultPage.page) => {
     loading.value = true
-    // 更新当前页码
     const params = {
         ...query,
         page: page,
@@ -193,10 +192,12 @@ const getData = (page=defaultPage.page) => {
         loading.value = false
     })
 }
+/* 点击分页触发方法 */
 const handleChange = (page:number,per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }
+
 const openDetail = (row:any) => {
     router.push({name:'manage.order.detail', query: {id: row.id},params:{order_sn: row.order_sn}})
 }
