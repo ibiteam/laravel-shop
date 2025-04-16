@@ -52,20 +52,19 @@
                 <el-option v-for="item in sourceOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
         </el-form-item>
-        <el-form-item label="下单开始时间" prop="done_start_time">
+        <el-form-item label="下单时间">
             <el-date-picker
                 v-model="query.done_start_time"
                 type="datetime"
-                placeholder="请选择下单开始时间"
+                placeholder="开始时间"
                 value-format="YYYY-MM-DD HH:mm:ss"
             >
             </el-date-picker>
-        </el-form-item>
-        <el-form-item label="下单结束时间" prop="done_end_time">
+            <span>&nbsp;至&nbsp;</span>
             <el-date-picker
                 v-model="query.done_end_time"
                 type="datetime"
-                placeholder="请选择下单结束时间"
+                placeholder="下单结束时间"
                 value-format="YYYY-MM-DD HH:mm:ss"
             >
             </el-date-picker>

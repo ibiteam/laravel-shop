@@ -76,7 +76,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button  type="primary" @click="handleSearch">搜索</el-button>
-                    <el-button  type="danger" @click="openDetailView(0)">添加</el-button>
+                    <el-button  type="danger" @click="openDetail(0)">添加</el-button>
                 </el-form-item>
     </search-form>
     <page-table
