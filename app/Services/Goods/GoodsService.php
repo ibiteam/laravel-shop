@@ -19,6 +19,7 @@ use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
 use App\Models\ShopConfig;
 use App\Models\User;
+use App\Services\Order\GoodsFormatter;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -92,8 +93,10 @@ class GoodsService
                     throw new BusinessException('商品价格不能为空！');
                 }
             }
-            $store_data['price'] = min(array_column($request_sku_data, 'price')) ?? 0;
-            $store_data['integral'] = min(array_column($request_sku_data, 'integral')) ?? 0;
+            $tmp_sku_prices = array_column($request_sku_data, 'price');
+            $store_data['price'] = $tmp_sku_prices ? min($tmp_sku_prices) : 0;
+            $tmp_sku_integrals = array_column($request_sku_data, 'integral');
+            $store_data['integral'] = $tmp_sku_integrals ? min($tmp_sku_integrals) : 0;
         }
 
         // 校验价格与积分
@@ -312,45 +315,59 @@ class GoodsService
      * @throws BusinessException
      * @throws ProcessDataException
      */
-    public function checkGoodsNumber(Goods $goods, int $request_sku_id, int $number): array
+    public function checkGoodsNumber(Goods $goods, User $user, int $request_sku_id, int $number): array
     {
-        $res = [
-            'total' => 0,
-            'can_buy' => false,
-        ];
-        $sku_data = $goods->skus()->get();
+        return app(GoodsFormatter::class)
+            ->setUser($user)
+            ->setGoods($goods)
+            ->setSkuId($request_sku_id)
+            ->setBuyNumber($number)
+            ->validate()
+            ->getNumberData();
+    }
 
-        if ($sku_data->isNotEmpty() && $request_sku_id === 0) {
-            throw new BusinessException('多规格商品请先选择商品规格');
+    /**
+     * 获取商品推荐数据.
+     */
+    public function getRecommendGoods(int $limit, int $sort_type, ?array $goods_nos = null, int $rule = AppDecorationItem::RULE_INTELLIGENT): array
+    {
+        // 是否展示销量
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
+        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
+
+        switch ($rule) {
+            case AppDecorationItem::RULE_INTELLIGENT:
+                $sort = Goods::$sorts[$sort_type] ?? null;
+                $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}"))->limit($limit);
+
+                break;
+
+            case AppDecorationItem::RULE_MANUAL:
+                $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
+
+                break;
         }
 
-        if ($request_sku_id > 0) {
-            $sku_item = $sku_data->where('id', $request_sku_id)->first();
+        return $query->get()->toArray();
+    }
 
-            if (! $sku_item instanceof GoodsSku) {
-                throw new BusinessException('商品规格不存在');
-            }
-            $res['total'] = $sku_item->number;
+    // 获取 为您推荐 数据
+    public function getRecommendData(): CommonResourceCollection
+    {
+        // 是否展示销量
+        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
 
-            if ($sku_item->number < $number) {
-                $tmp_message = $sku_item->number.$goods->unit;
+        $items = Goods::query()
+            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
+            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
+            ->orderByDesc('sales_volume')
+            ->orderByDesc('id')
+            ->paginate(6);
 
-                throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
-            }
-            $res['can_buy'] = true;
+        $data = new CommonResourceCollection($items);
 
-            return $res;
-        }
-        $res['total'] = $goods->total;
-
-        if ($goods->total < $number) {
-            $tmp_message = $goods->total.$goods->unit;
-
-            throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $res);
-        }
-        $res['can_buy'] = true;
-
-        return $res;
+        return $data;
     }
 
     /**
@@ -401,43 +418,5 @@ class GoodsService
                 })->values(),
             ];
         });
-    }
-
-    // 获取商品推荐数据
-    public function getRecommendGoods(int $limit, int $sort_type, ?array $goods_nos = null, int $rule = AppDecorationItem::RULE_INTELLIGENT): array
-    {
-        // 是否展示销量
-        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
-            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
-        switch ($rule) {
-            case AppDecorationItem::RULE_INTELLIGENT:
-                $sort = Goods::$sorts[$sort_type] ?? null;
-                $query->when($sort, fn ($query) => $query->orderByRaw("{$sort}") )->limit($limit);
-                break;
-            case AppDecorationItem::RULE_MANUAL:
-                $query->when($goods_nos, fn ($query) => $query->whereIn('no', $goods_nos))->limit(20);
-                break;
-        }
-
-        return $query->get()->toArray();
-    }
-
-    // 获取 为您推荐 数据
-    public function getRecommendData(): CommonResourceCollection
-    {
-        // 是否展示销量
-        $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-
-        $items = Goods::query()
-            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
-            ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
-            ->orderByDesc('sales_volume')
-            ->orderByDesc('id')
-            ->paginate(6);
-
-        $data =  new CommonResourceCollection($items);
-
-        return $data;
     }
 }

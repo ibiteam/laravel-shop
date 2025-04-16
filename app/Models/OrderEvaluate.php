@@ -30,6 +30,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null                  $created_at
  * @property Carbon|null                  $updated_at
  * @property-read Goods|null $goods
+ * @property-read Order|null $order
  * @property-read User $user
  *
  * @method static Builder<static>|OrderEvaluate newModelQuery()
@@ -74,6 +75,11 @@ class OrderEvaluate extends Model
     public function goods(): BelongsTo
     {
         return $this->belongsTo(Goods::class, 'goods_id', 'id');
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
     protected function casts(): array

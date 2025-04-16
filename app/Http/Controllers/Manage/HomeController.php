@@ -10,9 +10,10 @@ use App\Http\Dao\CollectDao;
 use App\Http\Dao\PermissionDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AccessStatistic;
-use App\Models\Collect;
 use App\Models\Order;
+use App\Models\Permission;
 use App\Models\ShopConfig;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -52,10 +53,10 @@ class HomeController extends BaseController
     {
         $admin_user = $this->adminUser();
 
-        // 数量统计 todo
+        // 数量统计
         $number_data['user_number'] = User::query()->count();  // 用户数
         $number_data['order_number'] = Order::query()->count();  // 订单数
-        $number_data['total_transaction_value'] = 10000;  // 总交易额
+        $number_data['total_transaction_value'] = Transaction::query()->sum('amount');  // 总交易额
 
         // 用户数据
         $statistic_time = [date('Y-m-d', strtotime('-1 week')), date('Y-m-d', strtotime('-1 day'))];
@@ -96,7 +97,7 @@ class HomeController extends BaseController
 
         // 收藏的权限菜单
         $collect_permission_ids = array_column($collect_permissions, 'id');
-        $menus = $permission_dao->fetchAndFormatPermissions($admin_user, config('auth.manage.guard'), $collect_permission_ids);
+        $menus = $permission_dao->fetchAndFormatPermissions($admin_user, $collect_permission_ids);
 
         return $this->success(['collect_permissions' => $collect_permissions, 'menus' => $permission_dao->buildTree($menus, 'index')]);
     }
@@ -124,7 +125,7 @@ class HomeController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('收藏菜单异常~'.$throwable->getMessage());
+            return $this->error('收藏菜单异常~');
         }
     }
 
@@ -133,11 +134,7 @@ class HomeController extends BaseController
      */
     public function clearCache()
     {
-        $admin_user = $this->adminUser();
-
         Cache::forget(CacheNameEnum::SHOP_CONFIG_ALL->value);
-
-        Cache::tags(config('auth.manage.guard').'_permission_menus')->forget('permission_menus_'.$admin_user->id);
 
         return $this->success('清除成功');
     }
@@ -173,37 +170,18 @@ class HomeController extends BaseController
             $permission_codes = [];
         }
 
-        // todo 替换数据
         $i = 0;
 
-        if (isset($permission_codes['manage.shop_config.index'])) {
-            $order_comment_good_number = 100;
-            $this->buildTodoList($i, '会员', '订单评论', $order_comment_good_number, 'manage.user.index', 'Comment');
+        if (isset($permission_codes[Permission::MANAGE_USER_INDEX])) {
+            $this->buildTodoList($i, '会员', '订单评论', Permission::MANAGE_ORDER_EVALUATE_INDEX);
+            // $this->buildTodoList($i, '会员', '购买咨询', '');
         }
 
-        if (isset($permission_codes['manage.shop_config.index'])) {
-            $consult_number = 2;
-            $this->buildTodoList($i, '会员', '购买咨询', $consult_number, 'manage.user.index', 'ChatDotSquare');
-        }
-
-        if (isset($permission_codes['manage.goods.index'])) {
-            $order_pending_number = 10;
-            $this->buildTodoList($i, '订单', '待付款', $order_pending_number, 'manage.goods.index', 'Notification');
-        }
-
-        if (isset($permission_codes['manage.goods.index'])) {
-            $order_sending_number = 9;
-            $this->buildTodoList($i, '订单', '待发货', $order_sending_number, 'manage.goods.index', 'Notification');
-        }
-
-        if (isset($permission_codes['manage.goods.index'])) {
-            $order_accepting_number = 8;
-            $this->buildTodoList($i, '订单', '待收货', $order_accepting_number, 'manage.goods.index', 'Notification');
-        }
-
-        if (isset($permission_codes['manage.goods.index'])) {
-            $order_backing_number = 0;
-            $this->buildTodoList($i, '订单', '退款申请', $order_backing_number, 'manage.goods.index', 'Notification');
+        if (isset($permission_codes[Permission::MANAGE_ORDER_INDEX])) {
+            $this->buildTodoList($i, '订单', '待付款', Permission::MANAGE_ORDER_INDEX);
+            $this->buildTodoList($i, '订单', '待发货', Permission::MANAGE_ORDER_INDEX);
+            $this->buildTodoList($i, '订单', '待收货', Permission::MANAGE_ORDER_INDEX);
+            $this->buildTodoList($i, '订单', '退款申请', Permission::MANAGE_ORDER_INDEX);
         }
 
         return array_values($this->todoList);
@@ -212,7 +190,7 @@ class HomeController extends BaseController
     /**
      * 构建待办列表.
      */
-    private function buildTodoList(int &$i, string $groupName, string $title, int $count, string $name, string $icon = ''): void
+    private function buildTodoList(int &$i, string $groupName, string $title, string $name, int $count = 0, string $icon = ''): void
     {
         $px = 60;
 
@@ -230,7 +208,7 @@ class HomeController extends BaseController
             'title' => $title,
             'count' => min($count, 99),
             'icon' => $icon,
-            'name' => $name,  // 路由 前端页面名称
+            'name' => $name,  // 前端页面
             'backgroundPosition' => $i * $px,
         ];
         $i++;

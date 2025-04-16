@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Order;
 
 use App\Enums\OrderTypeEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\UserAddressDao;
@@ -57,6 +58,8 @@ class DoneController extends BaseController
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (ProcessDataException $process_data_exception) {
+            return $this->error($process_data_exception->getMessage(), $process_data_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }
@@ -110,6 +113,8 @@ class DoneController extends BaseController
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (ProcessDataException $process_data_exception) {
+            return $this->error($process_data_exception->getMessage(), $process_data_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }
@@ -156,6 +161,8 @@ class DoneController extends BaseController
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (ProcessDataException $process_data_exception) {
+            return $this->error($process_data_exception->getMessage(), $process_data_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }
@@ -216,6 +223,8 @@ class DoneController extends BaseController
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
+        } catch (ProcessDataException $process_data_exception) {
+            return $this->error($process_data_exception->getMessage(), $process_data_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }

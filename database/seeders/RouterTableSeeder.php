@@ -18,6 +18,7 @@ class RouterTableSeeder extends Seeder
         // 基础链接
         $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::PAY_SUCCESS, '支付成功', '/pay/success', ['no' => ''], 1);
         $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::ORDER_SUCCESS, '下单成功', '/order/success', sort: 1);
+        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::HOME_PREVIEW, '首页预览', '/home/:id', sort: 1);
     }
 
     private function addRouter(
@@ -45,7 +46,7 @@ class RouterTableSeeder extends Seeder
             $router->alias = $router_alias->value;
             $router->name = $name;
             $router->h5_url = $h5_url;
-            $router->params = $params ?: null;
+            $router->params = $params;
             $router->sort = $sort;
             $router->is_show = Router::IS_SHOW_YES;
             $router->save();

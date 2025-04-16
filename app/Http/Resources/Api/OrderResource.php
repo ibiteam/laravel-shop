@@ -32,7 +32,7 @@ class OrderResource extends JsonResource
         $can_evaluate = $order_dao->canEvaluate($this->resource, $order_constant_enum);
 
         return [
-            'no' => $this->resource->no,
+            'order_sn' => $this->resource->order_sn,
             'status' => $order_constant_enum->value,
             'items' => $this->resource->detail->map(function (OrderDetail $item) {
                 return [

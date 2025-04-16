@@ -13,19 +13,39 @@ use App\Models\OrderDetail;
 use App\Models\ShopConfig;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ApplyRefundDao
 {
     /**
+     * 根据用户获取申请退款列表(分页).
+     */
+    public function getListByUser(User $user, string $keywords = '', int $page = 1, int $number = 10): LengthAwarePaginator
+    {
+        return ApplyRefund::query()->with(['user', 'order', 'orderDetail'])
+            ->when($keywords, function (Builder $query) use ($keywords) {
+                $query->where(function (Builder $query) use ($keywords) {
+                    $query->whereLike('no', "%$keywords%")->orWhereHas('orderDetail', function (Builder $query) use ($keywords) {
+                        $query->whereLike('goods_name', "%$keywords%");
+                    });
+                });
+            })
+            ->whereUserId($user->id)
+            ->orderByDesc('created_at')
+            ->paginate($number, page: $page);
+    }
+
+    /**
      * 校验是否允许申请售后.
      *
      * @throws BusinessException
      */
-    public function verifyApply(User $user, string $order_no, int $order_detail_id): void
+    public function verifyApply(User $user, string $order_sn, int $order_detail_id): void
     {
-        $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_sn)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');

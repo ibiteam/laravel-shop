@@ -18,7 +18,6 @@
                             },
                             loop: form.content.data.length >= 3 ? true : false,
                             pagination: {
-                                'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,
                             },
                             modules: swiperModules
@@ -40,7 +39,6 @@
                             },
                             loop: form.content.data.length >= 3 ? true : false,
                             pagination: {
-                                'el': '.swiper-pagination.decoration-swiper-pagination',
                                 'clickable': false,
                             },
                             modules: swiperModules
@@ -51,7 +49,6 @@
                                 />
                             </swiper-slide>
                         </swiper>
-                        <div class="swiper-pagination decoration-swiper-pagination"></div>
                     </div>
                 </div>
             </template>

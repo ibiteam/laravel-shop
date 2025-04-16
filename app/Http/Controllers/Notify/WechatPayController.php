@@ -44,7 +44,7 @@ class WechatPayController extends Controller
 
             Log::info('微信支付申请退款回调信息：'.$message);
 
-            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            if (! isset($message['refund_status']) || $message['refund_status'] !== 'SUCCESS') {
                 throw new BusinessException('Result Code Fail');
             }
             // 请求微信查询支付结果
@@ -59,7 +59,7 @@ class WechatPayController extends Controller
             $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
 
             if ($transaction instanceof Transaction) {
-                $transaction->update(['status' => Transaction::STATUS_SUCCESS]);
+                $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->toDateTimeString()]);
             }
 
             return $wechat_pay_util->server()->serve();
@@ -98,7 +98,7 @@ class WechatPayController extends Controller
 
             Log::info('微信支付回调信息：'.$message);
 
-            if (! isset($message['result_code']) || $message['result_code'] !== 'SUCCESS') {
+            if (! isset($message['trade_state']) || $message['trade_state'] !== 'SUCCESS') {
                 throw new BusinessException('Result Code Fail');
             }
             // 请求微信查询支付结果
@@ -163,7 +163,7 @@ class WechatPayController extends Controller
             $order->pay_status = PayStatusEnum::PAYED;
 
             if ($order->money_paid != $order->order_amount) {
-                Log::error("订单编号：{$order->no}，支付金额与订单总金额不一致，请前往后台查看！");
+                Log::error("订单编号：{$order->order_sn}，支付金额与订单总金额不一致，请前往后台查看！");
             }
 
             $order->save();

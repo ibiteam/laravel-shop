@@ -37,9 +37,9 @@ class OrderDeliveryController extends BaseController
         $number = (int) $request->get('number', 10);
         $list = OrderDelivery::query()
             ->latest()
-            ->with(['order:id,no', 'shipCompany:id,name', 'adminUser:id,nickname'])
+            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,nickname'])
             ->when(! is_null($delivery_no), fn (Builder $query) => $query->where('delivery_no', $delivery_no))
-            ->when(! is_null($order_no), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('no', $order_no)))
+            ->when(! is_null($order_no), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', $order_no)))
             ->when(! is_null($created_start_time), fn (Builder $query) => $query->where('shipped_at', '>=', $created_start_time))
             ->when(! is_null($created_end_time), fn (Builder $query) => $query->where('shipped_at', '<=', $created_end_time))
             ->paginate($number);
@@ -127,10 +127,10 @@ class OrderDeliveryController extends BaseController
                     ->where('order_status', OrderStatusEnum::CONFIRMED)
                     ->where('pay_status', PayStatusEnum::PAYED)
                     ->where('ship_status', ShippingStatusEnum::UNSHIPPED)
-                    ->whereIn('no', array_column($import_data, 'order_no'))
-                    ->select(['id', 'no', 'order_status', 'pay_status', 'ship_status'])
+                    ->whereIn('order_sn', array_column($import_data, 'order_no'))
+                    ->select(['id', 'order_sn', 'order_status', 'pay_status', 'ship_status'])
                     ->get()
-                    ->keyBy('no');
+                    ->keyBy('order_sn');
 
                 foreach ($import_data as $import_datum) {
                     $order = $orders[$import_datum['order_no']] ?? null;

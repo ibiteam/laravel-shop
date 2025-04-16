@@ -14,7 +14,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property int         $id
- * @property string      $no              订单编号
+ * @property string      $order_sn        订单编号
  * @property int         $user_id         用户ID
  * @property string      $type            订单类型
  * @property int         $order_status    订单状态
@@ -77,7 +77,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereIp($value)
  * @method static Builder<static>|Order whereIsEditAddress($value)
  * @method static Builder<static>|Order whereMoneyPaid($value)
- * @method static Builder<static>|Order whereNo($value)
+ * @method static Builder<static>|Order whereOrderSn($value)
  * @method static Builder<static>|Order whereOrderAmount($value)
  * @method static Builder<static>|Order whereOrderStatus($value)
  * @method static Builder<static>|Order wherePaidAt($value)

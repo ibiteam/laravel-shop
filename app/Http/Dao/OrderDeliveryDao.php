@@ -9,10 +9,41 @@ use App\Models\OrderDelivery;
 use App\Models\OrderDeliveryItem;
 use App\Models\OrderDetail;
 use App\Models\ShipCompany;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class OrderDeliveryDao
 {
+    /**
+     * 根据订单获取发货列表(分页).
+     */
+    public function getListByOrder(string $order_sn, int $page = 1, int $number = 10): LengthAwarePaginator
+    {
+        $order_id = Order::query()->whereOrderSn($order_sn)->first()->id ?? 0;
+
+        $list = OrderDelivery::query()
+            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,nickname'])
+            ->whereOrderId($order_id)
+            ->orderByDesc('shipped_at')
+            ->orderByDesc('created_at')
+            ->paginate($number, page: $page);
+        $list->getCollection()->transform(function (OrderDelivery $order_delivery) {
+            return [
+                'id' => $order_delivery->id,
+                'delivery_no' => $order_delivery->delivery_no,
+                'order_sn' => $order_delivery->order->order_sn,
+                'ship_company_name' => $order_delivery->shipCompany?->name,
+                'ship_no' => $order_delivery->ship_no,
+                'status' => $order_delivery->status,
+                'shipped_at' => $order_delivery->shipped_at?->format('Y-m-d H:i:s'),
+                'received_at' => $order_delivery->received_at?->format('Y-m-d H:i:s'),
+                'remark' => $order_delivery->remark,
+            ];
+        });
+
+        return $list;
+    }
+
     /**
      * 根据订单添加发货.
      *

@@ -2,6 +2,7 @@
 
 namespace App\Http\Dao;
 
+use App\Enums\CacheNameEnum;
 use App\Models\AdminUser;
 use App\Models\Permission;
 use Illuminate\Support\Carbon;
@@ -15,24 +16,19 @@ class PermissionDao
      */
     public function getTreePermissionByAdminUser(AdminUser $admin_user, array $collect_permission_ids = []): array
     {
-        $guard_name = config('auth.manage.guard');
-        $cache_key = 'permission_menus_'.$admin_user->id;
-
         try {
-            // 缓存逻辑
-            $menus = Cache::tags($guard_name.'_permission_menus')->remember(
-                $cache_key,
+            $menus = Cache::remember(
+                CacheNameEnum::ADMIN_PERMISSION_MENUS->value.'_'.$admin_user->id,
                 is_local_env() ? Carbon::now()->endOfDay() : null, // 本地环境缓存1天，其他环境永久缓存
-                function () use ($admin_user, $guard_name, $collect_permission_ids) {
-                    return $this->fetchAndFormatPermissions($admin_user, $guard_name, $collect_permission_ids);
+                function () use ($admin_user, $collect_permission_ids) {
+                    return $this->fetchAndFormatPermissions($admin_user, $collect_permission_ids);
                 }
             );
         } catch (\Exception $e) {
             // 异常处理：如果缓存操作失败，回退到直接查询数据库
-            $menus = $this->fetchAndFormatPermissions($admin_user, $guard_name, $collect_permission_ids);
+            $menus = $this->fetchAndFormatPermissions($admin_user, $collect_permission_ids);
         }
 
-        // 构建树结构并返回
         return $this->buildTree($menus, 'index');
     }
 
@@ -78,11 +74,11 @@ class PermissionDao
     /**
      * 查询并格式化权限数据.
      */
-    public function fetchAndFormatPermissions(AdminUser $admin_user, string $guard_name, array $collect_permission_ids): array
+    public function fetchAndFormatPermissions(AdminUser $admin_user, array $collect_permission_ids): array
     {
         return $admin_user->getPermissionsViaRoles()
             ->where('is_left_nav', Permission::IS_LEFT_NAV)
-            ->where('guard_name', $guard_name)
+            ->where('guard_name', config('auth.manage.guard'))
             ->unique('id')
             ->values()
             ->map(function (SpatiePermission $permission) use ($collect_permission_ids) {

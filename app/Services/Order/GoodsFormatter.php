@@ -3,6 +3,7 @@
 namespace App\Services\Order;
 
 use App\Exceptions\BusinessException;
+use App\Exceptions\ProcessDataException;
 use App\Http\Dao\GoodsSpecValueDao;
 use App\Models\Goods;
 use App\Models\GoodsSku;
@@ -49,6 +50,11 @@ class GoodsFormatter
     private int $cart_id = 0;
 
     /**
+     * @var array 设置可以购买的最大数量以及是否可以购买
+     */
+    private array $number_data;
+
+    /**
      * 获取商品总价格.
      */
     public function getGoodsAmount(): float|int
@@ -70,6 +76,7 @@ class GoodsFormatter
      * @return $this
      *
      * @throws BusinessException
+     * @throws ProcessDataException
      */
     public function validate(): self
     {
@@ -121,16 +128,36 @@ class GoodsFormatter
                 throw new BusinessException('商品所选规格已下架，请重新选择');
             }
 
-            if ($this->getBuyNumber() >= $goods_sku->number) {
-                throw new BusinessException('商品所选规格库存不足');
+            if ($goods_sku->number <= 0) {
+                throw new BusinessException('商品所选规格库存不足，请重新选择');
             }
+
+            if ($this->getBuyNumber() > $goods_sku->number) {
+                $this->setNumberData(false, $goods_sku->number);
+
+                $tmp_message = $goods_sku->number.$goods->unit;
+
+                throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $this->getNumberData());
+            }
+            $this->setNumberData(true, $goods_sku->number);
+
             $goods->total = $goods_sku->number;
             // 设置商品规格信息
             $this->setGoodsSku($goods_sku);
         } else {
-            if ($this->getBuyNumber() > $goods->total) {
-                throw new BusinessException('商品库存不足');
+            if ($goods->total <= 0) {
+                throw new BusinessException('商品库存不足，请重新选择');
             }
+
+            if ($this->getBuyNumber() > $goods->total) {
+                $this->setNumberData(false, $goods->total);
+
+                $tmp_message = $goods->total.$goods->unit;
+
+                throw new ProcessDataException("库存数量只有{$tmp_message}，您最多只能购买{$tmp_message}", $this->getNumberData());
+            }
+
+            $this->setNumberData(true, $goods->total);
         }
 
         $this->setGoods($goods);
@@ -185,7 +212,7 @@ class GoodsFormatter
             'goods_price' => $goods->price,
             'goods_integral' => $goods->integral,
             'goods_amount' => $this->getGoodsAmount(),
-            'goods_unit' => $goods->unit,
+            'goods_unit' => $goods->unit ?: '',
             'goods_sku_id' => $this->getSkuId(),
             'goods_sku_value' => $this->getSkuData(),
         ];
@@ -291,6 +318,19 @@ class GoodsFormatter
         $this->cart_id = $cart_id;
 
         return $this;
+    }
+
+    public function getNumberData(): array
+    {
+        return $this->number_data;
+    }
+
+    public function setNumberData(bool $can_buy, int $total): void
+    {
+        $this->number_data = [
+            'can_buy' => $can_buy,
+            'total' => $total,
+        ];
     }
 
     public function getSkuData(): array

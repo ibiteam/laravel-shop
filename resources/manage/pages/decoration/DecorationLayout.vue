@@ -31,7 +31,7 @@
                                 <template #default="scope">
                                     <el-popconfirm title="确定还原到当前版本吗？" placement="bottom" confirm-button-text="确定" cancel-button-text="取消" @confirm="handleResetDecoration(scope.row)">
                                         <template #reference>
-                                            <el-button link type="primary" size="large">编辑</el-button>
+                                            <el-button link type="primary" size="large">还原</el-button>
                                         </template>
                                     </el-popconfirm>
                                 </template>
@@ -41,7 +41,7 @@
                     
                     <el-button text @click.stop="emit('pageSetting')">页面配置</el-button>
                     <el-button @click.stop="emit('pageSave', {button_type: 1})" type="primary">保存草稿</el-button>
-                    <el-button plain @click.stop="emit('pageSave', {button_type: 2})">预览</el-button>
+                    <el-button plain @click.stop="handlePreview">预览</el-button>
                     <el-button @click.stop="emit('pageSave', {button_type: 3})" type="danger">发布</el-button>
                 </div>
             </el-header>
@@ -69,6 +69,10 @@ const props = defineProps({
         default: null
     },
     id: {
+        type: String,
+        default: ''
+    },
+    previewPath: {
         type: String,
         default: ''
     }
@@ -128,6 +132,11 @@ const handleResetDecoration = (row) => {
             cns.$message.error(res.message)
         }
     })
+}
+
+// 预览
+const handlePreview = () => {
+    window.open(props.previewPath, '_blank')
 }
 
 watch(() => props.id, (newValue) => {

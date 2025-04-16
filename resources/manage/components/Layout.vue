@@ -23,9 +23,13 @@
                         <template #default="{ node, data }">
                             <div class="custom-tree-node s-flex ai-ct">
                                 <div class="tree-icon">
-                                    <el-icon v-if='data.icon'>
-                                        <component :is="data.icon"/>
-                                    </el-icon>
+                                    <template v-if="data.icon">
+                                        <img v-if="data.icon.indexOf('http') > -1" :src="data.icon" alt="" style="width: 20px;height: 20px">
+                                        <i v-if="data.icon.indexOf('icon-') > -1" style="font-size:20px;color: #333333" class="iconfont" :class="data.icon"></i>
+                                        <el-icon v-else :size="20">
+                                            <component :is="data.icon"/>
+                                        </el-icon>
+                                    </template>
                                 </div>
                                 <span>{{ data.title }}</span>
                             </div>
@@ -140,13 +144,11 @@
                     </div>
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }" v-if="isRendered">
-                                <transition name="fade" mode="out-in">
-                                    <div :key="route.path" style="height: 100%;">
-                                        <div class="common-wrap">
-                                            <component :is="Component"></component>
-                                        </div>
-                                    </div>
-                                </transition>
+                            <transition name="fade" mode="out-in">
+                                <div :key="route.path" style="height: 100%;">
+                                    <component :is="Component"></component>
+                                </div>
+                            </transition>
                         </router-view>
                         <div v-else v-loading="!isRendered" class="bg-fff" style="width: 100%;height: 100%;"></div>
                     </div>
@@ -160,8 +162,8 @@
     </div>
 </template>
 
-<script lang="ts" setup>
-import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch} from 'vue';
+<script setup>
+import {nextTick, onUnmounted, ref, onMounted, getCurrentInstance,watch,computed} from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import { useRoute,useRouter } from 'vue-router';
 import { ArrowRight } from '@element-plus/icons-vue'
@@ -195,11 +197,11 @@ const left = ref(0)
 const selectedTag = ref({})
 const isRendered = ref(true)
 
-watch(() => route.path,(to) => {
-    for (const index in commonStore.visitedViews) {
-        const view = commonStore.visitedViews[index];
+watch(() => route.path,(to, from) => {
+    for (var index in commonStore.visitedViews) {
+        var view = commonStore.visitedViews[index]
         if (view.name === to.name && view.path !== to.path) {
-            commonStore.delVisitedViews(view).then(() => {
+            commonStore.delVisitedViews(view).then((views) => {
                 router.push({name:to.name,query:to.query})
             })
             break
@@ -270,7 +272,7 @@ const checkMenuActive = () => {
     })
 }
 const formatMenu = () => {
-    const menuListCopy = []
+    let menuListCopy = []
     menus.value.forEach(item => {
         if(item.children && item.children.length > 0){
             item.children.forEach(ite => {
@@ -311,7 +313,7 @@ const addViewTags = () => {
     if (!add_route) {
         return false
     }
-    const routeFileter = commonStore.visitedViews.filter(item => item.name == add_route.name)
+    let routeFileter = commonStore.visitedViews.filter(item => item.name == add_route.name)
     if (routeFileter.length>0){
         return false
     }
@@ -519,7 +521,7 @@ onUnmounted(() => {
                             height: 100%;
                             display: flex;
                             align-items: center;
-                            padding: 0 15px 0 15px;
+                            padding: 0 6px 0 6px;
                             margin: 0 10px 0 8px;
                             border-radius: 6px;
                             &.custom-tree-node-select.actived{
@@ -531,16 +533,11 @@ onUnmounted(() => {
                             &:hover{
                                 background-color: #F4F4F4 !important;
                             }
-                            .tree-icon{
-                                width: 16px;
-                                font-size: 16px;
-                            }
                         }
                         .custom-tree-node span{
                             font-weight: 600;
                             font-size: 14px;
                             color: #333333;
-                            margin-left: 5px;
                         }
                         .custom-tree-node.custom-tree-node-select span {
                             font-weight: 400;
@@ -550,11 +547,8 @@ onUnmounted(() => {
                         .el-tree-node__expand-icon{
                             position: absolute;
                             right: 8px;
-                            transform: rotate(0deg);
+                            transform: rotate(270deg);
                             color: #31373D;
-                        }
-                        .el-tree-node__expand-icon.expanded {
-                            transform: rotate(90deg);
                         }
 
                     }

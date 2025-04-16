@@ -56,7 +56,7 @@ class PermissionController extends BaseController
             $permission->parent_id = $validated['parent_id'];
             $permission->name = $validated['name'];
             $permission->display_name = $validated['display_name'];
-            $permission->icon = $validated['icon'];
+            $permission->icon = $validated['icon'] ?? '';
             $permission->sort = $validated['sort'] ?? 0;
 
             if (! $permission->save()) {

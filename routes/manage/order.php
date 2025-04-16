@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Manage\Order\ApplyRefundController;
 use App\Http\Controllers\Manage\Order\ApplyRefundReasonController;
+use App\Http\Controllers\Manage\Order\EvaluateController;
 use App\Http\Controllers\Manage\Order\OrderController;
 use App\Http\Controllers\Manage\Order\OrderDeliveryController;
 use App\Models\Permission;
@@ -54,6 +55,16 @@ Route::prefix('order')->group(function () {
         Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_DELIVERY_UPDATE)->group(function () {
             Route::post('import', [OrderDeliveryController::class, 'import']);
             Route::post('destroy', [OrderDeliveryController::class, 'destroy']);
+        });
+    });
+    // 订单评价
+    Route::prefix('evaluate')->group(function () {
+        Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_INDEX)->group(function () {
+            Route::get('/', [EvaluateController::class, 'index'])->name(Permission::MANAGE_ORDER_EVALUATE_INDEX);
+            Route::get('detail', [EvaluateController::class, 'detail']);
+        });
+        Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_UPDATE)->group(function () {
+            Route::post('check', [EvaluateController::class, 'check']);
         });
     });
 });

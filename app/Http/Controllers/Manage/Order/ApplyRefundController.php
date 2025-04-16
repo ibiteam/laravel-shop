@@ -7,6 +7,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\ApplyRefundLogDao;
+use App\Http\Dao\OrderLogDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Jobs\Order\ApplyRefundJob;
 use App\Models\ApplyRefund;
@@ -40,7 +41,7 @@ class ApplyRefundController extends BaseController
             ->with(['user', 'order', 'orderDetail', 'applyRefundReason'])
             ->when($user_name, fn ($query) => $query->whereHas('user', fn ($query) => $query->where('user_name', 'like', '%'.$user_name.'%')))
             ->when($goods_name, fn ($query) => $query->whereHas('orderDetail', fn ($query) => $query->where('goods_name', 'like', '%'.$goods_name.'%')))
-            ->when($order_no, fn ($query) => $query->whereHas('order', fn ($query) => $query->where('no', 'like', '%'.$order_no.'%')))
+            ->when($order_no, fn ($query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', 'like', '%'.$order_no.'%')))
             ->when($no, fn ($query) => $query->where('no', 'like', '%'.$no.'%'))
             ->when(! is_null($status), fn ($query) => $query->where('status', '=', $status))
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
@@ -51,9 +52,9 @@ class ApplyRefundController extends BaseController
             return [
                 'id' => $apply_refund->id,
                 'no' => $apply_refund->no,
-                'user_name' => $apply_refund->user->user_name,
+                'user_name' => $apply_refund->user?->user_name,
                 'goods_name' => $apply_refund->orderDetail?->goods_name,
-                'order_no' => $apply_refund->order->no,
+                'order_no' => $apply_refund->order?->order_sn,
                 'type' => strval($apply_refund->type),
                 'status' => strval($apply_refund->status),
                 'money' => $apply_refund->money,
@@ -85,7 +86,7 @@ class ApplyRefundController extends BaseController
                 return $query->select('id', 'user_name', 'avatar');
             }])
             ->with(['order' => function ($query) {
-                return $query->select('id', 'no', 'user_id', 'created_at');
+                return $query->select('id', 'order_sn', 'user_id', 'created_at');
             }])
             ->with(['orderDetail' => function ($query) {
                 return $query->select(['id', 'goods_id', 'goods_name', 'goods_number', 'goods_price', 'goods_amount', 'goods_unit', 'goods_sku_id', 'goods_sku_value'])
@@ -105,8 +106,10 @@ class ApplyRefundController extends BaseController
     /**
      * 同意申请.
      */
-    public function agreeApply(Request $request)
+    public function agreeApply(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -134,7 +137,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 退款交易检测
-            app(ApplyRefundDao::class)->refundTransactionCheck($apply_refund);
+            $apply_refund_dao->refundTransactionCheck($apply_refund);
 
             $buyer_refund_time = intval(shop_config(ShopConfig::BUYER_REFUND_TIME));
             $job_time = Carbon::now()->addDays($buyer_refund_time);
@@ -149,7 +152,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = "卖家同意了本次{$typeMsg}申请";
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家同意了'.$typeMsg, ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了'.$typeMsg, ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, "卖家同意了{$typeMsg}");
+
+                admin_operation_log($current_user, "同意了{$typeMsg}申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -174,8 +181,10 @@ class ApplyRefundController extends BaseController
     /**
      * 关闭申请.
      */
-    public function closeApply(Request $request)
+    public function closeApply(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -200,7 +209,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '退款流程已关闭，交易正常进行';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家已发货，退款流程关闭，交易正常进行', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家已发货，退款流程关闭，交易正常进行', ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '关闭了售后申请');
+
+                admin_operation_log($current_user, "关闭了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -222,8 +235,10 @@ class ApplyRefundController extends BaseController
     /**
      * 执行退款(卖家主动同意退款给买家).
      */
-    public function executeRefund(Request $request)
+    public function executeRefund(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -249,7 +264,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
+            $apply_refund_dao->wechatRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -259,12 +274,16 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '卖家同意了退款';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+
+                $order_log_dao->storeByAdminUser($current_user, $order, '卖家同意了退款');
+
+                admin_operation_log($current_user, "同意了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -286,8 +305,10 @@ class ApplyRefundController extends BaseController
     /**
      * 拒绝退款.
      */
-    public function refuseRefund(Request $request)
+    public function refuseRefund(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -317,7 +338,11 @@ class ApplyRefundController extends BaseController
                 $apply_refund->job_time = $job_time;
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家拒绝了退货退款', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家拒绝了退货退款', ApplyRefundLog::TYPE_SELLER);
+
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家拒绝了退款');
+
+                admin_operation_log($current_user, "拒绝了退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
 
@@ -342,8 +367,10 @@ class ApplyRefundController extends BaseController
     /**
      * 确认收货.
      */
-    public function confirmReceipt(Request $request)
+    public function confirmReceipt(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
+        $current_user = $this->adminUser();
+
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
@@ -362,7 +389,7 @@ class ApplyRefundController extends BaseController
             }
 
             // 微信退款
-            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
+            $apply_refund_dao->wechatRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -372,12 +399,16 @@ class ApplyRefundController extends BaseController
                 $apply_refund->result = '款项已原路返回买家账号';
                 $apply_refund->save();
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
 
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $this->adminUser()->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+
+                $order_log_dao->storeByAdminUser($current_user, $order, '卖家确认收货，已退款给买家');
+
+                admin_operation_log($current_user, "确认收货退款给买家，退款申请记录：{$apply_refund->id}");
 
                 DB::commit();
             } catch (\Exception $exception) {
@@ -437,48 +468,54 @@ class ApplyRefundController extends BaseController
     private function transformer(ApplyRefund $apply_refund): array
     {
         $user = $apply_refund->user;
-        $temp_unit = $apply_refund->orderDetail->goods_unit ?? ($apply_refund->orderDetail->goods->unit ?? '');
+        $order = $apply_refund->order;
+        $orderDetail = $apply_refund->orderDetail;
+
+        if (! $order || ! $orderDetail || ! $user) {
+            return [];
+        }
+
+        $temp_unit = $orderDetail->goods_unit ?? ($orderDetail->goods->unit ?? '');
 
         return [
             'server_time' => time(),
-            'goods_image' => $apply_refund->orderDetail->goods->image ?? '',
-            'buyer_name' => $user->user_name ?? '',
-            'order_no' => $apply_refund->order->no ?? '',
-            'created_at' => $apply_refund->order->created_at->format('Y-m-d H:i:s'),
-            'goods_number' => $apply_refund->orderDetail->goods_number,
-            'goods_name' => $apply_refund->orderDetail->goods_name,
-            'goods_sku_value' => $apply_refund->orderDetail->goods_sku_value,
-            'goods_price' => price_format($apply_refund->orderDetail->goods_price),
-            'goods_amount' => price_format($apply_refund->orderDetail->goods_amount),
-            'refund_number' => get_new_price($apply_refund->number),
+            'goods_image' => $orderDetail->goods->image ?? '',
+            'buyer_name' => $user->user_name,
+            'order_no' => $order->order_sn,
+            'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+            'goods_number' => $orderDetail->goods_number,
+            'goods_name' => $orderDetail->goods_name,
+            'goods_sku_value' => $orderDetail->goods_sku_value,
+            'goods_price' => price_format($orderDetail->goods_price),
+            'goods_amount' => price_format($orderDetail->goods_amount),
+            'number' => get_new_price($apply_refund->number),
             'unit' => $temp_unit,
-            'refund_no' => $apply_refund->no,
+            'no' => $apply_refund->no,
             'type' => $apply_refund->type,
-            'certificate' => $apply_refund->certificate,
             'money' => $apply_refund->money,
             'format_money' => price_format($apply_refund->money),
-            'reason' => $apply_refund->applyRefundReason->content,
+            'reason' => $apply_refund->applyRefundReason?->content,
             'result' => $apply_refund->result,
             'description' => $apply_refund->description,
+            'certificate' => $apply_refund->certificate,
             'status' => $apply_refund->status,
             'time' => strtotime($apply_refund->job_time),
             'end_time' => $apply_refund->updated_at->toDateTimeString(),
             'isShipped' => (bool) $apply_refund->applyRefundShip,
-            // 'shopAddress' => $shopAddress ? $this->formatAddress($shopAddress) : null,
             'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) use (&$user, $temp_unit) {
                 if ($item->type === ApplyRefundLog::TYPE_BUYER) {
-                    $item->setAttribute('user_name', $user->user_name);
+                    $item->setAttribute('user_name', $user->user_name,);
                     $item->setAttribute('avatar', $user->avatar);
                 } else {
-                    $item->setAttribute('user_name', '');
+                    $item->setAttribute('user_name', $item->action_name);
                     $item->setAttribute('avatar', '');
                 }
                 $item->setAttribute('unit', $temp_unit);
                 $item->setAttribute('add_time', $item->created_at->toDateTimeString());
                 $item->setAttribute('money', price_format($item->applyRefund->money));
-                $item->setAttribute('refund_number', get_new_price($item->applyRefund->number));
+                $item->setAttribute('number', get_new_price($item->applyRefund->number));
 
-                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'refund_number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
+                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),
         ];
     }

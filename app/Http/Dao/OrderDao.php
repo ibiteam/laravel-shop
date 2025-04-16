@@ -12,9 +12,9 @@ use App\Models\OrderDetail;
 
 class OrderDao
 {
-    public function getInfoByNo(string $no, int $user_id): ?Order
+    public function getInfoByOrderSnAndUserId(string $order_sn, int $user_id): ?Order
     {
-        return Order::query()->whereUserId($user_id)->whereNo($no)->first();
+        return Order::query()->whereUserId($user_id)->whereOrderSn($order_sn)->first();
     }
 
     /**
@@ -139,7 +139,7 @@ class OrderDao
 
     public function refundActionByOrderDetail(OrderDetail $order_detail): int
     {
-        // todo operate: 订单详情申请售后按钮状态
-        return 0;
+        // 订单详情申请售后按钮状态
+        return app(ApplyRefundDao::class)->showAfterSales($order_detail);
     }
 }

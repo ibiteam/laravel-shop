@@ -23,12 +23,13 @@ class TransactionResource extends JsonResource
         return [
             'id' => $this->resource->id,
             'transaction_no' => $this->resource->transaction_no,
+            'parent_transaction_no' => $this->resource->parent?->transaction_no,
             'type' => match ($this->resource->type) {
                 Order::class => 'order',
                 default => '',
             },
             'type_no' => match ($this->resource->type) {
-                Order::class => $this->resource->typeInfo?->no,
+                Order::class => $this->resource->typeInfo?->order_sn,
                 default => '',
             },
             'amount' => $this->resource->amount,

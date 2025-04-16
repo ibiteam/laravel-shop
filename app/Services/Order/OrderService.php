@@ -175,7 +175,7 @@ class OrderService
         try {
             // 创建订单
             $order = Order::query()->create([
-                'no' => $this->generateOrderSn(),
+                'order_sn' => $this->generateOrderSn(),
                 'user_id' => $current_user->id,
                 'type' => $this->getOrderTypeEnum(),
                 'order_status' => OrderStatusEnum::CONFIRMED,
@@ -232,7 +232,7 @@ class OrderService
             DB::commit();
 
             return [
-                'no' => $order->no,
+                'order_sn' => $order->order_sn,
                 'can_pay' => $order->pay_status === PayStatusEnum::PAY_WAIT,
             ];
         } catch (BusinessException $business_exception) {
@@ -420,7 +420,7 @@ class OrderService
     {
         do {
             $no = date('Ymd').rand(100000, 999999).rand(10, 99);
-        } while (Order::query()->whereNo($no)->exists());
+        } while (Order::query()->whereOrderSn($no)->exists());
 
         return $no;
     }

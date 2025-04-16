@@ -3,6 +3,7 @@
 use App\Enums\ConstantEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
+use App\Exceptions\WeChatPayException;
 use App\Http\Middleware\Api\Authenticate as ApiAuthenticate;
 use App\Http\Middleware\Manage\Authenticate as ManageAuthenticate;
 use App\Http\Middleware\Manage\AccessRecord as ManageAccessRecord;
@@ -45,6 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->dontReport([
             BusinessException::class,
             ProcessDataException::class,
+            WeChatPayException::class,
         ]);
         // 封装异常返回
         $exceptions->render(function (AuthenticationException $authentication_exception, $request) {

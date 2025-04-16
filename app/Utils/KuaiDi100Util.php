@@ -3,6 +3,7 @@
 namespace App\Utils;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class KuaiDi100Util
@@ -109,8 +110,7 @@ class KuaiDi100Util
 
             return json_decode(html_entity_decode($content), true);
         } catch (\Throwable $throwable) {
-            dd($throwable);
-
+            Log::error($throwable->getMessage());
             return [];
         }
     }

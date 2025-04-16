@@ -5,6 +5,7 @@ import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
 import { transactionIndex, transactionRefund } from '@/api/set.js';
+import _ from 'lodash';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -25,7 +26,7 @@ const transactionTypeOptions = [
 
 const queryParams = reactive({
     transaction_no: '',
-    order_no: '',
+    order_sn: '',
     type: '',
     user_name: '',
     transaction_type: '',
@@ -44,7 +45,7 @@ const handleSearch = () => {
 // 重置搜索条件
 const resetSearch = () => {
     queryParams.transaction_no = '';
-    queryParams.order_no = '';
+    queryParams.order_sn = '';
     queryParams.type = '';
     queryParams.user_name = '';
     queryParams.transaction_type = '';
@@ -100,23 +101,49 @@ const getData = (page = 1) => {
         loading.value = false;
     })
 }
-
-const handleRefund = (transactionId) => {
-    cns.$confirm('确定要退款吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-    }).then(() => {
-        transactionRefund({id: transactionId}).then(res => {
-            if (cns.$successCode(res.code)) {
-                cns.$message.success(res.message);
-                getData(pageInfo.current_page)
-            } else {
-                cns.$message.error(res.message)
-            }
-        })
-    });
+/* 申请退款开始 */
+const refundVisible = ref(false)
+const refundFormRef = ref(null)
+const submitRefundFormLoading = ref(false)
+const refundForm = reactive({
+    id: 0,
+    reason: '',
+})
+const refundFormRules = {
+    reason: [
+        { required: false, message: '请输入退款原因', trigger: 'blur' },
+    ],
 }
+const openRefundDialog = (transactionId) => {
+    refundVisible.value = true;
+    refundForm.id = transactionId
+    refundForm.reason = '';
+    submitRefundFormLoading.value = false;
+}
+const submitRefundForm = _.throttle(() => {
+    refundFormRef.value.validate((valid) => {
+        if (valid) {
+            submitRefundFormLoading.value = true;
+            transactionRefund(refundForm).then(res => {
+                submitRefundFormLoading.value = false;
+                if (cns.$successCode(res.code)) {
+                    getData(pageInfo.current_page)
+                    closeRefundDialog()
+                    cns.$message.success(res.message)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            });
+        }
+    });
+}, 1000);
+const closeRefundDialog = () => {
+    refundVisible.value = false;
+    refundForm.id = 0;
+    refundForm.reason = '';
+    submitRefundFormLoading.value = false;
+}
+/* 申请退款结束 */
 
 
 onMounted(() => {
@@ -160,9 +187,9 @@ onMounted(() => {
                         <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="订单编号" prop="order_no">
+                <el-form-item label="订单编号" prop="order_sn">
                     <el-input
-                        v-model="queryParams.order_no"
+                        v-model="queryParams.order_sn"
                         placeholder="请输入订单编号搜索"
                         clearable
                         @keyup.enter="handleSearch"
@@ -200,20 +227,21 @@ onMounted(() => {
             @currentChange="handleCurrentChange"
             style="width: 100%;">
             <el-table-column label="ID" prop="id" width="80px"></el-table-column>
-            <el-table-column label="流水号" prop="transaction_no" width="210px"></el-table-column>
-            <el-table-column label="类型" width="80px">
-                <template #default="scope">
-                    <el-tag v-if="scope.row.transaction_type == 'pay'" type="success">支付</el-tag>
-                    <el-tag v-if="scope.row.transaction_type == 'refund'" type="danger">退款</el-tag>
-                </template>
-            </el-table-column>
+            <el-table-column label="业务单号" prop="type_no" width="180px"></el-table-column>
             <el-table-column label="业务类型" width="90px">
                 <template #default="scope">
                     <span v-if="scope.row.type == 'order'">订单</span>
                     <span v-else>--</span>
                 </template>
             </el-table-column>
-            <el-table-column label="业务单号" prop="type_no" width="180px"></el-table-column>
+            <el-table-column label="父级流水号" prop="parent_transaction_no" width="210px"></el-table-column>
+            <el-table-column label="流水号" prop="transaction_no" width="270px"></el-table-column>
+            <el-table-column label="类型" width="80px">
+                <template #default="scope">
+                    <el-tag v-if="scope.row.transaction_type == 'pay'" type="success">支付</el-tag>
+                    <el-tag v-if="scope.row.transaction_type == 'refund'" type="danger">退款</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column label="用户名" prop="user_name" width="220px"></el-table-column>
             <el-table-column label="支付方式" prop="payment_name" width="100px"></el-table-column>
             <el-table-column label="状态" width="90px">
@@ -225,13 +253,31 @@ onMounted(() => {
             <el-table-column label="金额" prop="amount"></el-table-column>
             <el-table-column label="成功时间" prop="paid_at" width="160px"></el-table-column>
             <el-table-column label="创建时间" prop="created_at" width="160px"></el-table-column>
-            <el-table-column label="备注" prop="remark" show-overflow-tooltip></el-table-column>
-            <el-table-column label="操作" width="200px">
+            <el-table-column label="备注" prop="remark" width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column label="操作" width="160px" fixed="right">
                 <template #default="scope">
-                    <el-button link type="primary" v-if="scope.row.can_refund && scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="handleRefund(scope.row.id)">退款</el-button>
+                    <el-button link type="primary" v-if="scope.row.can_refund && scope.row.transaction_type === 'pay' && scope.row.status === 1" @click="openRefundDialog(scope.row.id)">退款</el-button>
                 </template>
             </el-table-column>
         </PublicPageTable>
+        <!-- 申请退款 -->
+        <el-dialog v-model="refundVisible" title="退款" width="600" center :before-close="closeRefundDialog">
+            <el-form :model="refundForm" ref="refundFormRef" :rules="refundFormRules" label-width="auto" style="width: 100%;">
+                <el-form-item label="退款原因" prop="reason">
+                    <el-input v-model="refundForm.reason" placeholder="请输入退款原因" show-word-limit maxlength="80"/>
+                    <small>若传了退款原因，该原因将在下发给用户的退款消息中显示</small>
+                    <small>注意：</small>
+                    <small>1、该退款原因参数的长度不得超过80个字节；</small>
+                    <small>2、当订单退款金额小于等于1元且为部分退款时，退款原因将不会在消息中体现；</small>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div class="dialog-footer">
+                    <el-button @click="closeRefundDialog()">取消</el-button>
+                    <el-button type="primary" :loading="submitRefundFormLoading" @click="submitRefundForm()">确定</el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 
 </template>

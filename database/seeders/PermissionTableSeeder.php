@@ -20,9 +20,6 @@ class PermissionTableSeeder extends Seeder
         $this->addArticlePermission();
         $this->addToolPermission();
         $this->addDataPermission();
-
-        // 清除权限缓存 标签'manage_permission_menus'
-        Cache::tags(config('auth.manage.guard').'_permission_menus')->flush();
     }
 
     private function addPermission(string $display_name, string $name, int $sort = 0, int $is_left_nav = Permission::NOT_IS_LEFT_NAV, string $icon = '', ?string $parent_name = null): void
@@ -70,7 +67,7 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('角色删除', Permission::MANAGE_ROLE_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::PERMISSION_MANAGE);
         $this->addPermission('管理员日志', Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::PERMISSION_MANAGE);
 
-        $this->addPermission('配送管理', Permission::MANAGE_BASIC_SET_DISTRIBUTION, 0, Permission::IS_LEFT_NAV, '', Permission::BASIC_SET_MANAGE);
+        $this->addPermission('配送管理', Permission::MANAGE_BASIC_SET_DISTRIBUTION, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_SET);
         $this->addPermission('快递公司', Permission::MANAGE_SHIP_COMPANY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
         $this->addPermission('快递公司新增|编辑', Permission::MANAGE_SHIP_COMPANY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::MANAGE_BASIC_SET_DISTRIBUTION);
 
@@ -106,6 +103,9 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('会员管理', Permission::USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_USER);
         $this->addPermission('会员列表', Permission::MANAGE_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::USER_MANAGE);
         $this->addPermission('会员列表新增|编辑', Permission::MANAGE_USER_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::USER_MANAGE);
+
+        $this->addPermission('授权用户', Permission::AUTHORIZED_USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_USER);
+        $this->addPermission('微信服务号', Permission::MANAGE_WECHAT_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::AUTHORIZED_USER_MANAGE);
     }
 
     private function addOrderPermission(): void
@@ -124,6 +124,10 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('发货管理', Permission::ORDER_DELIVERY_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
         $this->addPermission('发货列表', Permission::MANAGE_ORDER_DELIVERY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_DELIVERY_MANAGE);
         $this->addPermission('发货导入|删除', Permission::MANAGE_ORDER_DELIVERY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ORDER_DELIVERY_MANAGE);
+
+        $this->addPermission('评价管理', Permission::ORDER_EVALUATE_MANAGE, 0, Permission::IS_LEFT_NAV, 'Menu', Permission::MODULE_ORDER);
+        $this->addPermission('评价列表', Permission::MANAGE_ORDER_EVALUATE_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::ORDER_EVALUATE_MANAGE);
+        $this->addPermission('评价编辑|审核', Permission::MANAGE_ORDER_EVALUATE_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::ORDER_EVALUATE_MANAGE);
     }
 
     private function addArticlePermission(): void
