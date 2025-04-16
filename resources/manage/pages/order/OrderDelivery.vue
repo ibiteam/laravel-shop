@@ -84,11 +84,14 @@ const getData = (page = 1) => {
 /* 物流轨迹开始 */
 const logisticsVisible = ref(false)
 const logisticsData = ref([])
+const logisticsInitLoading = ref(false)
 const openLogisticsDialog = (orderId) => {
+    logisticsInitLoading.value = true
+    logisticsVisible.value = true
     orderQueryExpress({id: orderId}).then(res => {
+        logisticsInitLoading.value = false
         if (cns.$successCode(res.code)) {
             logisticsData.value = res.data
-            logisticsVisible.value = true
         } else {
             cns.$message.error(res.message)
         }
@@ -97,6 +100,7 @@ const openLogisticsDialog = (orderId) => {
 const closeLogisticsDialog = () => {
     logisticsVisible.value = false;
     logisticsData.value = [];
+    logisticsInitLoading.value = false
 }
 /* 物流轨迹结束 */
 /* 导入发货开始 */
@@ -259,7 +263,7 @@ onMounted(() => {
         </PublicPageTable>
         <!-- 查看物流 -->
         <el-dialog v-model="logisticsVisible" title="查看物流轨迹" width="600"  center :before-close="closeLogisticsDialog">
-            <div style="height: 60vh;overflow: auto">
+            <div style="height: 60vh;overflow: auto" v-loading="logisticsInitLoading">
                 <el-timeline :reverse="false">
                     <el-timeline-item v-for="(shipItem, index) in logisticsData" :key="index" :timestamp="shipItem.time">
                         {{ shipItem.context }}
