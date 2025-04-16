@@ -204,14 +204,14 @@ onMounted(() => {
             style="width: 100%;">
             <el-table-column label="ID" prop="id" width="80px"></el-table-column>
             <el-table-column label="订单编号" prop="order.no" width="150px"></el-table-column>
-            <el-table-column label="商品名称" width="180px" show-overflow-tooltip>
+            <el-table-column label="商品名称" width="220px" show-overflow-tooltip>
                 <template #default="scope">
-                        <img :src="scope.row.goods.image" width="50px" height="50px" alt="">
-                        <div class="goods-name">{{scope.row.goods.name}}</div>
+                    <img :src="scope.row.goods.image" width="50px" height="50px" alt="">
+                    <div class="goods-name">{{scope.row.goods.name}}</div>
                 </template>
             </el-table-column>
             <el-table-column label="用户名" prop="user.user_name" width="200px"></el-table-column>
-            <el-table-column label="星级" width="420px">
+            <el-table-column label="星级" min-width="420px">
                 <template #default="scope">
                     <div class="s-flex ai-ct">
                         <div class="rate">综合评分：</div><el-rate  style="height: auto;" v-model="scope.row.rank" disabled text-color="#ff9900" score-template="{value}"></el-rate>
@@ -234,7 +234,6 @@ onMounted(() => {
                     <el-tag v-else type="info">未审核</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="审核说明" min-width="140px"></el-table-column>
             <el-table-column label="评价时间" prop="comment_at" width="160px"></el-table-column>
             <el-table-column fixed="right" label="操作" width="200px">
                 <template #default="scope">
@@ -317,7 +316,7 @@ onMounted(() => {
     font-size: 11px;
 }
 .goods-name {
-    width: 180px;
+    width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
