@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('no', 50)->comment('订单编号')->unique();
+            $table->string('order_sn', 50)->comment('订单编号')->unique();
             $table->unsignedBigInteger('user_id')->comment('用户ID')->index();
             $table->string('type', 50)->comment('订单类型')->index();
             $table->tinyInteger('order_status')->comment('订单状态')->index();

@@ -30,7 +30,7 @@ class ApplyRefundService
      */
     public function init(User $user, string $order_no, int $order_detail_id): array
     {
-        $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_no)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
@@ -93,7 +93,7 @@ class ApplyRefundService
      */
     public function getInfoByTypeAndOrder(User $user, string $order_no, int $order_detail_id, int $type): array
     {
-        $order = Order::query()->whereNo($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_no)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');
@@ -130,7 +130,7 @@ class ApplyRefundService
             'goods_sku_value' => $order_detail->goods_sku_value,
             'goods_amount' => get_new_price($order_detail->goods_amount),
             'goods_amount_format' => price_format($order_detail->goods_amount),
-            'order_no' => $order->no,
+            'order_no' => $order->order_sn,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
         ];
@@ -200,7 +200,7 @@ class ApplyRefundService
             $count = $apply_refund->count + 1;
         } else {
             // 新增申请售后
-            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
+            $order = Order::query()->with('user')->whereUserId($user->id)->whereOrderSn($order_no)->wherePayStatus(PayStatusEnum::PAYED->value)->first();
 
             if (! $order) {
                 throw new BusinessException('订单已不支持退款');
@@ -333,7 +333,7 @@ class ApplyRefundService
                 throw new BusinessException('订单明细不存在');
             }
         } else {
-            $order = Order::query()->with('user')->whereUserId($user->id)->whereNo($order_no)->first();
+            $order = Order::query()->with('user')->whereUserId($user->id)->whereOrderSn($order_no)->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -405,7 +405,7 @@ class ApplyRefundService
             'goods_sku_value' => $order_detail->goods_sku_value,
             'goods_amount' => get_new_price($order_detail->goods_amount),
             'goods_amount_format' => price_format($order_detail->goods_amount),
-            'order_no' => $order->no,
+            'order_no' => $order->order_sn,
             'shipping_fee' => $order->shipping_fee,
             'pay_time' => $order->paid_at,
         ];

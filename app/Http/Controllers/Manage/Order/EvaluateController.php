@@ -30,8 +30,8 @@ class EvaluateController extends BaseController
         $list = OrderEvaluate::query()
             ->latest()
             ->latest('id')
-            ->with(['order:id,no', 'goods:id,name,image', 'user:id,user_name'])
-            ->when($order_no, fn (Builder $query) => $query->whereHas('order', fn (Builder $query) => $query->where('no', $order_no)))
+            ->with(['order:id,order_sn', 'goods:id,name,image', 'user:id,user_name'])
+            ->when($order_no, fn (Builder $query) => $query->whereHas('order', fn (Builder $query) => $query->where('order_sn', $order_no)))
             ->when($goods_name, fn (Builder $query) => $query->whereHas('goods', fn (Builder $query) => $query->where('name', $goods_name)))
             ->when($user_name, fn (Builder $query) => $query->whereHas('user', fn (Builder $query) => $query->where('user_name', 'like', "%{$user_name}%")))
             ->when(! is_null($status), fn (Builder $query) => $query->where('status', $status))
@@ -99,7 +99,7 @@ class EvaluateController extends BaseController
             ], [], [
                 'id' => '评价ID',
             ]);
-            $order_evaluate = OrderEvaluate::query()->with(['order:id,no', 'goods:id,name,image', 'user:id,user_name'])->whereId($validated['id'])->first();
+            $order_evaluate = OrderEvaluate::query()->with(['order:id,order_sn', 'goods:id,name,image', 'user:id,user_name'])->whereId($validated['id'])->first();
 
             if (! $order_evaluate instanceof OrderEvaluate) {
                 throw new BusinessException('订单评价不存在');

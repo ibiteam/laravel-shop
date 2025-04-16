@@ -61,7 +61,7 @@ class EvaluateController extends BaseController
             ]);
             $current_user = $this->user();
 
-            $order = Order::query()->with('evaluate')->whereUserId($current_user->id)->whereNo($validated['no'])->first();
+            $order = Order::query()->with('evaluate')->whereUserId($current_user->id)->whereOrderSn($validated['no'])->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -72,7 +72,7 @@ class EvaluateController extends BaseController
             }
 
             return $this->success([
-                'no' => $order->no,
+                'no' => $order->order_sn,
                 'items' => $order
                     ->detail()
                     ->with('goods:id,name,image')
@@ -135,7 +135,7 @@ class EvaluateController extends BaseController
                 'is_anonymous' => '是否匿名',
             ]);
             $current_user = $this->user();
-            $order = Order::query()->with(['evaluate', 'detail'])->whereUserId($current_user->id)->whereNo($validated['no'])->first();
+            $order = Order::query()->with(['evaluate', 'detail'])->whereUserId($current_user->id)->whereOrderSn($validated['no'])->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');

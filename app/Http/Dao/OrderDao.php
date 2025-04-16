@@ -14,7 +14,7 @@ class OrderDao
 {
     public function getInfoByNo(string $no, int $user_id): ?Order
     {
-        return Order::query()->whereUserId($user_id)->whereNo($no)->first();
+        return Order::query()->whereUserId($user_id)->whereOrderSn($no)->first();
     }
 
     /**

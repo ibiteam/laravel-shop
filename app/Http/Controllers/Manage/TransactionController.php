@@ -44,7 +44,7 @@ class TransactionController extends BaseController
             ->when(is_numeric($status), fn (Builder $query) => $query->where('status', $status))
             ->when($type === 'order', fn (Builder $query) => $query->where('type', Order::class))
             ->when($order_no, function (Builder $query) use ($order_no) {
-                $query->whereHasMorph('typeInfo', Order::class, fn (Builder $query) => $query->where('no', $order_no));
+                $query->whereHasMorph('typeInfo', Order::class, fn (Builder $query) => $query->where('order_sn', $order_no));
             })
             ->when($user_name, function (Builder $query) use ($user_name) {
                 $query->whereHas('user', fn (Builder $query) => $query->where('user_name', 'like', "%{$user_name}%"));

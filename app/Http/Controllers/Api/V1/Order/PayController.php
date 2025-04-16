@@ -65,7 +65,7 @@ class PayController extends BaseController
 
             return $this->success([
                 'order' => [
-                    'no' => $order->no,
+                    'no' => $order->order_sn,
                     'order_amount' => $order->order_amount,
                     'created_at' => $order->created_at->toDateTimeString(),
                 ],

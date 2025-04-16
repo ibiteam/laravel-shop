@@ -29,7 +29,7 @@ class TransactionResource extends JsonResource
                 default => '',
             },
             'type_no' => match ($this->resource->type) {
-                Order::class => $this->resource->typeInfo?->no,
+                Order::class => $this->resource->typeInfo?->order_sn,
                 default => '',
             },
             'amount' => $this->resource->amount,

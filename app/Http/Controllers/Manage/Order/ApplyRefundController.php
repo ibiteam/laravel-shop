@@ -41,7 +41,7 @@ class ApplyRefundController extends BaseController
             ->with(['user', 'order', 'orderDetail', 'applyRefundReason'])
             ->when($user_name, fn ($query) => $query->whereHas('user', fn ($query) => $query->where('user_name', 'like', '%'.$user_name.'%')))
             ->when($goods_name, fn ($query) => $query->whereHas('orderDetail', fn ($query) => $query->where('goods_name', 'like', '%'.$goods_name.'%')))
-            ->when($order_no, fn ($query) => $query->whereHas('order', fn ($query) => $query->where('no', 'like', '%'.$order_no.'%')))
+            ->when($order_no, fn ($query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', 'like', '%'.$order_no.'%')))
             ->when($no, fn ($query) => $query->where('no', 'like', '%'.$no.'%'))
             ->when(! is_null($status), fn ($query) => $query->where('status', '=', $status))
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
@@ -54,7 +54,7 @@ class ApplyRefundController extends BaseController
                 'no' => $apply_refund->no,
                 'user_name' => $apply_refund->user?->user_name,
                 'goods_name' => $apply_refund->orderDetail?->goods_name,
-                'order_no' => $apply_refund->order?->no,
+                'order_no' => $apply_refund->order?->order_sn,
                 'type' => strval($apply_refund->type),
                 'status' => strval($apply_refund->status),
                 'money' => $apply_refund->money,
@@ -86,7 +86,7 @@ class ApplyRefundController extends BaseController
                 return $query->select('id', 'user_name', 'avatar');
             }])
             ->with(['order' => function ($query) {
-                return $query->select('id', 'no', 'user_id', 'created_at');
+                return $query->select('id', 'order_sn', 'user_id', 'created_at');
             }])
             ->with(['orderDetail' => function ($query) {
                 return $query->select(['id', 'goods_id', 'goods_name', 'goods_number', 'goods_price', 'goods_amount', 'goods_unit', 'goods_sku_id', 'goods_sku_value'])
@@ -481,7 +481,7 @@ class ApplyRefundController extends BaseController
             'server_time' => time(),
             'goods_image' => $orderDetail->goods->image ?? '',
             'buyer_name' => $user->user_name,
-            'order_no' => $order->no,
+            'order_no' => $order->order_sn,
             'created_at' => $order->created_at->format('Y-m-d H:i:s'),
             'goods_number' => $orderDetail->goods_number,
             'goods_name' => $orderDetail->goods_name,

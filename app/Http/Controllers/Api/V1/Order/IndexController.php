@@ -47,7 +47,7 @@ class IndexController extends BaseController
             ->whereUserId($current_user->id)
             ->when(! is_null($keywords), function (Builder $query) use ($keywords) {
                 $query->where(function (Builder $query) use ($keywords) {
-                    $query->whereLike('no', "%$keywords%")->orWhereHas('detail', function (Builder $query) use ($keywords) {
+                    $query->whereLike('order_sn', "%$keywords%")->orWhereHas('detail', function (Builder $query) use ($keywords) {
                         $query->whereLike('goods_name', "%$keywords%")->orWhereLike('goods_no', "%$keywords%");
                     });
                 });
@@ -104,7 +104,7 @@ class IndexController extends BaseController
             $order = Order::query()
                 ->withCount('orderDelivery')
                 ->with(['detail', 'province', 'city', 'district'])
-                ->whereNo($validated['no'])
+                ->whereOrderSn($validated['no'])
                 ->whereUserId($current_user->id)
                 ->first();
 
@@ -138,7 +138,7 @@ class IndexController extends BaseController
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
-                ->whereNo($validated['no'])
+                ->whereOrderSn($validated['no'])
                 ->first();
 
             if (! $order instanceof Order) {
@@ -150,7 +150,7 @@ class IndexController extends BaseController
             }
 
             return $this->success([
-                'no' => $order->no,
+                'no' => $order->order_sn,
                 'province_name' => $order->province?->name,
                 'city_name' => $order->city?->name,
                 'district_name' => $order->district?->name,
@@ -186,7 +186,7 @@ class IndexController extends BaseController
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
-                ->whereNo($validated['no'])
+                ->whereOrderSn($validated['no'])
                 ->first();
 
             if (! $order instanceof Order) {
@@ -372,7 +372,7 @@ class IndexController extends BaseController
             $order = Order::query()
                 ->with(['orderDelivery'])
                 ->whereUserId($current_user->id)
-                ->whereNo($validated['no'])
+                ->whereOrderSn($validated['no'])
                 ->first();
 
             if (! $order instanceof Order) {
