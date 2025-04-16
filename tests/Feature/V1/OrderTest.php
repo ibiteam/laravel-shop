@@ -70,7 +70,7 @@ it('test wechat pay api interface', function () {
 
 it('test my order list interface', function () {
     $response = $this->doGet('api/v1/order/my/index', [
-        // 'keywords' => '测试商1',
+        'type' => 'wait_ship',
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
