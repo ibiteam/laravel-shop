@@ -165,7 +165,7 @@ class Order extends Model
     {
         return $query
             ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAYED);
+            ->where('pay_status', PayStatusEnum::PAY_WAIT);
     }
 
     /**
