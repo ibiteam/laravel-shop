@@ -10,7 +10,7 @@
 
 | 字段                 | 字段类型    | 是否必须 | 说明              |
 |--------------------|---------|------|-----------------|
-| no                 | String  | Y    | 订单编号            |
+| order_sn           | String  | Y    | 订单编号            |
 | items              | Array   | Y    | 评价明细数据          |
 | items.\*.id        | Integer | Y    | 评价明细ID(订单明细ID)  |
 | items.\*.comment   | String  | Y    | 评价内容            |

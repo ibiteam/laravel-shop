@@ -55,13 +55,13 @@ class EvaluateController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
 
-            $order = Order::query()->with('evaluate')->whereUserId($current_user->id)->whereOrderSn($validated['no'])->first();
+            $order = Order::query()->with('evaluate')->whereUserId($current_user->id)->whereOrderSn($validated['order_sn'])->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
@@ -72,7 +72,7 @@ class EvaluateController extends BaseController
             }
 
             return $this->success([
-                'no' => $order->order_sn,
+                'order_sn' => $order->order_sn,
                 'items' => $order
                     ->detail()
                     ->with('goods:id,name,image')
@@ -104,7 +104,7 @@ class EvaluateController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
                 'items' => 'required|array',
                 'items.*.id' => 'required|integer',
                 'items.*.comment' => 'required|string|max:200',
@@ -120,7 +120,7 @@ class EvaluateController extends BaseController
             ], [
                 'items.*.images.max' => '评价图片最多 :max 张',
             ], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
                 'items' => '评价明细',
                 'items.*.id' => '评价明细ID',
                 'items.*.comment' => '评价内容',
@@ -135,7 +135,7 @@ class EvaluateController extends BaseController
                 'is_anonymous' => '是否匿名',
             ]);
             $current_user = $this->user();
-            $order = Order::query()->with(['evaluate', 'detail'])->whereUserId($current_user->id)->whereOrderSn($validated['no'])->first();
+            $order = Order::query()->with(['evaluate', 'detail'])->whereUserId($current_user->id)->whereOrderSn($validated['order_sn'])->first();
 
             if (! $order instanceof Order) {
                 throw new BusinessException('订单不存在');
