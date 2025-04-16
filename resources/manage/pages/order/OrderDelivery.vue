@@ -13,7 +13,7 @@ const loading = ref(false);
 
 const queryParams = reactive({
     delivery_no: '',
-    order_no: '',
+    order_sn: '',
     created_start_time: '',
     created_end_time: '',
     page: 1,
@@ -28,7 +28,7 @@ const handleSearch = () => {
 // 重置搜索条件
 const resetSearch = () => {
     queryParams.delivery_no = '';
-    queryParams.order_no = '';
+    queryParams.order_sn = '';
     queryParams.created_start_time = '';
     queryParams.created_end_time = '';
     queryParams.page = 1;
@@ -83,12 +83,9 @@ const getData = (page = 1) => {
 
 /* 物流轨迹开始 */
 const logisticsVisible = ref(false)
-const logisticsInitLoading = ref(false);
 const logisticsData = ref([])
 const openLogisticsDialog = (orderId) => {
-    logisticsInitLoading.value = true
     orderQueryExpress({id: orderId}).then(res => {
-        logisticsInitLoading.value = false
         if (cns.$successCode(res.code)) {
             logisticsData.value = res.data
             logisticsVisible.value = true
@@ -100,7 +97,6 @@ const openLogisticsDialog = (orderId) => {
 const closeLogisticsDialog = () => {
     logisticsVisible.value = false;
     logisticsData.value = [];
-    logisticsInitLoading.value = false;
 }
 /* 物流轨迹结束 */
 /* 导入发货开始 */
@@ -189,9 +185,9 @@ onMounted(() => {
                         @keyup.enter="handleSearch"
                     />
                 </el-form-item>
-                <el-form-item label="订单编号" prop="order_no">
+                <el-form-item label="订单编号" prop="order_sn">
                     <el-input
-                        v-model="queryParams.order_no"
+                        v-model="queryParams.order_sn"
                         placeholder="请输入订单编号搜索"
                         clearable
                         @keyup.enter="handleSearch"
@@ -231,12 +227,12 @@ onMounted(() => {
             style="width: 100%;">
             <el-table-column label="ID" prop="id" width="80px"></el-table-column>
             <el-table-column label="运单号" prop="delivery_no" width="180px"></el-table-column>
-            <el-table-column label="订单编号" prop="order.no" width="180px"></el-table-column>
+            <el-table-column label="订单编号" prop="order.order_sn" width="180px"></el-table-column>
             <el-table-column label="快递公司" prop="ship_company.name"></el-table-column>
             <el-table-column label="快递单号" width="240px">
                 <template #default="scope">
                     <span>{{ scope.row.ship_no }}</span>
-                    <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" :loading="logisticsInitLoading" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
+                    <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
                 </template>
             </el-table-column>
             <el-table-column label="状态">
