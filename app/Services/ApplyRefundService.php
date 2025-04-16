@@ -449,6 +449,7 @@ class ApplyRefundService
                 'money' => get_new_price($apply_refund->money),
                 'number' => get_new_price($apply_refund->number),
                 'reason_id' => $apply_refund->reason_id,
+                'reason_content' => $apply_refund->applyRefundReason?->content,
                 'is_revoke' => $apply_refund->is_revoke,
                 'description' => $apply_refund->description,
                 'certificate' => $apply_refund->certificate,
