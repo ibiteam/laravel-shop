@@ -41,6 +41,7 @@ class OrderDetailResource extends JsonResource
             ],
             'items' => $this->resource->detail->map(function (OrderDetail $item) {
                 return [
+                    'id' => $item->id,
                     'goods_no' => $item->goods_no,
                     'goods_name' => $item->goods_name,
                     'goods_unit' => $item->goods_unit,
