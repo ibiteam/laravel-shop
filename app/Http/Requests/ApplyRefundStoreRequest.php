@@ -27,7 +27,7 @@ class ApplyRefundStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'apply_refund_id' => 'required_without_all:order_no,order_detail_id|integer',
+            'apply_refund_id' => 'required_without_all:order_sn,order_detail_id|integer',
             'order_sn' => 'required_without:apply_refund_id|string',
             'order_detail_id' => 'required_without:apply_refund_id|integer',
             'number' => 'required|numeric',
