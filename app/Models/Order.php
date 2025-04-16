@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
+use App\Enums\PayStatusEnum;
+use App\Enums\ShippingStatusEnum;
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -62,6 +65,11 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order newQuery()
  * @method static Builder<static>|Order onlyTrashed()
  * @method static Builder<static>|Order query()
+ * @method static Builder<static>|Order searchComplete()
+ * @method static Builder<static>|Order searchWaitEvaluate(array $evaluate_ids = [])
+ * @method static Builder<static>|Order searchWaitPay()
+ * @method static Builder<static>|Order searchWaitReceive()
+ * @method static Builder<static>|Order searchWaitShip()
  * @method static Builder<static>|Order whereAddress($value)
  * @method static Builder<static>|Order whereCancelReason($value)
  * @method static Builder<static>|Order whereCityId($value)
@@ -77,8 +85,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Order whereIp($value)
  * @method static Builder<static>|Order whereIsEditAddress($value)
  * @method static Builder<static>|Order whereMoneyPaid($value)
- * @method static Builder<static>|Order whereOrderSn($value)
  * @method static Builder<static>|Order whereOrderAmount($value)
+ * @method static Builder<static>|Order whereOrderSn($value)
  * @method static Builder<static>|Order whereOrderStatus($value)
  * @method static Builder<static>|Order wherePaidAt($value)
  * @method static Builder<static>|Order wherePayStatus($value)
@@ -148,6 +156,61 @@ class Order extends Model
     public function transactions(): MorphMany
     {
         return $this->morphMany(Transaction::class, 'typeInfo', 'type', 'type_id');
+    }
+
+    /**
+     * 待付款查询作用域
+     */
+    public function scopeSearchWaitPay(Builder $query): Builder
+    {
+        return $query
+            ->where('order_status', OrderStatusEnum::CONFIRMED)
+            ->where('pay_status', PayStatusEnum::PAYED);
+    }
+
+    /**
+     * 待发货查询作用域
+     */
+    public function scopeSearchWaitShip(Builder $query): Builder
+    {
+        return $query
+            ->where('order_status', OrderStatusEnum::CONFIRMED)
+            ->where('pay_status', PayStatusEnum::PAYED)
+            ->where('ship_status', ShippingStatusEnum::UNSHIPPED);
+    }
+
+    /**
+     * 待评价查询作用域
+     */
+    public function scopeSearchWaitEvaluate(Builder $query, array $evaluate_ids = []): Builder
+    {
+        return $query
+            ->where('order_status', OrderStatusEnum::CONFIRMED)
+            ->where('pay_status', PayStatusEnum::PAYED)
+            ->where('ship_status', ShippingStatusEnum::RECEIVED)
+            ->whereNotIn('id', $evaluate_ids);
+    }
+
+    /**
+     * 待收货查询作用域
+     */
+    public function scopeSearchWaitReceive(Builder $query): Builder
+    {
+        return $query
+            ->where('order_status', OrderStatusEnum::CONFIRMED)
+            ->where('pay_status', PayStatusEnum::PAYED)
+            ->where('ship_status', ShippingStatusEnum::SHIPPED);
+    }
+
+    /**
+     * 订单完成查询作用域
+     */
+    public function scopeSearchComplete(Builder $query): Builder
+    {
+        return $query
+            ->where('order_status', OrderStatusEnum::CONFIRMED)
+            ->where('pay_status', PayStatusEnum::PAYED)
+            ->where('ship_status', ShippingStatusEnum::RECEIVED);
     }
 
     protected function casts(): array
