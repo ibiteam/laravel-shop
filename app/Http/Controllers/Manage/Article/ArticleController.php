@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Article;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ArticleCategoryDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
@@ -183,7 +184,7 @@ class ArticleController extends BaseController
                 $article->click_count = $validated['click_count'] ?? 0;
                 $article->file_url = $validated['file_url'] ?? '';
                 $article->goods_category_id = $validated['goods_category_id'] ?? 0;
-                $article->admin_user_id = $this->adminUser()->id;
+                $article->admin_user_id = get_admin_user()->id;
 
                 if (! $article->save()) {
                     throw new \Exception('保存文章失败');
@@ -213,7 +214,7 @@ class ArticleController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($article->getChanges()), $article->getChanges()));
             }
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('保存成功');
         } catch (ValidationException $validation_exception) {
@@ -258,7 +259,7 @@ class ArticleController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($article->getChanges()), $article->getChanges())
             );
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (BusinessException $business_exception) {
@@ -286,7 +287,7 @@ class ArticleController extends BaseController
             }
 
             if ($article->delete()) {
-                admin_operation_log($this->adminUser(), "删除了文章:{$article->title}[{$article->id}]", AdminOperationLog::TYPE_DESTROY);
+                admin_operation_log("删除了文章:{$article->title}[{$article->id}]", AdminOperationLog::TYPE_DESTROY);
 
                 return $this->success('删除成功');
             }
@@ -359,7 +360,7 @@ class ArticleController extends BaseController
                 throw new BusinessException('生成副本失败');
             }
 
-            admin_operation_log($this->adminUser(), "生成副本文章:{$article_info->title}[{$article_info->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log("生成副本文章:{$article_info->title}[{$article_info->id}]", AdminOperationLog::TYPE_STORE);
 
             return $this->success('生成副本成功');
         } catch (ValidationException $validation_exception) {

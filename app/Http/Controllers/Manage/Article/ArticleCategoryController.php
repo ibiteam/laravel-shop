@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Article;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ArticleCategoryDao;
 use App\Models\AdminOperationLog;
 use App\Models\Article;
@@ -132,10 +133,10 @@ class ArticleCategoryController extends BaseController
                 $log = "编辑文章分类[id:{$article_category->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($article_category->getChanges()), $article_category->getChanges()));
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
             } else {
                 $log = "新增文章分类[id:{$article_category->id}]";
-                admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_STORE);
+                admin_operation_log($log, AdminOperationLog::TYPE_STORE);
             }
 
             return $this->success('保存成功');
@@ -174,7 +175,7 @@ class ArticleCategoryController extends BaseController
             }
 
             if ($route_category->delete()) {
-                admin_operation_log($this->adminUser(), "删除了文章分类:{$route_category->name}[{$route_category->id}]", AdminOperationLog::TYPE_DESTROY);
+                admin_operation_log("删除了文章分类:{$route_category->name}[{$route_category->id}]", AdminOperationLog::TYPE_DESTROY);
 
                 return $this->success('删除成功');
             }
@@ -221,7 +222,7 @@ class ArticleCategoryController extends BaseController
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($article_category->getChanges()), $article_category->getChanges())
             );
-            admin_operation_log($this->adminUser(), $log, AdminOperationLog::TYPE_UPDATE);
+            admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
 
             return $this->success('切换成功');
         } catch (ValidationException $validation_exception) {

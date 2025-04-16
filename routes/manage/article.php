@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Manage\ArticleCategoryController;
-use App\Http\Controllers\Manage\ArticleController;
+use App\Http\Controllers\Manage\Article\ArticleCategoryController;
+use App\Http\Controllers\Manage\Article\ArticleController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
