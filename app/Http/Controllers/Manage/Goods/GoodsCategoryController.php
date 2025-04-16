@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Manage;
+namespace App\Http\Controllers\Manage\Goods;
 
 use App\Exceptions\BusinessException;
+use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\CategoryDao;
 use App\Models\AdminOperationLog;
 use App\Models\Category;

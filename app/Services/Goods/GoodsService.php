@@ -25,7 +25,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class GoodsService
 {
@@ -168,7 +167,7 @@ class GoodsService
         DB::beginTransaction();
 
         try {
-            $store_data['no'] = Str::uuid()->toString();
+            $store_data['no'] = $this->generateGoodsNo();
             $store_data['sales_volume'] = 0;
             $store_data['sort'] = 0;
             /* 商品信息 */
@@ -418,5 +417,14 @@ class GoodsService
                 })->values(),
             ];
         });
+    }
+
+    private function generateGoodsNo(): string
+    {
+        do {
+            $no = time().mt_rand(10, 99);
+        } while (Goods::query()->where('no', $no)->exists());
+
+        return $no;
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Manage\GoodsCategoryController;
-use App\Http\Controllers\Manage\GoodsController;
-use App\Http\Controllers\Manage\GoodsParameterTemplateController;
-use App\Http\Controllers\Manage\GoodsSkuTemplateController;
+use App\Http\Controllers\Manage\Goods\GoodsCategoryController;
+use App\Http\Controllers\Manage\Goods\GoodsController;
+use App\Http\Controllers\Manage\Goods\GoodsParameterTemplateController;
+use App\Http\Controllers\Manage\Goods\GoodsSkuTemplateController;
 use App\Models\Permission as PermissionModel;
 use Illuminate\Support\Facades\Route;
 
