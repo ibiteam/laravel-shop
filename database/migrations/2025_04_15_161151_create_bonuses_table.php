@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('type_values')->nullable()->comment('红包类型限制的值');
             $table->tinyInteger('can_use_coupon')->default(0)->comment('是否跟优惠券一起使用 0、不可以 1、可以');
             $table->tinyInteger('is_add')->default(0)->comment('是否可以叠加 0、不可以 1、可以');
-            $table->decimal('min_order_amount')->default(0)->comment('最小订单值');
+            $table->decimal('min_amount')->default(0)->comment('最小使用金额');
             $table->timestamps();
         });
     }

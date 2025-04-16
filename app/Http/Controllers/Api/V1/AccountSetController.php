@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Enums\PhoneMsgTypeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
+use App\Models\Order;
+use App\Models\OrderEvaluate;
 use App\Models\User;
 use App\Rules\PhoneRule;
 use App\Rules\UserNameRule;
@@ -17,20 +19,27 @@ class AccountSetController extends BaseController
 {
     protected $user;
 
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $this->user = $request->user();
+        $this->user = $this->user();
     }
 
     // 获取用户信息
     public function getUserInfo()
     {
         $user = $this->user;
-        $data['user_name'] = $user->user_name;
-        $data['nickname'] = $user->nickname;
-        $data['phone'] = $user->phone;
-        $data['avatar'] = $user->avatar;
-        $data['is_modify'] = $user->is_modify;
+        $data = [];
+        if ($user) {
+            $evaluate_ids = OrderEvaluate::query()->whereUserId($user->id)->pluck('order_id')->unique()->filter()->toArray();
+            $data['user_name'] = $user->user_name;
+            $data['nickname'] = $user->nickname;
+            $data['phone'] = $user->phone;
+            $data['avatar'] = $user->avatar;
+            $data['is_modify'] = $user->is_modify;
+            $data['wait_pay_count'] = Order::query()->whereUserId($user->id)->searchWaitPay()->count();
+            $data['wait_ship_count'] = Order::query()->whereUserId($user->id)->searchWaitShip()->count();
+            $data['wait_evaluate_count'] = Order::query()->whereUserId($user->id)->searchWaitEvaluate($evaluate_ids)->count();
+        }
 
         return $this->success($data);
     }

@@ -21,7 +21,7 @@ class AddressController extends BaseController
     public function index(Request $request, UserAddressDao $userAddressDao)
     {
         $data = $userAddressDao
-            ->getAddrListsForUser($request->user()?->id ?: 0)
+            ->getAddrListsForUser($this->user()?->id ?: 0)
             ->toArray();
 
         return $this->success($data);
@@ -35,7 +35,7 @@ class AddressController extends BaseController
     public function search(Request $request, UserAddressDao $userAddressDao)
     {
         $data = $userAddressDao
-            ->getAddrListsForUser($request->user()?->id ?: 0, $request->get('keywords'))
+            ->getAddrListsForUser($this->user()?->id ?: 0, $request->get('keywords'))
             ->toArray();
 
         return $this->success($data);
@@ -44,7 +44,7 @@ class AddressController extends BaseController
     // 获取地址详情
     public function show(Request $request, UserAddressDao $userAddressDao)
     {
-        $user = $request->user();
+        $user = $this->user();
 
         try {
             $id = $request->get('id');
@@ -60,7 +60,7 @@ class AddressController extends BaseController
     public function destroy(Request $request)
     {
         $address = UserAddress::query()
-            ->whereUserId($request->user()?->id ?: 0)
+            ->whereUserId($this->user()?->id ?: 0)
             ->whereId($request->get('id'))->first();
 
         if (! $address) {
@@ -82,7 +82,7 @@ class AddressController extends BaseController
     public function batchDestroy(BatchDestroyAddressRequest $request)
     {
         $validate = $request->validated();
-        $user = $request->user();
+        $user = $this->user();
         $res = UserAddress::whereUserId($user->id)->whereIn('id', $validate['ids'])->delete();
 
         if (! $res) {
@@ -95,7 +95,7 @@ class AddressController extends BaseController
     // 设置默认地址
     public function setDefault(Request $request, UserAddressDao $userAddressDao)
     {
-        $user_id = $request->user()?->id ?: 0;
+        $user_id = $this->user()?->id ?: 0;
         $address = UserAddress::whereUserId($user_id)
             ->whereId($request->get('id'))->first();
 
@@ -114,7 +114,7 @@ class AddressController extends BaseController
     public function update(UserAddressRequest $request, UserAddressDao $userAddressDao)
     {
         $validated = $request->validated();
-        $user_id = $request->user()?->id ?: 0;
+        $user_id = $this->user()?->id ?: 0;
         $id = $validated['id'] ?? 0;
 
         if ($id) {

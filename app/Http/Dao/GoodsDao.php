@@ -23,6 +23,21 @@ class GoodsDao
 
         return $goods;
     }
+    /**
+     * 根据商品编号获取商品信息.
+     *
+     * @throws BusinessException
+     */
+    public function getInfoByNos(array $nos): \Illuminate\Database\Eloquent\Collection
+    {
+        $goods = Goods::query()->whereIn('no', $nos)->get();
+
+        if (! $goods) {
+            throw new BusinessException('商品不存在');
+        }
+
+        return $goods;
+    }
 
     /**
      * 校验商品是否删除.

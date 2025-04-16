@@ -22,6 +22,7 @@ class RouterService
 
         foreach ($params as $k => $v) {
             $search = "/:{$k}";
+
             if (str_contains($path, $search)) {
                 $path = str_replace($search, "/{$v}", $path);
             }
@@ -31,14 +32,14 @@ class RouterService
 
         if ($router->params) {
             foreach ($router->params as $key => $value) {
-                if (isset($params[$key])) {
-                    $set_data[$key] = $params[$key];
-                } else {
-                    $set_data[$key] = $value;
-                }
+                $set_data[$key] = $params[$key] ?? $value;
             }
         }
 
-        return rtrim($path, '/').get_url_joiner($path).http_build_query($set_data);
+        if ($set_data) {
+            return rtrim($path, '/').get_url_joiner($path).http_build_query($set_data);
+        }
+
+        return rtrim($path, '/');
     }
 }

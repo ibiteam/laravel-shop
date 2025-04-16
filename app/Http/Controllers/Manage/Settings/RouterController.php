@@ -8,6 +8,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\Router;
 use App\Models\RouterCategory;
+use App\Services\RouterService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -17,7 +18,7 @@ class RouterController extends BaseController
     /**
      * 列表.
      */
-    public function index(Request $request)
+    public function index(Request $request, RouterService $router_service)
     {
         $name = $request->get('name');
         $alias = $request->get('alias');
@@ -30,18 +31,17 @@ class RouterController extends BaseController
             ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
             ->when($router_category_id, fn ($query) => $query->where('router_category_id', '=', $router_category_id))
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
-            ->orderByDesc('created_at')->paginate($number);
+            ->orderByDesc('sort')->orderByDesc('id')->paginate($number);
 
-        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
-
-        $data->getCollection()->transform(function (Router $router) use ($vue_app_url) {
+        $data->getCollection()->transform(function (Router $router) use ($router_service) {
             return [
                 'id' => $router->id,
                 'category_name' => $router->routerCategory?->name,
                 'router_category_id' => $router->router_category_id,
                 'name' => $router->name,
                 'alias' => $router->alias,
-                'h5_url' => $vue_app_url .'/'.ltrim($router->h5_url, '/'),
+                'h5_url_show' => $router->h5_url,
+                'h5_url' => $router_service->getRouterPath(Router::$path[$router->alias]),
                 'params' => $router->params ? json_encode($router->params, JSON_UNESCAPED_UNICODE) : '',
                 'is_show' => $router->is_show,
                 'sort' => $router->sort,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RouterEnum;
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,8 +39,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Router extends Model
 {
     use DatetimeTrait;
+
     public const IS_SHOW_YES = 1; // 显示
     public const IS_SHOW_NO = 0; // 不显示
+
+    public static array $path = [
+        RouterEnum::PAY_SUCCESS->value => RouterEnum::PAY_SUCCESS,
+        RouterEnum::ORDER_SUCCESS->value => RouterEnum::ORDER_SUCCESS,
+        RouterEnum::SUPERMARKET->value => RouterEnum::SUPERMARKET,
+        RouterEnum::HOME_PREVIEW->value => RouterEnum::HOME_PREVIEW,
+    ];
+
     protected $guarded = [];
 
     public function routerCategory(): BelongsTo
