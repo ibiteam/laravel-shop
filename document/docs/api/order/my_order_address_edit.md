@@ -8,9 +8,9 @@
 
 ### 请求参数
 
-| 字段 | 字段类型   | 是否必须 | 说明   |
-|----|--------|------|------|
-| no | String | Y    | 订单编号 |
+| 字段       | 字段类型   | 是否必须 | 说明   |
+|----------|--------|------|------|
+| order_sn | String | Y    | 订单编号 |
 
 ### 请求方式
 * GET
@@ -22,7 +22,7 @@
     "code": 200,
     "message": "success",
     "data": {
-        "no": "2025040918889931",
+        "order_sn": "2025040918889931",
         "province_name": "北京",
         "city_name": "北京",
         "district_name": "朝阳区",
@@ -39,7 +39,7 @@ data 返回参数说明
 
 | 字段            | 字段类型    | 字段说明 |
 |---------------|---------|------|
-| no            | String  | 订单编号 |
+| order_sn      | String  | 订单编号 |
 | province_name | String  | 省份名称 |
 | city_name     | String  | 城市名称 |
 | district_name | String  | 区县名  |

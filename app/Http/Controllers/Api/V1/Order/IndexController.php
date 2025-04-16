@@ -130,15 +130,15 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
-                ->whereOrderSn($validated['no'])
+                ->whereOrderSn($validated['order_sn'])
                 ->first();
 
             if (! $order instanceof Order) {
@@ -150,7 +150,7 @@ class IndexController extends BaseController
             }
 
             return $this->success([
-                'no' => $order->order_sn,
+                'order_sn' => $order->order_sn,
                 'province_name' => $order->province?->name,
                 'city_name' => $order->city?->name,
                 'district_name' => $order->district?->name,
@@ -176,17 +176,17 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
                 'user_address_id' => 'required|integer',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
 
             $order = Order::query()
                 ->with(['province:id,name', 'city:id,name', 'district:id,name'])
                 ->whereUserId($current_user->id)
-                ->whereOrderSn($validated['no'])
+                ->whereOrderSn($validated['order_sn'])
                 ->first();
 
             if (! $order instanceof Order) {
