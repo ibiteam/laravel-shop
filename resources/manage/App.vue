@@ -14,7 +14,7 @@ onMounted(() => {
         return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
     }
     const mainColor = getCssVariableValue('--main-color')
-    let root = document.querySelector(":root") as HTMLElement
+    const root = document.querySelector(":root") as HTMLElement
     let color_number = 10
     root.style.setProperty("--main-color", mainColor)
     while (color_number < 100) {

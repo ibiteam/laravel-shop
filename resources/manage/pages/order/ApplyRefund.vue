@@ -70,7 +70,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding: 10px 0;height: auto;">
             <el-form :inline="true" :model="searchForm" class="search-form" label-width="120px">
                 <el-form-item label="用户名称">

@@ -46,7 +46,7 @@ class OrderController extends BaseController
         $done_start_time = $request->get('done_start_time');
         $done_end_time = $request->get('done_end_time');
         $source = $request->get('source');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
 
         $list = Order::query()
             ->with('user:id,user_name')
@@ -72,7 +72,7 @@ class OrderController extends BaseController
                 });
             })
             ->latest()
-            ->paginate($number);
+            ->paginate($per_page);
 
         return $this->success(new OrderResourceCollection($list));
     }

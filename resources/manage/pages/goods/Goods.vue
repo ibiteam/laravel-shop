@@ -3,7 +3,6 @@ import { Plus, Search, RefreshLeft } from '@element-plus/icons-vue'
 import { categoryIndex, goodsIndex, goodsChangeStatus } from '@/api/goods.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import Page from '@/components/common/Pagination.vue';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
@@ -136,10 +135,10 @@ onMounted( () => {
 </script>
 
 <template>
-    <div class="common-wrap">
+    <div>
         <el-header style="padding: 10px 0;height: auto;">
             <!-- 添加搜索表单 -->
-            <el-form :inline="true" :model="queryParams" class="search-form" label-width="100px">
+            <el-form :inline="true" :model="queryParams" class="search-form" >
                 <el-form-item label="商品ID" prop="goods_id">
                     <el-input
                         v-model="queryParams.goods_id"
@@ -215,9 +214,8 @@ onMounted( () => {
                     </el-date-picker>
                 </el-form-item>
                 <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="handleSearch">搜索</el-button>
-                    <el-button :icon="RefreshLeft" @click="resetSearch">重置</el-button>
-                    <el-button :icon="Plus" type="warning" @click="openDetailView(0)">添加</el-button>
+                    <el-button  type="primary" @click="handleSearch">搜索</el-button>
+                    <el-button  type="danger" @click="openDetailView(0)">添加</el-button>
                 </el-form-item>
             </el-form>
         </el-header>
