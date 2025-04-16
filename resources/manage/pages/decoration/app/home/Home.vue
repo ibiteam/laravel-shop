@@ -3,6 +3,7 @@
         :pageName="decoration.app_website_data?.name"
         :time="decoration.app_website_data?.release_time"
         :id="decoration.app_website_data?.id"
+        :previewPath="decoration.preview_path"
         @pageSetting="openPageSetting"
         @pageSave="decorationSave"
     >
@@ -34,12 +35,12 @@
                             @add="handleDragAdd">
                             <template v-for="(temp, index) in decoration.data">
                                 <div class="drag-placeholder" v-if="dragData.placeholderIndex == index"></div>
-                                <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
-                                <HotZone v-if="temp.component_name == 'hot_zone'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
-                                <AdvertisingBanner v-if="temp.component_name == 'advertising_banner'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
-                                <QuickLink v-if="temp.component_name == 'quick_link'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
-                                <GoodsRecommend v-if="temp.component_name == 'goods_recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
-                                <Recommend v-if="temp.component_name == 'recommend'" ref="tempRefs" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index, default_data: defaultRecommendData}"></Recommend>
+                                <HorizontalCarousel v-if="temp.component_name == 'horizontal_carousel'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" />
+                                <HotZone v-if="temp.component_name == 'hot_zone'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}" ></HotZone>
+                                <AdvertisingBanner v-if="temp.component_name == 'advertising_banner'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></AdvertisingBanner>
+                                <QuickLink v-if="temp.component_name == 'quick_link'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></QuickLink>
+                                <GoodsRecommend v-if="temp.component_name == 'goods_recommend'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index,}"></GoodsRecommend>
+                                <Recommend v-if="temp.component_name == 'recommend'" :ref="el => setTempItemRef(el, temp.id)" :key="temp.id" v-bind="{component: temp, temp_index: decoration.temp_index, parent: decoration.data, parent_index: index, default_data: defaultRecommendData}"></Recommend>
                             </template>
                         </VueDraggable>
                         <!-- <bottom-nav-bar v-if="findNotForData('label')" ref="homeLabelRef" v-bind="{component: findNotForData('label'), temp_index: decoration.temp_index}" ></bottom-nav-bar> -->
@@ -88,7 +89,8 @@ const decoration = reactive({
     // 不可拖拽的数据
     not_for_data: [],
     // 当前选中拖拽的索引
-    temp_index: ''
+    temp_index: '',
+    preview_path: '',
 })
 // 拖拽过程 true-拖拽中 false-拖拽结束
 const dragMove = ref(false)
@@ -98,7 +100,7 @@ const dragData = reactive({
     temp_index: '', // 拖拽元素id
 })
 // 组件refs
-const tempRefs = ref([])
+const tempRefs = ref({})
 // 固定头部搜索ref
 const homeSearchRef = ref(null)
 // 固定底部导航栏ref
@@ -143,6 +145,14 @@ const handleDragChoose = (e) => {
     console.log(e)   
 }
 
+const setTempItemRef = (el, id) => {
+    if (el) {
+        tempRefs.value[id] = el; // 存储引用
+    } else {
+        // delete tempRefs.value[id]; // 清除无效引用
+    }
+}
+
 // 装修组件顺序控制
 const sortDecorationData = (params = {component: {}, direction: 'up'}) => {
     // id, direction
@@ -177,8 +187,8 @@ const handlematerialCenterDialogConfirm = (res) => {
     materialCenterDialogData.show = false
     const updateData = {...materialCenterDialogData, file: res}
     if (materialCenterDialogData.temp_index) {
-        const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
-        tempRefs.value[index].updateUploadComponentData(updateData)
+        // const index = decoration.data.findIndex(item => item.id === materialCenterDialogData.temp_index)
+        tempRefs.value[materialCenterDialogData.temp_index].updateUploadComponentData(updateData)
         return
     }
     if (materialCenterDialogData.not_for_data) {
@@ -204,8 +214,8 @@ const handleLinkCenterDialogConfirm = (res) => {
         value: res[0]?.h5_url
     }}
     if (linkCenterDialogData.temp_index) {
-        const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
-        tempRefs.value[index].updateLinkComponentData(updateData)
+        // const index = decoration.data.findIndex(item => item.id === linkCenterDialogData.temp_index)
+        tempRefs.value[linkCenterDialogData.temp_index].updateLinkComponentData(updateData)
         return
     }
     if (linkCenterDialogData.not_for_data) {
@@ -236,8 +246,8 @@ const handleGoodsDialogConfirm = (res) => {
         goods: res
     }
     if (goodsDialogData.temp_index) {
-        const index = decoration.data.findIndex(item => item.id === goodsDialogData.temp_index)
-        tempRefs.value[index].updateGoodsComponentData(updateData)
+        // const index = decoration.data.findIndex(item => item.id === goodsDialogData.temp_index)
+        tempRefs.value[goodsDialogData.temp_index].updateGoodsComponentData(updateData)
         return
     }
 }
@@ -260,8 +270,12 @@ const decorationSave = (params) => {
             return
         }
         let decoration_data = []
-        tempRefs.value.map(item => {
-            let temp_data = JSON.parse(JSON.stringify(item.getComponentData()))
+        // tempRefs.value.map(item => {
+        //     let temp_data = JSON.parse(JSON.stringify(item.getComponentData()))
+        //     decoration_data.push(temp_data)
+        // })
+        decoration.data.map(item => {
+            let temp_data = JSON.parse(JSON.stringify(tempRefs.value[item.id].getComponentData()))
             decoration_data.push(temp_data)
         })
         const save_decoration_data = [
@@ -311,8 +325,8 @@ const getDecorationHome = () => {
             decoration.component_value = res.data.component_value
             decoration.data = res.data.data
             decoration.not_for_data = res.data.not_for_data
-
-            
+            decoration.preview_path = res.data.preview_path
+            console.log(tempRefs.value)
         } else {
             cns.$message.error(res.message)
         }
@@ -348,10 +362,11 @@ onMounted(() => {
             if (res.type == 'show') {
                 decoration.data.forEach((item, index) => {
                     if (item.id == res.component.id) {
-                        decoration.data[index] = {
-                            ...tempRefs.value[index].getComponentData(),
-                            is_show: !decoration.data[index].is_show ? 1 : 0
-                        } 
+                        // decoration.data[index] = {
+                        //     ...tempRefs.value[item.id].getComponentData(),
+                        //     is_show: !decoration.data[index].is_show ? 1 : 0
+                        // } 
+                        decoration.data[index]['is_show'] = !decoration.data[index].is_show ? 1 : 0
                     }
                 })
             }

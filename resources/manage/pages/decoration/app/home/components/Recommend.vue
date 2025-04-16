@@ -114,9 +114,9 @@ watch([() => props.component], (newValue) => {
             if (key == 'content') {
                 form['content'] = {
                     title: temp[key].title ? temp[key].title : '为您推荐',
-                    // goods: {
-                    //     goods_data: props.default_data
-                    // }
+                    goods: {
+                        goods_data: props.default_data
+                    }
                 }
             } else {
                 form[key] = temp[key]
