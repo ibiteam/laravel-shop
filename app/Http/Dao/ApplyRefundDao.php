@@ -43,9 +43,9 @@ class ApplyRefundDao
      *
      * @throws BusinessException
      */
-    public function verifyApply(User $user, string $order_no, int $order_detail_id): void
+    public function verifyApply(User $user, string $order_sn, int $order_detail_id): void
     {
-        $order = Order::query()->whereOrderSn($order_no)->whereUserId($user->id)->first();
+        $order = Order::query()->whereOrderSn($order_sn)->whereUserId($user->id)->first();
 
         if (! $order instanceof Order) {
             throw new BusinessException('订单未找到');

@@ -14,7 +14,7 @@
 
 | 字段              | 字段类型    | 是否必须 | 说明     |
 |-----------------|---------|------|--------|
-| order_no        | string  | Y    | 订单编号   |
+| order_sn        | string  | Y    | 订单编号   |
 | order_detail_id | integer | Y    | 订单明细ID |
 
 ### 返回示例
@@ -26,7 +26,7 @@
   "data": {
     "goods_info": {// 售后商品信息
       "order_detail_id": 1,
-      "order_no": "2025041096246684",
+      "order_sn": "2025041096246684",
       "goods_no": "cbda6ddf-0c08-4c82-a777-c73121b9698d",
       "goods_name": "华为老年机",
       "goods_image": "https:\/\/laravel-shop.ptdmeta.cn\/storage\/manage\/2025\/04\/01\/cr7J8mCH3mcDo1unCAixpLpngG8hi7vfhIDTFhmh.jpg",
