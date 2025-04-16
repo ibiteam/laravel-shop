@@ -96,15 +96,15 @@ class IndexController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'no' => 'required|string',
+                'order_sn' => 'required|string',
             ], [], [
-                'no' => '订单编号',
+                'order_sn' => '订单编号',
             ]);
             $current_user = $this->user();
             $order = Order::query()
                 ->withCount('orderDelivery')
                 ->with(['detail', 'province', 'city', 'district'])
-                ->whereOrderSn($validated['no'])
+                ->whereOrderSn($validated['order_sn'])
                 ->whereUserId($current_user->id)
                 ->first();
 

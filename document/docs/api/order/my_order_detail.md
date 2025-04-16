@@ -25,7 +25,7 @@
     "data": {
         "status": 3,
         "order": {
-            "no": "2025040918889931",
+            "order_sn": "2025040918889931",
             "paid_at": null,
             "remark": "",
             "status": 3
@@ -73,7 +73,7 @@ data 返回参数说明
 |-----------------------|---------|--------------------------|
 | status                | Integer | 订单状态，详见 `status_enum`枚举  |
 | order                 | Object  | 订单信息                     |
-| order.no              | String  | 订单编号                     |
+| order.order_sn        | String  | 订单编号                     |
 | order.paid_at         | String  | 支付时间                     |
 | order.remark          | String  | 买家留言                     |
 | order.status          | Integer | 订单状态，，详见 `status_enum`枚举 |
