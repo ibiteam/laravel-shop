@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Order\ApplyRefundController;
 use App\Http\Controllers\Api\V1\Order\DoneController;
 use App\Http\Controllers\Api\V1\Order\EvaluateController;
 use App\Http\Controllers\Api\V1\Order\IndexController as MyOrderIndexController;
+use App\Http\Controllers\Api\V1\Order\OrderDeliveryController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
@@ -116,6 +117,12 @@ Route::middleware('api.auth')->group(function () {
             Route::post('revoke', [ApplyRefundController::class, 'revoke']); // 撤销申请
             Route::get('ship_info', [ApplyRefundController::class, 'shipInfo']); // 退货物流信息
             Route::post('ship_add', [ApplyRefundController::class, 'shipAdd']); // 填写物流单号
+        });
+
+        // 发货物流
+        Route::prefix('delivery')->group(function () {
+            Route::get('list', [OrderDeliveryController::class, 'list']);
+            Route::get('logistics', [OrderDeliveryController::class, 'logistics']);
         });
     });
 

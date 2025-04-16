@@ -103,6 +103,12 @@
     },
     {
         "type": "dir",
+        "name": "delivery",
+        "label": "发货物流",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
         "name": "decoration",
         "label": "装修",
         "collapsed": true

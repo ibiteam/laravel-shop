@@ -6,7 +6,7 @@ use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name 名称
@@ -46,6 +46,7 @@ class AppServiceConfig extends Model
     public const IS_RECORD = 1; // 记录日志
 
     public const IBI_CHAT = 'ibi_chat'; // 国联云客服
+    public const GEO_AMAP = 'geo_amap'; // 地理位置
 
     public function getConfigAttribute($value)
     {
