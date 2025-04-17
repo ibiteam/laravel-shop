@@ -11,14 +11,12 @@ use App\Http\Dao\GoodsViewDao;
 use App\Http\Dao\OrderEvaluateDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
-use App\Models\AdminUser;
 use App\Models\AppDecorationItem;
 use App\Models\Goods;
 use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
 use App\Models\GoodsSpec;
 use App\Models\GoodsSpecValue;
-use App\Models\GoodsView;
 use App\Models\ShopConfig;
 use App\Models\User;
 use App\Services\HTMLPurifierService;
@@ -95,9 +93,9 @@ class GoodsService
                     throw new BusinessException('商品价格不能为空！');
                 }
             }
-            $tmp_sku_prices = array_column($request_sku_data, 'price');
+            $tmp_sku_prices = array_filter(array_column($request_sku_data, 'price'));
             $store_data['price'] = $tmp_sku_prices ? min($tmp_sku_prices) : 0;
-            $tmp_sku_integrals = array_column($request_sku_data, 'integral');
+            $tmp_sku_integrals = array_filter(array_column($request_sku_data, 'integral'));
             $store_data['integral'] = $tmp_sku_integrals ? min($tmp_sku_integrals) : 0;
         }
 
@@ -366,7 +364,7 @@ class GoodsService
 
         $items = Goods::query()
             ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
-            ->when($goods_no, fn ($query) => $query->where('no', '<>', $goods_no) )
+            ->when($goods_no, fn ($query) => $query->where('no', '<>', $goods_no))
             ->whereStatus(Goods::STATUS_ON_SALE)
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->orderByDesc('sales_volume')
