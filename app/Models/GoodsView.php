@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id 用户ID
@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView whereDeletedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView withoutTrashed()
+ * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
 class GoodsView extends Model
@@ -43,5 +44,10 @@ class GoodsView extends Model
     public function goods()
     {
         return $this->belongsTo(Goods::class, 'goods_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

@@ -20,6 +20,7 @@ class PermissionTableSeeder extends Seeder
         $this->addArticlePermission();
         $this->addToolPermission();
         $this->addDataPermission();
+        $this->addMarketingPermission();
     }
 
     private function addPermission(string $display_name, string $name, int $sort = 0, int $is_left_nav = Permission::NOT_IS_LEFT_NAV, string $icon = '', ?string $parent_name = null): void
@@ -94,6 +95,10 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('商品分类', Permission::MANAGE_CATEGORY_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
         $this->addPermission('商品分类新增|编辑', Permission::MANAGE_CATEGORY_UPDATE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
         $this->addPermission('商品分类删除', Permission::MANAGE_CATEGORY_DELETE, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::CATEGORY_MANAGE);
+
+        $this->addPermission('商品数据', Permission::GOODS_DATA_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_GOODS);
+        $this->addPermission('商品浏览', Permission::MANAGE_GOODS_VIEWS, 0, Permission::IS_LEFT_NAV, '', Permission::GOODS_DATA_MANAGE);
+        $this->addPermission('商品收藏', Permission::MANAGE_GOODS_COLLECT, 0, Permission::IS_LEFT_NAV, '', Permission::GOODS_DATA_MANAGE);
     }
 
     private function addUserPermission(): void
@@ -106,6 +111,10 @@ class PermissionTableSeeder extends Seeder
 
         $this->addPermission('授权用户', Permission::AUTHORIZED_USER_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_USER);
         $this->addPermission('微信服务号', Permission::MANAGE_WECHAT_USER_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::AUTHORIZED_USER_MANAGE);
+
+        $this->addPermission('积分管理', Permission::INTEGRAL_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_USER);
+        $this->addPermission('用户积分', Permission::MANAGE_USER_INTEGRAL_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::INTEGRAL_MANAGE);
+        $this->addPermission('积分明细', Permission::MANAGE_INTEGRAL_DETAIL_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::INTEGRAL_MANAGE);
     }
 
     private function addOrderPermission(): void
@@ -157,5 +166,14 @@ class PermissionTableSeeder extends Seeder
     private function addDataPermission(): void
     {
         $this->addPermission('数据', Permission::MODULE_DATA, 94, Permission::IS_LEFT_NAV, 'DataAnalysis');
+    }
+
+    private function addMarketingPermission(): void
+    {
+        $this->addPermission('营销', Permission::MODULE_MARKETING, 93, Permission::IS_LEFT_NAV, 'DataAnalysis');
+
+        $this->addPermission('优惠管理', Permission::DISCOUNT_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_MARKETING);
+        $this->addPermission('红包', Permission::MANAGE_BONUS_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
+        $this->addPermission('优惠券', Permission::MANAGE_COUPON_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
     }
 }

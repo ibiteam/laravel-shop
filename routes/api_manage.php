@@ -30,4 +30,6 @@ Route::middleware(['manage.auth', 'manage.access.record'])->group(function () {
     require __DIR__.'/manage/article.php';
 
     require __DIR__.'/manage/tool.php';
+
+    require __DIR__.'/manage/marketing.php';
 });

@@ -4,6 +4,8 @@ use App\Http\Controllers\Manage\Goods\GoodsCategoryController;
 use App\Http\Controllers\Manage\Goods\GoodsController;
 use App\Http\Controllers\Manage\Goods\GoodsParameterTemplateController;
 use App\Http\Controllers\Manage\Goods\GoodsSkuTemplateController;
+use App\Http\Controllers\Manage\GoodsCollect\GoodsCollectController;
+use App\Http\Controllers\Manage\GoodsView\GoodsViewController;
 use App\Models\Permission as PermissionModel;
 use Illuminate\Support\Facades\Route;
 
@@ -47,5 +49,14 @@ Route::prefix('goods')->group(function () {
         Route::middleware(['manage.permission:'.PermissionModel::MANAGE_CATEGORY_DELETE])->group(function () {
             Route::post('destroy', [GoodsCategoryController::class, 'destroy']); // 删除
         });
+    });
+
+    // 商品浏览
+    Route::middleware(['manage.permission:'.PermissionModel::MANAGE_GOODS_VIEWS])->prefix('views')->group(function () {
+        Route::get('/', [GoodsViewController::class, 'index'])->name(PermissionModel::MANAGE_GOODS_VIEWS);
+    });
+    // 商品收藏
+    Route::middleware(['manage.permission:'.PermissionModel::MANAGE_GOODS_COLLECT])->prefix('collect')->group(function () {
+        Route::get('/', [GoodsCollectController::class, 'index'])->name(PermissionModel::MANAGE_GOODS_COLLECT);
     });
 });
