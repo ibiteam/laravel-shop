@@ -26,6 +26,9 @@ import OrderDelivery from '@/pages/order/OrderDelivery.vue';
 import Transaction from '@/pages/set/Transaction.vue';
 import WechatUser from '@/pages/user/WechatUser.vue';
 import Evaluate from '@/pages/order/Evaluate.vue';
+import ArticleCategory from '@/pages/article/Category.vue';
+import Article from '@/pages/article/Index.vue';
+import ArticleUpdate from '@/pages/article/Update.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -64,6 +67,10 @@ const router = createRouter({
                 { path: '/user/index', component: UserIndex , name: 'manage.user.index',meta:{title:'用户'} },
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },
                 { path: '/user/wechat_user', component: WechatUser , name: 'manage.wechat_user.index',meta:{title:'微信服务号'} },
+                // 文章
+                { path: '/article/category', component: ArticleCategory, name: 'manage.article_category.index',meta:{title:'文章分类'} },
+                { path: '/article/index', component: Article, name: 'manage.article.index',meta:{title:'文章列表'} },
+                { path: '/article/update/:id', component: ArticleUpdate , name: 'manage.article.form',meta:{title:'编辑文章'} },
                 // 工具
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
                 //正在刷新
