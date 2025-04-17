@@ -32,6 +32,8 @@ class GoodsView extends Model
 {
     use DatetimeTrait;
 
+    protected $guarded = [];
+
     public function goods()
     {
         return $this->belongsTo(Goods::class, 'goods_id', 'id');
