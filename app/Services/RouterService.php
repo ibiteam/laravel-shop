@@ -12,7 +12,7 @@ class RouterService
      */
     public function getRouterPath($router_alias, array $params = []): string
     {
-        if (RouterEnum::formSource($router_alias)) {
+        if (!RouterEnum::formSource($router_alias)) {
             return '';
         }
 
