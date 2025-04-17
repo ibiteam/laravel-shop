@@ -91,14 +91,14 @@ class Goods extends Model
     public const TYPE_DONE_ORDER = 1; // 下单减库存
     public const TYPE_PAY_ORDER = 2; // 支付订单减库存
 
-    protected $guarded = [];
-
     // 排序对应字段
     public static $sorts = [
         AppDecorationItem::SORT_SALES => 'sales_volume DESC',
         AppDecorationItem::SORT_LOW_PRICE => 'price ASC',
         AppDecorationItem::SORT_NEW_PRODUCT => 'created_at DESC',
     ];
+
+    protected $guarded = [];
 
     // 配置模型索引
     public function searchableAs(): string
@@ -147,15 +147,15 @@ class Goods extends Model
         return $query->where('status', self::STATUS_ON_SALE);
     }
 
-    public function isDoneDecrementStock(): bool
-    {
-        return $this->type === self::TYPE_DONE_ORDER;
-    }
-
     public function decrementStock(int $buy_number): void
     {
         $this->decrement('total', $buy_number);
         $this->increment('sales_volume', $buy_number);
+    }
+
+    public function isPayDecrementStock(): bool
+    {
+        return $this->type === self::TYPE_PAY_ORDER;
     }
 
     protected function casts(): array

@@ -95,12 +95,14 @@ class TransactionController extends BaseController
             if ($payment->alias !== PaymentEnum::WECHAT->value) {
                 throw new BusinessException('当前支付方式不支持退款');
             }
+            // 负数 or 0
             $old_refund_amount = $transaction->children()->sum('amount');
 
-            if ($old_refund_amount == $transaction->amount) {
+            $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
+
+            if ($refund_amount <= 0) {
                 throw new BusinessException('交易记录已退款完成');
             }
-            $refund_amount = $transaction->amount - $old_refund_amount;
             // 请求微信退款
             $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
 
@@ -122,7 +124,7 @@ class TransactionController extends BaseController
         DB::beginTransaction();
 
         try {
-            admin_operation_log( "针对流水号：【{$transaction->transaction_no}】申请退款");
+            admin_operation_log("针对流水号：【{$transaction->transaction_no}】申请退款");
 
             $transaction->can_refund = false;
             $transaction->save();
@@ -130,13 +132,13 @@ class TransactionController extends BaseController
             switch ($wechat_response['status'] ?? '') {
                 case 'PROCESSING': // 退款处理中
                     $response_message = '已经提交微信退款申请，请耐心等待~';
-                    $transaction_dao->storeByManageRefund($transaction, $out_refund_no, $refund_amount, remark: $reason);
+                    $transaction_dao->storeByParentTransaction($transaction, $out_refund_no, $refund_amount, remark: $reason);
 
                     break;
 
                 case 'SUCCESS': // 退款成功
                     $response_message = '退款成功';
-                    $transaction_dao->storeByManageRefund($transaction, $out_refund_no, $refund_amount, Transaction::STATUS_SUCCESS, remark: $validated['reason']);
+                    $transaction_dao->storeByParentTransaction($transaction, $out_refund_no, $refund_amount, Transaction::STATUS_SUCCESS, remark: $validated['reason']);
 
                     break;
 

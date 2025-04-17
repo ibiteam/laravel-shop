@@ -58,7 +58,7 @@ class TransactionDao
      * @param int         $status             退款状态
      * @param string      $remark             退款备注
      */
-    public function storeByManageRefund(Transaction $parent_transaction, string $transaction_no, int|float $refund_amount, int $status = Transaction::STATUS_WAIT, string $remark = ''): Transaction
+    public function storeByParentTransaction(Transaction $parent_transaction, string $transaction_no, int|float $refund_amount, int $status = Transaction::STATUS_WAIT, string $remark = ''): Transaction
     {
         return Transaction::query()->create([
             'transaction_no' => $transaction_no,

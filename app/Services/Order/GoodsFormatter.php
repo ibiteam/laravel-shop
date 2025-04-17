@@ -219,18 +219,25 @@ class GoodsFormatter
     }
 
     /**
-     * 是否下单减库存.
+     * 减少库存.
+     *
+     * @param bool $payed 是否支付
      */
-    public function isDoneDecrementStock(): bool
+    public function decrementStock(bool $payed = false): void
     {
-        return $this->getGoods()->isDoneDecrementStock();
-    }
+        // 先判断 是否支付减库存 && 已支付
+        if ($this->getGoods()->isPayDecrementStock()) {
+            if ($payed) {
+                if ($this->getGoodsSku() instanceof GoodsSku) {
+                    $this->getGoodsSku()->decrementStock($this->getBuyNumber());
+                }
 
-    /**
-     * 减库存.
-     */
-    public function decrementStock(): void
-    {
+                $this->getGoods()->decrementStock($this->getBuyNumber());
+            }
+
+            return;
+        }
+
         if ($this->getGoodsSku() instanceof GoodsSku) {
             $this->getGoodsSku()->decrementStock($this->getBuyNumber());
         }

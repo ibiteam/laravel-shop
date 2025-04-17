@@ -14,7 +14,9 @@ use App\Models\ShopConfig;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -104,7 +106,6 @@ class ApplyRefundDao
 
         if ($is_show_after_sales) {
             $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
-
 
             if ($order->order_amount <= $after_sales_max_money) {
                 // 成功支付记录
@@ -266,6 +267,14 @@ class ApplyRefundDao
         }
 
         return $order;
+    }
+
+    /**
+     * 根据订单与用户获取正在进行中的申请售后数据.
+     */
+    public function getProgressDataByOrder(Order $order, User $user): EloquentCollection|Collection
+    {
+        return ApplyRefund::query()->whereOrderId($order->id)->whereUserId($user->id)->get();
     }
 
     /**

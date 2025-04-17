@@ -50,6 +50,7 @@ class DoneController extends BaseController
                 ->setIp(get_request_ip())
                 ->setGoodsFormatters([$current_goods_format])
                 ->calculatePrice()
+                ->checkIntegral()
                 ->setShippingFee(0)
                 ->getInitData($validated['user_address_id'] ?? 0);
 
@@ -105,6 +106,7 @@ class DoneController extends BaseController
                 ->setGoodsFormatters([$current_goods_format])
                 ->setPaymentMethod($validated['payment_method'])
                 ->calculatePrice()
+                ->checkIntegral()
                 ->setShippingFee(0)
                 ->store($validated['remark'] ?? '');
 
@@ -153,6 +155,7 @@ class DoneController extends BaseController
                 ->setIp(get_request_ip())
                 ->setGoodsFormatters($goods_formatters->toArray())
                 ->calculatePrice()
+                ->checkIntegral()
                 ->setShippingFee(0)
                 ->getInitData($validated['user_address_id'] ?? 0);
 
@@ -215,6 +218,7 @@ class DoneController extends BaseController
                 ->setGoodsFormatters($goods_formatters->toArray())
                 ->setPaymentMethod($validated['payment_method'])
                 ->calculatePrice()
+                ->checkIntegral()
                 ->setShippingFee(0)
                 ->store($validated['remark'] ?? '');
 
