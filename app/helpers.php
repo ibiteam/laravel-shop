@@ -375,3 +375,240 @@ if (! function_exists('get_new_price')) {
         return implode('.', $arrayNum);
     }
 }
+
+/**
+ * 系统获取:浏览器信息获取|当前访问系统获取|当前访问IP获取.
+ */
+if (! function_exists('get_custom_browser')) {
+    /**
+     * 获取客户端浏览器信息.
+     */
+    function get_custom_browser(): string
+    {
+        $system = $_SERVER['HTTP_USER_AGENT'] ?? '';  // 获取用户代理字符串
+
+        // 火狐
+        if (stripos($system, 'Firefox/') > 0) {
+            preg_match("/Firefox\/([^;)]+)+/i", $system, $matches);
+
+            return 'Firefox('.($matches[1] ?? '').')';
+        }
+
+        // 傲游
+        if (stripos($system, 'Maxthon') > 0) {
+            preg_match("/Maxthon\/([\d\.]+)/", $system, $matches);
+
+            return '傲游('.($matches[1] ?? '').')';
+        }
+
+        if (stripos($system, 'MSIE') > 0) {
+            preg_match("/MSIE\s+([^;)]+)+/i", $system, $matches);
+
+            return 'IE('.($matches[1] ?? '').')';
+        }
+
+        if (stripos($system, 'OPR') > 0) {
+            preg_match("/OPR\/([\d\.]+)/", $system, $matches);
+
+            return 'Opera('.($matches[1] ?? '').')';
+        }
+
+        // Edge浏览器
+        if (stripos($system, 'Edge') > 0) {
+            // win10 Edge浏览器 添加了chrome内核标记 在判断Chrome之前匹配
+            preg_match("/Edge\/([\d\.]+)/", $system, $matches);
+
+            return 'Edge('.($matches[1] ?? '').')';
+        }
+
+        // chrome
+        if (stripos($system, 'Chrome') > 0) {
+            preg_match("/Chrome\/([\d\.]+)/", $system, $matches);
+
+            return 'Chrome('.($matches[1] ?? '').')';
+        }
+
+        // 苹果自带浏览器
+        if (stripos($system, 'Safari') > 0) {
+            preg_match("/Safari\/([\d\.]+)/", $system, $safari);
+
+            return 'Safari('.($safari[1] ?? '').')';
+        }
+
+        if (stripos($system, 'rv:') > 0 && stripos($system, 'Gecko') > 0) {
+            preg_match("/rv:([\d\.]+)/", $system, $matches);
+
+            return 'IE('.($matches[1] ?? '').')';
+        }
+
+        if (stripos($system, 'iphone') > 0) {
+            return 'iPhone()';
+        }
+
+        if (stripos($system, 'android') > 0) {
+            return 'android()';
+        }
+
+        return '未知浏览器()';
+    }
+}
+
+if (! function_exists('get_system')) {
+    /**
+     * 获取客户端操作系统信息.
+     */
+    function get_system(): string
+    {
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        if (preg_match('/win 9x/i', $agent) && strpos($agent, '4.90')) {
+            return 'Windows ME';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 6.0/i', $agent)) {
+            return 'Windows Vista';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 6.1/i', $agent)) {
+            return 'Windows 7';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 6.2/i', $agent)) {
+            return 'Windows 8';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 10.0/i', $agent)) {
+            return 'Windows 10'; // 添加win10判断
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 5.1/i', $agent)) {
+            return 'Windows XP';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/nt 5/i', $agent)) {
+            return 'Windows 2000';
+        }
+
+        if (preg_match('/win/i', $agent) && preg_match('/32/i', $agent)) {
+            return 'Windows 32';
+        }
+
+        if (preg_match('/sun/i', $agent) && preg_match('/os/i', $agent)) {
+            return 'SunOS';
+        }
+
+        if (preg_match('/ibm/i', $agent) && preg_match('/os/i', $agent)) {
+            return 'IBM OS/2';
+        }
+
+        if (preg_match('/Mac/i', $agent) && preg_match('/PC/i', $agent)) {
+            return 'Macintosh';
+        }
+
+        if (preg_match('/linux/i', $agent)) {
+            return 'Linux';
+        }
+
+        if (preg_match('/unix/i', $agent)) {
+            return 'Unix';
+        }
+
+        if (preg_match('/PowerPC/i', $agent)) {
+            return 'PowerPC';
+        }
+
+        if (preg_match('/AIX/i', $agent)) {
+            return 'AIX';
+        }
+
+        if (preg_match('/HPUX/i', $agent)) {
+            return 'HPUX';
+        }
+
+        if (preg_match('/NetBSD/i', $agent)) {
+            return 'NetBSD';
+        }
+
+        if (preg_match('/BSD/i', $agent)) {
+            return 'BSD';
+        }
+
+        if (preg_match('/OSF1/i', $agent)) {
+            return 'OSF1';
+        }
+
+        if (preg_match('/IRIX/i', $agent)) {
+            return 'IRIX';
+        }
+
+        if (preg_match('/FreeBSD/i', $agent)) {
+            return 'FreeBSD';
+        }
+
+        if (preg_match('/teleport/i', $agent)) {
+            return 'teleport';
+        }
+
+        if (preg_match('/flashget/i', $agent)) {
+            return 'flashget';
+        }
+
+        if (preg_match('/webzip/i', $agent)) {
+            return 'webzip';
+        }
+
+        if (preg_match('/offline/i', $agent)) {
+            return 'offline';
+        }
+
+        if (preg_match('/iphone/i', $agent)) {
+            return 'iphone';
+        }
+
+        if (preg_match('/Mac OS/i', $agent)) {
+            // 获取苹果系统
+            $data = substr($agent, stripos($agent, 'Mac OS'));
+            $os = substr($data, 0, stripos($data, ';'));
+
+            if (! $os) {
+                return 'Mac OS';
+            }
+
+            return '未知操作系统';
+        }
+
+        if (str_contains($agent, 'iphone')) {
+            return 'iPhone';
+        }
+
+        if (str_contains($agent, 'android')) {
+            return 'android';
+        }
+
+        if (preg_match('/sogou/i', $agent)) {
+            return '搜狗搜索';
+        }
+
+        if (preg_match('/bing/i', $agent)) {
+            return '微软搜索';
+        }
+
+        if (preg_match('/baidu/i', $agent)) {
+            return '百度搜索';
+        }
+
+        if (preg_match('/google/i', $agent)) {
+            return '谷歌搜索';
+        }
+
+        if (preg_match('/360/i', $agent)) {
+            return '360搜索';
+        }
+
+        if (preg_match('/soso/i', $agent)) {
+            return '腾讯搜搜';
+        }
+
+        return '未知操作系统';
+    }
+}

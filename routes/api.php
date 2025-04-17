@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\Notify\WechatPayController;
+use App\Http\Middleware\Api\AccessLogMiddleware;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')->middleware([])->group(function () {
+Route::prefix('v1')->middleware([AccessLogMiddleware::class])->group(function () {
     require __DIR__.'/api_v1.php';
 });
 

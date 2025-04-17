@@ -7,9 +7,5 @@ return [
     'sms_access_key' => env('SMS_ACCESS_KEY', ''),
     'sms_access_secret' => env('SMS_ACCESS_SECRET', ''),
     'sms_sign_name' => env('SMS_SIGN_NAME', ''),
-    'kuaidi100' => [
-        'host' => env('KUAIDI100_HOST', ''),
-        'customer' => env('KUAIDI100_CUSTOMER', ''),
-        'key' => env('KUAIDI100_KEY', ''),
-    ],
+    'access_log_driver' => env('ACCESS_LOG_DRIVER', 'mysql'),
 ];
