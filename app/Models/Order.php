@@ -164,8 +164,8 @@ class Order extends Model
     public function scopeSearchWaitPay(Builder $query): Builder
     {
         return $query
-            ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAY_WAIT);
+            ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+            ->where('pay_status', PayStatusEnum::PAY_WAIT->value);
     }
 
     /**
@@ -174,9 +174,9 @@ class Order extends Model
     public function scopeSearchWaitShip(Builder $query): Builder
     {
         return $query
-            ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAYED)
-            ->where('ship_status', ShippingStatusEnum::UNSHIPPED);
+            ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+            ->where('pay_status', PayStatusEnum::PAYED->value)
+            ->where('ship_status', ShippingStatusEnum::UNSHIPPED->value);
     }
 
     /**
@@ -185,9 +185,9 @@ class Order extends Model
     public function scopeSearchWaitEvaluate(Builder $query, array $evaluate_ids = []): Builder
     {
         return $query
-            ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAYED)
-            ->where('ship_status', ShippingStatusEnum::RECEIVED)
+            ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+            ->where('pay_status', PayStatusEnum::PAYED->value)
+            ->where('ship_status', ShippingStatusEnum::RECEIVED->value)
             ->whereNotIn('id', $evaluate_ids);
     }
 
@@ -197,9 +197,9 @@ class Order extends Model
     public function scopeSearchWaitReceive(Builder $query): Builder
     {
         return $query
-            ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAYED)
-            ->where('ship_status', ShippingStatusEnum::SHIPPED);
+            ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+            ->where('pay_status', PayStatusEnum::PAYED->value)
+            ->where('ship_status', ShippingStatusEnum::SHIPPED->value);
     }
 
     /**
@@ -208,9 +208,9 @@ class Order extends Model
     public function scopeSearchComplete(Builder $query): Builder
     {
         return $query
-            ->where('order_status', OrderStatusEnum::CONFIRMED)
-            ->where('pay_status', PayStatusEnum::PAYED)
-            ->where('ship_status', ShippingStatusEnum::RECEIVED);
+            ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+            ->where('pay_status', PayStatusEnum::PAYED->value)
+            ->where('ship_status', ShippingStatusEnum::RECEIVED->value);
     }
 
     protected function casts(): array

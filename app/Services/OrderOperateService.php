@@ -82,9 +82,9 @@ class OrderOperateService
 
             // 更新订单状态
             if (! $order->update([
-                'order_status' => OrderStatusEnum::CANCELLED,
-                'pay_status' => PayStatusEnum::PAY_WAIT,
-                'ship_status' => ShippingStatusEnum::UNSHIPPED,
+                'order_status' => OrderStatusEnum::CANCELLED->value,
+                'pay_status' => PayStatusEnum::PAY_WAIT->value,
+                'ship_status' => ShippingStatusEnum::UNSHIPPED->value,
                 'paid_at' => null,
                 'shipped_at' => null,
                 'received_at' => null,
@@ -118,7 +118,7 @@ class OrderOperateService
         DB::beginTransaction();
 
         try {
-            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED, 'received_at' => now()->toDateTimeString()])) {
+            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED->value, 'received_at' => now()->toDateTimeString()])) {
                 throw new BusinessException('确认收货失败');
             }
 

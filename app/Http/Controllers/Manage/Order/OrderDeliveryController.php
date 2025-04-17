@@ -245,7 +245,7 @@ class OrderDeliveryController extends BaseController
                     ]);
 
                     $order_delivery->items()->createMany($order_delivery_items);
-                    $order->update(['ship_status' => $order_ship_status, 'shipped_at' => $import_datum['shipped_at']]);
+                    $order->update(['ship_status' => $order_ship_status->value, 'shipped_at' => $import_datum['shipped_at']]);
                     $order_log_dao->storeByAdminUser($current_user, $order, '添加发货', OrderLog::TYPE_ADMIN_USER);
                     $success_data[] = $order_delivery->id;
                 }
@@ -330,7 +330,7 @@ class OrderDeliveryController extends BaseController
         DB::beginTransaction();
 
         try {
-            if (! $order->update(['ship_status' => $order_ship_status, 'shipped_at' => $order_shipped_at])) {
+            if (! $order->update(['ship_status' => $order_ship_status->value, 'shipped_at' => $order_shipped_at])) {
                 throw new BusinessException('修改订单发货状态失败');
             }
 
