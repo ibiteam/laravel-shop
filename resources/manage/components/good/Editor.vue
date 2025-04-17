@@ -41,15 +41,18 @@
             </div>
         </el-dialog>
         <div class="import-table"></div>
+        <MaterialCenterDialog v-bind="{show: materialDialogShow, dir_type: materialSelectType, multiple: true}" @close="materialDialogShow = false" @confirm="confirmSelectMaterial"/>
     </div>
 </template>
 
 <script setup>
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { onBeforeUnmount, ref, shallowRef, onMounted, reactive, getCurrentInstance, watch } from 'vue'
+import { Boot, SlateTransforms } from '@wangeditor/editor'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import html2canvas from 'html2canvas-pro';
 import { fileUpload } from '@/api/common'
+import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const editorRef = shallowRef()
@@ -64,6 +67,46 @@ const props = defineProps({
 })
 const uploadFileFormRef = ref(null);
 const uploadFileRef = ref(null);
+
+const materialDialogShow = ref(false);
+const materialSelectType = ref(1);
+
+class MyMaterialButtonMenu {
+    constructor() {
+        this.title = '从素材库选择' // 自定义菜单标题
+        this.tag = 'button'
+    }
+
+    // 获取菜单执行时的 value ，用不到则返回空 字符串或 false
+    getValue(editor) {
+        return false
+    }
+
+    // 菜单是否需要激活，用不到则返回 false
+    isActive(editor) {
+        return false
+    }
+
+    // 菜单是否需要禁用，用不到则返回 false
+    isDisabled(editor) {
+        return false
+    }
+
+    // 点击菜单时触发的函数
+    exec(editor, value) {
+        if (this.isDisabled(editor)) return
+        materialDialogShow.value = true
+    }
+}
+
+const materialConf = {
+    key: 'material', // 定义 menu key ：要保证唯一、不重复（重要）
+    factory() {
+        return new MyMaterialButtonMenu() // 把 `YourMenuClass` 替换为你菜单的 class
+    },
+}
+
+Boot.registerMenu(materialConf)
 
 const uploadFileForm = reactive({
     editor_files: [],   //  图片列表
@@ -86,7 +129,11 @@ const mode = ref('default')
 const msgErr = ref(null)
 
 const toolbarConfig = ref({
-    excludeKeys: exclude_keys
+    excludeKeys: exclude_keys,
+    insertKeys:{
+        index: 99,
+        keys:['material']
+    }
 })
 const editorConfig = {
     placeholder: '请输入商品详细信息',
@@ -121,7 +168,25 @@ const editorConfig = {
         }
     }
 }
-
+// 选择素材确认回调
+const confirmSelectMaterial = (data) => {
+    materialDialogShow.value = false
+    if (!data.length) return
+    let imagesNodes = []
+    data.length && data.forEach(item => {
+        imagesNodes.push({
+            type: 'image',
+            src: item.file_path,
+            style:{
+                width: '100%'
+            },
+            children: [
+                {text:''}
+            ]
+        })
+    })
+    SlateTransforms.insertNodes(editorRef.value, imagesNodes)
+}
 const customPasteSet = (editor, event)=> {
     const html = event.clipboardData.getData('text/html')
     //  如果获取到的html有值，则拦截并过滤表格，将表格生成为图片，并将表格标签替换为图片
