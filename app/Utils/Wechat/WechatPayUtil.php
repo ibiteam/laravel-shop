@@ -84,11 +84,11 @@ class WechatPayUtil
         } catch (WeChatPayException $we_chat_pay_exception) {
             Log::error($we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getTrace());
 
-            throw new WeChatPayException('微信支付失败~');
+            throw new WeChatPayException('微信支付查询订单支付信息失败~');
         } catch (\Throwable $throwable) {
             Log::error('Wechat Pay query order Throwable'.$throwable->getMessage(), $throwable->getTrace());
 
-            throw new WeChatPayException('微信支付失败');
+            throw new WeChatPayException('微信支付查询订单支付信息失败');
         }
     }
 
@@ -132,11 +132,11 @@ class WechatPayUtil
         } catch (WeChatPayException $we_chat_pay_exception) {
             Log::error($we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getTrace());
 
-            throw new WeChatPayException('微信支付失败~');
+            throw new WeChatPayException('微信支付申请退款失败~');
         } catch (\Throwable $throwable) {
             Log::error('Wechat Pay refund order Throwable'.$throwable->getMessage(), $throwable->getTrace());
 
-            throw new WeChatPayException('微信支付失败');
+            throw new WeChatPayException('微信支付申请退款失败');
         }
     }
 
@@ -163,11 +163,11 @@ class WechatPayUtil
         } catch (WeChatPayException $we_chat_pay_exception) {
             Log::error($we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getTrace());
 
-            throw new WeChatPayException('微信支付失败~');
+            throw new WeChatPayException('微信支付查询单笔退款失败~');
         } catch (\Throwable $throwable) {
             Log::error('Wechat Pay query refund order Throwable'.$throwable->getMessage(), $throwable->getTrace());
 
-            throw new WeChatPayException('微信支付失败');
+            throw new WeChatPayException('微信支付查询单笔退款失败');
         }
     }
 
