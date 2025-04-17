@@ -12,14 +12,15 @@ class AppServiceConfigTableSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->ibi_chat();       // 国联云客服
-        $this->geo_amap();       // 地理位置
+        $this->addConfig(AppServiceConfig::IBI_CHAT, '国联云客服', ['host' => '', 'platform_id' => '', 'platform_secret' => '']);
+        $this->addConfig(AppServiceConfig::GEO_AMAP, '地理位置', ['host' => '', 'key' => '']);
+        $this->addConfig(AppServiceConfig::KUAI_DI_100, '快递100', ['host' => '', 'key' => '', 'customer' => '']);
     }
 
     /**
      * 新增记录.
      */
-    private function addConfig(string $alias, string $name, string $config, int $is_enable = AppServiceConfig::IS_ENABLE, int $is_record = AppServiceConfig::IS_RECORD, int $error_number = 0, int $stop_number = 0)
+    private function addConfig(string $alias, string $name, array $config, int $is_enable = AppServiceConfig::IS_ENABLE, int $is_record = AppServiceConfig::IS_RECORD, int $error_number = 0, int $stop_number = 0)
     {
         $appServiceConfig = AppServiceConfig::firstOrNew([
             'alias' => $alias,
@@ -27,7 +28,7 @@ class AppServiceConfigTableSeeder extends Seeder
 
         if (! $appServiceConfig->exists) {
             $appServiceConfig->name = $name;
-            $appServiceConfig->config = $config;
+            $appServiceConfig->config = json_encode($config, JSON_UNESCAPED_UNICODE);
             $appServiceConfig->is_enable = $is_enable;
             $appServiceConfig->is_record = $is_record;
             $appServiceConfig->error_number = $error_number;
@@ -35,47 +36,5 @@ class AppServiceConfigTableSeeder extends Seeder
             $appServiceConfig->desc = '';
             $appServiceConfig->save();
         }
-    }
-
-    private function ibi_chat()
-    {
-        $alias = AppServiceConfig::IBI_CHAT;
-        $name = '国联云客服';
-
-        if (is_pro_env()) {
-            $config = json_encode([
-                'host' => '',
-                'platform_id' => '',
-                'platform_secret' => '',
-            ], JSON_UNESCAPED_UNICODE);
-        } else {
-            $config = json_encode([
-                'host' => 'https://testchat.ptdplat.com/#/client',
-                'platform_id' => '174417042419',
-                'platform_secret' => '76bad80526f1e149f78051db34f7c9eb',
-            ], JSON_UNESCAPED_UNICODE);
-        }
-
-        $this->addConfig($alias, $name, $config);
-    }
-
-    private function geo_amap()
-    {
-        $alias = AppServiceConfig::GEO_AMAP;
-        $name = '地理位置';
-
-        if (is_pro_env()) {
-            $config = json_encode([
-                'host' => '',
-                'key' => '',
-            ], JSON_UNESCAPED_UNICODE);
-        } else {
-            $config = json_encode([
-                'host' => 'https://restapi.amap.com',
-                'key' => '46060c0ad9f9298490e225bcb4f7549b',
-            ], JSON_UNESCAPED_UNICODE);
-        }
-
-        $this->addConfig($alias, $name, $config);
     }
 }
