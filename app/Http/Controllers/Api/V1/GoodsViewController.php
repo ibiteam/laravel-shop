@@ -20,6 +20,7 @@ class GoodsViewController extends BaseController
         $data->getCollection()->transform(function (GoodsView $item) {
             $goods = $item->goods;
             return [
+                'id' => $item->id,
                 'image' => $goods->image,
                 'price' => $goods->price,
                 'goods_name' => $goods->name,
