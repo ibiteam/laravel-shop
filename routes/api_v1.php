@@ -174,7 +174,10 @@ Route::middleware('api.auth')->group(function () {
         Route::get('integrals', [UserIntegralController::class, 'index']);// 我的积分
         Route::get('collect', [GoodsCollectController::class, 'myCollect']);// 收藏列表
         Route::post('batch/unfollow', [GoodsCollectController::class, 'batchUnfollow']); // 批量取消关注商品
-        Route::get('views', [GoodsViewController::class, 'index']);// 浏览记录
+        Route::prefix('views')->group(function () {
+            Route::get('/', [GoodsViewController::class, 'index']);// 浏览记录
+            Route::post('batch/distory', [GoodsViewController::class, 'batchDistory']);// 批量删除浏览记录
+        });
     });
 
 });

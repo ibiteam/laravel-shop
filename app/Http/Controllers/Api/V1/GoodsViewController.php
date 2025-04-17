@@ -31,4 +31,18 @@ class GoodsViewController extends BaseController
 
         return $this->success(new CommonResourceCollection($data));
     }
+    // 批量删除
+    public function batchDistory(Request $request)
+    {
+        $ids = $request->get('ids');
+        if (!is_array($ids)) {
+            return $this->error('请求参数类型错误');
+        }
+        GoodsView::query()
+            ->whereUserId(get_user()?->id)
+            ->whereIn('id', $ids)
+            ->delete();
+
+        return $this->success('删除成功');
+    }
 }

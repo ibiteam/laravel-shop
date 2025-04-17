@@ -4,9 +4,10 @@ namespace App\Models;
 
 use App\Traits\DatetimeTrait;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property int $user_id 用户ID
@@ -26,11 +27,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView whereUserId($value)
  * @property-read \App\Models\Goods|null $goods
+ * @property \Illuminate\Support\Carbon|null $deleted_at 删除时间
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|GoodsView withoutTrashed()
  * @mixin \Eloquent
  */
 class GoodsView extends Model
 {
-    use DatetimeTrait;
+    use DatetimeTrait,SoftDeletes;
 
     protected $guarded = [];
 
