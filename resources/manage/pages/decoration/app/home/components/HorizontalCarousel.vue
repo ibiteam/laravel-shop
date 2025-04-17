@@ -23,7 +23,7 @@
                             modules: swiperModules
                         }" class="cards-swiper">
                             <template v-if="form.content.data.length <= 3">
-                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in [...form.content.data, ...form.content.data, ...form.content.data, ...form.content.data]" :key="index">
+                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in [...form.content.data, ...form.content.data]" :key="index">
                                     <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
                                 </swiper-slide>
                             </template>
@@ -45,7 +45,7 @@
                         }" class="scroll-wrapper">
                             <swiper-slide class="scroll-item" v-for="(item, index) in form.content.data" :key="index" :style="{width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px'}">
                                 <image-wrapper
-                                    v-bind="{src: item.image, width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '10px'}" 
+                                    v-bind="{src: item.image, width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '10px', fit: 'cover'}" 
                                 />
                             </swiper-slide>
                         </swiper>
