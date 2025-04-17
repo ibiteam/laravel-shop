@@ -1,6 +1,6 @@
 <?php
 
-use App\Utils\AppServiceConfig\GeoUtil;
+use App\Utils\AppService\GeoUtil;
 
 it('test getAddressByIp', function () {
     $res = (new GeoUtil(0))->getAddressByIp('27.196.91.0');

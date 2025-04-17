@@ -1,20 +1,21 @@
 <?php
 
-namespace App\Utils\AppServiceConfig;
+namespace App\Utils\AppService;
 
 use App\Exceptions\BusinessException;
 use App\Models\AppServiceConfig;
 use App\Models\AppServiceLog;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
-abstract class AppServiceBase
+abstract class BaseUtil
 {
-    protected $config;
+    protected AppServiceConfig $config;
 
-    protected $user_id;
+    protected int $user_id;
 
     public function __construct(int $user_id)
     {
@@ -31,17 +32,19 @@ abstract class AppServiceBase
     }
 
     /**
+     * get app service settings.
+     */
+    final public function getSettings(): array
+    {
+        return $this->config->config;
+    }
+
+    /**
      * get the request host.
      */
     public function host(): string
     {
-        $host = $this->config->config['host'];
-
-        if (! $host) {
-            return '';
-        }
-
-        return $this->config->config['host'];
+        return $this->getSettings()['host'] ?? '';
     }
 
     /**
@@ -109,42 +112,38 @@ abstract class AppServiceBase
     /**
      * send post request.
      *
-     * @param  string     $url  Request url
-     * @param  array      $data Request data
-     * @return mixed|null
-     *
      * @throws BusinessException
+     * @throws GuzzleException
      */
-    protected function doPost(string $url, array $data, bool $log_record = true, array $config = []): mixed
+    protected function doPost(string $url, array $data, bool $can_record_log = true, array $config = []): mixed
     {
-        return $this->doRequest($url, $data, 'post', $log_record, $config);
+        return $this->doRequest($url, $data, 'POST', $can_record_log, $config);
     }
 
     /**
      * send get request.
      *
-     * @param  string     $url  Request url
-     * @param  array      $data Request data
-     * @return mixed|null
-     *
      * @throws BusinessException
+     * @throws GuzzleException
      */
-    protected function doGet(string $url, array $data, bool $log_record = true): mixed
+    protected function doGet(string $url, array $data, bool $can_record_log = true): mixed
     {
-        return $this->doRequest($url, $data, 'get', $log_record);
+        return $this->doRequest($url, $data, 'GET', $can_record_log);
     }
 
     /**
      * do request.
      *
-     * @param  string     $url    request url
-     * @param  array      $data   request data
-     * @param  string     $method request method
-     * @return mixed|void
+     * @param string $url            request url
+     * @param array  $data           request params
+     * @param string $method         request method
+     * @param bool   $can_record_log can record request log
+     * @param array  $config         request config
      *
-     * @throws BusinessException|\GuzzleHttp\Exception\GuzzleException
+     * @throws BusinessException
+     * @throws GuzzleException
      */
-    private function doRequest(string $url, array $data, string $method = 'post', bool $log_record = true, array $config = []): mixed
+    private function doRequest(string $url, array $data, string $method = 'post', bool $can_record_log = true, array $config = []): mixed
     {
         $host = $this->host();
 
@@ -164,7 +163,8 @@ abstract class AppServiceBase
 
                 if ($res->getStatusCode() === Response::HTTP_OK) {
                     $result = json_decode($res->getBody()->getContents(), true);
-                    if ($log_record) {
+
+                    if ($can_record_log) {
                         $this->addLog($this->user_id, $data, $result);
                     }
 

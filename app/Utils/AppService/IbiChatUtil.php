@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Utils\AppServiceConfig;
+namespace App\Utils\AppService;
 
 use App\Models\AppServiceConfig;
 
-class IbiChatUtil extends AppServiceBase
+class IbiChatUtil extends BaseUtil
 {
     private array $settings = [
         'host' => '',
