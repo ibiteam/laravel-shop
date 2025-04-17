@@ -136,9 +136,9 @@ class OrderDeliveryController extends BaseController
                 }
                 $orders = Order::query()
                     ->with('detail:id,order_id,goods_name,goods_number')
-                    ->where('order_status', OrderStatusEnum::CONFIRMED)
-                    ->where('pay_status', PayStatusEnum::PAYED)
-                    ->where('ship_status', ShippingStatusEnum::UNSHIPPED)
+                    ->where('order_status', OrderStatusEnum::CONFIRMED->value)
+                    ->where('pay_status', PayStatusEnum::PAYED->value)
+                    ->whereIn('ship_status', [ShippingStatusEnum::UNSHIPPED->value, ShippingStatusEnum::PART->value])
                     ->whereIn('order_sn', array_column($import_data, 'order_sn'))
                     ->select(['id', 'order_sn', 'order_status', 'pay_status', 'ship_status'])
                     ->get()
