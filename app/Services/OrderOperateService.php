@@ -118,7 +118,7 @@ class OrderOperateService
         DB::beginTransaction();
 
         try {
-            if (! $order->update(['order_status' => ShippingStatusEnum::RECEIVED, 'received_at' => now()->toDateTimeString()])) {
+            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED, 'received_at' => now()->toDateTimeString()])) {
                 throw new BusinessException('确认收货失败');
             }
 
