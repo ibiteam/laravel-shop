@@ -92,7 +92,11 @@ class OrderDeliveryController extends BaseController
 
                     $line = $key + 1;
 
-                    if (! $order_sn || ! $ship_company_name || ! $ship_no || ! $shipped_at) {
+                    if (! $order_sn) {
+                        continue;
+                    }
+
+                    if (! $ship_company_name || ! $ship_no || ! $shipped_at) {
                         $error_data[] = ['line' => $line, 'message' => '数据错误缺少必填数据'];
 
                         continue;
@@ -259,7 +263,7 @@ class OrderDeliveryController extends BaseController
             return $this->success([
                 'success_number' => count($res['success_data']),
                 'error_number' => count($res['error_data']),
-                'error_data' => $res['error_data'],
+                'error_data' => collect($res['error_data'])->sortBy('line')->values(),
             ]);
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
