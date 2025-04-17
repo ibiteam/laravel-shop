@@ -32,19 +32,11 @@ abstract class BaseUtil
     }
 
     /**
-     * get app service settings.
-     */
-    final public function getSettings(): array
-    {
-        return $this->config->config;
-    }
-
-    /**
      * get the request host.
      */
     public function host(): string
     {
-        return $this->getSettings()['host'] ?? '';
+        return $this->config->config['host'] ?? '';
     }
 
     /**
