@@ -22,6 +22,7 @@ import Order from '@/pages/order/Index.vue';
 import OrderDetail from '@/pages/order/Detail.vue';
 import ApplyRefundReason from '@/pages/order/ApplyRefundReason.vue';
 import ApplyRefund from '@/pages/order/ApplyRefund.vue';
+import ApplyRefundDetail from '@/pages/order/ApplyRefundDetail.vue';
 import OrderDelivery from '@/pages/order/OrderDelivery.vue';
 import Transaction from '@/pages/set/Transaction.vue';
 import WechatUser from '@/pages/user/WechatUser.vue';
@@ -59,8 +60,9 @@ const router = createRouter({
                 // 订单
                 { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },
                 { path: '/order/detail/:order_sn', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
-                { path: '/order/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
-                { path: '/order/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
+                { path: '/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
+                { path: '/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
+                { path: '/apply_refund/detail/:id', component: ApplyRefundDetail, name: 'manage.apply_refund.detail',meta:{title:'退款详情'} },
                 { path: '/order/delivery', component: OrderDelivery, name: 'manage.order_delivery.index',meta:{title:'发货列表'} },
                 { path: '/order/evaluate', component: Evaluate, name: 'manage.order_evaluate.index',meta:{title:'评价列表'} },
                 // 用户

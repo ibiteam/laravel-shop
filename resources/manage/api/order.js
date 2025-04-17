@@ -1,63 +1,100 @@
-import $http from '../utils/http'
+import $http from '../utils/http';
 
 export function orderIndex(data) {
-    return $http.doGet('manage/order/info/index', data)
+    return $http.doGet('manage/order/info/index', data);
 }
+
 export function orderDetail(data) {
-    return $http.doGet('manage/order/info/detail', data)
+    return $http.doGet('manage/order/info/detail', data);
 }
 
 export function orderShipEdit(data) {
-    return $http.doGet('manage/order/info/ship/edit', data)
+    return $http.doGet('manage/order/info/ship/edit', data);
 }
+
 export function orderShipUpdate(data) {
-    return $http.doPost('manage/order/info/ship/update', data)
+    return $http.doPost('manage/order/info/ship/update', data);
 }
 
 export function orderAddressEdit(data) {
-    return $http.doGet('manage/order/info/address/edit', data)
+    return $http.doGet('manage/order/info/address/edit', data);
 }
+
 export function orderAddressUpdate(data) {
-    return $http.doPost('manage/order/info/address/update', data)
+    return $http.doPost('manage/order/info/address/update', data);
 }
+
 export function orderQueryExpress(data) {
-    return $http.doGet('manage/order/info/express/query', data)
+    return $http.doGet('manage/order/info/express/query', data);
 }
 
 export function orderDeliveryIndex(data) {
-    return $http.doGet('manage/order/delivery', data)
+    return $http.doGet('manage/order/delivery', data);
 }
 
 export function orderDeliveryImport(data) {
-    return $http.doPost('manage/order/delivery/import', data)
+    return $http.doPost('manage/order/delivery/import', data);
 }
 
 export function orderDeliveryDestroy(data) {
-    return $http.doPost('manage/order/delivery/destroy', data)
+    return $http.doPost('manage/order/delivery/destroy', data);
 }
 
 // 退款原因
 export function applyRefundReasonIndex(data) {
-    return $http.doGet('manage/order/apply_refund_reason', data)
+    return $http.doGet('manage/order/apply_refund_reason', data);
 }
+
 export function applyRefundReasonStore(data) {
-    return $http.doPost('manage/order/apply_refund_reason/store', data)
+    return $http.doPost('manage/order/apply_refund_reason/store', data);
 }
+
 export function applyRefundReasonDestroy(data) {
-    return $http.doPost('manage/order/apply_refund_reason/destroy', data)
+    return $http.doPost('manage/order/apply_refund_reason/destroy', data);
 }
 
 // 退款申请
 export function applyRefundIndex(data) {
-    return $http.doGet('manage/order/apply_refund', data)
+    return $http.doGet('manage/order/apply_refund', data);
 }
+
+export function applyRefundDetail(data) {
+    return $http.doGet('manage/order/apply_refund/detail', data);
+}
+
+export function applyRefundAgreeApply(data) {
+    return $http.doPost('manage/order/apply_refund/agree_apply', data);  // 同意申请
+}
+
+export function applyRefundCloseApply(data) {
+    return $http.doPost('manage/order/apply_refund/close_apply', data);  // 拒绝申请
+}
+
+export function applyRefundExecuteRefund(data) {
+    return $http.doPost('manage/order/apply_refund/execute_refund', data);  // 执行退款
+}
+
+export function applyRefundRefuseRefund(data) {
+    return $http.doPost('manage/order/apply_refund/refuse_refund', data);    // 拒绝退款
+}
+
+export function applyRefundConfirmReceipt(data) {
+    return $http.doPost('manage/order/apply_refund/confirm_receipt', data);  // 确认收货
+}
+
+export function applyRefundQueryExpress(data) {
+    return $http.doPost('manage/order/apply_refund/query_express', data);    // 查询快递
+}
+
 // 订单评价
 export function orderEvaluateIndex(data) {
-    return $http.doGet('manage/order/evaluate', data)
+    return $http.doGet('manage/order/evaluate', data);
 }
+
 export function orderEvaluateCheck(data) {
-    return $http.doPost('manage/order/evaluate/check', data)
+    return $http.doPost('manage/order/evaluate/check', data);
 }
+
 export function orderEvaluateDetail(data) {
-    return $http.doGet('manage/order/evaluate/detail', data)
+    return $http.doGet('manage/order/evaluate/detail', data);
 }
