@@ -19,7 +19,7 @@ use App\Http\Controllers\Api\V1\Order\OrderDeliveryController;
 use App\Http\Controllers\Api\V1\Order\PayController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Api\V1\SmsController;
-use App\Http\Controllers\Api\V1\SupermarketController;
+use App\Http\Controllers\Api\V1\SpecialController;
 use App\Http\Controllers\Api\V1\UploadController;
 use App\Http\Controllers\Api\V1\UserBonusController;
 use App\Http\Controllers\Api\V1\UserCouponController;
@@ -51,8 +51,8 @@ Route::prefix('auth')->group(function () {
     Route::post('wechat', [WechatController::class, 'auth']); // 微信公众号授权
 });
 
-// 超市
-Route::get('supermarket', [SupermarketController::class, 'index']); // 获取超市页数据
+// 专题
+Route::get('special', [SpecialController::class, 'index']); // 专题页
 
 // 搜索
 Route::prefix('search')->group(function () {

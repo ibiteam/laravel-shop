@@ -10,9 +10,13 @@ class RouterService
     /**
      * 获取完整请求地址
      */
-    public function getRouterPath(RouterEnum $router_enum, array $params = []): string
+    public function getRouterPath($router_alias, array $params = []): string
     {
-        $router = Router::query()->whereAlias($router_enum->value)->whereIsShow(Router::IS_SHOW_YES)->first();
+        if (RouterEnum::formSource($router_alias)) {
+            return '';
+        }
+
+        $router = Router::query()->whereAlias($router_alias)->whereIsShow(Router::IS_SHOW_YES)->first();
 
         if (! $router instanceof Router) {
             return '';

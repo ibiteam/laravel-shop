@@ -56,7 +56,7 @@ class WechatPayOrderService implements PayOrderInterface
                     shop_config(ShopConfig::SHOP_NAME).'订单支付',
                     $transaction->transaction_no,
                     $order->order_amount,
-                    app(RouterService::class)->getRouterPath(RouterEnum::ORDER_SUCCESS)
+                    app(RouterService::class)->getRouterPath(RouterEnum::ORDER_SUCCESS->value)
                 );
 
                 break;
