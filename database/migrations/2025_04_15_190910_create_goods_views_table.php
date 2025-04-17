@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('goods_id')->comment('商品ID');
             $table->string('referer')->nullable()->comment('来源 pc、app、h5、mini');
             $table->string('ip')->nullable()->comment('用户IP地址');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

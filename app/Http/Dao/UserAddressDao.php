@@ -151,6 +151,9 @@ class UserAddressDao
             'province' => $user_address->regionProvince?->name,
             'city' => $user_address->regionCity?->name,
             'district' => $user_address->regionDistrict?->name,
+            'province_id' => $user_address->province,
+            'city_id' => $user_address->city,
+            'district_id' => $user_address->district,
             'address_detail' => $user_address->address_detail,
             'is_default' => $user_address->is_default,
         ];

@@ -1,10 +1,23 @@
 <script setup>
 import { Plus, Search } from '@element-plus/icons-vue';
-import Page from '@/components/common/Pagination.vue'
+import Page from '@/components/common/Pagination.vue';
 import { applyRefundIndex } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
+
+const refundStatuses = [
+    { label: '退款待处理', value: 0 },
+    { label: '已经拒绝退款', value: 1 },
+    { label: '退货审核成功', value: 2 },
+    { label: '买家已发货', value: 3 },
+    { label: '卖家已收货', value: 4 },
+    { label: '退款成功', value: 5 },
+    { label: '退款关闭', value: 6 }
+];
 
 const searchForm = reactive({
     user_name: '',
@@ -26,9 +39,12 @@ const pageInfo = reactive({
 const tableData = ref([]);
 const loading = ref(false);
 
-
 const imageShow = (url) => {
     window.open(url);
+};
+
+const openDetail = (id) => {
+    router.push({ name: 'manage.apply_refund.detail', params: { id: id } });
 };
 
 const getData = (page = 1) => {
@@ -93,13 +109,10 @@ onMounted(() => {
                 </el-form-item>
                 <el-form-item label="状态">
                     <el-select v-model="searchForm.status" clearable placeholder="请选择">
-                        <el-option label="退款待处理" value="0"></el-option>
-                        <el-option label="已经拒绝退款" value="1"></el-option>
-                        <el-option label="退货审核成功" value="2"></el-option>
-                        <el-option label="买家已发货" value="3"></el-option>
-                        <el-option label="卖家已收货" value="4"></el-option>
-                        <el-option label="退款成功" value="5"></el-option>
-                        <el-option label="退款关闭" value="6"></el-option>
+                        <el-option
+                            v-for="item in refundStatuses"
+                            :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="申请时间">
@@ -136,17 +149,6 @@ onMounted(() => {
             <el-table-column label="退款单号" prop="no"></el-table-column>
             <el-table-column label="退款金额" prop="money"></el-table-column>
             <el-table-column label="退款数量" prop="number"></el-table-column>
-            <el-table-column label="状态">
-                <template #default="scope">
-                    <span v-if="scope.row.status == 0">退款待处理</span>
-                    <span v-if="scope.row.status == 1">已经拒绝退款</span>
-                    <span v-if="scope.row.status == 2">退货审核成功</span>
-                    <span v-if="scope.row.status == 3">买家已发货</span>
-                    <span v-if="scope.row.status == 4">卖家已收货</span>
-                    <span v-if="scope.row.status == 5">退款成功</span>
-                    <span v-if="scope.row.status == 6">退款关闭</span>
-                </template>
-            </el-table-column>
             <el-table-column label="类型">
                 <template #default="scope">
                     <span v-if="scope.row.type == 0">退款</span>
@@ -174,12 +176,16 @@ onMounted(() => {
             <el-table-column label="申请次数" prop="count"></el-table-column>
             <el-table-column label="申请时间" prop="created_at"></el-table-column>
             <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-            <!--<el-table-column label="操作">
+            <el-table-column label="退款状态">
                 <template #default="scope">
-                    <el-button link type="primary" size="large" @click="openLogDialog(scope.row)">协商历史</el-button>
-                    <el-button link type="primary" size="large" @click="openShipDialog(scope.row)">物流轨迹</el-button>
+                    <el-button
+                        link type="primary" size="large"
+                        v-for="item in refundStatuses"
+                        @click="openDetail(scope.row.id)">
+                        <span v-if="scope.row.status == item.value">{{ item.label }}</span>
+                    </el-button>
                 </template>
-            </el-table-column>-->
+            </el-table-column>
         </el-table>
         <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
     </div>

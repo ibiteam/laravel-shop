@@ -4,7 +4,7 @@
 
 ### 请求URL
 
-* /api/v1/region_group
+* /api/v1/region/group
 
 ### 请求方式
 * POST

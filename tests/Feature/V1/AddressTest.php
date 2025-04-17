@@ -26,7 +26,7 @@ it('test address search', function () {
 
 it('test address show', function () {
     $data = [
-        'id' => 1,
+        'id' => 7,
     ];
     $response = $this->doPost('api/v1/address/show', $data);
     $this->assertIsArray($response);
@@ -94,7 +94,7 @@ it('test region', function () {
     $data = [
 
     ];
-    $response = $this->doGet('api/v1/region', $data);
+    $response = $this->doPost('api/v1/region', $data);dd($response);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);
@@ -106,7 +106,7 @@ it('test region_group', function () {
     $data = [
 
     ];
-    $response = $this->doGet('api/v1/region_group', $data);
+    $response = $this->doPost('api/v1/region/group', $data);dd($response);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
     $this->assertArrayHasKey('data', $response);

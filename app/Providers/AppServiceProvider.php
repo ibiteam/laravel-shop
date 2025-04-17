@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // 网站颜色
-        view()->share('app_shop_color', shop_config('shop_color'));
+        Model::shouldBeStrict(!is_pro_env());
 
         Validator::extend('is_phone', function ($attribute, $value, $parameters, $validator) {
             return is_phone($value);

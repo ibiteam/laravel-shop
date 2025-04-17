@@ -10,6 +10,7 @@ use App\Enums\ShippingStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Dao\CartDao;
 use App\Http\Dao\UserAddressDao;
+use App\Http\Dao\UserDao;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\UserAddress;
@@ -199,14 +200,18 @@ class OrderService
                 'source' => $this->getSource(),
                 'payment_method' => $this->getPaymentMethod(),
             ]);
+
+            if ($order->order_amount == 0) {
+                $order->pay_status = PayStatusEnum::PAYED;
+                $order->paid_at = now()->toDateTimeString();
+                $order->save();
+            }
             $destroy_cart_ids = [];
 
             foreach ($this->getGoodsFormatters() as $goods_formatter) {
                 $order->detail()->create($goods_formatter->getOrderDetailFormat());
 
-                if ($goods_formatter->isDoneDecrementStock()) {
-                    $goods_formatter->decrementStock();
-                }
+                $goods_formatter->decrementStock();
 
                 // 清除购物车中的下单的商品
                 if ($tmp_cart_id = $goods_formatter->getCartId()) {
@@ -218,15 +223,8 @@ class OrderService
                 app(CartDao::class)->clearDoneCartGoods($destroy_cart_ids, $current_user->id);
             }
 
-            // todo operate:  下单完成，判断是否需要扣除积分
-            // if ($order->integral > 0) {
-            //
-            // }
-
-            if ($order->order_amount == 0) {
-                $order->pay_status = PayStatusEnum::PAYED;
-                $order->paid_at = now()->toDateTimeString();
-                $order->save();
+            if ($order->integral > 0) {
+                app(UserDao::class)->decrementIntegralByDoneOrder($this->getUser(), $order->integral, '用户下单使用积分');
             }
 
             DB::commit();
@@ -404,6 +402,28 @@ class OrderService
         }
         $this->setGoodsAmount($goods_amount);
         $this->setGoodsIntegral($goods_integral);
+
+        return $this;
+    }
+
+    /**
+     * 检查积分是否足够.
+     *
+     * @return $this
+     *
+     * @throws BusinessException
+     */
+    public function checkIntegral(): self
+    {
+        $integral = $this->getGoodsIntegral();
+
+        if ($integral <= 0) {
+            return $this;
+        }
+
+        if ($this->getUser()->integral < $integral) {
+            throw new BusinessException('积分不足');
+        }
 
         return $this;
     }
