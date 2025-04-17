@@ -24,7 +24,7 @@ class ChatController extends BaseController
 //        $platform_is_show = shop_config(ShopConfig::SERVER_IS_SHOW);
         $platform_is_show = true;
         if ($platform_is_show) {
-            $user = $this->user();
+            $user = get_user();
             $ibi_chat = new IbiChatUtil(0);
             $config = $ibi_chat->getConfig()->config;
             $platform_id = $config['platform_id'];

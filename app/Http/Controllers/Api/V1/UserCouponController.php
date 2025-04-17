@@ -14,7 +14,7 @@ class UserCouponController extends BaseController
 {
     public function index()
     {
-        $user = $this->user();
+        $user = get_user();
         $data = UserCoupon::query()
             ->whereUserId($user?->id)
             ->with('coupon')
