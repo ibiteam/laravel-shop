@@ -65,7 +65,7 @@ class ArticleCategoryController extends BaseController
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
-                'parent_id' => 'required|integer',
+                'parent_id' => 'nullable|integer',
                 'name' => 'required|string',
                 'alias' => 'nullable|string',
                 'title' => 'required|string',
@@ -115,7 +115,7 @@ class ArticleCategoryController extends BaseController
                 }
             }
 
-            $article_category->parent_id = $validated['parent_id'];
+            $article_category->parent_id = $validated['parent_id'] ?? 0;
             $article_category->name = $validated['name'];
             $article_category->alias = $alias;
             $article_category->title = $validated['title'];

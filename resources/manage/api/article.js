@@ -2,22 +2,22 @@
 import $http from '@/utils/http.js';
 
 export function articleCategoryIndex(data) {
-    return $http.doGet('manage/article/article_category', data)
+    return $http.doGet('manage/article/category', data)
 }
 export function articleCategoryInfo(data) {
-    return $http.doGet('manage/article/article_category/info', data)
+    return $http.doGet('manage/article/category/info', data)
 }
 export function articleCategoryStore(data) {
-    return $http.doPost('manage/article/article_category/store', data)
+    return $http.doPost('manage/article/category/store', data)
 }
 export function articleCategoryDestroy(data) {
-    return $http.doPost('manage/article/article_category/destroy', data)
+    return $http.doPost('manage/article/category/destroy', data)
 }
 export function articleCategoryChangeShow(data) {
-    return $http.doPost('manage/article/article_category/change_show', data)
+    return $http.doPost('manage/article/category/change_show', data)
 }
 export function articleCategoryMove(data) {
-    return $http.doPost('manage/article/article_category/move', data)
+    return $http.doPost('manage/article/category/move', data)
 }
 
 // 文章列表

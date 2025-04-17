@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('article')->group(function () {
     // 文章分类
-    Route::prefix('article_category')->group(function () {
+    Route::prefix('category')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_ARTICLE_CATEGORY_INDEX])->group(function () {
             Route::get('/', [ArticleCategoryController::class, 'index'])->name(Permission::MANAGE_ARTICLE_CATEGORY_INDEX);
             Route::get('info', [ArticleCategoryController::class, 'info']);
