@@ -407,6 +407,12 @@ const handleCreated = (editor) => {
     editorRef.value.setHtml(props.modelValue)
 }
 
+watch(() => props.modelValue, (newVal) => {
+    if (editorRef.value && newVal !== editorRef.value.getHtml() && newVal) {
+        editorRef.value.setHtml(newVal)
+    }
+})
+
 const handleChange = async (editor) => {
     const parent = await resetElementInlineStyle(editor)
     emit('update:modelValue', parent.innerHTML)
