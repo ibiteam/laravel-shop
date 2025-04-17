@@ -113,7 +113,7 @@ class OrderDeliveryController extends BaseController
                         continue;
                     }
 
-                    if ($ship_timestamp <= now()->startOfYear()->getTimestamp() || $ship_timestamp >= now()->endOfYear()->getTimestamp()) {
+                    if ($ship_timestamp <= now()->startOfYear()->getTimestamp() || $ship_timestamp >= now()->getTimestamp()) {
                         $error_data[] = ['line' => $line, 'message' => '发货时间错误，请选择今年的发货时间'];
 
                         continue;
