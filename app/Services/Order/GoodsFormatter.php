@@ -54,21 +54,13 @@ class GoodsFormatter
      */
     private array $number_data;
 
-    /**
-     * 获取商品总价格.
-     */
-    public function getGoodsAmount(): float|int
-    {
-        return (float) to_number_format($this->getGoods()->price * $this->getBuyNumber());
-    }
+    private int|float $goods_amount;
 
-    /**
-     * 获取商品总积分.
-     */
-    public function getGoodsIntegral(): float|int
-    {
-        return $this->getGoods()->integral * $this->getBuyNumber();
-    }
+    private int|float $goods_integral;
+
+    private array $sku_value = [];
+
+    private string $goods_image = '';
 
     /**
      * 校验商品信息并赋值
@@ -80,7 +72,7 @@ class GoodsFormatter
      */
     public function validate(): self
     {
-        $goods = $this->getGoods() ?: Goods::query()->with('skus')->withTrashed()->whereNo($this->getGoodsNo())->first();
+        $goods = $this->goods ?: Goods::query()->with('skus')->withTrashed()->whereNo($this->goods_no)->first();
 
         if (! $goods instanceof Goods) {
             throw new BusinessException('商品不存在');
@@ -95,7 +87,7 @@ class GoodsFormatter
         }
 
         if ($goods->can_quota === Goods::QUOTA) {
-            $order_ids = Order::query()->whereUserId($this->getUser()->id)->pluck('id');
+            $order_ids = Order::query()->whereUserId($this->user->id)->pluck('id');
 
             if ($order_ids->isNotEmpty()) {
                 $sum = OrderDetail::query()->whereGoodsId($goods->id)->whereIn('order_id', $order_ids)->sum('goods_number');
@@ -105,7 +97,7 @@ class GoodsFormatter
                 }
             }
         }
-        $sku_id = $this->getSkuId();
+        $sku_id = $this->sku_id;
 
         // 校验商品规格
         if ($goods->skus->isEmpty() && $sku_id) {
@@ -132,7 +124,7 @@ class GoodsFormatter
                 throw new BusinessException('商品所选规格库存不足，请重新选择');
             }
 
-            if ($this->getBuyNumber() > $goods_sku->number) {
+            if ($this->buy_number > $goods_sku->number) {
                 $this->setNumberData(false, $goods_sku->number);
 
                 $tmp_message = $goods_sku->number.$goods->unit;
@@ -141,15 +133,34 @@ class GoodsFormatter
             }
             $this->setNumberData(true, $goods_sku->number);
 
-            $goods->total = $goods_sku->number;
+            $sku_value = [];
+
+            $spec_value_ids = $goods_sku->explodeSkuValue();
+            $spec_values = app(GoodsSpecValueDao::class)->getInfoByIds($spec_value_ids, $goods_sku->goods_id);
+
+            foreach ($spec_value_ids as $key => $spec_value_id) {
+                $spec_value = $spec_values->where('id', $spec_value_id)->first();
+
+                if (! $spec_value instanceof GoodsSpecValue) {
+                    throw new BusinessException('商品规格值不存在');
+                }
+
+                if ($key === 0 && $spec_value->thumb) {
+                    $this->goods_image = $spec_value->thumb;
+                }
+                $sku_value[] = ['key' => $spec_value->spec?->name, 'value' => $spec_value->value];
+            }
+            $this->setSkuValue($sku_value);
             // 设置商品规格信息
             $this->setGoodsSku($goods_sku);
+            $this->setGoodsIntegral((float) to_number_format($goods_sku->integral * $this->buy_number));
+            $this->setGoodsAmount((float) to_number_format($goods_sku->price * $this->buy_number));
         } else {
             if ($goods->total <= 0) {
                 throw new BusinessException('商品库存不足，请重新选择');
             }
 
-            if ($this->getBuyNumber() > $goods->total) {
+            if ($this->buy_number > $goods->total) {
                 $this->setNumberData(false, $goods->total);
 
                 $tmp_message = $goods->total.$goods->unit;
@@ -158,6 +169,8 @@ class GoodsFormatter
             }
 
             $this->setNumberData(true, $goods->total);
+            $this->setGoodsIntegral((float) to_number_format($goods->integral * $this->buy_number));
+            $this->setGoodsAmount((float) to_number_format($goods->price * $this->buy_number));
         }
 
         $this->setGoods($goods);
@@ -167,54 +180,64 @@ class GoodsFormatter
 
     /**
      * 初始化回显商品数据.
-     *
-     * @throws BusinessException
      */
     public function initFormat(): array
     {
-        $goods = $this->getGoods();
-        $sku_data = '';
+        $sku_value = '';
 
-        foreach ($this->getSkuData() as $sku_datum) {
-            $sku_data .= $sku_datum['key'].':'.$sku_datum['value'].';';
+        if ($this->goods_sku) {
+            foreach ($this->sku_value as $sku_datum) {
+                $sku_value .= $sku_datum['key'].':'.$sku_datum['value'].';';
+            }
+            $tmp_price = $this->goods_sku->price;
+            $tmp_integral = $this->goods_sku->integral;
+            $tmp_number = $this->goods_sku->number;
+        } else {
+            $tmp_price = $this->goods->price;
+            $tmp_integral = $this->goods->integral;
+            $tmp_number = $this->goods->total;
         }
 
         return [
-            'no' => $goods->no,
-            'name' => $goods->name,
-            'sub_name' => $goods->sub_name,
-            'label' => $goods->label,
-            'thumb' => $goods->image,
-            'price' => $goods->price,
-            'integral' => $goods->integral,
-            'unit' => $goods->unit,
-            'number' => $goods->total,
-            'buy_number' => $this->getBuyNumber(),
-            'sku_id' => $this->getSkuId(),
-            'sku_data' => $sku_data,
+            'no' => $this->goods->no,
+            'name' => $this->goods->name,
+            'sub_name' => $this->goods->sub_name,
+            'label' => $this->goods->label,
+            'thumb' => $this->goods_image ?? $this->goods->image,
+            'price' => $tmp_price,
+            'integral' => $tmp_integral,
+            'unit' => $this->goods->unit,
+            'number' => $tmp_number,
+            'buy_number' => $this->buy_number,
+            'sku_id' => $this->sku_id,
+            'sku_data' => $sku_value,
         ];
     }
 
     /**
      * 生成订单详情数据.
-     *
-     * @throws BusinessException
      */
     public function getOrderDetailFormat(): array
     {
-        $goods = $this->getGoods();
+        if ($this->goods_sku) {
+            $tmp_price = $this->goods_sku->price;
+            $tmp_integral = $this->goods_sku->integral;
+        } else {
+            $tmp_price = $this->goods->price;
+            $tmp_integral = $this->goods->integral;
+        }
 
         return [
-            'goods_id' => $goods->id,
-            'goods_no' => $goods->no,
-            'goods_name' => $goods->name,
-            'goods_number' => $this->getBuyNumber(),
-            'goods_price' => $goods->price,
-            'goods_integral' => $goods->integral,
+            'goods_id' => $this->goods->id,
+            'goods_no' => $this->goods->no,
+            'goods_name' => $this->goods->name,
+            'goods_number' => $this->buy_number,
+            'goods_price' => $tmp_price,
+            'goods_integral' => $tmp_integral,
             'goods_amount' => $this->getGoodsAmount(),
-            'goods_unit' => $goods->unit ?: '',
-            'goods_sku_id' => $this->getSkuId(),
-            'goods_sku_value' => $this->getSkuData(),
+            'goods_unit' => $this->goods->unit ?: '',
+            'goods_sku_id' => $this->sku_id,
+            'goods_sku_value' => $this->sku_value,
         ];
     }
 
@@ -226,28 +249,54 @@ class GoodsFormatter
     public function decrementStock(bool $payed = false): void
     {
         // 先判断 是否支付减库存 && 已支付
-        if ($this->getGoods()->isPayDecrementStock()) {
+        if ($this->goods->isPayDecrementStock()) {
             if ($payed) {
-                if ($this->getGoodsSku() instanceof GoodsSku) {
-                    $this->getGoodsSku()->decrementStock($this->getBuyNumber());
+                if ($this->goods_sku instanceof GoodsSku) {
+                    $this->goods_sku->decrementStock($this->buy_number);
                 }
 
-                $this->getGoods()->decrementStock($this->getBuyNumber());
+                $this->goods->decrementStock($this->buy_number);
             }
 
             return;
         }
 
-        if ($this->getGoodsSku() instanceof GoodsSku) {
-            $this->getGoodsSku()->decrementStock($this->getBuyNumber());
+        if ($this->goods_sku instanceof GoodsSku) {
+            $this->goods_sku->decrementStock($this->buy_number);
         }
 
-        $this->getGoods()->decrementStock($this->getBuyNumber());
+        $this->goods->decrementStock($this->buy_number);
     }
 
-    public function getBuyNumber(): int
+    public function setSkuValue(array $sku_value): self
     {
-        return $this->buy_number;
+        $this->sku_value = $sku_value;
+
+        return $this;
+    }
+
+    public function getGoodsAmount(): float|int
+    {
+        return $this->goods_amount;
+    }
+
+    public function setGoodsAmount(float|int $goods_amount): self
+    {
+        $this->goods_amount = $goods_amount;
+
+        return $this;
+    }
+
+    public function getGoodsIntegral(): float|int
+    {
+        return $this->goods_integral;
+    }
+
+    public function setGoodsIntegral(float|int $goods_integral): self
+    {
+        $this->goods_integral = $goods_integral;
+
+        return $this;
     }
 
     public function setBuyNumber(int $buy_number): self
@@ -269,21 +318,11 @@ class GoodsFormatter
         return $this;
     }
 
-    public function getGoodsNo(): string
-    {
-        return $this->goods_no;
-    }
-
     public function setGoodsNo(string $goods_no): self
     {
         $this->goods_no = $goods_no;
 
         return $this;
-    }
-
-    public function getGoods(): ?Goods
-    {
-        return $this->goods;
     }
 
     public function setGoods(Goods $goods): self
@@ -293,21 +332,11 @@ class GoodsFormatter
         return $this;
     }
 
-    public function getSkuId(): int
-    {
-        return $this->sku_id;
-    }
-
     public function setSkuId(int $sku_id): self
     {
         $this->sku_id = $sku_id;
 
         return $this;
-    }
-
-    public function getGoodsSku(): ?GoodsSku
-    {
-        return $this->goods_sku;
     }
 
     public function setGoodsSku(?GoodsSku $goods_sku): void
@@ -344,7 +373,7 @@ class GoodsFormatter
     {
         $sku_data = [];
 
-        $goods_sku = $this->getGoodsSku();
+        $goods_sku = $this->goods_sku;
 
         if (! $goods_sku instanceof GoodsSku) {
             return $sku_data;

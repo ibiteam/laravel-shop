@@ -2,10 +2,10 @@
 
 it('test direct init api interface', function () {
     $response = $this->doGet('api/v1/order/direct/init', [
-        'no' => 'eda482c3-df45-47a4-abc5-f795db6fefae',
-        'sku_id' => 3,
-        'buy_number' => 3,
-        'user_address_id' => 1,
+        'no' => '174487023926',
+        // 'sku_id' => 24,
+        'buy_number' => 1,
+        'user_address_id' => 8,
     ]);
     $this->assertIsArray($response);
     $this->assertArrayHasKey('code', $response);
@@ -15,10 +15,10 @@ it('test direct init api interface', function () {
 
 it('test direct done api interface', function () {
     $response = $this->doPost('api/v1/order/direct/done', [
-        'no' => '8757ac6a-a621-4a0b-8a43-322fc5275ee7',
-        // 'sku_id' => 3,
+        'no' => '174487023926',
+        // 'sku_id' => 24,
         'buy_number' => 1,
-        'user_address_id' => 3,
+        'user_address_id' => 8,
         'payment_method' => 'online',
     ]);
     $this->assertIsArray($response);
