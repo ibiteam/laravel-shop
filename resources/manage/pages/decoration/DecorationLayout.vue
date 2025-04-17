@@ -153,6 +153,7 @@ watch(() => props.id, (newValue) => {
     height: 100%;
     overflow: hidden;
     position: relative;
+    border-radius: 5px;
     .decoration-layout-aside {
         position: relative;
         border-right: 1px solid #D8D8D8;
@@ -163,12 +164,14 @@ watch(() => props.id, (newValue) => {
         border-bottom: 1px solid #D8D8D8;
         box-sizing: border-box;
         user-select: none;
+        padding: 10px;
         .header-left,.header-left-back {
             color: #333;
         }
     }
     .decoration-layout-main{
         padding: 0;
+        overflow: hidden;
         .main-content-wrapper {
             position: relative;
             height: calc(100% - 50px);
