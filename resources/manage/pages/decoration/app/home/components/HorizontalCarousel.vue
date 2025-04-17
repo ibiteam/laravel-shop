@@ -9,7 +9,7 @@
                     <div class="ad-swiper">
                         <swiper v-if="form.content.style == 2" v-bind="{
                             slidesPerView: 3,
-                            spaceBetween: 0,
+                            spaceBetween: 1,
                             centeredSlides: true,
                             autoplay: {
                                 'delay': (form.content.interval || 3) * 1000,
