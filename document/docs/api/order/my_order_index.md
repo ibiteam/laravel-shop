@@ -56,6 +56,7 @@ type_enum 枚举说明
                 ],
                 "order_amount": "￥30.69",
                 "logistics": null,
+                "logistics_number": 2,
                 "evaluate": null,
                 "buttons": [
                     {

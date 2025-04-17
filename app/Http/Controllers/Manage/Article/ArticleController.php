@@ -10,6 +10,7 @@ use App\Models\AdminOperationLog;
 use App\Models\Article;
 use App\Models\ArticleContent;
 use App\Models\ArticleCover;
+use App\Services\HTMLPurifierService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -190,11 +191,8 @@ class ArticleController extends BaseController
                     throw new \Exception('保存文章失败');
                 }
 
-                $res = $article->articleContent()->updateOrCreate([
-                    'article_id' => $article->id,
-                ], [
-                    'content' => $validated['content'],
-                ]);
+                // 文章内容处理
+                $res = $article->articleContent()->updateOrCreate(['article_id' => $article->id], ['content' => app(HTMLPurifierService::class)->purify($validated['content'])]);
 
                 if (! $res) {
                     throw new \Exception('保存文章内容失败');
