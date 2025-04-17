@@ -122,7 +122,7 @@ class SearchDao
                 'integral' => $item->integral,
                 'image' => $item->image,
                 'sales_volume' => $item->sales_volume,
-               'created_at' => $item->created_at,
+                'created_at' => $item->created_at,
             ];
         });
 

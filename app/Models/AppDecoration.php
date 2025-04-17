@@ -54,11 +54,6 @@ class AppDecoration extends Model
 
     protected $guarded = [];
 
-
-    public static array $path = [
-        self::ALIAS_HOME => RouterEnum::HOME_PREVIEW
-    ];
-
     // 操作类型 - 发布
     public const OPERATE_TYPE_RELEASE = 3;
     // 操作类型 - 预览
