@@ -1,84 +1,83 @@
 <template>
     <search-form :model="query" :label-width="120">
-            <el-form-item label="订单编号" prop="order_sn">
-                <el-input
-                    v-model="query.order_sn"
-                    placeholder="请输入订单编号搜索"
-                    clearable
-                    @keyup.enter="getData()"
-                />
-            </el-form-item>
-            <el-form-item label="用户ID/用户名" prop="user_keywords">
-                <el-input
-                    v-model="query.user_keywords"
-                    placeholder="请输入用户ID/用户名搜索"
-                    clearable
-                    @keyup.enter="getData()"
-                />
-            </el-form-item>
-            <el-form-item label="商品ID" prop="goods_id">
-                <el-input
-                    v-model="query.goods_id"
-                    placeholder="请输入商品ID搜索"
-                    clearable
-                    @keyup.enter="getData()"
-                />
-            </el-form-item>
-            <el-form-item label="历史商品名称" prop="goods_name">
-                <el-input
-                    v-model="query.goods_name"
-                    placeholder="请输入历史商品名称搜索"
-                    clearable
-                    @keyup.enter="getData()"
-                />
-            </el-form-item>
-            <el-form-item label="订单状态" prop="order_status">
-                <el-select v-model="query.order_status" placeholder="请选择订单状态" clearable>
-                    <el-option v-for="item in orderStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="支付状态" prop="pay_status">
-                <el-select v-model="query.pay_status" placeholder="请选择支付状态" clearable>
-                    <el-option v-for="item in payStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="发货状态" prop="shipping_status">
-                <el-select v-model="query.shipping_status" placeholder="请选择发货状态" clearable>
-                    <el-option v-for="item in shipStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="订单来源" prop="source">
-                <el-select v-model="query.source" placeholder="请选择订单来源" clearable>
-                    <el-option v-for="item in sourceOptions" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-            </el-form-item>
-            <el-form-item label="下单开始时间" prop="done_start_time">
-                <el-date-picker
-                    v-model="query.done_start_time"
-                    type="datetime"
-                    placeholder="请选择下单开始时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                >
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item label="下单结束时间" prop="done_end_time">
-                <el-date-picker
-                    v-model="query.done_end_time"
-                    type="datetime"
-                    placeholder="请选择下单结束时间"
-                    value-format="YYYY-MM-DD HH:mm:ss"
-                >
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="getData()">搜索</el-button>
-                <el-button @click="resetSearch">重置</el-button>
-            </el-form-item>
+        <el-form-item label="订单编号" prop="order_sn">
+            <el-input
+                v-model="query.order_sn"
+                placeholder="请输入订单编号搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="用户ID/用户名" prop="user_keywords">
+            <el-input
+                v-model="query.user_keywords"
+                placeholder="请输入用户ID/用户名搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="商品ID" prop="goods_id">
+            <el-input
+                v-model="query.goods_id"
+                placeholder="请输入商品ID搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="历史商品名称" prop="goods_name">
+            <el-input
+                v-model="query.goods_name"
+                placeholder="请输入历史商品名称搜索"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item label="订单状态" prop="order_status">
+            <el-select v-model="query.order_status" placeholder="请选择订单状态" clearable>
+                <el-option v-for="item in orderStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+        </el-form-item>
+        <el-form-item label="支付状态" prop="pay_status">
+            <el-select v-model="query.pay_status" placeholder="请选择支付状态" clearable>
+                <el-option v-for="item in payStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+        </el-form-item>
+        <el-form-item label="发货状态" prop="shipping_status">
+            <el-select v-model="query.shipping_status" placeholder="请选择发货状态" clearable>
+                <el-option v-for="item in shipStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+        </el-form-item>
+        <el-form-item label="订单来源" prop="source">
+            <el-select v-model="query.source" placeholder="请选择订单来源" clearable>
+                <el-option v-for="item in sourceOptions" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+        </el-form-item>
+        <el-form-item label="下单时间">
+            <el-date-picker
+                v-model="query.done_start_time"
+                type="datetime"
+                placeholder="开始时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+            <span>&nbsp;至&nbsp;</span>
+            <el-date-picker
+                v-model="query.done_end_time"
+                type="datetime"
+                placeholder="下单结束时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button @click="resetSearch">重置</el-button>
+        </el-form-item>
     </search-form>
     <page-table
         :data="tableData"
         v-loading="loading"
-        @change="handleChange"
+        @change="handlePageChange"
     >
         <el-table-column label="订单ID" prop="id"></el-table-column>
         <el-table-column label="订单编号" prop="order_sn"></el-table-column>
@@ -193,7 +192,7 @@ const getData = (page:number = defaultPage.page) => {
     })
 }
 /* 点击分页触发方法 */
-const handleChange = (page:number,per_page:number) => {
+const handlePageChange = (page:number,per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }

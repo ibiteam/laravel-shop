@@ -3,8 +3,8 @@ import Login from '@/pages/auth/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
 import MaterialIndex from '@/pages/material/Index.vue';
-import Goods from '@/pages/goods/Goods.vue';
-import GoodsForm from '@/pages/goods/GoodsForm.vue';
+import Goods from '@/pages/goods/Index.vue';
+import GoodsUpdate from '@/pages/goods/Update.vue';
 import SetShopConfig from '@/pages/set/ShopConfig.vue';
 import SetRouterCategory from '@/pages/set/RouterCategory.vue';
 import SetRouter from '@/pages/set/Router.vue';
@@ -54,7 +54,7 @@ const router = createRouter({
                 { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
                 // 商品
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},
-                { path: '/goods/form/:id', component: GoodsForm , name: 'manage.goods.form',meta:{title:'编辑商品'} },
+                { path: '/goods/update/:id', component: GoodsUpdate , name: 'manage.goods.update',meta:{title:'添加商品'} },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'manage.category.index',meta:{title:'商品分类'} },
                 // 订单
                 { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },

@@ -25,7 +25,7 @@
         <page-table
             :data="tableData"
             v-loading="loading"
-            @change="handleChange"
+            @change="handlePageChange"
         >
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="用户名" prop="user_name"></el-table-column>
@@ -325,7 +325,7 @@ const getData = (page=defaultPage.page) => {
 };
 
 // 页码改变
-const handleChange = (page:number,per_page:number) => {
+const handlePageChange = (page:number,per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }
