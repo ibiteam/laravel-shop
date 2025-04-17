@@ -21,7 +21,7 @@ class AccountSetController extends BaseController
 
     public function __construct()
     {
-        $this->user = $this->user();
+        $this->user = get_user();
     }
 
     // 获取用户信息
