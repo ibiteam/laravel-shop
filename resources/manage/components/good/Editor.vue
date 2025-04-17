@@ -102,11 +102,14 @@ class MyMaterialButtonMenu {
 const materialConf = {
     key: 'material', // 定义 menu key ：要保证唯一、不重复（重要）
     factory() {
-        return new MyMaterialButtonMenu() // 把 `YourMenuClass` 替换为你菜单的 class
+        return new MyMaterialButtonMenu()
     },
 }
 
-Boot.registerMenu(materialConf)
+try {
+    Boot.registerMenu(materialConf)
+} catch (err){}
+
 
 const uploadFileForm = reactive({
     editor_files: [],   //  图片列表

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Utils\AppServiceConfig;
+namespace App\Utils\AppService;
 
 use App\Models\AppServiceConfig;
 
-class GeoUtil extends AppServiceBase
+class GeoUtil extends BaseUtil
 {
     private array $settings;
 

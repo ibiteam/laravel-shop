@@ -33,10 +33,10 @@ class GoodsController extends BaseController
         $no = $request->get('no');
         $goods_name = $request->get('goods_name');
         $status = (int) $request->get('status', -1);
-        $create_start_time = $request->get('create_start_time');
-        $create_end_time = $request->get('create_end_time');
-        $update_start_time = $request->get('update_start_time');
-        $update_end_time = $request->get('update_end_time');
+        $created_start_time = $request->get('created_start_time');
+        $created_end_time = $request->get('created_end_time');
+        $updated_start_time = $request->get('updated_start_time');
+        $updated_end_time = $request->get('updated_end_time');
         $number = (int) $request->get('number', 10);
 
         $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
@@ -45,10 +45,10 @@ class GoodsController extends BaseController
             ->when($no, fn (Builder $query) => $query->where('no', $no))
             ->when($goods_name, fn (Builder $query) => $query->where('name', 'like', "%{$goods_name}%"))
             ->when($status >= 0, fn (Builder $query) => $query->where('status', $status))
-            ->when($create_start_time, fn (Builder $query) => $query->where('created_at', '>=', $create_start_time))
-            ->when($create_end_time, fn (Builder $query) => $query->where('created_at', '<=', $create_end_time))
-            ->when($update_start_time, fn (Builder $query) => $query->where('updated_at', '>=', $update_start_time))
-            ->when($update_end_time, fn (Builder $query) => $query->where('updated_at', '<=', $update_end_time))
+            ->when($created_start_time, fn (Builder $query) => $query->where('created_at', '>=', $created_start_time))
+            ->when($created_end_time, fn (Builder $query) => $query->where('created_at', '<=', $created_end_time))
+            ->when($updated_start_time, fn (Builder $query) => $query->where('updated_at', '>=', $updated_start_time))
+            ->when($updated_end_time, fn (Builder $query) => $query->where('updated_at', '<=', $updated_end_time))
             ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
             ->paginate($number);
 

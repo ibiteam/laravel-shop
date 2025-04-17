@@ -10,7 +10,7 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Services\ExpressService;
-use App\Utils\AppServiceConfig\GeoUtil;
+use App\Utils\AppService\GeoUtil;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 

@@ -54,7 +54,7 @@
                     <el-input v-model="searchForm.name" placeholder="搜索图片名称" style="width: 200px" @change="handleCurrentChange(1)"/>
                 </div>
                 <div class="table-wrapper" v-show="!viewType" v-loading="tableLoading">
-                    <el-table :data="tableData" ref="tableRef" style="width: 100%" height="100%" @select="handleSelect">
+                    <el-table :data="tableData" ref="tableRef" style="width: 100%" height="100%" @select="handleSelect" @row-click="handleRowClick">
                         <el-table-column fixed type="selection" width="55" />
                         <el-table-column label="素材名称" width="240" show-overflow-tooltip>
                             <template #default="scope">
@@ -157,6 +157,10 @@ const viewerData = reactive({
 // 勾选数据
 const check_group = ref([])
 
+// 表格行单击
+const handleRowClick = (row, column, event) => {
+    handleClickImageItem(row)
+}
 // 表格单选
 const handleSelect = (selection, row) => {
     if (!props.multiple && tableRef.value) {
