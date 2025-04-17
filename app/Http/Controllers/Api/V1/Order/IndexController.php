@@ -43,6 +43,7 @@ class IndexController extends BaseController
         $current_user = get_user();
         $order = Order::query()
             ->withCount('detail')
+            ->withCount('orderDelivery')
             ->with(['detail', 'detail.goods', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
             ->latest()
             ->whereUserId($current_user->id)
