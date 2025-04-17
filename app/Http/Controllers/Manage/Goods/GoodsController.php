@@ -38,8 +38,13 @@ class GoodsController extends BaseController
         $updated_start_time = $request->get('updated_start_time');
         $updated_end_time = $request->get('updated_end_time');
         $number = (int) $request->get('number', 10);
+        $keywords = $request->get('keywords', '');
 
         $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
+            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
+                $query->where('name', 'like', "%{$keywords}%")
+                    ->orWhere('no', $keywords)->orWhere('id', $keywords);
+            }))
             ->when($goods_id, fn (Builder $query) => $query->where('id', $goods_id))
             ->when($category_id, fn (Builder $query) => $query->where('category_id', $category_id))
             ->when($no, fn (Builder $query) => $query->where('no', $no))

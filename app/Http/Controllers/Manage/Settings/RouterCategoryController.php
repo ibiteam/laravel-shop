@@ -52,12 +52,12 @@ class RouterCategoryController extends BaseController
 
         // 处理数据并添加额外字段
         $data->each(function ($item) use ($permissions) {
-            $item->routers_count = $item->routers->count();
+            $item->routers_count = $item->routers()->count();
             $item->page_title = $item->page_name ? ($permissions[$item->page_name] ?? '') : '';
 
             if ($item->allChildren) {
                 $item->allChildren->each(function ($child) use ($permissions) {
-                    $child->routers_count = $child->routers->count();
+                    $child->routers_count = $child->routers()->count();
                     $child->page_title = $child->page_name ? ($permissions[$child->page_name] ?? '') : '';
                 });
             }

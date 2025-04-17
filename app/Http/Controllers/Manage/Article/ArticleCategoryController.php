@@ -24,9 +24,14 @@ class ArticleCategoryController extends BaseController
         $data = ArticleCategory::query()
             ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->with(['allChildren'])->whereParentId(0)
-            ->orderByDesc('sort')
-            ->orderByDesc('id')
             ->get();
+
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
+        $data = $data->map(function (ArticleCategory $article_category) use ($vue_app_url) {
+            $article_category->setAttribute('h5_url', $vue_app_url.'/article/category?cat_id='.$article_category->id);  // 分类h5地址
+
+            return $article_category;
+        })->toArray();
 
         return $this->success($data);
     }

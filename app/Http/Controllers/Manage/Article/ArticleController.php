@@ -31,9 +31,13 @@ class ArticleController extends BaseController
         $start_time = $request->get('start_time', '');
         $end_time = $request->get('end_time', '');
         $number = (int) $request->get('number', 10);
+        $keywords = $request->get('keywords', '');
 
-        $data = Article::query()->with(['articleCategory', 'adminUser'])
-            ->withCount(['articleViews'])
+        $data = Article::query()->with(['articleCategory', 'adminUser'])->withCount(['articleViews'])
+            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
+                $query->where('title', 'like', "%{$keywords}%")
+                    ->orWhere('id', $keywords);
+            }))
             ->when($title, fn ($query) => $query->where('title', 'like', '%'.$title.'%'))
             ->when($author, fn ($query) => $query->where('author', 'like', '%'.$author.'%'))
             ->when($article_category_id, fn ($query) => $query->where('article_category_id', '=', $article_category_id))
@@ -42,13 +46,16 @@ class ArticleController extends BaseController
             ->when($start_time, fn ($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
             ->when($end_time, fn ($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
             ->orderByDesc('sort')->orderByDesc('id')->paginate($number);
-        $data->getCollection()->transform(function (Article $article) {
+
+        $vue_app_url = rtrim(config('host.vue_app_url'), '/');
+        $data->getCollection()->transform(function (Article $article) use ($vue_app_url) {
             return [
                 'id' => $article->id,
                 'category_name' => $article->articleCategory?->name,
                 'article_category_id' => $article->article_category_id,
                 'title' => $article->title,
                 'cover' => $article->cover,
+                'h5_url' => $vue_app_url.'/article?id='.$article->id,
                 'author' => $article->author,
                 'is_show' => $article->is_show,
                 'is_top' => $article->is_top,

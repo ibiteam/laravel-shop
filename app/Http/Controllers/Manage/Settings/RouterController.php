@@ -25,8 +25,13 @@ class RouterController extends BaseController
         $router_category_id = intval($request->get('router_category_id'));
         $is_show = intval($request->get('is_show'));
         $number = (int) $request->get('number', 10);
+        $keywords = $request->get('keywords', '');
 
         $data = Router::query()->with('routerCategory')
+            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
+                $query->where('name', 'like', "%{$keywords}%")
+                    ->orWhere('alias', 'like', "%{$keywords}%");
+            }))
             ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
             ->when($router_category_id, fn ($query) => $query->where('router_category_id', '=', $router_category_id))
