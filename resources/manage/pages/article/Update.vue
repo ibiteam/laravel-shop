@@ -6,7 +6,8 @@
                 <el-input v-model="submitForm.title" />
             </el-form-item>
             <el-form-item label="内容" prop="content">
-                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容" @change="handleChangeContent" />
+                <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
+                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容" @change="handleChangeContent" v-else/>
             </el-form-item>
             <el-form-item label="分类" prop="article_category_id">
                 <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
@@ -39,7 +40,7 @@
                         <Plus />
                     </el-icon>
                 </el-upload>
-                <span style="width: 100%"><small>建议尺寸220*150或者350*238</small></span>
+                <span class="co-999 fs14" style="width: 100%"><small>建议尺寸220*150或者350*238</small></span>
             </el-form-item>
             <el-form-item label="是否置顶" prop="is_top">
                 <el-switch v-model="submitForm.is_top" :active-value="1" :inactive-value="0" />
@@ -89,7 +90,7 @@ const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
-const detailFormLoading = ref(false);
+const detailFormLoading = ref(true);
 const isInitContent = ref(true);
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
