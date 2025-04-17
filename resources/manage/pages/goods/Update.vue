@@ -93,7 +93,7 @@
                                                 :min-scale="0.2"
                                                 :preview-src-list="updateForm.images"
                                                 show-progress
-                                                :initial-index="4"
+                                                :initial-index="imgIndex"
                                                 fit="cover"
                                             />
                                             <div class="masking">

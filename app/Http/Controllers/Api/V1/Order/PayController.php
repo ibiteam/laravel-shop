@@ -12,7 +12,7 @@ use App\Http\Dao\OrderDao;
 use App\Http\Dao\PaymentDao;
 use App\Models\Order;
 use App\Models\Payment;
-use App\Services\Pay\WechatPayOrderService;
+use App\Services\Pay\PayService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -80,7 +80,7 @@ class PayController extends BaseController
         }
     }
 
-    public function wechatPay(Request $request, OrderDao $order_dao, PaymentDao $payment_dao, WechatPayOrderService $wechat_pay_order_service): JsonResponse
+    public function wechatPay(Request $request, OrderDao $order_dao, PaymentDao $payment_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -107,7 +107,7 @@ class PayController extends BaseController
             if (! $payment instanceof Payment || ! $payment->is_enabled) {
                 throw new BusinessException('该支付方式暂不可用');
             }
-            $data = $wechat_pay_order_service->orderPay($order, $payment, $wechat_pay_form_enum);
+            $data = PayService::init($payment->alias)->orderPay($order, $payment, $wechat_pay_form_enum);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {

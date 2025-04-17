@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
-use App\Enums\PayFormEnum;
 use App\Exceptions\BusinessException;
+use App\Exceptions\WeChatPayException;
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\OrderDao;
 use App\Http\Dao\TransactionDao;
@@ -15,11 +15,12 @@ use App\Models\OrderEvaluate;
 use App\Models\Transaction;
 use App\Models\UserAddress;
 use App\Services\OrderOperateService;
-use App\Utils\Wechat\WechatPayUtil;
+use App\Services\Pay\PayService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class IndexController extends BaseController
@@ -224,7 +225,7 @@ class IndexController extends BaseController
     /**
      * 取消订单.
      */
-    public function cancel(Request $request, OrderDao $order_dao, OrderOperateService $order_operate_service): JsonResponse
+    public function cancel(Request $request, OrderDao $order_dao, OrderOperateService $order_operate_service, TransactionDao $transaction_dao): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -243,61 +244,6 @@ class IndexController extends BaseController
                 throw new BusinessException('订单状态不允许取消');
             }
             $data = $order_operate_service->cancel($order, $current_user);
-
-            if (isset($data['can_payed']) && $data['can_payed']) {
-                // 请求微信退款
-                $transaction = $order
-                    ->transactions()
-                    ->with('payment')->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)->where('status', true)->first();
-
-                if ($transaction instanceof Transaction) {
-                    $payment = $transaction->payment;
-                    // 负数 or 0
-                    $old_refund_amount = $transaction->children()->sum('amount');
-
-                    $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
-
-                    if ($refund_amount > 0) {
-                        // 请求微信退款
-                        $wechat_pay_util = new WechatPayUtil($payment->config, PayFormEnum::PAY_FORM_H5);
-
-                        $out_refund_no = app(TransactionDao::class)->generateTransactionNo('cancel_order');
-
-                        $reason = '用户手动取消订单，进行退款';
-
-                        $wechat_response = $wechat_pay_util->refundOrder($transaction->transaction_no, $out_refund_no, $refund_amount, $transaction->amount, $reason);
-                        $transaction->can_refund = false;
-                        $transaction->save();
-
-                        switch ($wechat_response['status'] ?? '') {
-                            case 'PROCESSING': // 退款处理中
-                                app(TransactionDao::class)->storeByParentTransaction($transaction, $out_refund_no, $refund_amount, remark: $reason);
-
-                                break;
-
-                            case 'SUCCESS': // 退款成功
-                                app(TransactionDao::class)->storeByParentTransaction($transaction, $out_refund_no, $refund_amount, Transaction::STATUS_SUCCESS, remark: $validated['reason']);
-
-                                break;
-
-                            case 'CLOSED': // 退款关闭
-                                throw new BusinessException('退款关闭，请联系管理员');
-
-                                break;
-
-                            case 'ABNORMAL': // 退款异常
-                                throw new BusinessException('退款异常，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败，可前往商户平台-交易中心，手动处理此笔退款');
-
-                                break;
-
-                            default:
-                                throw new BusinessException('退款状态异常，请联系管理员');
-                        }
-                    }
-                }
-            }
-
-            return $this->success('取消订单成功');
         } catch (ModelNotFoundException) {
             return $this->error('订单不存在');
         } catch (ValidationException $validation_exception) {
@@ -307,6 +253,41 @@ class IndexController extends BaseController
         } catch (\Throwable $throwable) {
             return $this->error('操作失败');
         }
+
+        // 已支付，调用微信退款
+        if ($data['can_payed']) {
+            // 请求微信退款
+            $transaction = $order
+                ->transactions()
+                ->with('payment')
+                ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
+                ->where('status', true)
+                ->first();
+
+            if ($transaction instanceof Transaction) {
+                $old_refund_amount = $transaction->children()->sum('amount');
+
+                $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
+
+                if ($refund_amount > 0) {
+                    try {
+                        $payment = $transaction->payment;
+
+                        $out_refund_no = $transaction_dao->generateTransactionNo('cancel_order');
+
+                        PayService::init($payment->alias)->refund($transaction, $out_refund_no, $payment, $refund_amount, '取消订单，进行退款');
+                    } catch (WeChatPayException $we_chat_pay_exception) {
+                        Log::error("用户取消订单：{$order->order_sn},进行微信退款失败".$we_chat_pay_exception->getMessage(), $we_chat_pay_exception->getTrace());
+                    } catch (BusinessException $business_exception) {
+                        Log::error("用户取消订单：{$order->order_sn},进行微信退款业务处理失败".$business_exception->getMessage(), $business_exception->getTrace());
+                    } catch (\Throwable $throwable) {
+                        Log::error("用户取消订单：{$order->order_sn},进行微信退款系统异常".$throwable->getMessage(), $throwable->getTrace());
+                    }
+                }
+            }
+        }
+
+        return $this->success('取消订单成功');
     }
 
     /**

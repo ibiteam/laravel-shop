@@ -151,7 +151,7 @@ class GoodsService
                 /* 商品 SKU 处理 */
                 (new ManageSkusService($goods, $request_sku_data))->exec();
 
-                admin_operation_log("修改了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
+                admin_operation_log("修改了商品信息:{$goods->no}[{$goods->id}]", AdminOperationLog::TYPE_UPDATE);
                 DB::commit();
 
                 return;
@@ -200,7 +200,7 @@ class GoodsService
             /* 商品 SKU 处理 */
             (new ManageSkusService($goods, $request_sku_data))->exec();
 
-            admin_operation_log("新增了商品信息:{$goods->goods_sn}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
+            admin_operation_log("新增了商品信息:{$goods->no}[{$goods->id}]", AdminOperationLog::TYPE_STORE);
             DB::commit();
         } catch (BusinessException $business_exception) {
             DB::rollBack();
