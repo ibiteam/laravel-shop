@@ -1,5 +1,5 @@
 <template>
-    <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 50)+ 'px', right: computedStyle?.getPropertyValue('padding-right'), bottom: computedStyle?.getPropertyValue('padding-bottom')}">
+    <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 53)+ 'px', right: computedStyle?.getPropertyValue('padding-right'), bottom: computedStyle?.getPropertyValue('padding-bottom')}">
         <div class="setting-bar-header s-flex ai-ct jc-bt" v-if="name">
             <p class="fs16 fw-b">{{ name }}</p>
         </div>
@@ -8,42 +8,6 @@
         </div>
     </aside>
 </template>
-
-<!-- <template>
-    <el-drawer
-        class="setting-drawer"
-        body-class="setting-drawer-body"
-        modal-class="setting-drawer-modal"
-        direction="rtl"
-        :model-value="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :with-header="false"
-        :modal="false"
-        append-to=".decoration-layout-main"
-        size="400px"
-        :before-close="handleCancle"
-    >
-        <aside class="setting-bar-wrapper s-flex" :style="{height: (clientHeight - 50)+ 'px', right: computedStyle.getPropertyValue('padding-right'), bottom: computedStyle.getPropertyValue('padding-bottom')}">
-            <div class="setting-bar-header s-flex ai-ct jc-bt" v-if="name">
-                <p class="fs16 fw-b">{{ name }}</p>
-                <el-radio-group v-model="formType" v-if="show_radio">
-                    <el-radio-button label="内容" :value="0" />
-                    <el-radio-button label="样式" :value="1" />
-                </el-radio-group>
-            </div>
-            <div class="setting-bar-content">
-                <slot name="content" :type="formType"></slot>
-            </div>
-            <div class="setting-bar-footer s-flex ai-ct jc-ct">
-                <el-button @click="handleCancle">取消</el-button>
-                <el-button type="primary" @click="emit('submit')">保存</el-button>
-            </div>
-        </aside>
-    </el-drawer>
-</template> -->
-
 
 <script setup>
 import { ref, getCurrentInstance, defineEmits, onMounted, nextTick } from 'vue'

@@ -23,7 +23,7 @@ class UserAddressRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'nullable|exists:user_addresses,id',
+            'id' => 'nullable',
             'consignee' => 'required',
             'phone' => 'required',
             'province' => 'required|int',

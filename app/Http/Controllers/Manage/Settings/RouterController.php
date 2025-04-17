@@ -41,7 +41,7 @@ class RouterController extends BaseController
                 'name' => $router->name,
                 'alias' => $router->alias,
                 'h5_url_show' => $router->h5_url,
-                'h5_url' => $router_service->getRouterPath(Router::$path[$router->alias]),
+                'h5_url' => $router_service->getRouterPath($router->alias),
                 'params' => $router->params ? json_encode($router->params, JSON_UNESCAPED_UNICODE) : '',
                 'is_show' => $router->is_show,
                 'sort' => $router->sort,

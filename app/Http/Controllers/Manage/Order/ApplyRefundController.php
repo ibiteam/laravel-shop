@@ -13,7 +13,7 @@ use App\Jobs\Order\ApplyRefundJob;
 use App\Models\ApplyRefund;
 use App\Models\ApplyRefundLog;
 use App\Models\ShopConfig;
-use App\Utils\KuaiDi100Util;
+use App\Services\ExpressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +47,7 @@ class ApplyRefundController extends BaseController
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
             ->when($start_time, fn ($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
             ->when($end_time, fn ($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
-            ->orderByDesc('created_at')->paginate($number);
+            ->orderByDesc('id')->paginate($number);
         $data->getCollection()->transform(function (ApplyRefund $apply_refund) {
             return [
                 'id' => $apply_refund->id,
@@ -56,7 +56,7 @@ class ApplyRefundController extends BaseController
                 'goods_name' => $apply_refund->orderDetail?->goods_name,
                 'order_sn' => $apply_refund->order?->order_sn,
                 'type' => strval($apply_refund->type),
-                'status' => strval($apply_refund->status),
+                'status' => $apply_refund->status,
                 'money' => $apply_refund->money,
                 'number' => $apply_refund->number,
                 'reason' => $apply_refund->applyRefundReason?->content,
@@ -428,9 +428,9 @@ class ApplyRefundController extends BaseController
     }
 
     /**
-     * 查询快递 物流轨迹.
+     * 查询快递.
      */
-    public function queryExpress(Request $request)
+    public function queryExpress(Request $request, ExpressService $express_service)
     {
         try {
             $validated = $request->validate([
@@ -453,7 +453,7 @@ class ApplyRefundController extends BaseController
                 throw new BusinessException('未找到发货信息');
             }
 
-            $data = KuaiDi100Util::queryExpress($shipping->no, $shipping->shipCompany->code, $shipping->phone);
+            $data = $express_service->queryExpress($shipping->no, $shipping->shipCompany->code, $shipping->phone);
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -461,7 +461,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('查询快递物流信息异常');
+            return $this->error('查询快递信息异常');
         }
     }
 

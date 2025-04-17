@@ -11,7 +11,7 @@ class GoodsViewController extends BaseController
 {
     public function index()
     {
-        $user = $this->user();
+        $user = get_user();
         $data = GoodsView::query()
             ->whereUserId($user?->id)
             ->with('goods')

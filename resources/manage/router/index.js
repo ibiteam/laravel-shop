@@ -22,10 +22,14 @@ import Order from '@/pages/order/Index.vue';
 import OrderDetail from '@/pages/order/Detail.vue';
 import ApplyRefundReason from '@/pages/order/ApplyRefundReason.vue';
 import ApplyRefund from '@/pages/order/ApplyRefund.vue';
+import ApplyRefundDetail from '@/pages/order/ApplyRefundDetail.vue';
 import OrderDelivery from '@/pages/order/OrderDelivery.vue';
 import Transaction from '@/pages/set/Transaction.vue';
 import WechatUser from '@/pages/user/WechatUser.vue';
 import Evaluate from '@/pages/order/Evaluate.vue';
+import ArticleCategory from '@/pages/article/Category.vue';
+import Article from '@/pages/article/Index.vue';
+import ArticleUpdate from '@/pages/article/Update.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -56,14 +60,19 @@ const router = createRouter({
                 // 订单
                 { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },
                 { path: '/order/detail/:order_sn', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
-                { path: '/order/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
-                { path: '/order/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
+                { path: '/apply_refund_reason', component: ApplyRefundReason, name: 'manage.apply_refund_reason.index',meta:{title:'退款原因'} },
+                { path: '/apply_refund', component: ApplyRefund, name: 'manage.apply_refund.index',meta:{title:'退款申请'} },
+                { path: '/apply_refund/detail/:id', component: ApplyRefundDetail, name: 'manage.apply_refund.detail',meta:{title:'退款详情'} },
                 { path: '/order/delivery', component: OrderDelivery, name: 'manage.order_delivery.index',meta:{title:'发货列表'} },
                 { path: '/order/evaluate', component: Evaluate, name: 'manage.order_evaluate.index',meta:{title:'评价列表'} },
                 // 用户
                 { path: '/user/index', component: UserIndex , name: 'manage.user.index',meta:{title:'用户'} },
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },
                 { path: '/user/wechat_user', component: WechatUser , name: 'manage.wechat_user.index',meta:{title:'微信服务号'} },
+                // 文章
+                { path: '/article/category', component: ArticleCategory, name: 'manage.article_category.index',meta:{title:'文章分类'} },
+                { path: '/article/index', component: Article, name: 'manage.article.index',meta:{title:'文章列表'} },
+                { path: '/article/update/:id', component: ArticleUpdate , name: 'manage.article.form',meta:{title:'编辑文章'} },
                 // 工具
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
                 //正在刷新

@@ -11,7 +11,7 @@ class UserIntegralController extends BaseController
 {
     public function index(Request $request)
     {
-        $user = $this->user();
+        $user = get_user();
         $type = $request->get('types') ?: 0;
         $data = UserIntegral::query()->whereUserId($user?->id)
             ->when($type > 0, fn ($query) => $query->whereType($type))

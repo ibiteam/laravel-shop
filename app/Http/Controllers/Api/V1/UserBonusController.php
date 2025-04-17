@@ -9,12 +9,13 @@ use App\Models\Category;
 use App\Models\Goods;
 use App\Models\UserBonus;
 use Illuminate\Http\Request;
+use function Pest\Laravel\get;
 
 class UserBonusController extends BaseController
 {
     public function index()
     {
-        $user = $this->user();
+        $user = get_user();
         $data = UserBonus::query()
             ->whereUserId($user?->id)
             ->with('bonus')

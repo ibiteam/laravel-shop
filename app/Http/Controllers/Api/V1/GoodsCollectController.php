@@ -95,7 +95,7 @@ class GoodsCollectController extends BaseController
     public function myCollect()
     {
         $data = GoodsCollect::query()
-            ->whereUserId($this->user()?->id)
+            ->whereUserId(get_user()?->id)
             ->whereIsAttention(GoodsCollect::ATTENTION_YES)
             ->with('goods')
             ->latest()->paginate(10);

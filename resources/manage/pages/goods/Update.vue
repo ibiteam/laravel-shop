@@ -514,7 +514,7 @@ const updateParameterTemplate = (item,i,type) => {
             goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('修改产品参数模板成功')
-                    getParameterTemplate()
+                    getParameterTemplate('')
                 } else {
                     cns.$message.error(res.message)
                 }
@@ -526,7 +526,7 @@ const updateParameterTemplate = (item,i,type) => {
             goodsParameterTemplateDestroy({id: item.id}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('删除产品参数模板成功')
-                    getParameterTemplate()
+                    getParameterTemplate('')
                 } else {
                     cns.$message.error(res.message)
                 }
@@ -1042,10 +1042,12 @@ const handleFileChange = (event, type)=> {
         if(type == 'image'){
             if(beforeUpload(files[0])){
                 uploadImage({file:files[0]}, 'images')
+                fileImgRef.value.value = ''
             }
         }else if(type == 'video'){
             if(beforeUploadVideo(files[0])){
                 uploadImage({file:files[0]}, 'video')
+                fileVideoRef.value.value = ''
             }
         }
 
@@ -1268,7 +1270,7 @@ onMounted(() => {
         }
     })
     getSkuTemplate()
-    getParameterTemplate()
+    getParameterTemplate('')
     wrapRef.value.parentElement.addEventListener('scroll', handleScroll);
 })
 
@@ -1604,6 +1606,11 @@ onBeforeUnmount(() => {
         cursor: pointer;
         color: #fff;
         font-size: 16px;
+        height: 50%;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 .avatar-uploader:hover .masking{
@@ -1636,6 +1643,11 @@ onBeforeUnmount(() => {
     color: #fff;
     line-height: 24px;
     cursor: pointer;
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .good-picture .main {

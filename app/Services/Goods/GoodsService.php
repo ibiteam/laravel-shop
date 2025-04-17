@@ -276,7 +276,7 @@ class GoodsService
         // 购物车数量以及是否收藏处理|访问记录
         if ($user instanceof User) {
             // 访问记录
-            app(GoodsViewDao::class)->store($goods->id, $user->id);
+            app(GoodsViewDao::class)->store($goods->id, $user);
 
             $goods->cart_number = app(CartDao::class)->getValidCarNumber($user->id);
 
