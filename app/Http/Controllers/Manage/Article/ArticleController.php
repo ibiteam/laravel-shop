@@ -79,14 +79,16 @@ class ArticleController extends BaseController
 
             $id = $validated['id'] ?? 0;
 
-            $info = null;
+            $article = null;
 
             if ($id) {
-                $info = Article::query()->with(['articleContent'])->whereId($id)->first();
+                $article = Article::query()->whereId($id)->first();
 
-                if (! $info instanceof Article) {
+                if (! $article instanceof Article) {
                     throw new BusinessException('文章不存在');
                 }
+
+                $article->content = $article->articleContent->content ?? '';
             }
 
             $tree_categories = $article_category_dao->getTreeList();
@@ -96,7 +98,7 @@ class ArticleController extends BaseController
             return $this->success([
                 'tree_categories' => $tree_categories,
                 'article_covers' => $article_covers,
-                'info' => $info,
+                'article' => $article,
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
@@ -114,7 +116,7 @@ class ArticleController extends BaseController
     {
         try {
             $validated = $request->validate([
-                'id' => 'required|integer',
+                'id' => 'nullable|integer',
                 'content' => 'required|string',
                 'article_category_id' => 'required|integer',
                 'title' => 'required|string',
@@ -207,7 +209,7 @@ class ArticleController extends BaseController
 
             $log = "新增文章[id:{$article->id}]";
 
-            if ($validated['id']) {
+            if ($id) {
                 $log = "编辑文章[id:{$article->id}]".implode(',', array_map(function ($k, $v) {
                     return sprintf('%s=`%s`', $k, $v);
                 }, array_keys($article->getChanges()), $article->getChanges()));
