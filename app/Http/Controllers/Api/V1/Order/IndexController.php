@@ -43,7 +43,7 @@ class IndexController extends BaseController
         $current_user = get_user();
         $order = Order::query()
             ->withCount('detail')
-            ->with(['detail', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
+            ->with(['detail', 'detail.goods', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
             ->latest()
             ->whereUserId($current_user->id)
             ->when(! is_null($keywords), function (Builder $query) use ($keywords) {
