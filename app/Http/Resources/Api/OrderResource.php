@@ -174,6 +174,7 @@ class OrderResource extends JsonResource
                     'title' => '已发货',
                     'description' => "您的订单将交付{$ship_company->name}，运单号：{$last_order_delivery->ship_no}",
                     'shipped_at' => $last_order_delivery->shipped_at,
+                    'delivery_no' => $last_order_delivery->delivery_no,
                 ];
             }
         }
