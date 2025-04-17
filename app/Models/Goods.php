@@ -153,6 +153,17 @@ class Goods extends Model
         $this->increment('sales_volume', $buy_number);
     }
 
+    public function incrementStock(int $buy_number): void
+    {
+        $this->increment('total', $buy_number);
+
+        if ($this->sales_volume >= $buy_number) {
+            $this->decrement('sales_volume', $buy_number);
+        } else {
+            $this->decrement('sales_volume', $this->sales_volume);
+        }
+    }
+
     public function isPayDecrementStock(): bool
     {
         return $this->type === self::TYPE_PAY_ORDER;

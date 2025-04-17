@@ -56,11 +56,11 @@ class OrderOperateService
 
                                 // 存在商品规格ID时，需要先判断是否存在商品规格 不存在时不进行处理
                                 if ($goods_sku instanceof GoodsSku) {
-                                    $goods_sku->decrementStock($order_detail->goods_number);
-                                    $goods->decrementStock($order_detail->goods_number);
+                                    $goods_sku->incrementStock($order_detail->goods_number);
+                                    $goods->incrementStock($order_detail->goods_number);
                                 }
                             } else {
-                                $goods->decrementStock($order_detail->goods_number);
+                                $goods->incrementStock($order_detail->goods_number);
                             }
                         }
 
@@ -71,11 +71,11 @@ class OrderOperateService
                         $goods_sku = GoodsSku::query()->whereGoodsId($goods->id)->whereId($order_detail->goods_sku_id)->first();
 
                         if ($goods_sku instanceof GoodsSku) {
-                            $goods_sku->decrementStock($order_detail->goods_number);
-                            $goods->decrementStock($order_detail->goods_number);
+                            $goods_sku->incrementStock($order_detail->goods_number);
+                            $goods->incrementStock($order_detail->goods_number);
                         }
                     } else {
-                        $goods->decrementStock($order_detail->goods_number);
+                        $goods->incrementStock($order_detail->goods_number);
                     }
                 }
             });

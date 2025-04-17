@@ -55,4 +55,9 @@ class GoodsSku extends Model
     {
         $this->decrement('number', $buy_number);
     }
+
+    public function incrementStock(int $buy_number): void
+    {
+        $this->increment('number', $buy_number);
+    }
 }
