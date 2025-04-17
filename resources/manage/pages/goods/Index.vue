@@ -89,7 +89,7 @@
             <el-table-column label="商品" width="400px">
                 <template #default="{row}">
                     <div style="display:flex;">
-                        <el-image style="width: 50px; height: 50px" :src="row.image" :preview-src-list="[row.image]"></el-image>
+                        <el-image style="width: 50px; height: 50px" :src="row.image" :preview-src-list="[row.image]" :z-index="9999"></el-image>
                         <div style="padding-left: 20px;">
                             <div>{{ row.name }}</div>
                             <div>{{ row.no }}</div>
@@ -223,5 +223,8 @@ onMounted( () => {
 </script>
 
 <style scoped lang="scss">
+:deep(.el-table .el-table__cell){
+    z-index: unset;
+}
 
 </style>
