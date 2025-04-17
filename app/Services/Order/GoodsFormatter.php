@@ -203,7 +203,7 @@ class GoodsFormatter
             'name' => $this->goods->name,
             'sub_name' => $this->goods->sub_name,
             'label' => $this->goods->label,
-            'thumb' => $this->goods_image ?? $this->goods->image,
+            'thumb' => $this->goods_image ?: $this->goods->image,
             'price' => $tmp_price,
             'integral' => $tmp_integral,
             'unit' => $this->goods->unit,
