@@ -39,7 +39,7 @@ class GoodsStoreRequest extends FormRequest
             'price' => 'nullable|numeric',
             'integral' => 'nullable|numeric|min:0',
             'total' => 'required|integer',
-            'type' => 'required|integer|in:0,1',
+            'type' => 'required|integer|in:1,2',
             'status' => 'required|integer|in:0,1',
             'can_quota' => 'required|integer|in:0,1',
             'quota_number' => 'required|integer|min:0',
