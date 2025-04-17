@@ -55,6 +55,7 @@ axios.interceptors.response.use(
             if (isUnauthorized(response.data.code)) {
                 // 未登录
                 router.push({ name: 'login' })
+                return;
             } else if (isForbidden(response.data.code)) {
                 // 无权限
                 dialog.error(response.data.message)
