@@ -16,9 +16,9 @@
                         @keyup.enter="handleSearch"
                     />
                 </el-form-item>
-                <el-form-item label="商品名称" prop="name">
+                <el-form-item label="商品名称" prop="goods_name">
                     <el-input
-                        v-model="query.name"
+                        v-model="query.goods_name"
                         placeholder="请输入商品名称"
                         clearable
                         @keyup.enter="handleSearch"
@@ -148,7 +148,7 @@ const categoryOptions = ref([]);
 
 const defaultQuery = {
     goods_id: '',
-    name: '',      // 商品名称搜索
+    goods_name: '',
     no: '',
     status: -1,
     category_id: '',

@@ -1,16 +1,16 @@
 <template>
     <!--新增编辑文章-->
     <div v-loading="detailFormLoading" class="s-flex jc-ct">
-        <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
-                 style="width: 480px" size="default">
-            <el-form-item label="标题" prop="title">
+        <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="100px">
+            <el-form-item label="文章标题" prop="title">
                 <el-input v-model="submitForm.title" />
             </el-form-item>
-            <el-form-item label="内容" prop="content">
+            <el-form-item label="文章内容" prop="content">
                 <!--内容编辑器-->
+                <Editor v-model="submitForm.content" height="500px" min-height="500px" @change="handleChangeContent" />
             </el-form-item>
             <el-form-item label="文章分类" prop="parent_id">
-                <el-cascader v-model="submitForm.parent_id" placeholder="顶级分类"  style="width: 400px;"
+                <el-cascader v-model="submitForm.parent_id" placeholder="顶级分类" style="width: 400px;"
                              filterable clearable :options="treeCategories"
                              :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
                 </el-cascader>
@@ -57,16 +57,20 @@
 </template>
 
 <script setup>
+import Editor from '@/components/good/Editor.vue';
 import { articleInfo, articleStore, articleUpdateCover, articleDeleteCover } from '@/api/article.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useCommonStore } from '@/store';
 
+const commonStore = useCommonStore();
 const router = useRouter();
 const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
 const detailFormLoading = ref(false);
+const isInitContent = ref(true);
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
 const treeCategories = ref([]);
@@ -86,17 +90,36 @@ const submitForm = reactive({
     click_count: 0,
     sort: 0,
     file_url: '',
-    goods_category_id: 0,
+    goods_category_id: 0
 });
 
+const validateContent = (rule, value, callback) => {
+    if (submitForm.value.content == '' || submitForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>' || submitForm.value.content == '<p style="line-height: 2; color: rgb(51, 51, 51);"><br></p>') {
+        callback(new Error('文章内容不能为空'));
+    } else {
+        callback();
+    }
+};
+
 const submitFormRules = reactive({
-    content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
+    content: [
+        { required: true, message: '请输入内容', trigger: 'blur' },
+        { validator: validateContent, trigger: 'blur' }
+    ],
     title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
     article_category_id: [{ required: true, message: '请选择分类', trigger: 'blur' }],
     cover: [{ required: true, message: '请输入封面', trigger: 'blur' }],
     description: [{ required: true, message: '请输入描述', trigger: 'blur' }],
-    keywords: [{ required: true, message: '请输入关键字', trigger: 'blur' }],
+    keywords: [{ required: true, message: '请输入关键字', trigger: 'blur' }]
 });
+
+const handleChangeContent = () => {
+    if (!isInitContent.value) {
+        submitFormRef.value.validateField('content');
+    } else {
+        isInitContent.value = false;
+    }
+};
 
 /* 新增编辑 提交 */
 const onSubmit = () => {
@@ -152,6 +175,11 @@ const getArticleInfo = () => {
 };
 
 onMounted(() => {
+    let title = '添加文章';
+    if (Number(route.params.id) > 0) {
+        title = '编辑文章-' + route.params.id;
+    }
+    commonStore.updateVisitedViewsTitle(route, title);
     getArticleInfo();
 });
 </script>

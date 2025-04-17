@@ -85,7 +85,7 @@ class AppDecorationController extends BaseController
             // 不可多个组件的数据
             $not_for_data = $temp_data->whereIn('component_name', $not_for_names[$app_decoration->alias] ?? [])->values()->toArray();
             // 预览地址
-            $preview_path = $router_service->getRouterPath($app_decoration->alias, ['id' => $id]);
+            $preview_path = $router_service->getRouterPath(AppDecoration::$path[$app_decoration->alias], ['id' => $id]);
 
             return $this->success(compact('component_icon', 'data', 'component_value', 'not_for_data', 'app_website_data', 'preview_path'));
         } catch (\Exception $exception) {

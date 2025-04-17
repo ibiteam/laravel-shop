@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\BaseController;
 use App\Models\Goods;
-use App\Utils\AppServiceConfig\IbiChatUtil;
+use App\Utils\AppService\IbiChatUtil;
 use App\Utils\Constant;
 use App\Utils\Md5Utils;
 use Illuminate\Http\Request;

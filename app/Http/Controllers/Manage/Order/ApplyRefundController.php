@@ -475,46 +475,38 @@ class ApplyRefundController extends BaseController
             return [];
         }
 
-        $temp_unit = $orderDetail->goods_unit ?? ($orderDetail->goods->unit ?? '');
-
         return [
-            'server_time' => time(),
-            'goods_image' => $orderDetail->goods->image ?? '',
             'buyer_name' => $user->user_name,
             'order_sn' => $order->order_sn,
             'created_at' => $order->created_at->format('Y-m-d H:i:s'),
             'goods_number' => $orderDetail->goods_number,
             'goods_name' => $orderDetail->goods_name,
+            'goods_image' => $orderDetail->goods->image ?? '',
             'goods_sku_value' => $orderDetail->goods_sku_value,
             'goods_price' => price_format($orderDetail->goods_price),
             'goods_amount' => price_format($orderDetail->goods_amount),
-            'number' => get_new_price($apply_refund->number),
-            'unit' => $temp_unit,
+            'unit' => $orderDetail->goods_unit,
             'no' => $apply_refund->no,
             'type' => $apply_refund->type,
+            'number' => get_new_price($apply_refund->number),
             'money' => $apply_refund->money,
             'format_money' => price_format($apply_refund->money),
             'reason' => $apply_refund->applyRefundReason?->content,
-            'result' => $apply_refund->result,
             'description' => $apply_refund->description,
             'certificate' => $apply_refund->certificate,
+            'result' => $apply_refund->result,
             'status' => $apply_refund->status,
-            'time' => strtotime($apply_refund->job_time),
-            'end_time' => $apply_refund->updated_at->toDateTimeString(),
             'isShipped' => (bool) $apply_refund->applyRefundShip,
-            'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) use (&$user, $temp_unit) {
-                if ($item->type === ApplyRefundLog::TYPE_BUYER) {
-                    $item->setAttribute('user_name', $user->user_name,);
-                    $item->setAttribute('avatar', $user->avatar);
-                } else {
-                    $item->setAttribute('user_name', $item->action_name);
-                    $item->setAttribute('avatar', '');
-                }
-                $item->setAttribute('unit', $temp_unit);
-                $item->setAttribute('add_time', $item->created_at->toDateTimeString());
+            // 'job_time' => strtotime($apply_refund->job_time),
+            // 'end_time' => $apply_refund->updated_at->toDateTimeString(),
+            'server_time' => time(),
+            'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) {
+                $item->setAttribute('user_name', $item->action_name);
+                $item->setAttribute('avatar', '');
+                $item->setAttribute('unit', $item->applyRefund->orderDetail->goods_unit ?? '');
                 $item->setAttribute('money', price_format($item->applyRefund->money));
                 $item->setAttribute('number', get_new_price($item->applyRefund->number));
-
+                $item->setAttribute('add_time', $item->created_at->toDateTimeString());
                 return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),
         ];

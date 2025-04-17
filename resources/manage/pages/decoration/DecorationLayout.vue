@@ -1,5 +1,5 @@
 <template>
-    <el-container class="decoration-layout-container" id="decorationLayoutContainer">
+    <el-container class="decoration-layout-container" id="decorationLayoutContainer" v-loading="loading">
         <el-aside class="decoration-layout-aside" width="300px">
             <slot name="aside-content"></slot>
         </el-aside>
@@ -75,6 +75,10 @@ const props = defineProps({
     previewPath: {
         type: String,
         default: ''
+    },
+    loading: {
+        type: Boolean,
+        default: false
     }
 })
 
@@ -136,6 +140,7 @@ const handleResetDecoration = (row) => {
 
 // 预览
 const handlePreview = () => {
+    if (!props.previewPath) return
     window.open(props.previewPath, '_blank')
 }
 

@@ -10,14 +10,14 @@ use App\Http\Resources\CommonResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Services\ExpressService;
-use App\Utils\AppServiceConfig\GeoUtil;
+use App\Utils\AppService\GeoUtil;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class OrderDeliveryController extends BaseController
 {
     /**
-     * 发货列表.
+     * 发货物流列表.
      */
     public function list(Request $request, OrderDeliveryDao $order_delivery_dao)
     {
@@ -40,7 +40,7 @@ class OrderDeliveryController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('获取发货列表异常~');
+            return $this->error('获取发货物流列表异常~');
         }
     }
 

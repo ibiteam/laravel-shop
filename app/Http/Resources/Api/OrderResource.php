@@ -49,6 +49,7 @@ class OrderResource extends JsonResource
             }),
             'order_amount' => price_number_format($this->resource->order_amount),
             'logistics' => $last_logistics,
+            'logistics_number' => $this->resource->order_delivery_count,
             'evaluate' => $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
             'buttons' => $this->getButtons(
                 $order_constant_enum,
@@ -173,6 +174,7 @@ class OrderResource extends JsonResource
                     'title' => '已发货',
                     'description' => "您的订单将交付{$ship_company->name}，运单号：{$last_order_delivery->ship_no}",
                     'shipped_at' => $last_order_delivery->shipped_at,
+                    'delivery_no' => $last_order_delivery->delivery_no,
                 ];
             }
         }

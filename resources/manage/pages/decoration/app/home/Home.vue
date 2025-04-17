@@ -4,6 +4,7 @@
         :time="decoration.app_website_data?.release_time"
         :id="decoration.app_website_data?.id"
         :previewPath="decoration.preview_path"
+        :loading="decoration.loading"
         @pageSetting="openPageSetting"
         @pageSave="decorationSave"
     >
@@ -91,6 +92,7 @@ const decoration = reactive({
     // 当前选中拖拽的索引
     temp_index: '',
     preview_path: '',
+    loading: true,
 })
 // 拖拽过程 true-拖拽中 false-拖拽结束
 const dragMove = ref(false)
@@ -260,6 +262,8 @@ const handleGoodsDialogClose = () => {
 // 保存装修
 const decorationSave = (params) => {
     try {
+        if (decoration.loading) return
+        decoration.loading = true
         const { button_type } = params
         const pageSettingData = pageSettingRef.value.getComponentData()
         const { app_website_data, danping_advertisement, suspended_advertisement } = pageSettingData
@@ -267,6 +271,7 @@ const decorationSave = (params) => {
             cns.$message.error('请设置TDK')
             decoration.temp_index = ''
             pageSetting.value = true
+            decoration.loading = false
             return
         }
         let decoration_data = []
@@ -295,6 +300,7 @@ const decorationSave = (params) => {
         console.log(save_decoration_data)
         console.log(saveData)
         appDecorationSave((saveData)).then(res => {
+            decoration.loading = false
             if (cns.$successCode(res.code)) {
                 cns.$message.success('保存成功')
             } else if (res.code == 4006) {
@@ -309,8 +315,11 @@ const decorationSave = (params) => {
             } else {
                 cns.$message.error(res.message)
             }
+        }).catch(() => {
+            decoration.loading = false
         })
     } catch (error) {
+        decoration.loading = false
         console.log(error)
     }
 
@@ -318,7 +327,9 @@ const decorationSave = (params) => {
 
 // 获取首页装修数据
 const getDecorationHome = () => {
+    decoration.loading = true
     appDecorationInit({id: cns.$route.query.id}).then(res => {
+        decoration.loading = false
         if (cns.$successCode(res.code)) {
             decoration.app_website_data = res.data.app_website_data
             decoration.component_icon = res.data.component_icon
@@ -330,6 +341,8 @@ const getDecorationHome = () => {
         } else {
             cns.$message.error(res.message)
         }
+    }).catch(() => {
+        decoration.loading = false
     })
     getDecorationRecommendData()
 }
