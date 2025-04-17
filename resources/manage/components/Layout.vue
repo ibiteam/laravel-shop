@@ -145,7 +145,7 @@
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
-                                <div :key="route.path" :class="{'common-wrap': !['decorationAppHome'].includes(route.name)}" style="height: 100%;">
+                                <div :key="route.path" :class="{'common-wrap': !['decorationAppHome','manage.goods.update'].includes(route.name)}" style="height: 100%;">
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
