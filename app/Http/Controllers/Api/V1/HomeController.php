@@ -107,8 +107,8 @@ class HomeController extends BaseController
     }
 
     // 为您推荐
-    public function recommend(GoodsService $goods_service)
+    public function recommend(Request $request, GoodsService $goods_service)
     {
-        return $this->success($goods_service->getRecommendData());
+        return $this->success($goods_service->getRecommendData($request->get('no')));
     }
 }

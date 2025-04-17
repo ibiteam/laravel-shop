@@ -51,7 +51,7 @@ it('test address default', function () {
 it('test address update', function () {
     $data = [
         'consignee' => 'jeck',
-        'phone' => '13322221111',
+        'phone' => '133222',
         'province' => '2',
         'city' => '52',
         'district' => '506',

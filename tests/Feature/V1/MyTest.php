@@ -77,3 +77,16 @@ it('test my batch unfollow', function () {
     $this->assertArrayHasKey('data', $response);
     $this->assertEquals(200, $response['code']);
 });
+
+it('test my views batch distory', function () {
+    $data = [
+        'ids' => ''
+    ];
+    $response = $this->doPost('api/v1/my/views/batch/distory', $data);
+    $res = json_encode($response, JSON_UNESCAPED_UNICODE);
+    dd($response, $res);
+    $this->assertIsArray($response);
+    $this->assertArrayHasKey('code', $response);
+    $this->assertArrayHasKey('data', $response);
+    $this->assertEquals(200, $response['code']);
+});

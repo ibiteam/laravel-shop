@@ -18,4 +18,9 @@ class PhoneRule implements ValidationRule
             $fail('validation.is_phone')->translate();
         }
     }
+
+    public function message()
+    {
+        return 'phone.phone_rule'; // 返回自定义错误消息的键
+    }
 }
