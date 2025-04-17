@@ -105,8 +105,16 @@ class OrderDeliveryController extends BaseController
                         continue;
                     }
 
-                    if (date('Y-m-d H:i:s', strtotime($shipped_at)) !== $shipped_at) {
+                    $ship_timestamp = strtotime($shipped_at);
+
+                    if (date('Y-m-d H:i:s', $ship_timestamp) !== $shipped_at) {
                         $error_data[] = ['line' => $line, 'message' => '发货时间格式错误'];
+
+                        continue;
+                    }
+
+                    if ($ship_timestamp <= now()->startOfYear()->getTimestamp() || $ship_timestamp >= now()->endOfYear()->getTimestamp()) {
+                        $error_data[] = ['line' => $line, 'message' => '发货时间错误，请选择今年的发货时间'];
 
                         continue;
                     }
