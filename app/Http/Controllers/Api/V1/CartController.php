@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\Goods;
 use App\Models\GoodsCollect;
 use App\Models\GoodsSku;
+use App\Services\Order\GoodsFormatter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -360,35 +361,23 @@ class CartController extends BaseController
     /**
      * 去结算.
      */
-    public function placeOrder()
+    public function placeOrder(CartDao $cart_dao)
     {
-        $user = get_user();
+        $current_user = get_user();
 
         try {
-            // 获取可以结算的商品数据
-            $carts = Cart::query()->whereUserId($user->id)
-                ->with(['goods'])
-                ->whereHas('goods', function ($query) {
-                    $query->show();
-                })
-                ->whereIsCheck(Cart::IS_CHECK_YES)
-                ->orderByDesc('updated_at')->orderByDesc('id')
-                ->get();
+            $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
+                return app(GoodsFormatter::class)
+                    ->setUser($current_user)
+                    ->setCartId($cart->id)
+                    ->setGoods($cart->goods)
+                    ->setSkuId($cart->goods_sku_id)
+                    ->setBuyNumber($cart->buy_number)
+                    ->validate();
+            });
 
-            if (! $carts->count()) {
+            if ($goods_formatters->isEmpty()) {
                 throw new BusinessException('没有待结算有效商品');
-            }
-
-            foreach ($carts as $cart) {
-                $goods = $cart->goods;
-
-                if ($goods->total <= 0 || $goods->total < $cart->buy_number) {
-                    throw new BusinessException('【'.$goods->name.'】库存不足');
-                }
-
-                if ($goods->can_quota == Goods::QUOTA && $goods->quota_number < $cart->buy_number) {
-                    throw new BusinessException('【'.$goods->name.'】超出限购数量：'.$goods->quota_number);
-                }
             }
 
             return $this->success('允许结算');
