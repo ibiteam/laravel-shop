@@ -43,9 +43,11 @@ class CartDao
                 }
 
                 $goods_price = $cart->goods->price;
+                $goods_integral = $cart->goods->integral;
 
-                if ($cart->goods_sku_id) {
-                    $goods_price = $cart->goodsSku ? $cart->goodsSku->price : $goods_price;
+                if ($cart->goods_sku_id && $cart->goodsSku) {
+                    $goods_price = $cart->goodsSku->price;
+                    $goods_integral = $cart->goodsSku->integral;
                 }
 
                 $invalid_type = '';  // 无效类型
@@ -69,7 +71,7 @@ class CartDao
                             'image' => $cart->goods->image,
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
-                            'integral' => $cart->goods->integral,
+                            'integral' => $goods_integral,
                             'invalid_type' => $invalid_type,
                         ],
                     ];
@@ -111,7 +113,7 @@ class CartDao
                     if ($cart->is_check == Cart::IS_CHECK_YES) {
                         $total['check_count']++;
                         $total['total_price'] += $goods_price * $buy_number;
-                        $total['total_integral'] += $cart->goods->integral;
+                        $total['total_integral'] += $goods_integral;
                     }
 
                     $validCarts[] = [
@@ -126,7 +128,7 @@ class CartDao
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
                             'total' => $cart->goods->total,
-                            'integral' => $cart->goods->integral,
+                            'integral' => $goods_integral,
                             'can_quota' => $cart->goods->can_quota,
                             'quota_number' => $cart->goods->quota_number,
                             'sku_desc' => $sku_desc,
