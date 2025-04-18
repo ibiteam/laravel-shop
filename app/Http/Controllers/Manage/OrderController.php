@@ -90,7 +90,7 @@ class OrderController extends BaseController
                 'id' => '订单ID',
             ]);
 
-            $order = Order::query()->with(['transactions', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->first();
+            $order = Order::query()->with(['transactions', 'transactions.payment', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->first();
 
             return $this->success([
                 'order_items' => $order->detail->map(function (OrderDetail $order_detail) {
@@ -178,7 +178,7 @@ class OrderController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('操作失败'.$throwable->getMessage());
         }
     }
 

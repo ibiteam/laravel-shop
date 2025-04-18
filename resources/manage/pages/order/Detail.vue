@@ -342,7 +342,7 @@ onMounted(() => {
         <div class="detail-item">
             <div class="detail-title">支付信息</div>
             <el-table :data="orderPayData" stripe border style="width: 100%;">
-                <el-table-column label="支付流水号" prop="transaction_no"></el-table-column>
+                <el-table-column label="支付流水号" prop="transaction_no" width="300px"></el-table-column>
                 <el-table-column label="支付来源" prop="payment_name"></el-table-column>
                 <el-table-column label="支付状态" prop="pay_message"></el-table-column>
                 <el-table-column label="备注" prop="remark"></el-table-column>
