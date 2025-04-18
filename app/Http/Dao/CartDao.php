@@ -166,7 +166,7 @@ class CartDao
      */
     public function getDoneCartGoods(int $user_id): EloquentCollection|Collection
     {
-        return Cart::query()->with(['goods', 'goodsSku'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
+        return Cart::query()->with(['goods', 'goods.skus'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
     }
 
     /**
