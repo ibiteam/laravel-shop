@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\WeChatPayException;
 use App\Http\Controllers\Api\BaseController;
@@ -275,7 +276,7 @@ class IndexController extends BaseController
                     try {
                         $payment = $transaction->payment;
 
-                        $out_refund_no = $transaction_dao->generateTransactionNo('cancel_order');
+                        $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::USER_CANCEL_ORDER);
 
                         PayService::init($payment->alias)->refund($transaction, $out_refund_no, $payment, $refund_amount, '取消订单，进行退款');
                     } catch (WeChatPayException $we_chat_pay_exception) {

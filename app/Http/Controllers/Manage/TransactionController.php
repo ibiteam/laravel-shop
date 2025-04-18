@@ -6,6 +6,7 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\WeChatPayException;
 use App\Http\Dao\TransactionDao;
@@ -103,7 +104,7 @@ class TransactionController extends BaseController
             if ($refund_amount <= 0) {
                 throw new BusinessException('交易记录已退款完成');
             }
-            $out_refund_no = $transaction_dao->generateTransactionNo(config('app.manage_prefix').'_'.'refund');
+            $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::MANAGE_REFUND->value);
 
             $payment = $transaction->payment;
 
