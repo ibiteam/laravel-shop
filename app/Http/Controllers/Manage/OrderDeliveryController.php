@@ -49,6 +49,8 @@ class OrderDeliveryController extends BaseController
 
     /**
      * 导入发货.
+     *
+     * @throws \Throwable
      */
     public function import(Request $request): JsonResponse
     {
@@ -65,6 +67,8 @@ class OrderDeliveryController extends BaseController
 
         $order_delivery_dao = app(OrderDeliveryDao::class);
         $order_log_dao = app(OrderLogDao::class);
+
+        DB::beginTransaction();
 
         try {
             $res = ExcelUtil::import($file, function ($data) use ($current_user, $order_delivery_dao, $order_log_dao) {
@@ -165,11 +169,10 @@ class OrderDeliveryController extends BaseController
 
                             continue;
                         }
+                        // 已发货数量
+                        $already_shipped_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
 
                         if ($import_datum['send_number'] > 0) {
-                            // 已发货数量
-                            $already_shipped_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
-
                             // 判断已发货数量+当前发货数量是否大于订单商品数量
                             if ($already_shipped_number + $import_datum['send_number'] > $order_detail->goods_number) {
                                 $error_data[] = ['line' => $import_datum['line'], 'message' => '商品名称'.$import_datum['goods_name'].' 发货数量超过订单商品数量'];
@@ -181,7 +184,7 @@ class OrderDeliveryController extends BaseController
                             ];
                         } else {
                             $order_delivery_items = [
-                                ['order_detail_id' => $order_detail->id, 'send_number' => $order_detail->goods_number],
+                                ['order_detail_id' => $order_detail->id, 'send_number' => $order_detail->goods_number - $already_shipped_number],
                             ];
                         }
                     } else {
@@ -218,8 +221,15 @@ class OrderDeliveryController extends BaseController
                         } else {
                             // 默认发货所有商品
                             $order_delivery_items = $order->detail->map(function (OrderDetail $order_detail) {
-                                return ['order_detail_id' => $order_detail->id, 'send_number' => $order_detail->goods_number];
-                            })->toArray();
+                                // 已发货数量
+                                $already_shipped_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
+
+                                if ($order_detail->goods_number - $already_shipped_number > 0) {
+                                    return ['order_detail_id' => $order_detail->id, 'send_number' => $order_detail->goods_number - $already_shipped_number];
+                                }
+
+                                return null;
+                            })->filter()->values()->toArray();
                         }
                     }
 
@@ -228,7 +238,6 @@ class OrderDeliveryController extends BaseController
 
                         continue;
                     }
-
                     $order_delivery = OrderDelivery::query()->create([
                         'delivery_no' => $order_delivery_dao->generateDeliveryNo(),
                         'order_id' => $order->id,
@@ -268,6 +277,7 @@ class OrderDeliveryController extends BaseController
             if (! empty($res['success_data'])) {
                 admin_operation_log('导入发货信息：发货单ID'.implode(',', $res['success_data']));
             }
+            DB::commit();
 
             return $this->success([
                 'success_number' => count($res['success_data']),
@@ -275,8 +285,12 @@ class OrderDeliveryController extends BaseController
                 'error_data' => collect($res['error_data'])->sortBy('line')->values(),
             ]);
         } catch (BusinessException $business_exception) {
+            DB::rollBack();
+
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            DB::rollBack();
+
             return $this->error('导入发货信息失败！');
         }
     }
