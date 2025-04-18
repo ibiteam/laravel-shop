@@ -66,8 +66,10 @@ class OrderController extends BaseController
                 $query->where('goods_id', $goods_id);
             }))
             ->when(! is_null($user_keywords), function (Builder $query) use ($user_keywords) {
-                $query->where('user_id', $user_keywords)->orWhereHas('user', function ($query) use ($user_keywords) {
-                    $query->whereLike('nickname', "%$user_keywords%");
+                $query->where(function ($query) use ($user_keywords) {
+                    $query->where('user_id', $user_keywords)->orWhereHas('user', function ($query) use ($user_keywords) {
+                        $query->whereLike('user_name', "%$user_keywords%");
+                    });
                 });
             })
             ->latest()
