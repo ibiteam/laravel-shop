@@ -23,7 +23,8 @@ class CartDao
             $carts = Cart::query()->whereUserId($user->id)
                 ->with(['goods' => function ($query) {
                     $query->withTrashed();  // 包括已软删除的商品
-                }], 'goodsSku')
+                }])
+                ->with(['goods.skus', 'goodsSku'])
                 ->orderByDesc('updated_at')->orderByDesc('id')
                 ->get(['id', 'goods_id', 'goods_sku_id', 'buy_number', 'is_check']);
 
@@ -42,9 +43,11 @@ class CartDao
                 }
 
                 $goods_price = $cart->goods->price;
+                $goods_integral = $cart->goods->integral;
 
-                if ($cart->goods_sku_id) {
-                    $goods_price = $cart->goodsSku ? $cart->goodsSku->price : $goods_price;
+                if ($cart->goods_sku_id && $cart->goodsSku) {
+                    $goods_price = $cart->goodsSku->price;
+                    $goods_integral = $cart->goodsSku->integral;
                 }
 
                 $invalid_type = '';  // 无效类型
@@ -68,7 +71,7 @@ class CartDao
                             'image' => $cart->goods->image,
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
-                            'integral' => $cart->goods->integral,
+                            'integral' => $goods_integral,
                             'invalid_type' => $invalid_type,
                         ],
                     ];
@@ -110,7 +113,7 @@ class CartDao
                     if ($cart->is_check == Cart::IS_CHECK_YES) {
                         $total['check_count']++;
                         $total['total_price'] += $goods_price * $buy_number;
-                        $total['total_integral'] += $cart->goods->integral;
+                        $total['total_integral'] += $goods_integral;
                     }
 
                     $validCarts[] = [
@@ -125,7 +128,7 @@ class CartDao
                             'price' => $goods_price,
                             'unit' => $cart->goods->unit,
                             'total' => $cart->goods->total,
-                            'integral' => $cart->goods->integral,
+                            'integral' => $goods_integral,
                             'can_quota' => $cart->goods->can_quota,
                             'quota_number' => $cart->goods->quota_number,
                             'sku_desc' => $sku_desc,
@@ -143,7 +146,7 @@ class CartDao
                 'total' => $total,
             ];
         } catch (\Exception $e) {
-            throw new BusinessException('购物车商品列表查询异常');
+            throw new BusinessException('查询购物车商品列表异常'.$e->getMessage());
         }
     }
 
@@ -165,7 +168,7 @@ class CartDao
      */
     public function getDoneCartGoods(int $user_id): EloquentCollection|Collection
     {
-        return Cart::query()->with(['goods', 'goodsSku'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
+        return Cart::query()->with(['goods', 'goods.skus'])->whereUserId($user_id)->whereIsCheck(Cart::IS_CHECK_YES)->get();
     }
 
     /**

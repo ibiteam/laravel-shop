@@ -56,11 +56,11 @@ class OrderOperateService
 
                                 // 存在商品规格ID时，需要先判断是否存在商品规格 不存在时不进行处理
                                 if ($goods_sku instanceof GoodsSku) {
-                                    $goods_sku->decrementStock($order_detail->goods_number);
-                                    $goods->decrementStock($order_detail->goods_number);
+                                    $goods_sku->incrementStock($order_detail->goods_number);
+                                    $goods->incrementStock($order_detail->goods_number);
                                 }
                             } else {
-                                $goods->decrementStock($order_detail->goods_number);
+                                $goods->incrementStock($order_detail->goods_number);
                             }
                         }
 
@@ -71,20 +71,20 @@ class OrderOperateService
                         $goods_sku = GoodsSku::query()->whereGoodsId($goods->id)->whereId($order_detail->goods_sku_id)->first();
 
                         if ($goods_sku instanceof GoodsSku) {
-                            $goods_sku->decrementStock($order_detail->goods_number);
-                            $goods->decrementStock($order_detail->goods_number);
+                            $goods_sku->incrementStock($order_detail->goods_number);
+                            $goods->incrementStock($order_detail->goods_number);
                         }
                     } else {
-                        $goods->decrementStock($order_detail->goods_number);
+                        $goods->incrementStock($order_detail->goods_number);
                     }
                 }
             });
 
             // 更新订单状态
             if (! $order->update([
-                'order_status' => OrderStatusEnum::CANCELLED,
-                'pay_status' => PayStatusEnum::PAY_WAIT,
-                'ship_status' => ShippingStatusEnum::UNSHIPPED,
+                'order_status' => OrderStatusEnum::CANCELLED->value,
+                'pay_status' => PayStatusEnum::PAY_WAIT->value,
+                'ship_status' => ShippingStatusEnum::UNSHIPPED->value,
                 'paid_at' => null,
                 'shipped_at' => null,
                 'received_at' => null,
@@ -118,7 +118,7 @@ class OrderOperateService
         DB::beginTransaction();
 
         try {
-            if (! $order->update(['order_status' => ShippingStatusEnum::RECEIVED, 'received_at' => now()->toDateTimeString()])) {
+            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED->value, 'received_at' => now()->toDateTimeString()])) {
                 throw new BusinessException('确认收货失败');
             }
 

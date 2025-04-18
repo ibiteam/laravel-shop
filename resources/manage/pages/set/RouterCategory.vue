@@ -220,7 +220,7 @@ onMounted(() => {
                 </template>
             </el-table-column>
             <el-table-column label="页面" prop="page_title"></el-table-column>
-            <el-table-column label="链接数量" prop="routers_count"></el-table-column>
+            <!--<el-table-column label="链接数量" prop="routers_count"></el-table-column>-->
             <el-table-column label="是否显示" prop="is_show">
                 <template #default="scope">
                     <el-switch

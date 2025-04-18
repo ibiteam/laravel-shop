@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Manage\Order\ApplyRefundController;
-use App\Http\Controllers\Manage\Order\ApplyRefundReasonController;
-use App\Http\Controllers\Manage\Order\EvaluateController;
-use App\Http\Controllers\Manage\Order\OrderController;
-use App\Http\Controllers\Manage\Order\OrderDeliveryController;
+use App\Http\Controllers\Manage\ApplyRefundController;
+use App\Http\Controllers\Manage\ApplyRefundReasonController;
+use App\Http\Controllers\Manage\OrderController;
+use App\Http\Controllers\Manage\OrderDeliveryController;
+use App\Http\Controllers\Manage\OrderEvaluateController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
@@ -60,11 +60,11 @@ Route::prefix('order')->group(function () {
     // 订单评价
     Route::prefix('evaluate')->group(function () {
         Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_INDEX)->group(function () {
-            Route::get('/', [EvaluateController::class, 'index'])->name(Permission::MANAGE_ORDER_EVALUATE_INDEX);
-            Route::get('detail', [EvaluateController::class, 'detail']);
+            Route::get('/', [OrderEvaluateController::class, 'index'])->name(Permission::MANAGE_ORDER_EVALUATE_INDEX);
+            Route::get('detail', [OrderEvaluateController::class, 'detail']);
         });
         Route::middleware('manage.permission:'.Permission::MANAGE_ORDER_EVALUATE_UPDATE)->group(function () {
-            Route::post('check', [EvaluateController::class, 'check']);
+            Route::post('check', [OrderEvaluateController::class, 'check']);
         });
     });
 });

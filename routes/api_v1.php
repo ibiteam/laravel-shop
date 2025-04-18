@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AccountSetController;
 use App\Http\Controllers\Api\V1\AddressController;
+use App\Http\Controllers\Api\V1\ArticleController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CartController;
 use App\Http\Controllers\Api\V1\CategoryController;
@@ -51,8 +52,13 @@ Route::prefix('auth')->group(function () {
     Route::post('wechat', [WechatController::class, 'auth']); // 微信公众号授权
 });
 
-// 专题
-Route::get('special', [SpecialController::class, 'index']); // 专题页
+// 专题页
+Route::get('special', [SpecialController::class, 'index']); // 获取数据
+
+// 文章
+Route::prefix('article')->group(function () {
+    Route::get('detail', [ArticleController::class, 'detail']); // 获取文章详情
+});
 
 // 搜索
 Route::prefix('search')->group(function () {

@@ -33,10 +33,12 @@
                 <el-link class="link-button" :underline="false" href="/manage/set/router">前往访问地址</el-link>
             </div>
             <div class="right-wrapper">
-                <div class="search-wrapper s-flex ai-ct" v-if="searchForm.page_name != 'manage.category.index'">
-                    <el-input v-model="searchForm.name" :placeholder="searchForm.page_name == 'manage.goods.index'?'搜索商品名称/货号/ID':'搜索名称/别名'" style="width: 200px" @change="handleCurrentChange(1)"/>
+                <div class="search-wrapper s-flex ai-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">
+                    <el-input v-if="searchForm.page_name == 'manage.router.index'" v-model="searchForm.name" placeholder="搜索名称/别名" style="width: 200px" @change="handleCurrentChange(1)"/>
+                    <el-input v-if="searchForm.page_name == 'manage.goods.index'" v-model="searchForm.name" placeholder="搜索商品名称/货号/ID" style="width: 200px" @change="handleCurrentChange(1)"/>
+                    <el-input v-if="searchForm.page_name == 'manage.article.index'" v-model="searchForm.name" placeholder="搜索文章名称/ID" style="width: 200px" @change="handleCurrentChange(1)"/>
                 </div>
-                <div class="table-wrapper" v-loading="tableLoading" :class="searchForm.page_name == 'manage.category.index'?'table-wrapper-cover':''">
+                <div class="table-wrapper" v-loading="tableLoading" :class="(searchForm.page_name == 'manage.category.index' || searchForm.page_name == 'manage.article_category.index')?'table-wrapper-cover':''">
                     <el-table
                         :data="tableData"
                         ref="tableRef"
@@ -46,13 +48,13 @@
                         @select="handleSelect">
                         <el-table-column fixed type="selection" width="55" v-if="searchForm.page_name"/>
                         <template v-if="searchForm.page_name == 'manage.router.index'">
-                            <el-table-column property="name" label="名称" />
-                            <el-table-column property="alias" label="别名"/>
+                            <el-table-column property="name" label="名称" width="150"/>
+                            <el-table-column property="alias" label="别名" width="150"/>
                             <el-table-column property="h5_url" label="h5链接" />
                         </template>
                         <template v-if="searchForm.page_name == 'manage.goods.index'">
                             <el-table-column property="id" label="ID" width="100"/>
-                            <el-table-column label="商品" align="center" width="250">
+                            <el-table-column label="商品" width="200">
                                 <template #default="scope">
                                     <div class="s-flex ai-ct">
                                         <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.image" fit="scale-down" @click="handleClickViewer(scope,'image')">
@@ -64,11 +66,12 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                            <el-table-column property="no" label="货号" align="center" />
+                            <el-table-column property="no" label="货号"/>
+                            <!--<el-table-column property="h5_url" label="h5链接"/>-->
                         </template>
                         <template v-if="searchForm.page_name == 'manage.category.index'">
-                            <el-table-column property="id" label="ID" align="center" width="100"/>
-                            <el-table-column label="分类名" align="center">
+                            <el-table-column property="id" label="ID" width="100"/>
+                            <el-table-column label="分类名称">
                                 <template #default="scope">
                                     <div class="s-flex ai-ct">
                                         <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.logo" fit="scale-down" @click="handleClickViewer(scope,'logo')">
@@ -80,6 +83,28 @@
                                     </div>
                                 </template>
                             </el-table-column>
+                            <!--<el-table-column property="h5_url" label="h5链接"/>-->
+                        </template>
+                        <template v-if="searchForm.page_name == 'manage.article.index'">
+                            <el-table-column property="id" label="ID" width="100"/>
+                            <el-table-column label="文章标题">
+                                <template #default="scope">
+                                    <div class="s-flex ai-ct">
+                                        <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.cover" fit="scale-down" @click="handleClickViewer(scope,'cover')">
+                                            <template #error>
+                                                <img src="@/assets/images/decoration/app-nopic.png" width="35" height="35"/>
+                                            </template>
+                                        </el-image>
+                                        <p class="elli-1" style="max-width: 70%;">{{scope.row.title}}</p>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                            <!--<el-table-column property="h5_url" label="h5链接"/>-->
+                        </template>
+                        <template v-if="searchForm.page_name == 'manage.article_category.index'">
+                            <el-table-column property="id" label="ID" width="100"/>
+                            <el-table-column property="name" label="分类名称" />
+                            <!--<el-table-column property="h5_url" label="h5链接" />-->
                         </template>
                     </el-table>
                 </div>
@@ -188,18 +213,26 @@ const handleConfirm = () => {
 
 const searchInfoData = () => {
     let searchInfo = {
-        name:searchForm.name,
-        page_name:searchForm.page_name
+        // name:searchForm.name,
+        // page_name:searchForm.page_name
     }
-    if (searchForm.page_name == 'manage.router.index'){//基础连接,自定义链接
-        searchInfo.url = 'manage/set/router'
-        searchInfo.is_show = -1
-        searchInfo.router_category_id = searchForm.id
-    }else if(searchForm.page_name == 'manage.goods.index'){//商品列表
-        searchInfo.url = 'manage/goods/info'
-        searchInfo.status = -1
-    }else if(searchForm.page_name == 'manage.category.index'){//商品分类
-        searchInfo.url = 'manage/goods/category'
+    if (searchForm.page_name == 'manage.router.index') {//基础连接,自定义链接
+        searchInfo.url = 'manage/set/router';
+        searchInfo.router_category_id = searchForm.id;
+        searchInfo.keywords = searchForm.name;
+        searchInfo.is_show = 1;
+    } else if (searchForm.page_name == 'manage.category.index') {//商品分类
+        searchInfo.url = 'manage/goods/category';
+    } else if (searchForm.page_name == 'manage.goods.index') {//商品列表
+        searchInfo.url = 'manage/goods/info';
+        searchInfo.keywords = searchForm.name;
+        searchInfo.status = 1;
+    } else if (searchForm.page_name == 'manage.article_category.index') {//文章分类
+        searchInfo.url = 'manage/article/category';
+    } else if (searchForm.page_name == 'manage.article.index') {//文章列表
+        searchInfo.url = 'manage/article/article';
+        searchInfo.keywords = searchForm.name;
+        searchInfo.is_show = 1;
     }
     return searchInfo
 }
@@ -225,7 +258,7 @@ const getLinkTableData = (params = {page: 1, number: 10}) => {
     tableLoading.value = true
     linkTableData(searchInfo).then(res => {
         if (res.code === 200) {
-            if (searchForm.page_name == 'manage.category.index'){
+            if (searchForm.page_name == 'manage.category.index' || searchForm.page_name == 'manage.article_category.index'){
                 tableData.value = res.data;
             }else{
                 tableData.value = res.data.list;

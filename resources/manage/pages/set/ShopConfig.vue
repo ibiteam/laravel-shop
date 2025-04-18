@@ -1,6 +1,6 @@
 <script setup>
 import { Plus, Delete } from '@element-plus/icons-vue';
-import { shopConfigIndex, shopConfigUpdate } from '@/api/set.js';
+import { shopConfigIndex, shopConfigUpdate, shopConfigSearchArticle } from '@/api/set.js';
 import { fileUpload } from '@/api/common.js';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
 import { getConfigAxios } from '@/api/home.js';
@@ -16,6 +16,11 @@ let inputFrom = reactive({});
 const tabPosition = ref('left');
 const loading = ref(false);
 const inputFromRef = ref(null);
+const userAgreementData = ref([]);
+const userCancelAgreementData = ref([]);
+const privacyPolicyData = ref([]);
+const aboutUsData = ref([]);
+
 
 const tab_label = computed(() => {
     switch (secondActiveName.value) {
@@ -33,6 +38,8 @@ const tab_label = computed(() => {
             return '商品设置';
         case 'group_refund_after_sales':
             return '退款售后';
+        case 'group_articles':
+            return '文章设置';
         default:
             return '';
     }
@@ -55,7 +62,15 @@ const secondHandleClick = (tab, event) => {
 const setInfo = (group_name) => {
     shopConfigIndex({ group_name: group_name }).then(res => {
         if (cns.$successCode(res.code)) {
-            Object.assign(inputFrom, res.data);
+            Object.assign(inputFrom, res.data.configs);
+
+            if (group_name === 'group_articles' && res.data.group_data) {
+                // 文章设置
+                userAgreementData.value = res.data.group_data.user_agreement;
+                userCancelAgreementData.value = res.data.group_data.user_cancel_agreement;
+                privacyPolicyData.value = res.data.group_data.privacy_policy;
+                aboutUsData.value = res.data.group_data.about_us;
+            }
         } else {
             cns.$message.error(res.message);
         }
@@ -77,6 +92,30 @@ const uploadFile = async (request, type) => {
 
 const handleRemoveOne = (type) => {
     inputFrom[type] = '';
+};
+
+const remoteSearchArticle = async (query, type) =>{
+    if (query !== '') {
+        try {
+            const res = await shopConfigSearchArticle({ keywords: query });
+            if (cns.$successCode(res.code)) {
+                if (type === 'user_agreement') {
+                    userAgreementData.value = res.data;
+                }
+                if (type === 'user_cancel_agreement') {
+                    userCancelAgreementData.value = res.data;
+                }
+                if (type === 'privacy_policy') {
+                    privacyPolicyData.value = res.data;
+                }
+                if (type === 'about_us') {
+                    aboutUsData.value = res.data;
+                }
+            }
+        } catch (error) {
+            console.error('Failed:', error);
+        }
+    }
 };
 
 // 提交表单
@@ -373,6 +412,65 @@ onMounted(() => {
                                                    @click="submitForm()">提交
                                         </el-button>
                                     </div>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
+                        <el-tab-pane label="文章设置" name="group_articles">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="180px">
+                                <div style="margin:0 auto 0 50px;width: 800px">
+                                    <el-form-item label="用户协议：" prop="user_agreement">
+                                        <el-select
+                                            v-model="inputFrom.user_agreement" placeholder="请输入文章Id|文章标题"
+                                            clearable @clear="handleRemoveOne('user_agreement')"
+                                            filterable remote reserve-keyword
+                                            :remote-method="(e) => remoteSearchArticle(e, 'user_agreement')">
+                                            <el-option
+                                                v-for="item in userAgreementData"
+                                                :key="item.value" :label="item.label" :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="用户注销协议：" prop="user_cancel_agreement">
+                                        <el-select
+                                            v-model="inputFrom.user_cancel_agreement" placeholder="请输入文章Id|文章标题"
+                                            clearable @clear="handleRemoveOne('user_cancel_agreement')"
+                                            filterable remote reserve-keyword
+                                            :remote-method="(e) => remoteSearchArticle(e, 'user_cancel_agreement')">
+                                            <el-option
+                                                v-for="item in userCancelAgreementData"
+                                                :key="item.value" :label="item.label" :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="隐私政策：" prop="privacy_policy">
+                                        <el-select
+                                            v-model="inputFrom.privacy_policy" placeholder="请输入文章Id|文章标题"
+                                            clearable @clear="handleRemoveOne('privacy_policy')"
+                                            filterable remote reserve-keyword
+                                            :remote-method="(e) => remoteSearchArticle(e, 'privacy_policy')">
+                                            <el-option
+                                                v-for="item in privacyPolicyData"
+                                                :key="item.value" :label="item.label" :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item label="关于我们：" prop="about_us">
+                                        <el-select
+                                            v-model="inputFrom.about_us" placeholder="请输入文章Id|文章标题"
+                                            clearable @clear="handleRemoveOne('about_us')"
+                                            filterable remote reserve-keyword
+                                            :remote-method="(e) => remoteSearchArticle(e, 'about_us')">
+                                            <el-option
+                                                v-for="item in aboutUsData"
+                                                :key="item.value" :label="item.label" :value="item.value">
+                                            </el-option>
+                                        </el-select>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" :class="{disable:loading}" :loading="loading"
+                                                   @click="submitForm(inputFrom)">提交
+                                        </el-button>
+                                    </el-form-item>
                                 </div>
                             </el-form>
                         </el-tab-pane>

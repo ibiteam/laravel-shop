@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
+ *
+ *
  * @property int         $id
  * @property int         $user_id    用户id
  * @property int         $number     积分数量
@@ -15,7 +17,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $desc       积分描述
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- *
  * @method static Builder<static>|UserIntegral newModelQuery()
  * @method static Builder<static>|UserIntegral newQuery()
  * @method static Builder<static>|UserIntegral query()
@@ -26,7 +27,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|UserIntegral whereType($value)
  * @method static Builder<static>|UserIntegral whereUpdatedAt($value)
  * @method static Builder<static>|UserIntegral whereUserId($value)
- *
+ * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
 class UserIntegral extends Model
@@ -36,4 +37,9 @@ class UserIntegral extends Model
     public const TYPE_DECREMENT = 2; // 减少
 
     protected $guarded = [];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

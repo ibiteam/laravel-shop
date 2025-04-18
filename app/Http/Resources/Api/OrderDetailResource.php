@@ -33,7 +33,9 @@ class OrderDetailResource extends JsonResource
                 'title' => '运输中',
                 'description' => '当前订单已拆分成'.$this->resource->order_delivery_count.'个运单运输，点击可以查看物流轨迹',
                 'shipped_at' => $this->resource->shipped_at,
+                'delivery_no' => $this->resource->orderDelivery->first()?->delivery_no,
             ] : null,
+            'logistics_number' => $this->resource->order_delivery_count,
             'address' => [
                 'consignee' => $this->resource->consignee,
                 'address' => $this->resource->province?->name.$this->resource->city?->name.$this->resource->district?->name.$this->resource->address,

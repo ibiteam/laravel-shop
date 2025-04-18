@@ -61,6 +61,7 @@ class Permission extends SpatiePermission
     public const MODULE_ARTICLE = 'module.article'; // 文章
     public const MODULE_TOOLS = 'module.tools'; // 工具
     public const MODULE_DATA = 'module.data'; // 数据
+    public const MODULE_MARKETING = 'module.marketing'; // 营销
 
     // 二级 设置部分
     public const BASIC_SET_MANAGE = 'basic_set.manage'; // 基础设置
@@ -104,6 +105,9 @@ class Permission extends SpatiePermission
     public const MANAGE_CATEGORY_INDEX = 'manage.category.index'; // 商品分类
     public const MANAGE_CATEGORY_UPDATE = 'manage.category.update'; // 商品分类新增|编辑
     public const MANAGE_CATEGORY_DELETE = 'manage.category.delete'; // 商品分类删除
+    public const GOODS_DATA_MANAGE = 'goods_data.manage'; // 商品数据
+    public const MANAGE_GOODS_VIEWS = 'manage.goods_views.index'; // 商品浏览
+    public const MANAGE_GOODS_COLLECT = 'manage.goods_collect.index'; // 商品收藏
 
     // 二级 用户部分
     public const USER_MANAGE = 'user.manage'; // 会员管理
@@ -111,6 +115,9 @@ class Permission extends SpatiePermission
     public const MANAGE_USER_UPDATE = 'manage.user.update'; // 会员列表新增|编辑
     public const AUTHORIZED_USER_MANAGE = 'authorized_user.manage'; // 授权用户
     public const MANAGE_WECHAT_USER_INDEX = 'manage.wechat_user.index'; // 微信服务号
+    public const INTEGRAL_MANAGE = 'integral.manage'; // 积分管理
+    public const MANAGE_USER_INTEGRAL_INDEX = 'manage.user_integral.index'; // 用户积分
+    public const MANAGE_INTEGRAL_DETAIL_INDEX = 'manage.integral_detail.index'; // 积分明细
 
     // 二级 工具部分
     public const MANAGE_MATERIAL_CENTER = 'manage.material_center.index'; // 素材中心
@@ -142,6 +149,12 @@ class Permission extends SpatiePermission
     public const MANAGE_ARTICLE_UPDATE = 'manage.article.update'; // 文章列表新增|编辑
     public const MANAGE_ARTICLE_DELETE = 'manage.article.delete'; // 文章列表删除
 
+    // 二级 营销部分
+    public const DISCOUNT_MANAGE = 'discount.manage'; // 优惠管理
+    public const MANAGE_BONUS_INDEX = 'manage.bonus.index'; // 红包
+    public const MANAGE_USER_BONUS_INDEX = 'manage.user_bonus.index'; // 查看用户红包
+    public const MANAGE_COUPON_INDEX = 'manage.coupon.index'; // 优惠券
+    public const MANAGE_USER_COUPON_INDEX = 'manage.user_coupon.index'; // 查看用户优惠券
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $this->guardName();

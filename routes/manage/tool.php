@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Manage\Tools\MaterialFileController;
+use App\Http\Controllers\Manage\MaterialFileController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 

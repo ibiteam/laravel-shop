@@ -63,6 +63,10 @@ const props = defineProps({
     modelValue: {
         type: String,
         default: ''
+    },
+    placeholder: {
+        type: String,
+        default: '请输入商品详细信息'
     }
 })
 const uploadFileFormRef = ref(null);
@@ -139,7 +143,7 @@ const toolbarConfig = ref({
     }
 })
 const editorConfig = {
-    placeholder: '请输入商品详细信息',
+    placeholder: props.placeholder,
     pasteFilterStyle: false,    //  关闭粘贴样式的过滤
     pasteIgnoreImg: false,  //  忽略粘贴内容中的图片
     MENU_CONF: {
@@ -402,6 +406,12 @@ const handleCreated = (editor) => {
     editorRef.value = editor // 记录 editor 实例，重要！
     editorRef.value.setHtml(props.modelValue)
 }
+
+watch(() => props.modelValue, (newVal) => {
+    if (editorRef.value && newVal !== editorRef.value.getHtml() && newVal) {
+        editorRef.value.setHtml(newVal)
+    }
+})
 
 const handleChange = async (editor) => {
     const parent = await resetElementInlineStyle(editor)

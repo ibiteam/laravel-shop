@@ -49,7 +49,7 @@ class OrderResource extends JsonResource
             }),
             'order_amount' => price_number_format($this->resource->order_amount),
             'logistics' => $last_logistics,
-            'logistics_number' => $this->resource->orderDelivery->count(),
+            'logistics_number' => $this->resource->order_delivery_count,
             'evaluate' => $can_evaluate ? ['default_value' => 4, 'description' => '请对订单进行评价'] : null,
             'buttons' => $this->getButtons(
                 $order_constant_enum,

@@ -179,9 +179,9 @@ class OrderService
                 'order_sn' => $this->generateOrderSn(),
                 'user_id' => $current_user->id,
                 'type' => $this->getOrderTypeEnum(),
-                'order_status' => OrderStatusEnum::CONFIRMED,
-                'pay_status' => PayStatusEnum::PAY_WAIT,
-                'ship_status' => ShippingStatusEnum::UNSHIPPED,
+                'order_status' => OrderStatusEnum::CONFIRMED->value,
+                'pay_status' => PayStatusEnum::PAY_WAIT->value,
+                'ship_status' => ShippingStatusEnum::UNSHIPPED->value,
                 'province_id' => $user_address->province,
                 'city_id' => $user_address->city,
                 'district_id' => $user_address->district,
@@ -202,7 +202,7 @@ class OrderService
             ]);
 
             if ($order->order_amount == 0) {
-                $order->pay_status = PayStatusEnum::PAYED;
+                $order->pay_status = PayStatusEnum::PAYED->value;
                 $order->paid_at = now()->toDateTimeString();
                 $order->save();
             }
@@ -231,7 +231,7 @@ class OrderService
 
             return [
                 'order_sn' => $order->order_sn,
-                'can_pay' => $order->pay_status === PayStatusEnum::PAY_WAIT,
+                'can_pay' => $order->pay_status === PayStatusEnum::PAY_WAIT->value,
             ];
         } catch (BusinessException $business_exception) {
             DB::rollBack();

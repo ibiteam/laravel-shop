@@ -1,16 +1,16 @@
 <template>
     <!--新增编辑文章-->
     <div v-loading="detailFormLoading" class="s-flex jc-ct">
-        <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="100px">
-            <el-form-item label="文章标题" prop="title">
+        <el-form ref="submitFormRef" :model="submitForm" :rules="submitFormRules" label-width="120px">
+            <el-form-item label="标题" prop="title">
                 <el-input v-model="submitForm.title" />
             </el-form-item>
-            <el-form-item label="文章内容" prop="content">
-                <!--内容编辑器-->
-                <Editor v-model="submitForm.content" height="500px" min-height="500px" @change="handleChangeContent" />
+            <el-form-item label="内容" prop="content">
+                <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
+                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容" @change="handleChangeContent" v-else/>
             </el-form-item>
-            <el-form-item label="文章分类" prop="parent_id">
-                <el-cascader v-model="submitForm.parent_id" placeholder="顶级分类" style="width: 400px;"
+            <el-form-item label="分类" prop="article_category_id">
+                <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
                              filterable clearable :options="treeCategories"
                              :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
                 </el-cascader>
@@ -19,10 +19,28 @@
                 <el-input v-model="submitForm.keywords" />
             </el-form-item>
             <el-form-item label="摘要" prop="description">
-                <el-input type="textarea" resize="none" v-model="submitForm.description"></el-input>
+                <el-input type="textarea" rows="3" v-model="submitForm.description"></el-input>
             </el-form-item>
-            <el-form-item label="封面" prop="cover">
-                <el-input v-model="submitForm.cover" />
+            <el-form-item label="封面：" prop="cover">
+                <div v-if="submitForm.cover" class="logo-uploader-preview">
+                    <img :src="submitForm.cover" class="logo" alt="" />
+                    <el-icon class="logo-uploader-icon logo-uploader-icon-delete">
+                        <Delete @click="handleRemoveCover" />
+                    </el-icon>
+                </div>
+                <el-upload
+                    class="logo-uploader"
+                    accept="image/jpeg,image/jpg,image/png"
+                    action=""
+                    :show-file-list="false"
+                    :http-request="(request) => uploadFile(request)"
+                    :with-credentials="true"
+                    v-else>
+                    <el-icon class="logo-uploader-icon logo-uploader-icon-plus">
+                        <Plus />
+                    </el-icon>
+                </el-upload>
+                <span class="co-999 fs14" style="width: 100%"><small>建议尺寸220*150或者350*238</small></span>
             </el-form-item>
             <el-form-item label="是否置顶" prop="is_top">
                 <el-switch v-model="submitForm.is_top" :active-value="1" :inactive-value="0" />
@@ -62,6 +80,9 @@ import { articleInfo, articleStore, articleUpdateCover, articleDeleteCover } fro
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCommonStore } from '@/store';
+import { Delete, Plus } from '@element-plus/icons-vue';
+import { fileUpload } from '@/api/common.js';
+import { tabRemove } from '@/router/tabs.js';
 
 const commonStore = useCommonStore();
 const router = useRouter();
@@ -69,16 +90,16 @@ const route = useRoute();
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
-const detailFormLoading = ref(false);
+const detailFormLoading = ref(true);
 const isInitContent = ref(true);
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
 const treeCategories = ref([]);
-const submitForm = reactive({
+const submitForm = ref({
     id: 0,
-    content: '',
     article_category_id: 0,
     title: '',
+    content: '',
     cover: '',
     keywords: '',
     description: '',
@@ -108,7 +129,7 @@ const submitFormRules = reactive({
     ],
     title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
     article_category_id: [{ required: true, message: '请选择分类', trigger: 'blur' }],
-    cover: [{ required: true, message: '请输入封面', trigger: 'blur' }],
+    cover: [{ required: true, message: '请上传封面', trigger: 'blur' }],
     description: [{ required: true, message: '请输入描述', trigger: 'blur' }],
     keywords: [{ required: true, message: '请输入关键字', trigger: 'blur' }]
 });
@@ -120,16 +141,32 @@ const handleChangeContent = () => {
         isInitContent.value = false;
     }
 };
+const uploadFile = async (request) => {
+    try {
+        const res = await fileUpload({ file: request.file });
+        if (cns.$successCode(res.code)) {
+            submitForm.value.cover = res.data.url;
+        } else {
+            cns.$message.error(res.message);
+        }
+    } catch (error) {
+        console.error('Failed:', error);
+    }
+};
 
-/* 新增编辑 提交 */
+const handleRemoveCover = () => {
+    submitForm.value.cover = '';
+};
+
+/* 提交 */
 const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            articleStore(submitForm).then(res => {
+            articleStore(submitForm.value).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
-
+                    tabRemove(String(router.currentRoute.value.name),{name: 'manage.article.index'})
                 } else {
                     cns.$message.error(res.message);
                 }
@@ -149,10 +186,7 @@ const closeArticleForm = () => {
         type: 'warning',
         center: true
     }).then(() => {
-        // 关闭当前页？
-
-        // 打开文章列表页
-        router.push({ name: 'manage.article.index' });
+        tabRemove(String(router.currentRoute.value.name),{name: 'manage.article.index'})
     });
 };
 
@@ -161,9 +195,9 @@ const getArticleInfo = () => {
     articleInfo({ id: route.params.id }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
-            console.log(res.data);
             treeCategories.value = res.data.tree_categories;
-
+            submitForm.value = { ...res.data.article };
+            console.log(submitForm.value.content);
         } else {
             cns.$message.error(res.message);
             router.push({ name: 'manage.article.index' });
@@ -185,5 +219,55 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.logo-uploader .el-upload) {
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--el-transition-duration-fast);
+}
+
+:deep(.logo-uploader .logo-uploader-icon) {
+    font-size: 28px;
+    color: #8c939d;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+}
+
+:deep(.logo-uploader .logo-uploader-icon.logo-uploader-icon-plus) {
+    border: 1px dashed #dcdfe6;
+}
+
+:deep(.logo-uploader-preview) {
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    position: relative;
+}
+
+:deep(.logo-uploader-preview .logo) {
+    max-width: 80px;
+    max-height: 80px;
+    width: auto;
+    height: auto;
+}
+
+:deep(.logo-uploader-preview .logo-uploader-icon.logo-uploader-icon-delete) {
+    position: absolute;
+    display: none;
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+:deep(.logo-uploader-preview:hover) {
+    .logo-uploader-icon-delete {
+        display: flex;
+    }
+}
 
 </style>

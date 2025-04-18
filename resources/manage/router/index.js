@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/pages/auth/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
-import MaterialIndex from '@/pages/material/Index.vue';
+import MaterialIndex from '@/pages/tool/Material.vue';
 import Goods from '@/pages/goods/Index.vue';
 import GoodsUpdate from '@/pages/goods/Update.vue';
 import SetShopConfig from '@/pages/set/ShopConfig.vue';
@@ -30,6 +30,14 @@ import Evaluate from '@/pages/order/Evaluate.vue';
 import ArticleCategory from '@/pages/article/Category.vue';
 import Article from '@/pages/article/Index.vue';
 import ArticleUpdate from '@/pages/article/Update.vue';
+import GoodsViews from '@/pages/goods/Views.vue';
+import GoodsCollect from '@/pages/goods/Collect.vue';
+import UserIntegral from '@/pages/user/UserIntegral.vue';
+import IntegralDetail from '@/pages/user/IntegralDetail.vue';
+import Bonus from '@/pages/marketing/Bonus.vue';
+import UserBonus from '@/pages/marketing/UserBonus.vue';
+import Coupon from '@/pages/marketing/Coupon.vue';
+import UserCoupon from '@/pages/marketing/UserCoupon.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -57,6 +65,8 @@ const router = createRouter({
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},
                 { path: '/goods/update/:id', component: GoodsUpdate , name: 'manage.goods.update',meta:{title:'添加商品'} },
                 { path: '/goods/category', component: GoodsCateGoryIndex, name: 'manage.category.index',meta:{title:'商品分类'} },
+                { path: '/goods/views', component: GoodsViews , name: 'manage.goods_views.index',meta:{title:'商品浏览'}},
+                { path: '/goods/collect', component: GoodsCollect , name: 'manage.goods_collect.index',meta:{title:'商品浏览'}},
                 // 订单
                 { path: '/order/index', component: Order, name: 'manage.order.index',meta:{title:'订单列表'} },
                 { path: '/order/detail/:order_sn', component: OrderDetail, name: 'manage.order.detail',meta:{title:'订单详情'} },
@@ -69,12 +79,19 @@ const router = createRouter({
                 { path: '/user/index', component: UserIndex , name: 'manage.user.index',meta:{title:'用户'} },
                 { path: '/user/address', component: UserAddress , name: 'manage.user.address',meta:{title:'用户地址'} },
                 { path: '/user/wechat_user', component: WechatUser , name: 'manage.wechat_user.index',meta:{title:'微信服务号'} },
+                { path: '/user/integral', component: UserIntegral , name: 'manage.user_integral.index',meta:{title:'用户积分'} },
+                { path: '/user/integral_detail', component: IntegralDetail , name: 'manage.integral_detail.index',meta:{title:'积分明细'} },
                 // 文章
                 { path: '/article/category', component: ArticleCategory, name: 'manage.article_category.index',meta:{title:'文章分类'} },
                 { path: '/article/index', component: Article, name: 'manage.article.index',meta:{title:'文章列表'} },
                 { path: '/article/update/:id', component: ArticleUpdate , name: 'manage.article.form',meta:{title:'编辑文章'} },
                 // 工具
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
+                // 营销
+                { path: '/marketing/bonus', component: Bonus, name: 'manage.bonus.index',meta:{title:'红包'} },
+                { path: '/marketing/user_bonus', component: UserBonus, name: 'manage.user_bonus.index',meta:{title:'用户红包'} },
+                { path: '/marketing/coupon', component: Coupon, name: 'manage.coupon.index',meta:{title:'优惠券'} },
+                { path: '/marketing/user_coupon', component: UserCoupon, name: 'manage.user_coupon.index',meta:{title:'用户优惠券'} },
                 //正在刷新
                 { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
                 // 移动端装修
