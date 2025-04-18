@@ -118,5 +118,11 @@
         "name": "my",
         "label": "我的",
         "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "article",
+        "label": "文章",
+        "collapsed": true
     }
 ]

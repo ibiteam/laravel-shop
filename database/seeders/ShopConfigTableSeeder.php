@@ -46,7 +46,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::SHOP_COLOR, '#E48F34');
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::MANAGE_COLOR, '#1050A9');
         $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::MOUSE_MOVE_COLOR, '#FFFFFF');
-        $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::IS_GRAY, 0);
+        $this->addItem(ShopConfig::GROUP_SITE_INFO, ShopConfig::IS_GRAY, '0');
     }
 
     private function addSiteLogo(): void

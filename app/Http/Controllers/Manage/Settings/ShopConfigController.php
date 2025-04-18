@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Manage\Settings;
 
 use App\Enums\CacheNameEnum;
 use App\Http\Controllers\Manage\BaseController;
+use App\Http\Dao\ArticleDao;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminOperationLog;
 use App\Models\Article;
@@ -72,23 +73,11 @@ class ShopConfigController extends BaseController
     /**
      * 搜索文章.
      */
-    public function searchArticle(Request $request)
+    public function searchArticle(Request $request, ArticleDao $article_dao)
     {
         $keywords = $request->get('keywords', '');
 
-        $data = Article::query()->select(['id as value', 'title as label'])
-            ->whereIsLogin(0)->whereIsShow(1)
-            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
-                $query->where('id', $keywords)->orWhere('title', 'like', '%'.$keywords.'%');
-            }))
-            ->orderByDesc('sort')->limit(10)
-            ->get()->map(function ($item) {
-                $item->label = $item->label.'【'.$item->value.'】';
-
-                return $item;
-            })->toArray();
-
-        return $this->success($data);
+        return $this->success($article_dao->getArticleOptions($keywords));
     }
 
     // 针对分组 处理需要的数据
