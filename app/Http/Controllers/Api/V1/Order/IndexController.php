@@ -82,7 +82,7 @@ class IndexController extends BaseController
             $current_user = get_user();
             $order = Order::query()
                 ->withCount('orderDelivery')
-                ->with(['detail', 'province', 'city', 'district'])
+                ->with(['detail', 'detail.goods', 'province', 'city', 'district'])
                 ->whereOrderSn($validated['order_sn'])
                 ->whereUserId($current_user->id)
                 ->firstOrFail();
