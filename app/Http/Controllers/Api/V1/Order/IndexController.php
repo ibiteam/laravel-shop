@@ -266,7 +266,8 @@ class IndexController extends BaseController
                 ->first();
 
             if ($transaction instanceof Transaction) {
-                $old_refund_amount = $transaction->children()->sum('amount');
+                // 负数 or 0
+                $old_refund_amount = $transaction->children()->where('status', Transaction::STATUS_SUCCESS)->sum('amount');
 
                 $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
 

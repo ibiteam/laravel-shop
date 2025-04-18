@@ -60,6 +60,13 @@ class WechatPayController extends Controller
 
             if ($transaction instanceof Transaction) {
                 $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->toDateTimeString()]);
+                /* 用户手动取消订单，在支付回调减钱 */
+                if (str_starts_with($transaction->transaction_no, 'cancel_order_')) {
+                    $order = Order::query()->whereId($transaction->type_id)->first();
+                    if ($order instanceof Order) {
+                        $order->update(['money_paid' => 0]);
+                    }
+                }
             }
 
             return $wechat_pay_util->server()->serve();

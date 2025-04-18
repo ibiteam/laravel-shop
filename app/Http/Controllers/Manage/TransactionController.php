@@ -93,7 +93,7 @@ class TransactionController extends BaseController
                 throw new BusinessException('当前支付方式不支持退款');
             }
             // 负数 or 0
-            $old_refund_amount = $transaction->children()->sum('amount');
+            $old_refund_amount = $transaction->children()->where('status', Transaction::STATUS_SUCCESS)->sum('amount');
 
             $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
 

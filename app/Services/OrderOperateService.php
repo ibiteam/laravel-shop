@@ -36,6 +36,8 @@ class OrderOperateService
             // 回退积分
             if ($order->integral > 0) {
                 app(UserDao::class)->incrementIntegralByDoneOrder($user, $order->integral, '用户取消订单，回退积分');
+                $order->integral = 0;
+                $order->save();
             }
             // 申请售后判断
             app(ApplyRefundDao::class)->getProgressDataByOrder($order, $user)->map(function (ApplyRefund $apply_refund) {
