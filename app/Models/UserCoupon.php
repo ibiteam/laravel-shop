@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCoupon whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCoupon whereUsedTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserCoupon whereUserId($value)
+ * @property-read \App\Models\Order|null $order
+ * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
 class UserCoupon extends Model
@@ -35,5 +37,15 @@ class UserCoupon extends Model
     public function coupon()
     {
         return $this->belongsTo(Coupon::class, 'coupon_id', 'id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 }

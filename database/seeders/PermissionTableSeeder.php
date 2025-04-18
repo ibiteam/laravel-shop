@@ -174,6 +174,8 @@ class PermissionTableSeeder extends Seeder
 
         $this->addPermission('优惠管理', Permission::DISCOUNT_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_MARKETING);
         $this->addPermission('红包', Permission::MANAGE_BONUS_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
+        $this->addPermission('查看用户红包', Permission::MANAGE_USER_BONUS_INDEX, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
         $this->addPermission('优惠券', Permission::MANAGE_COUPON_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
+        $this->addPermission('查看用户优惠券', Permission::MANAGE_USER_COUPON_INDEX, 0, Permission::NOT_IS_LEFT_NAV, '', Permission::DISCOUNT_MANAGE);
     }
 }

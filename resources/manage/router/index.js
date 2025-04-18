@@ -35,7 +35,9 @@ import GoodsCollect from '@/pages/goods/Collect.vue';
 import UserIntegral from '@/pages/user/UserIntegral.vue';
 import IntegralDetail from '@/pages/user/IntegralDetail.vue';
 import Bonus from '@/pages/marketing/Bonus.vue';
+import UserBonus from '@/pages/marketing/UserBonus.vue';
 import Coupon from '@/pages/marketing/Coupon.vue';
+import UserCoupon from '@/pages/marketing/UserCoupon.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -87,7 +89,9 @@ const router = createRouter({
                 { path: '/material/index', component: MaterialIndex, name: 'manage.material_center.index',meta:{title:'素材中心'} },
                 // 营销
                 { path: '/marketing/bonus', component: Bonus, name: 'manage.bonus.index',meta:{title:'红包'} },
+                { path: '/marketing/user_bonus', component: UserBonus, name: 'manage.user_bonus.index',meta:{title:'用户红包'} },
                 { path: '/marketing/coupon', component: Coupon, name: 'manage.coupon.index',meta:{title:'优惠券'} },
+                { path: '/marketing/user_coupon', component: UserCoupon, name: 'manage.user_coupon.index',meta:{title:'用户优惠券'} },
                 //正在刷新
                 { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
                 // 移动端装修

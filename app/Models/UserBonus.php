@@ -26,6 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserBonus whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserBonus whereUsedTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UserBonus whereUserId($value)
+ * @property-read \App\Models\Order|null $order
+ * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
 class UserBonus extends Model
@@ -35,5 +37,15 @@ class UserBonus extends Model
     public function bonus()
     {
         return $this->belongsTo(Bonus::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

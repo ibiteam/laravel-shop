@@ -152,7 +152,9 @@ class Permission extends SpatiePermission
     // 二级 营销部分
     public const DISCOUNT_MANAGE = 'discount.manage'; // 优惠管理
     public const MANAGE_BONUS_INDEX = 'manage.bonus.index'; // 红包
+    public const MANAGE_USER_BONUS_INDEX = 'manage.user_bonus.index'; // 查看用户红包
     public const MANAGE_COUPON_INDEX = 'manage.coupon.index'; // 优惠券
+    public const MANAGE_USER_COUPON_INDEX = 'manage.user_coupon.index'; // 查看用户优惠券
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $this->guardName();
