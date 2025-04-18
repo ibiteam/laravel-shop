@@ -383,6 +383,7 @@ watch([() => props.component], (newValue) => {
                 padding: 10px;
                 box-sizing: border-box;
                 .goods-name {
+                    height: 36px;
                     margin-bottom: 8px;
                 }
             }
@@ -399,6 +400,7 @@ watch([() => props.component], (newValue) => {
                 padding: 5px 0;
                 box-sizing: border-box;
                 .goods-name {
+                    height: 36px;
                     margin-bottom: 4px;
                 }
             }

@@ -197,6 +197,7 @@ watch(() => props.default_data, (newValue) => {
                 padding: 10px;
                 box-sizing: border-box;
                 .goods-name {
+                    height: 36px;
                     margin-bottom: 8px;
                 }
             }
