@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class EvaluateController extends BaseController
+class OrderEvaluateController extends BaseController
 {
     /**
      * 评价列表.
