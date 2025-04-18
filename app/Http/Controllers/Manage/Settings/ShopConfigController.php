@@ -6,6 +6,7 @@ use App\Enums\CacheNameEnum;
 use App\Http\Controllers\Manage\BaseController;
 use App\Http\Dao\ShopConfigDao;
 use App\Models\AdminOperationLog;
+use App\Models\Article;
 use App\Models\ShopConfig;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -25,9 +26,13 @@ class ShopConfigController extends BaseController
                 'group_name' => '组名',
             ]);
 
-            $group_name = $validated['group_name'] ?? 'site_info';
+            $group_name = $validated['group_name'] ?? ShopConfig::GROUP_SITE_INFO;
 
-            return $this->success($shop_config_dao->getConfigByGroupName($group_name));
+            $configs = $shop_config_dao->getConfigByGroupName($group_name);
+
+            $group_data = $this->handleGroupData($configs, $group_name);
+
+            return $this->success(['configs' => $configs, 'group_data' => $group_data]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (\Throwable $throwable) {
@@ -59,8 +64,47 @@ class ShopConfigController extends BaseController
         // 重新更新缓存
         $shop_config_dao->getAll();
 
-        admin_operation_log( '更新了商店设置的【'.$tab_label.'】', AdminOperationLog::TYPE_UPDATE);
+        admin_operation_log('更新了商店设置的【'.$tab_label.'】', AdminOperationLog::TYPE_UPDATE);
 
         return $this->success('更新成功');
+    }
+
+    /**
+     * 搜索文章.
+     */
+    public function searchArticle(Request $request)
+    {
+        $keywords = $request->get('keywords', '');
+
+        $data = Article::query()->select(['id as value', 'title as label'])
+            ->whereIsLogin(0)->whereIsShow(1)
+            ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
+                $query->where('id', $keywords)->orWhere('title', 'like', '%'.$keywords.'%');
+            }))
+            ->orderByDesc('sort')->limit(10)
+            ->get()->map(function ($item) {
+                $item->label = $item->label.'【'.$item->value.'】';
+
+                return $item;
+            })->toArray();
+
+        return $this->success($data);
+    }
+
+    // 针对分组 处理需要的数据
+    private function handleGroupData($configs, $group_name)
+    {
+        $group_data = [];
+
+        if ($group_name == ShopConfig::GROUP_ARTICLES) {
+            // 文章设置
+            $articleList = Article::query()->whereIn('id', array_values($configs))->pluck('title', 'id')->toArray();
+
+            foreach ($configs as $key => $value) {
+                $group_data[$key] = [['value' => $value, 'label' => isset($articleList[$value]) ? $articleList[$value].'【'.$value.'】' : '']];
+            }
+        }
+
+        return $group_data;
     }
 }

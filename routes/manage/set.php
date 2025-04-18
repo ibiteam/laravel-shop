@@ -19,6 +19,7 @@ Route::prefix('set')->group(function () {
     Route::prefix('shop_config')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_INDEX])->group(function () {
             Route::get('/', [ShopConfigController::class, 'index'])->name(Permission::MANAGE_SHOP_CONFIG_INDEX);
+            Route::get('search_article', [ShopConfigController::class, 'searchArticle']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_UPDATE])->group(function () {
             Route::post('update', [ShopConfigController::class, 'update']);

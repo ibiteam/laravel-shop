@@ -20,6 +20,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addSearchSettings(); // 搜索设置
         $this->addGoodsSettings(); // 商品设置
         $this->addRefundAfterSales(); // 退款售后
+        $this->addArticleSettings(); // 文章设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -78,18 +79,18 @@ class ShopConfigTableSeeder extends Seeder
     {
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PUBLIC_KEY, '');
         $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::MANAGE_LOGIN_RSA_PRIVATE_KEY, '');
-        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::CURRENCY_FORMAT, '￥%s');
-        $this->addItem(ShopConfig::GROUP_MANAGE_SETTINGS, ShopConfig::PRICE_FORMAT, '2');
     }
 
     private function addGoodsSettings(): void
     {
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_SALES_VOLUME, '0');
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_AFTER_SALES, '1');
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::CURRENCY_FORMAT, '￥%s');
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::PRICE_FORMAT, '2');
     }
 
     private function addRefundAfterSales(): void
     {
-        $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::IS_SHOW_AFTER_SALES, '1');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_SHIPPED_TIME, '24');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_CONFIRM_TIME, '72');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::BUYER_CHANGE_TIME, '72');
@@ -97,5 +98,13 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::SELLER_RECEIVE_TIME, '10');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_TIMELINESS, '15');
         $this->addItem(ShopConfig::GROUP_REFUND_AFTER_SALES, ShopConfig::AFTER_SALES_MAX_MONEY, '1000');
+    }
+
+    private function addArticleSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::USER_AGREEMENT, '');
+        $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::USER_CANCEL_AGREEMENT, '');
+        $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::PRIVACY_POLICY, '');
+        $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::ABOUT_US, '');
     }
 }
