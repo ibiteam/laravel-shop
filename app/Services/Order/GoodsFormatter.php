@@ -2,6 +2,7 @@
 
 namespace App\Services\Order;
 
+use App\Enums\OrderStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\ProcessDataException;
 use App\Http\Dao\GoodsSpecValueDao;
@@ -87,7 +88,7 @@ class GoodsFormatter
         }
 
         if ($goods->can_quota === Goods::QUOTA) {
-            $order_ids = Order::query()->whereUserId($this->user->id)->pluck('id');
+            $order_ids = Order::query()->where('order_status', '!=', OrderStatusEnum::CANCELLED->value)->whereUserId($this->user->id)->pluck('id');
 
             if ($order_ids->isNotEmpty()) {
                 $sum = OrderDetail::query()->whereGoodsId($goods->id)->whereIn('order_id', $order_ids)->sum('goods_number');
