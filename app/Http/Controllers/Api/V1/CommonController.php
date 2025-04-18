@@ -24,8 +24,13 @@ class CommonController extends BaseController
             ShopConfig::SHOP_DESCRIPTION,
             ShopConfig::IS_GRAY,
             ShopConfig::SHOP_COLOR,
-            ShopConfig::SHOP_LOGO
+            ShopConfig::SHOP_LOGO,
+            ShopConfig::USER_AGREEMENT,
+            ShopConfig::USER_CANCEL_AGREEMENT,
+            ShopConfig::PRIVACY_POLICY,
+            ShopConfig::ABOUT_US,
         );
+
         $data['cart_count'] = 0;
 
         $current_user = get_user();
