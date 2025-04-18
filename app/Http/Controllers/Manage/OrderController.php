@@ -245,6 +245,11 @@ class OrderController extends BaseController
             if ($validated['ship_status'] == $order->ship_status) {
                 throw new BusinessException('发货状态未改变');
             }
+
+            // 检查该订单商品是否发货，已发货的情况下不允许修改
+            if ($validated['ship_status'] == ShippingStatusEnum::SHIPPED->value && OrderDelivery::query()->whereOrderId($order->id)->exists()) {
+                throw new BusinessException('已发货或者是部分发货的订单，请前往发货列表进行导入发货');
+            }
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
