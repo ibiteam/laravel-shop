@@ -83,7 +83,7 @@ use Laravel\Scout\Searchable;
  */
 class Goods extends BaseModel
 {
-    use DatetimeTrait, Searchable, SoftDeletes;
+    use Searchable, SoftDeletes;
     public const STATUS_ON_SALE = 1; // 上架
     public const STATUS_NOT_SALE = 0; // 下架
     public const QUOTA = 1; // 限购

@@ -65,7 +65,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Article extends BaseModel
 {
-    use DatetimeTrait, SoftDeletes;
+    use SoftDeletes;
 
     // 是否显示 1是 0否
     public const IS_SHOW_YES = 1;

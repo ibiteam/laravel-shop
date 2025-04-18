@@ -33,6 +33,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class ApplyRefundReason extends BaseModel
 {
-    use DatetimeTrait, SoftDeletes;
+    use SoftDeletes;
     protected $guarded = [];
 }

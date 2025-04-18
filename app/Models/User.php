@@ -59,7 +59,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  */
 class User extends Authenticatable
 {
-    use DatetimeTrait, HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable;
 
     // 修改过用户名
     public const IS_MODIFY_YES = 1;

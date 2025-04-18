@@ -49,7 +49,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class MaterialFile extends BaseModel
 {
-    use DatetimeTrait, softDeletes;
+    use softDeletes;
 
     protected $guarded = [];
 

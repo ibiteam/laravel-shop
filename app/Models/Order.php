@@ -109,7 +109,7 @@ use Illuminate\Support\Carbon;
  */
 class Order extends BaseModel
 {
-    use DatetimeTrait, SoftDeletes;
+    use SoftDeletes;
     public const PAYMENT_METHOD_ONLINE = 'online'; // 在线支付
 
     public static array $paymentMethodMap = [
