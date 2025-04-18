@@ -1,9 +1,8 @@
 <?php
 
-use App\Http\Controllers\Manage\Marketing\BonusController;
-use App\Http\Controllers\Manage\Marketing\CouponController;
-use App\Http\Controllers\Manage\Marketing\UserBonusController;
-use App\Http\Controllers\Manage\Marketing\UserCouponController;
+use App\Http\Controllers\Manage\BonusController;
+use App\Http\Controllers\Manage\UserBonusController;
+use App\Http\Controllers\Manage\UserCouponController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 

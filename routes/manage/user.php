@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Manage\User\UserAddressController;
-use App\Http\Controllers\Manage\User\UserController;
-use App\Http\Controllers\Manage\User\UserIntegralController;
-use App\Http\Controllers\Manage\User\WechatUserController;
+use App\Http\Controllers\Manage\UserAddressController;
+use App\Http\Controllers\Manage\UserController;
+use App\Http\Controllers\Manage\UserIntegralController;
+use App\Http\Controllers\Manage\WechatUserController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 

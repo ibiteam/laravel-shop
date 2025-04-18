@@ -1,16 +1,16 @@
 <?php
 
-use App\Http\Controllers\Manage\Settings\AdminOperationLogController;
-use App\Http\Controllers\Manage\Settings\AdminUserController;
-use App\Http\Controllers\Manage\Settings\AppDecorationController;
-use App\Http\Controllers\Manage\Settings\PaymentController;
-use App\Http\Controllers\Manage\Settings\PermissionController;
-use App\Http\Controllers\Manage\Settings\RoleController;
-use App\Http\Controllers\Manage\Settings\RouterCategoryController;
-use App\Http\Controllers\Manage\Settings\RouterController;
-use App\Http\Controllers\Manage\Settings\ShipCompanyController;
-use App\Http\Controllers\Manage\Settings\ShopConfigController;
-use App\Http\Controllers\Manage\Settings\TransactionController;
+use App\Http\Controllers\Manage\AdminOperationLogController;
+use App\Http\Controllers\Manage\AdminUserController;
+use App\Http\Controllers\Manage\AppDecorationController;
+use App\Http\Controllers\Manage\PaymentController;
+use App\Http\Controllers\Manage\PermissionController;
+use App\Http\Controllers\Manage\RoleController;
+use App\Http\Controllers\Manage\RouterCategoryController;
+use App\Http\Controllers\Manage\RouterController;
+use App\Http\Controllers\Manage\ShipCompanyController;
+use App\Http\Controllers\Manage\ShopConfigController;
+use App\Http\Controllers\Manage\TransactionController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 

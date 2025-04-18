@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Manage\Order\ApplyRefundController;
-use App\Http\Controllers\Manage\Order\ApplyRefundReasonController;
-use App\Http\Controllers\Manage\Order\OrderEvaluateController;
-use App\Http\Controllers\Manage\Order\OrderController;
-use App\Http\Controllers\Manage\Order\OrderDeliveryController;
+use App\Http\Controllers\Manage\ApplyRefundController;
+use App\Http\Controllers\Manage\ApplyRefundReasonController;
+use App\Http\Controllers\Manage\OrderController;
+use App\Http\Controllers\Manage\OrderDeliveryController;
+use App\Http\Controllers\Manage\OrderEvaluateController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
