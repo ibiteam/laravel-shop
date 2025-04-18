@@ -23,9 +23,10 @@ class AppServiceConfigController extends BaseController
             ->when($is_enable != '-1', fn (Builder $query) => $query->whereIsEnable($is_enable))
             ->orderByDesc('id')
             ->paginate((int) $request->get('number', 10));
+
         $list->getCollection()->transform(function (AppServiceConfig $app_service_config) {
             $app_service_config->error_name = $app_service_config->error_number == 0 ? '无限制' : $app_service_config->error_number;
-            $app_service_config->stop_name = $app_service_config->stop_name == 0 ? '无限制' : $app_service_config->stop_name;
+            $app_service_config->stop_name = $app_service_config->stop_number == 0 ? '无限制' : $app_service_config->stop_number;
 
             return $app_service_config;
         });

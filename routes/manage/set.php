@@ -3,6 +3,8 @@
 use App\Http\Controllers\Manage\AdminOperationLogController;
 use App\Http\Controllers\Manage\AdminUserController;
 use App\Http\Controllers\Manage\AppDecorationController;
+use App\Http\Controllers\Manage\AppServiceConfigController;
+use App\Http\Controllers\Manage\AppServiceLogController;
 use App\Http\Controllers\Manage\PaymentController;
 use App\Http\Controllers\Manage\PermissionController;
 use App\Http\Controllers\Manage\RoleController;
@@ -58,16 +60,17 @@ Route::prefix('set')->group(function () {
     // 外部服务
     Route::prefix('app_service')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_INDEX])->group(function () {
-            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_CONFIG_INDEX);
+            Route::get('/', [AppServiceConfigController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_CONFIG_INDEX);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_UPDATE])->group(function () {
-            Route::post('update', [RouterController::class, 'update']);
+            Route::post('update', [AppServiceConfigController::class, 'update']);
+            Route::post('toggle/status', [AppServiceConfigController::class, 'toggleStatus']);
         });
     });
     // 外部服务日志
-    Route::prefix('app_service')->group(function () {
+    Route::prefix('app_service_log')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
-            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
+            Route::get('/', [AppServiceLogController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
         });
     });
 
