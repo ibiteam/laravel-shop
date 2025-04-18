@@ -1,8 +1,11 @@
 <script setup>
 import { Search} from '@element-plus/icons-vue';
 import Page from '@/components/common/Pagination.vue'
-import { getUserBonus } from '@/api/bonus.js'
+import { getBonus } from '@/api/bonus.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -42,7 +45,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    getUserBonus(queryParams).then(res => {
+    getBonus(queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data.list;
@@ -62,6 +65,11 @@ const setPageInfo = (meta) => {
     pageInfo.per_page = Number(meta.per_page);
     pageInfo.current_page = meta.current_page;
 }
+
+// 查看
+const examine = (row) => {
+    router.push({ name: 'manage.user_bonus.index' , query: {bonus_id: row.id}})
+};
 
 onMounted( () => {
     getData()
@@ -140,6 +148,11 @@ const loading = ref(false);
             <el-table-column label="限领数量" prop="limit"></el-table-column>
             <el-table-column label="发放开始时间" prop="send_start_time"></el-table-column>
             <el-table-column label="使用开始时间" prop="use_start_time"></el-table-column>
+            <el-table-column label="操作">
+                <template #default="scope">
+                    <el-button type="primary" size="small" @click="examine(scope.row)">查看</el-button>
+                </template>
+            </el-table-column>
         </el-table>
         <!-- 添加分页组件 -->
         <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />

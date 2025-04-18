@@ -1,7 +1,7 @@
 <script setup>
 import { Search} from '@element-plus/icons-vue';
 import Page from '@/components/common/Pagination.vue'
-import { getUserCoupon } from '@/api/coupon.js'
+import { getCoupon } from '@/api/coupon.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -30,7 +30,7 @@ const handleSearch = () => {
 };
 // 查看
 const examine = (row) => {
-    router.push({ name: '' , query: {id: row.id}})
+    router.push({ name: 'manage.user_coupon.index' , query: {coupon_id: row.id}})
 };
 
 // 页码改变
@@ -49,7 +49,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    getUserCoupon(queryParams).then(res => {
+    getCoupon(queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data.list;

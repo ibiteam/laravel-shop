@@ -9,21 +9,28 @@
 ### 请求方式
 * POST
 
+### Headers 参数
+
+| 字段           | 是否必填 | 字段类型   | 说明                |
+|:-------------|:-----|:-------|:------------------|
+| phone-verify | Y    | string | 详细见 `操作类型枚举` 加密格式 |
+
 ### 请求参数
 
-|字段|是否必填|字段类型|说明|
-| :--- | :--- | :--- | :--- |
-|phone|Y|integer|手机号 详见 操作类型枚举|
-|action|Y|string|操作类型，详见 操作类型枚举|
+| 字段        | 是否必填 | 字段类型    | 说明               |
+|:----------|:-----|:--------|:-----------------|
+| phone     | Y    | integer | 手机号 详见 `操作类型枚举`  |
+| action    | Y    | string  | 操作类型，详见 `操作类型枚举` |
+| timestamp | Y    | string  | 当前时间戳            |
 
 #### 操作类型枚举
-| action枚举值       | 说明                   | 手机号是否必填 |
-|:----------------|:---------------------|:--------|
-| login           | 用于发送登录验证码            | Y       |
-| password-forget | 用于发送忘记密码验证码          | Y       |
-| password-edit   | 用于发送修改密码验证码          | N       |
-| phone-edit   | 用于发送修改手机号验证码         | Y       |
-| phone-verify   | 用于发送修改手机号之前的验证手机号验证码 | N       |
+| action枚举值       | 说明                   | 手机号是否必填 | 加密格式                        |
+|:----------------|:---------------------|:--------|:----------------------------|
+| login           | 用于发送登录验证码            | Y       | md5(phone+action+timestamp) |
+| password-forget | 用于发送忘记密码验证码          | Y       | md5(phone+action+timestamp) |
+| password-edit   | 用于发送修改密码验证码          | N       | md5(action+timestamp)       |
+| phone-edit      | 用于发送修改手机号验证码         | Y       | md5(phone+action+timestamp) |
+| phone-verify    | 用于发送修改手机号之前的验证手机号验证码 | N       | md5(action+timestamp)       |
 
 ### 返回示例
 

@@ -16,6 +16,12 @@ class SmsController extends BaseController
     public function handleAction(Request $request, SmsService $sms_service)
     {
         try {
+            $current_user = get_user();
+            $need_phone_actions = [
+                SmsService::ACTION_LOGIN,
+                SmsService::ACTION_FORGET_PASSWORD,
+                SmsService::ACTION_EDIT_PHONE,
+            ];
             $validated = $request->validate([
                 'action' => [
                     'required',
@@ -29,18 +35,24 @@ class SmsController extends BaseController
                     ]),
                 ],
                 'phone' => [
-                    'required_if:action,'.implode(',', [
-                        SmsService::ACTION_LOGIN,
-                        SmsService::ACTION_FORGET_PASSWORD,
-                        SmsService::ACTION_EDIT_PHONE,
-                    ]), 'integer', new PhoneRule,
+                    'required_if:action,'.implode(',', $need_phone_actions), 'integer', new PhoneRule,
                 ],
             ], [], [
                 'action' => '操作类型',
                 'phone' => '手机号',
             ]);
 
-            $sms_service->sendOtp($validated['action'], $validated['phone'] ?? 0, get_user());
+            if (in_array($validated['action'], $need_phone_actions)) {
+                if ($request->header('phone-verify') != md5($validated['phone'].$validated['action'].$request->get('timestamp'))) {
+                    throw new BusinessException('发送失败');
+                }
+            } else {
+                if ($request->header('phone-verify') != md5($validated['action'].$request->get('timestamp'))) {
+                    throw new BusinessException('发送失败');
+                }
+            }
+
+            $sms_service->sendOtp($validated['action'], $validated['phone'] ?? 0, $current_user);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
@@ -51,7 +63,6 @@ class SmsController extends BaseController
 
         return $this->success('短信发送成功');
     }
-
 
     // 验证手机号验证码
     public function checkActionCode(Request $request, SmsService $sms_service)
@@ -82,12 +93,14 @@ class SmsController extends BaseController
                 'phone' => '手机号',
                 'code' => '验证码',
             ]);
-            if (in_array($validated['action'], [SmsService::ACTION_LOGIN, SmsService::ACTION_FORGET_PASSWORD, SmsService::ACTION_EDIT_PHONE ])) {
+
+            if (in_array($validated['action'], [SmsService::ACTION_LOGIN, SmsService::ACTION_FORGET_PASSWORD, SmsService::ACTION_EDIT_PHONE])) {
                 $phone = $validated['phone'] ?? 0;
             } else {
                 $phone = get_user()?->phone ?: 0;
             }
-            if (!$phone) {
+
+            if (! $phone) {
                 throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
             }
 
@@ -96,7 +109,6 @@ class SmsController extends BaseController
             }
 
             return $this->success('验证成功');
-
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {
