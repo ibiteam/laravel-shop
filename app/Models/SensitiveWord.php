@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
 
 /**
  *
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SensitiveWord whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class SensitiveWord extends Model
+class SensitiveWord extends BaseModel
 {
     protected $guarded = [];
 }

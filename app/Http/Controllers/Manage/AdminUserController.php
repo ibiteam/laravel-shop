@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -16,20 +18,18 @@ use Illuminate\Validation\ValidationException;
 class AdminUserController extends BaseController
 {
     // 列表
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $user_name = $request->get('user_name');
         $role_id = $request->get('role_id', '');
         $status = $request->get('status', '1');
-        $number = (int) $request->get('number', 10);
-
         $data = AdminUser::with(['modelHasRole.role', 'loginLog'])->orderByDesc('id')
             ->when($user_name, fn ($query) => $query->where('user_name', 'like', '%'.$user_name.'%'))
             ->when($status > -1, fn ($query) => $query->where('status', '=', $status))
             ->when($role_id, fn ($query) => $query->whereHas('modelHasRole', function ($query) use ($role_id) {
                 $query->where('role_id', $role_id);
             }))
-            ->paginate($number);
+            ->paginate($request->per_page);
         $data->getCollection()->transform(function (AdminUser $admin_user) {
             $role_names = $admin_user->modelHasRole->filter(function ($modelHasRole) {
                 return $modelHasRole->role && $modelHasRole->role->is_show === Role::SHOW;
@@ -56,7 +56,7 @@ class AdminUserController extends BaseController
             ];
         });
 
-        return $this->success(new CommonResourceCollection($data));
+        return $this->success($data);
     }
 
     /**
@@ -192,40 +192,31 @@ class AdminUserController extends BaseController
     }
 
     /**
-     * 切换状态.
+     * 修改字段.
      */
-    public function changeStatus(Request $request)
+    public function changeField(Request $request): JsonResponse
     {
-        try {
-            $validated = $request->validate([
-                'id' => 'required|integer',
-                'status' => 'required|integer|in:0,1',
-            ], [], [
-                'id' => '管理员ID',
-                'status' => '状态',
-            ]);
+        $validated = $request->validate([
+            'id' => 'required|integer',
+            'name' => 'required|string',
+            'field' => 'required|string|in:status',
+        ], [], [
+            'id' => 'ID',
+            'name' => '名称',
+            'field' => '字段',
+        ]);
+        $admin_user = AdminUser::findOrFail($validated['id']);
+        $field = (string) $validated['field'];
+        $value = ! $admin_user->$field;
+        $status = $value ? '启用' : '禁用';
+        $message = '修改了管理员id='.$admin_user->id.'的'.$validated['name'].'['.$field.']变更为'.$status;
+        $admin_user->$field = $value;
 
-            $admin_user = AdminUser::query()->whereId($validated['id'])->first();
-
-            if (! $admin_user) {
-                throw new BusinessException('管理员不存在');
-            }
-            $admin_user->status = $validated['status'];
-
-            if (! $admin_user->save()) {
-                throw new BusinessException('切换失败');
-            }
-
-            $log = "更改管理员状态[id:{$validated['id']}]".implode(',', array_map(function ($k, $v) {
-                return sprintf('%s=`%s`', $k, $v);
-            }, array_keys($admin_user->getChanges()), $admin_user->getChanges()));
-            admin_operation_log($log, AdminOperationLog::TYPE_UPDATE);
-
-            return $this->success('切换成功');
-        } catch (BusinessException $business_exception) {
-            return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
-        } catch (\Throwable $throwable) {
-            return $this->error('切换状态异常~');
+        if (! $admin_user->save()) {
+            return $this->error('修改失败');
         }
+        admin_operation_log($message);
+
+        return $this->success('修改成功');
     }
 }

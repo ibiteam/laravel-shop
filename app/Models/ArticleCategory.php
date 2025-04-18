@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -44,9 +44,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-class ArticleCategory extends Model
+class ArticleCategory extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 是否显示
     public const IS_SHOW_YES = 1; // 显示

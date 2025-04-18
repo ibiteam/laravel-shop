@@ -4,7 +4,7 @@ namespace App\Models;
 
 //use App\Utils\Route;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+
 
 /**
  *
@@ -48,7 +48,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppWebsiteDecoration whereVersion($value)
  * @mixin \Eloquent
  */
-class AppWebsiteDecoration extends Model
+class AppWebsiteDecoration extends BaseModel
 {
     use HasFactory;
 

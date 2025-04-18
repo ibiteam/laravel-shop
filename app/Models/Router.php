@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\RouterEnum;
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -36,9 +36,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class Router extends Model
+class Router extends BaseModel
 {
-    use DatetimeTrait;
+
 
     public const IS_SHOW_YES = 1; // 显示
     public const IS_SHOW_NO = 0; // 不显示

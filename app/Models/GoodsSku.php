@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  * @property int                             $id
@@ -33,9 +33,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
-class GoodsSku extends Model
+class GoodsSku extends BaseModel
 {
-    use DatetimeTrait;
+
     public const SHOW = 1; // 展示
     public const NOT_SHOW = 0; // 不展示
 

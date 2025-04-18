@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+
 
 /**
  *
@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Region extends Model
+class Region extends BaseModel
 {
     public const ENABLE = 1; // 启用
 

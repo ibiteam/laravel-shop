@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  * @property int                             $id
@@ -23,9 +23,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
-class GoodsImage extends Model
+class GoodsImage extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $guarded = [];
 }

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  * @property int                             $id
@@ -35,9 +35,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
-class PhoneMsg extends Model
+class PhoneMsg extends BaseModel
 {
-    use DatetimeTrait;
+
 
     public const CODE_TIME = 5; // 验证码有效时间 5分钟
     public const STATUS_NOT_USED = 0; // 未使用

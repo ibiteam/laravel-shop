@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $service_id 服务id
@@ -29,9 +29,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppServiceLog whereUserId($value)
  * @mixin \Eloquent
  */
-class AppServiceLog extends Model
+class AppServiceLog extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $fillable = ['user_id', 'request_param', 'result_data', 'service_id'];
 

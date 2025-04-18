@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+
 
 /**
  *
@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppWebsiteDecorationItem whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class AppWebsiteDecorationItem extends Model
+class AppWebsiteDecorationItem extends BaseModel
 {
     use HasFactory;
     /* 组件中的常量 */

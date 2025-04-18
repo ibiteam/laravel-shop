@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\ApplyRefundStatusEnum;
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -60,9 +60,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  *
  * @mixin \Eloquent
  */
-class ApplyRefund extends Model
+class ApplyRefund extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 类型 0退款；1退货退款
     public const TYPE_REFUND_MONEY = 0;

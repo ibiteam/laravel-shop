@@ -79,7 +79,7 @@ Route::prefix('set')->group(function () {
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
             Route::post('store', [AdminUserController::class, 'store']);
-            Route::post('change_status', [AdminUserController::class, 'changeStatus']);
+            Route::post('change/field', [AdminUserController::class, 'changeField']);
         });
     });
 

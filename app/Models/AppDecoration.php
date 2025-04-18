@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Enums\RouterEnum;
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  *
@@ -48,9 +48,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read int|null $item_draft_count
  * @mixin \Eloquent
  */
-class AppDecoration extends Model
+class AppDecoration extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $guarded = [];
 

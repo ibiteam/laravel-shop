@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Support\Carbon;
 
 /**
@@ -39,9 +39,9 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class OrderEvaluateCount extends Model
+class OrderEvaluateCount extends BaseModel
 {
-    use DatetimeTrait;
+
     public const TOTAL = 'total';
     public const HAS_IMAGE_TOTAL = 'has_image_total';
     public const RANK_TOTAL = 'rank_total';

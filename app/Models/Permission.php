@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 use Spatie\Permission\PermissionRegistrar;
@@ -47,7 +47,7 @@ use Spatie\Permission\PermissionRegistrar;
  */
 class Permission extends SpatiePermission
 {
-    use DatetimeTrait;
+
 
     // 是否在左侧菜单栏
     public const NOT_IS_LEFT_NAV = 0;

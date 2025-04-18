@@ -5,10 +5,10 @@ namespace App\Models;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -107,7 +107,7 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class Order extends Model
+class Order extends BaseModel
 {
     use DatetimeTrait, SoftDeletes;
     public const PAYMENT_METHOD_ONLINE = 'online'; // 在线支付

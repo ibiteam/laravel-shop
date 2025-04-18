@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -35,7 +35,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
-class GoodsView extends Model
+class GoodsView extends BaseModel
 {
     use DatetimeTrait,SoftDeletes;
 

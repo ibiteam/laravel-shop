@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  *
@@ -45,9 +45,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Coupon whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Coupon extends Model
+class Coupon extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 限制商品
     public const TYPE_GOODS = 1;

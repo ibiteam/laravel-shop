@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -32,9 +32,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class ApplyRefundLog extends Model
+class ApplyRefundLog extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 类型 0:买方，1:卖方
     public const TYPE_BUYER = 0;

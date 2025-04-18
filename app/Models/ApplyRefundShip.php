@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -34,9 +34,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class ApplyRefundShip extends Model
+class ApplyRefundShip extends BaseModel
 {
-    use DatetimeTrait;
+
     protected $guarded = [];
 
     public function applyRefund(): BelongsTo

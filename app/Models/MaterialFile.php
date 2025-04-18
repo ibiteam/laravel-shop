@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -47,7 +47,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MaterialFile withoutTrashed()
  * @mixin \Eloquent
  */
-class MaterialFile extends Model
+class MaterialFile extends BaseModel
 {
     use DatetimeTrait, softDeletes;
 

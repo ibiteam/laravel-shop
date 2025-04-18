@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -34,9 +34,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class UserLog extends Model
+class UserLog extends BaseModel
 {
-    use DatetimeTrait;
+
     public const TYPE_LOGIN = 'login'; // 类型：登录
     public const TYPE_OPERATE = 'operate'; // 类型：操作
     public const STATUS_SUCCESS = 1; // 成功

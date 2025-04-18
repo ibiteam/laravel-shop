@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Support\Carbon;
 
 /**
@@ -37,9 +37,9 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class AppServiceConfig extends Model
+class AppServiceConfig extends BaseModel
 {
-    use DatetimeTrait;
+
     public const IS_ENABLE = 1; // 启用
     public const NO_ENABLE = 0; // 不启用
 

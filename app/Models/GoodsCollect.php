@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -28,9 +28,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class GoodsCollect extends Model
+class GoodsCollect extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 关注状态
     public const ATTENTION_YES = 1; // 关注

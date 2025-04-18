@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -32,9 +32,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-class AdminOperationLog extends Model
+class AdminOperationLog extends BaseModel
 {
-    use DatetimeTrait;
+
     public const TYPE_STORE = 1; // 新增
     public const TYPE_UPDATE = 2; // 更新
     public const TYPE_DESTROY = 3; // 删除

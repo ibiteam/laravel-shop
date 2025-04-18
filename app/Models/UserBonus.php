@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  *
@@ -30,9 +30,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
-class UserBonus extends Model
+class UserBonus extends BaseModel
 {
-    use DatetimeTrait;
+
 
     public function bonus()
     {

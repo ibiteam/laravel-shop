@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -81,7 +81,7 @@ use Laravel\Scout\Searchable;
  *
  * @mixin \Eloquent
  */
-class Goods extends Model
+class Goods extends BaseModel
 {
     use DatetimeTrait, Searchable, SoftDeletes;
     public const STATUS_ON_SALE = 1; // 上架

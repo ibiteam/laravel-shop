@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  *
@@ -34,9 +34,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\AppWebsiteDecoration $app_website_decoration
  * @mixin \Eloquent
  */
-class AppDecorationItem extends Model
+class AppDecorationItem extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $guarded = [];
 

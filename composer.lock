@@ -9573,12 +9573,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/foryoufeng/laravel-generator.git",
-                "reference": "b7c760ca509036e86e2004d4b2a8a3c1674bd3a2"
+                "reference": "9dd91242c7544ac3b68868863a715e00054daf8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/foryoufeng/laravel-generator/zipball/b7c760ca509036e86e2004d4b2a8a3c1674bd3a2",
-                "reference": "b7c760ca509036e86e2004d4b2a8a3c1674bd3a2",
+                "url": "https://api.github.com/repos/foryoufeng/laravel-generator/zipball/9dd91242c7544ac3b68868863a715e00054daf8d",
+                "reference": "9dd91242c7544ac3b68868863a715e00054daf8d",
                 "shasum": ""
             },
             "require": {
@@ -9624,7 +9624,7 @@
                 "issues": "https://github.com/foryoufeng/laravel-generator/issues",
                 "source": "https://github.com/foryoufeng/laravel-generator/tree/v3.0"
             },
-            "time": "2025-04-17T13:19:46+00:00"
+            "time": "2025-04-18T10:54:11+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",

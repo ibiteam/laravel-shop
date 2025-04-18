@@ -36,16 +36,16 @@
                     <el-switch
                         v-model="scope.row.status"
                         :active-value="1" :inactive-value="0"
-                        @click="changeStatus(scope.row)">
+                        @click="handleFieldChange(scope)">
                     </el-switch>
                 </template>
             </el-table-column>
             <el-table-column label="最新登录时间" prop="latest_login_time"></el-table-column>
             <el-table-column label="创建时间" prop="created_at"></el-table-column>
             <el-table-column label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
-                    <el-button link type="primary" size="large" @click="openAdminOperationLog(scope.row.user_name)">操作日志
+                <template #default="{row}">
+                    <el-button link type="primary" size="large" @click="openStoreDialog(row)">编辑</el-button>
+                    <el-button link type="primary" size="large" @click="openAdminOperationLog(row.user_name)">操作日志
                     </el-button>
                 </template>
             </el-table-column>
@@ -97,7 +97,12 @@
         </el-dialog>
 </template>
 <script setup lang="ts">
-import { adminUserIndex, adminUserStore, adminUserChangeStatus, adminUserRoles } from '@/api/set.js';
+import {
+    adminUserIndex,
+    adminUserStore,
+    adminUserChangeStatus,
+    adminUserRoles
+} from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import PageTable from '@/components/common/PageTable.vue'
@@ -276,18 +281,15 @@ const onSubmit = () => {
     });
 };
 
-const changeStatus = (row) => {
-    adminUserChangeStatus({
-        id: row.id,
-        status: row.status
-    }).then(res => {
+const handleFieldChange = (scope:any) => {
+    adminUserChangeStatus({ id: scope.row.id, field: scope.column.property,name:scope.column.label }).then((res:any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
         }
     });
-};
+}
 
 // 跳转操作日志
 const openAdminOperationLog = (admin_user_name) => {

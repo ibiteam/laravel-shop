@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * @mixin \Eloquent
  */
-class ApplyRefundReason extends Model
+class ApplyRefundReason extends BaseModel
 {
     use DatetimeTrait, SoftDeletes;
     protected $guarded = [];

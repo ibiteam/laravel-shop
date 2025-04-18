@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -31,9 +31,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class AdminUserLoginLog extends Model
+class AdminUserLoginLog extends BaseModel
 {
-    use DatetimeTrait;
+
     public const STATUS_SUCCESS = 1; // 登录成功
     public const STATUS_FAILED = 0; // 登录失败
 

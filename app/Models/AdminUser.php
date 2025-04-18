@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Collection;
@@ -64,7 +64,7 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class AdminUser extends Authenticatable
 {
-    use DatetimeTrait;
+
     use HasApiTokens;
     use HasRoles;
     public const STATUS_ENABLE = 1; // 启用
@@ -78,6 +78,10 @@ class AdminUser extends Authenticatable
         return $this->hasMany(ModelHasRole::class, 'model_id', 'id');
     }
 
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
     public function orderLog(): MorphMany
     {
         return $this->morphMany(OrderLog::class, 'operateType', 'operate_type', 'operate_type_id');

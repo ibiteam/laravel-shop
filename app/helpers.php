@@ -3,6 +3,7 @@
 use App\Enums\RefererEnum;
 use App\Http\Dao\AdminOperationLogDao;
 use App\Http\Dao\ShopConfigDao;
+use App\Models\AdminOperationLog;
 use App\Models\AdminUser;
 use App\Models\SensitiveWord;
 use App\Models\ShopConfig;
@@ -188,7 +189,7 @@ if (! function_exists('admin_operation_log')) {
     /**
      * 记录后台管理员操作日志.
      */
-    function admin_operation_log(string $description, int $type = 0): void
+    function admin_operation_log(string $description, int $type = AdminOperationLog::TYPE_UPDATE): void
     {
         $admin_user_id = get_admin_user()->id ?? 0;
         app(AdminOperationLogDao::class)->addOperationLogByAdminUser($admin_user_id, $description, $type);

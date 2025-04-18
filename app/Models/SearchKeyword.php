@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  * @property int                             $id
@@ -25,9 +25,9 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @mixin \Eloquent
  */
-class SearchKeyword extends Model
+class SearchKeyword extends BaseModel
 {
-    use DatetimeTrait;
+
     public const CAN_SEARCH_YES = 1;    // 搜索可查询
     public const CAN_SEARCH_NO = 0;     // 搜索不可查询
 

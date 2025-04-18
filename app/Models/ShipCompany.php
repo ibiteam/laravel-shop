@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Support\Carbon;
 
 /**
@@ -27,9 +27,9 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class ShipCompany extends Model
+class ShipCompany extends BaseModel
 {
-    use DatetimeTrait;
+
 
     public const STATUS_ENABLE = 1;
     public const STATUS_DISABLE = 0;

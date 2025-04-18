@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Support\Carbon;
 
 /**
@@ -30,9 +30,9 @@ use Illuminate\Support\Carbon;
  * @property-read \App\Models\User|null $user
  * @mixin \Eloquent
  */
-class UserIntegral extends Model
+class UserIntegral extends BaseModel
 {
-    use DatetimeTrait;
+
     public const TYPE_INCREMENT = 1; // 增加
     public const TYPE_DECREMENT = 2; // 减少
 

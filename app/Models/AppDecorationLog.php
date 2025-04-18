@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $app_decoration_id 装修页面ID
@@ -26,9 +26,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\AdminUser $admin_user
  * @mixin \Eloquent
  */
-class AppDecorationLog extends Model
+class AppDecorationLog extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $guarded = [];
 

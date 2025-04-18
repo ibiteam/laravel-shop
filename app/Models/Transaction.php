@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -55,9 +55,9 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class Transaction extends Model
+class Transaction extends BaseModel
 {
-    use DatetimeTrait;
+
     public const TRANSACTION_TYPE_PAY = 'pay'; // 支付
     public const TRANSACTION_TYPE_REFUND = 'refund'; // 退款
     public const STATUS_WAIT = 0; // 待处理

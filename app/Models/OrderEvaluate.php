@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use App\Observers\OrderEvaluateObserver;
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
@@ -58,9 +58,9 @@ use Illuminate\Support\Carbon;
  * @mixin \Eloquent
  */
 #[ObservedBy(OrderEvaluateObserver::class)]
-class OrderEvaluate extends Model
+class OrderEvaluate extends BaseModel
 {
-    use DatetimeTrait;
+
     public const STATUS_SUCCESS = 1; // 通过
     public const STATUS_REJECT = 2; // 驳回
     public const STATUS_WAIT = 0; // 待处理

@@ -3,7 +3,9 @@
 namespace App\Traits;
 
 use App\Enums\ConstantEnum;
+use App\Http\Resources\CommonResourceCollection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ApiResponse
 {
@@ -16,7 +18,9 @@ trait ApiResponse
             $message = $data;
             $data = null;
         }
-
+        if ($data instanceof LengthAwarePaginator) {
+            $data = new CommonResourceCollection($data);
+        }
         return response()->json([
             'code' => $response_enum->value,
             'message' => $message,

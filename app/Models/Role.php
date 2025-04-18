@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Models\Role as SpatieRole;
@@ -44,7 +44,7 @@ use Spatie\Permission\PermissionRegistrar;
  */
 class Role extends SpatieRole
 {
-    use DatetimeTrait;
+
     public const SHOW = 1; // 展示
     public const NOT_SHOW = 0; // 不展示
 

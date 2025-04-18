@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
+
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
@@ -29,9 +29,9 @@ use Illuminate\Support\Carbon;
  *
  * @mixin \Eloquent
  */
-class OrderDeliveryItem extends Model
+class OrderDeliveryItem extends BaseModel
 {
-    use DatetimeTrait;
+
 
     protected $guarded = [];
 

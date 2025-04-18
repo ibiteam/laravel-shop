@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\DatetimeTrait;
-use Illuminate\Database\Eloquent\Model;
+
+
 
 /**
  *
@@ -45,9 +45,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereUseStartTime($value)
  * @mixin \Eloquent
  */
-class Bonus extends Model
+class Bonus extends BaseModel
 {
-    use DatetimeTrait;
+
 
     // 限制商品
     public const TYPE_GOODS = 1;

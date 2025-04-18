@@ -56,7 +56,7 @@ export function adminUserStore(data) {
     return $http.doPost('manage/set/admin_user/store', data)
 }
 export function adminUserChangeStatus(data) {
-    return $http.doPost('manage/set/admin_user/change_status', data)
+    return $http.doPost('manage/set/admin_user/change/field', data)
 }
 
 // 权限菜单
