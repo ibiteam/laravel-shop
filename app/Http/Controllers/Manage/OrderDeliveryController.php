@@ -241,13 +241,16 @@ class OrderDeliveryController extends BaseController
                     ]);
 
                     $order_delivery->items()->createMany($order_delivery_items);
-                    // 计算全部已发货数量
                     $order_ship_status = ShippingStatusEnum::SHIPPED;
+
                     foreach ($order->detail as $order_detail) {
+                        // 计算全部已发货数量
                         $tmp_total_send_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
+
                         // 订单商品的总发货量如果小于订单商品的数量直接终止循环
                         if ($tmp_total_send_number < $order_detail->goods_number) {
                             $order_ship_status = ShippingStatusEnum::PART;
+
                             break;
                         }
                     }
@@ -303,20 +306,16 @@ class OrderDeliveryController extends BaseController
             // 需要修改订单发货状态 判断是未发货还是部分发货
             $order_ship_status = ShippingStatusEnum::UNSHIPPED;
             $order_shipped_at = null;
-            $order_deliveries = OrderDelivery::query()->whereOrderId($order_delivery->order_id)->where('id', '!=', $order_delivery->id)->orderByDesc('shipped_at')->get();
-            // todo 重新计算订单发货状态 该订单发货状态不正确
 
-            foreach ($order_deliveries as $key => $order_delivery_datum) {
-                if ($key === 0) {
-                    $order_shipped_at = $order_delivery_datum->shipped_at;
-                }
+            /**
+             * 删除后只能是未发货以及部分发货
+             * 根据要删除的发货单获取该订单的所有发货单记录，判断是否存在其他发货单，存在其他发货单的情况下则设置为部分发货，否则设置为未发货.
+             */
+            $other_order_delivery = OrderDelivery::query()->whereOrderId($order_delivery->order_id)->where('id', '!=', $order_delivery->id)->orderByDesc('shipped_at')->first();
 
-                if ($order_delivery_datum->status === OrderDelivery::STATUS_WAIT) {
-                    $order_ship_status = ShippingStatusEnum::PART;
-
-                    break;
-                }
-                $order_ship_status = ShippingStatusEnum::SHIPPED;
+            if ($other_order_delivery instanceof OrderDelivery) {
+                $order_ship_status = ShippingStatusEnum::PART;
+                $order_shipped_at = $other_order_delivery->shipped_at;
             }
 
             $order = $order_delivery->order;
