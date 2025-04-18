@@ -13,6 +13,7 @@ use App\Http\Dao\ShipCompanyDao;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
+use App\Models\OrderDeliveryItem;
 use App\Models\OrderDetail;
 use App\Models\OrderLog;
 use App\Models\ShipCompany;
@@ -152,7 +153,6 @@ class OrderDeliveryController extends BaseController
 
                         continue;
                     }
-                    $order_ship_status = ShippingStatusEnum::SHIPPED;
 
                     if ($import_datum['goods_name']) {
                         /**
@@ -168,12 +168,11 @@ class OrderDeliveryController extends BaseController
                         }
 
                         if ($import_datum['send_number'] > 0) {
-                            // 部分发货
-                            if ($import_datum['send_number'] < $order_detail->goods_number) {
-                                $order_ship_status = ShippingStatusEnum::PART;
-                            }
+                            // 已发货数量
+                            $already_shipped_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
 
-                            if ($import_datum['send_number'] > $order_detail->goods_number) {
+                            // 判断已发货数量+当前发货数量是否大于订单商品数量
+                            if ($already_shipped_number + $import_datum['send_number'] > $order_detail->goods_number) {
                                 $error_data[] = ['line' => $import_datum['line'], 'message' => '商品名称'.$import_datum['goods_name'].' 发货数量超过订单商品数量'];
 
                                 continue;
@@ -206,12 +205,10 @@ class OrderDeliveryController extends BaseController
                                 continue;
                             }
 
-                            // 部分发货
-                            if ($import_datum['send_number'] < $order_detail->goods_number) {
-                                $order_ship_status = ShippingStatusEnum::PART;
-                            }
+                            // 已发货数量
+                            $already_shipped_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
 
-                            if ($import_datum['send_number'] > $order_detail->goods_number) {
+                            if ($already_shipped_number + $import_datum['send_number'] > $order_detail->goods_number) {
                                 $error_data[] = ['line' => $import_datum['line'], 'message' => '发货数量超过订单商品数量'];
 
                                 continue;
@@ -245,6 +242,16 @@ class OrderDeliveryController extends BaseController
                     ]);
 
                     $order_delivery->items()->createMany($order_delivery_items);
+                    // 计算全部已发货数量
+                    $order_ship_status = ShippingStatusEnum::SHIPPED;
+                    foreach ($order->detail as $order_detail) {
+                        $tmp_total_send_number = OrderDeliveryItem::query()->whereOrderDetailId($order_detail->id)->sum('send_number');
+                        // 订单商品的总发货量如果小于订单商品的数量直接终止循环
+                        if ($tmp_total_send_number < $order_detail->goods_number) {
+                            $order_ship_status = ShippingStatusEnum::PART;
+                            break;
+                        }
+                    }
                     $order->update(['ship_status' => $order_ship_status->value, 'shipped_at' => $import_datum['shipped_at']]);
                     $order_log_dao->storeByAdminUser($current_user, $order, '添加发货', OrderLog::TYPE_ADMIN_USER);
                     $success_data[] = $order_delivery->id;
