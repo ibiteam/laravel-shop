@@ -38,6 +38,8 @@ import Bonus from '@/pages/marketing/Bonus.vue';
 import UserBonus from '@/pages/marketing/UserBonus.vue';
 import Coupon from '@/pages/marketing/Coupon.vue';
 import UserCoupon from '@/pages/marketing/UserCoupon.vue';
+import AppServiceConfig from '@/pages/set/AppServiceConfig.vue';
+import AppServiceConfigLog from '@/pages/set/AppServiceConfigLog.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -54,6 +56,8 @@ const router = createRouter({
                 { path: '/set/shop_config', component: SetShopConfig, name: 'manage.shop_config.index',meta:{title:'商店设置'} },
                 { path: '/set/router_category', component: SetRouterCategory, name: 'manage.router_category.index',meta:{title:'访问地址分类'} },
                 { path: '/set/router', component: SetRouter, name: 'manage.router.index',meta:{title:'访问地址'} },
+                { path: '/set/app_service_config', component: AppServiceConfig, name: 'manage.app_service_config.index',meta:{title:'外部服务'} },
+                { path: '/set/app_service_config_log', component: AppServiceConfigLog, name: 'manage.app_service_config_log.index',meta:{title:'外部服务请求日志'} },
                 { path: '/set/admin_user', component: SetAdminUser, name: 'manage.admin_user.index',meta:{title:'管理员列表'} },
                 { path: '/set/role', component: SetRole, name: 'manage.role.index',meta:{title:'角色管理'} },
                 { path: '/set/permission', component: SetPermission, name: 'manage.permission.index',meta:{title:'权限菜单'} },
