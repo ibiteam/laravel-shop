@@ -26,6 +26,7 @@ return new class extends Migration
             $table->text('certificate')->nullable()->comment('退款凭证,号分割');
             $table->tinyInteger('is_revoke')->default(0)->comment('是否撤销：0否 1是');
             $table->integer('count')->default(0)->comment('申请次数');
+            $table->integer('transaction_id')->default(0)->comment('交易流水ID');
             $table->string('result')->nullable()->comment('结果');
             $table->dateTime('job_time')->nullable()->comment('定时任务执行时间');
             $table->timestamps();

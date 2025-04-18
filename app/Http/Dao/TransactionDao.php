@@ -2,7 +2,6 @@
 
 namespace App\Http\Dao;
 
-use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Transaction;
@@ -30,27 +29,7 @@ class TransactionDao
     }
 
     /**
-     * 退款订单生成流水.
-     */
-    public function storeByRefund(ApplyRefund $apply_refund, Transaction $transaction, string $remark = ''): Transaction
-    {
-        return Transaction::query()->create([
-            'transaction_no' => $this->generateRefundNo(),
-            'user_id' => $apply_refund->user_id,
-            'transaction_type' => Transaction::TRANSACTION_TYPE_REFUND,
-            'parent_id' => $transaction->id,
-            'type' => $transaction->type,
-            'type_id' => $transaction->type_id,
-            'payment_id' => $transaction->payment_id,
-            'amount' => -$apply_refund->money,  // 退款金额记负数
-            'status' => Transaction::STATUS_WAIT,
-            'remark' => $remark,
-            'can_refund' => false,
-        ]);
-    }
-
-    /**
-     * 管理员退款生成流水.
+     * 退款生成流水.
      *
      * @param Transaction $parent_transaction 父级交易流水
      * @param string      $transaction_no     退款单号
@@ -73,14 +52,6 @@ class TransactionDao
             'remark' => $remark,
             'can_refund' => false,
         ]);
-    }
-
-    /**
-     * 生成退款单号.
-     */
-    public function generateRefundNo(): string
-    {
-        return $this->generateTransactionNo('refund');
     }
 
     /**

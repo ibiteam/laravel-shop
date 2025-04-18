@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Notify;
 
+use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
+use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\PaymentDao;
+use App\Models\ApplyRefund;
 use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\Order;
@@ -65,6 +68,20 @@ class WechatPayController extends Controller
                     $order = Order::query()->whereId($transaction->type_id)->first();
                     if ($order instanceof Order) {
                         $order->update(['money_paid' => 0]);
+                    }
+                } elseif (str_starts_with($transaction->transaction_no, 'apply_refund_')) {
+                    /* 申请售后退款成功 */
+                    $apply_refund = ApplyRefund::query()->whereTransactionId($transaction->id)->first();
+
+                    if ($apply_refund instanceof ApplyRefund) {
+                        $apply_refund->update([
+                            'status' => ApplyRefundStatusEnum::REFUND_SUCCESS->value,
+                            'job_time' => null,
+                            'result' => '款项已原路返回买家账号'
+                        ]);
+
+                        // 退款成功后更新订单信息
+                        app(ApplyRefundDao::class)->refundSuccessChangeOrder($apply_refund);
                     }
                 }
             }
