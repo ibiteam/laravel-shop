@@ -62,7 +62,7 @@
                 <span v-else>--</span>
             </template>
         </el-table-column>
-        <el-table-column label="操作人" prop="admin_user.nickname"></el-table-column>
+        <el-table-column label="操作人" prop="admin_user.user_name"></el-table-column>
         <el-table-column label="备注">
             <template #default="scope">
                 <span v-if="scope.row.remark">{{ scope.row.remark }}</span>

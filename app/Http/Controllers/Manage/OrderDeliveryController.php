@@ -37,7 +37,7 @@ class OrderDeliveryController extends BaseController
         $number = (int) $request->get('number', 10);
         $list = OrderDelivery::query()
             ->latest()
-            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,nickname'])
+            ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,user_name'])
             ->when(! is_null($delivery_no), fn (Builder $query) => $query->where('delivery_no', $delivery_no))
             ->when(! is_null($order_sn), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', $order_sn)))
             ->when(! is_null($created_start_time), fn (Builder $query) => $query->where('shipped_at', '>=', $created_start_time))
