@@ -468,7 +468,7 @@ const getData = () => {
             nextTick(() => {
                 if (document.getElementById('access-data')){
                     lineRef = echarts.init(document.getElementById('access-data'));
-                    lineRef.setOption(getUvChartOption(access_statistic));
+                    lineRef.setOption(getUvChartOption(access_statistic.value));
                 }
             });
         } else {
