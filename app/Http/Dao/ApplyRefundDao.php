@@ -6,6 +6,7 @@ use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Models\ApplyRefund;
 use App\Models\Order;
@@ -295,7 +296,7 @@ class ApplyRefundDao
             $pay_success_transaction = $this->refundTransactionCheck($apply_refund);
 
             // 微信退款
-            $out_refund_no = app(TransactionDao::class)->generateTransactionNo('apply_refund');
+            $out_refund_no = app(TransactionDao::class)->generateTransactionNo(PayPrefixEnum::APPLY_REFUND);
 
             $payment = Payment::query()->whereId($pay_success_transaction->payment_id)->first();
 
