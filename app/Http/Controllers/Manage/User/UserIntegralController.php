@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Manage\Integral;
+namespace App\Http\Controllers\Manage\User;
 
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Resources\CommonResourceCollection;

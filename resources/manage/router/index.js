@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Login from '@/pages/auth/Login.vue'
 import Home from '@/pages/Home.vue';
 import GoodsCateGoryIndex from '@/pages/goods/Category.vue';
-import MaterialIndex from '@/pages/material/Index.vue';
+import MaterialIndex from '@/pages/tool/Material.vue';
 import Goods from '@/pages/goods/Index.vue';
 import GoodsUpdate from '@/pages/goods/Update.vue';
 import SetShopConfig from '@/pages/set/ShopConfig.vue';
@@ -32,10 +32,10 @@ import Article from '@/pages/article/Index.vue';
 import ArticleUpdate from '@/pages/article/Update.vue';
 import GoodsViews from '@/pages/goods/Views.vue';
 import GoodsCollect from '@/pages/goods/Collect.vue';
-import UserIntegral from '@/pages/integral/index.vue';
-import IntegralDetail from '@/pages/integral/detail.vue';
-import Bonus from '@/pages/bonus/index.vue';
-import Coupon from '@/pages/coupon/index.vue';
+import UserIntegral from '@/pages/user/UserIntegral.vue';
+import IntegralDetail from '@/pages/user/IntegralDetail.vue';
+import Bonus from '@/pages/marketing/Bonus.vue';
+import Coupon from '@/pages/marketing/Coupon.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),

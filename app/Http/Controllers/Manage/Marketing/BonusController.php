@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Manage\Bonus;
+namespace App\Http\Controllers\Manage\Marketing;
 
 use App\Http\Controllers\Api\BaseController;
 use App\Http\Resources\CommonResourceCollection;

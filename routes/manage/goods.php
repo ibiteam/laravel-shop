@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Manage\Goods\GoodsCategoryController;
+use App\Http\Controllers\Manage\Goods\GoodsCollectController;
 use App\Http\Controllers\Manage\Goods\GoodsController;
 use App\Http\Controllers\Manage\Goods\GoodsParameterTemplateController;
 use App\Http\Controllers\Manage\Goods\GoodsSkuTemplateController;
-use App\Http\Controllers\Manage\GoodsCollect\GoodsCollectController;
-use App\Http\Controllers\Manage\GoodsView\GoodsViewController;
+use App\Http\Controllers\Manage\Goods\GoodsViewController;
 use App\Models\Permission as PermissionModel;
 use Illuminate\Support\Facades\Route;
 

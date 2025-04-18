@@ -23909,7 +23909,7 @@
       }), 128))
     ], 42, ["onKeydown"]);
   }
-  var CascaderPanel = /* @__PURE__ */ _export_sfc(_sfc_main$1R, [["render", _sfc_render$o], ["__file", "index.vue"]]);
+  var CascaderPanel = /* @__PURE__ */ _export_sfc(_sfc_main$1R, [["render", _sfc_render$o], ["__file", "UserIntegral.vue"]]);
 
   const ElCascaderPanel = withInstall(CascaderPanel);
 
@@ -60720,7 +60720,7 @@
       _: 3
     }, 8, ["onAfterLeave"]);
   }
-  var MessageBoxConstructor = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "index.vue"]]);
+  var MessageBoxConstructor = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "UserIntegral.vue"]]);
 
   const messageInstance = /* @__PURE__ */ new Map();
   const getAppendToElement = (props) => {

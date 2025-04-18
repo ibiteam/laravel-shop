@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Manage\Bonus\BonusController;
-use App\Http\Controllers\Manage\Coupon\CouponController;
+use App\Http\Controllers\Manage\Marketing\BonusController;
+use App\Http\Controllers\Manage\Marketing\CouponController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
