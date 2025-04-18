@@ -266,7 +266,7 @@ const handleDelete = (id) => {
         orderDeliveryDestroy({id: id}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success(res.message)
-                getData(pageInfo.current_page)
+                getData(pagination.page)
             } else {
                 cns.$message.error(res.message)
             }
