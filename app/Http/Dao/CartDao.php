@@ -23,7 +23,8 @@ class CartDao
             $carts = Cart::query()->whereUserId($user->id)
                 ->with(['goods' => function ($query) {
                     $query->withTrashed();  // 包括已软删除的商品
-                }], 'goodsSku')
+                }])
+                ->with(['goods.skus', 'goodsSku'])
                 ->orderByDesc('updated_at')->orderByDesc('id')
                 ->get(['id', 'goods_id', 'goods_sku_id', 'buy_number', 'is_check']);
 
@@ -143,7 +144,7 @@ class CartDao
                 'total' => $total,
             ];
         } catch (\Exception $e) {
-            throw new BusinessException('购物车商品列表查询异常');
+            throw new BusinessException('查询购物车商品列表异常'.$e->getMessage());
         }
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Models\Goods;
+use App\Models\Router;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -18,13 +19,18 @@ class SpecialController extends BaseController
         try {
             $validated = $request->validate([
                 'alias' => 'required|string',
-                'title' => 'nullable|string',
                 'cat_id' => 'nullable|string',
             ], [], [
                 'alias' => '别名',
-                'title' => '标题',
                 'cat_id' => '分类ID',
             ]);
+
+            $alias = $validated['alias'];
+            $cat_id = $validated['cat_id'] ?? 0;
+
+            // 获取title
+            $router = Router::query()->whereAlias($alias)->first();
+            $title = $router ? $router->name : '';
 
             // todo 根据别名获取专题页BANNER 这里先写死
             $banner_list = [
@@ -32,9 +38,6 @@ class SpecialController extends BaseController
                 'https://cdn.toodudu.com/2021/03/24/i2DGzLEd3UrgZQYVqTl9xaqvsQIrvvFixl6aErJl.png',
                 'https://cdn.toodudu.com/1582c5ff87961214faad7bf3cee76a95.jpg',
             ];
-
-            $title = $validated['title'] ?? '';
-            $cat_id = $validated['cat_id'] ?? 0;
 
             // 获取商品数据
             $good_list = Goods::query()->show()

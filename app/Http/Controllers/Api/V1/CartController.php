@@ -25,11 +25,9 @@ class CartController extends BaseController
     public function list(CartDao $cart_dao)
     {
         try {
-            $data = $cart_dao->cartGoodsList(get_user());
-
-            return $this->success($data);
+            return $this->success($cart_dao->cartGoodsList(get_user()));
         } catch (\Throwable $throwable) {
-            return $this->error('获取购物车商品列表异常~');
+            return $this->error('购物车异常~');
         }
     }
 
