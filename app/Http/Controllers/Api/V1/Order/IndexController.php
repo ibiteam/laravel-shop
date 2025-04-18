@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Order;
 
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\WeChatPayException;
 use App\Http\Controllers\Api\BaseController;
@@ -82,7 +83,7 @@ class IndexController extends BaseController
             $current_user = get_user();
             $order = Order::query()
                 ->withCount('orderDelivery')
-                ->with(['detail', 'province', 'city', 'district'])
+                ->with(['detail', 'detail.goods', 'province', 'city', 'district'])
                 ->whereOrderSn($validated['order_sn'])
                 ->whereUserId($current_user->id)
                 ->firstOrFail();
@@ -266,7 +267,8 @@ class IndexController extends BaseController
                 ->first();
 
             if ($transaction instanceof Transaction) {
-                $old_refund_amount = $transaction->children()->sum('amount');
+                // 负数 or 0
+                $old_refund_amount = $transaction->children()->where('status', Transaction::STATUS_SUCCESS)->sum('amount');
 
                 $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
 
@@ -274,7 +276,7 @@ class IndexController extends BaseController
                     try {
                         $payment = $transaction->payment;
 
-                        $out_refund_no = $transaction_dao->generateTransactionNo('cancel_order');
+                        $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::USER_CANCEL_ORDER);
 
                         PayService::init($payment->alias)->refund($transaction, $out_refund_no, $payment, $refund_amount, '取消订单，进行退款');
                     } catch (WeChatPayException $we_chat_pay_exception) {

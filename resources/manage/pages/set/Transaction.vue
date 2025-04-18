@@ -218,7 +218,7 @@ const submitRefundForm = () => {
             transactionRefund(refundForm).then(res => {
                 submitRefundFormLoading.value = false;
                 if (cns.$successCode(res.code)) {
-                    getData(pageInfo.current_page)
+                    getData(pagination.page)
                     closeRefundDialog()
                     cns.$message.success(res.message)
                 } else {

@@ -24,7 +24,7 @@ class RegionSeeder extends Seeder
         DB::beginTransaction();
 
         try {
-            $json = File::get(resource_path('File/regions.json'));
+            $json = File::get(resource_path('files/regions.json'));
             $regions = json_decode($json, true);
             Region::insert($regions);
 

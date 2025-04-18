@@ -4,6 +4,7 @@
             :data="data.list"
             border
             stripe
+            :max-height="maxHeight"
             :style="{width, minHeight}">
             <slot></slot>
         </el-table>
@@ -44,6 +45,10 @@ const props = defineProps({
     minHeight: {
         type: String,
         default: '600px'
+    },
+    maxHeight: {
+        type: String,
+        default: '100%'
     }
 })
 const layout = computed(() => {

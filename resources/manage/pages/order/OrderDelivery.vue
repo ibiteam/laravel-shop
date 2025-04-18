@@ -62,7 +62,7 @@
                 <span v-else>--</span>
             </template>
         </el-table-column>
-        <el-table-column label="操作人" prop="admin_user.nickname"></el-table-column>
+        <el-table-column label="操作人" prop="admin_user.user_name"></el-table-column>
         <el-table-column label="备注">
             <template #default="scope">
                 <span v-if="scope.row.remark">{{ scope.row.remark }}</span>
@@ -71,6 +71,7 @@
         </el-table-column>
         <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
         <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
+        <el-table-column label="更新时间" prop="updated_at" width="160px"></el-table-column>
         <el-table-column label="操作"width="160px">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="handleDelete(scope.row.id)">删除</el-button>
@@ -257,7 +258,7 @@ const handleDelete = (id) => {
         orderDeliveryDestroy({id: id}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success(res.message)
-                getData(pageInfo.current_page)
+                getData(pagination.page)
             } else {
                 cns.$message.error(res.message)
             }

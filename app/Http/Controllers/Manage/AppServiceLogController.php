@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppServiceConfig;
 use App\Models\AppServiceLog;
 use Illuminate\Http\Request;
@@ -10,21 +11,24 @@ class AppServiceLogController extends BaseController
 {
     public function index(Request $request)
     {
-        $alias = $request->get('alias', '');
-        //        $allConfigData = $this->getConfigData();
-        //        $name_list = $allConfigData['name_array'];
-        //        $alias_list = $allConfigData['alias_array'];
-
         $number = $request->input('number', 10);
-        $query = AppServiceLog::select(['id', 'service_id', 'user_id', 'created_at'])->with(['app_service_config:id,alias,name', 'user:id,nickname'])->orderByDesc('id');
+        $query = AppServiceLog::query();
         $query = $this->getWhere($query, $request);
-        $data = $query->paginate($number)->toArray();
+        $list = $query->select(['id', 'service_id', 'user_id', 'created_at', 'request_param', 'result_data'])
+            ->with(['app_service_config:id,alias,name', 'user:id,user_name'])
+            ->orderByDesc('id')->paginate($number);
+        $list->getCollection()->transform(function (AppServiceLog $app_service_log) {
+            $app_service_log->user_name = "【{$app_service_log->user_id}】{$app_service_log->user?->user_name}";
+            $app_service_log->name = "{$app_service_log->app_service_config?->name}【{$app_service_log->app_service_config?->alias}】";
+            $app_service_log->request_param = json_decode($app_service_log->request_param, true);
+            $app_service_log->result_data = json_decode($app_service_log->result_data, true);
 
-        if ($data['data']) {
-            foreach ($data['data'] as $k => $v) {
-                $data['data'][$k]['name'] = $v['user']['nickname'] ?? '';
-            }
-        }
+            return $app_service_log;
+        });
+        $data = (new CommonResourceCollection($list))->toArray($request);
+        $allConfigData = $this->getConfigData();
+        $data['name_list'] = $allConfigData['name_array'];
+        $data['alias_list'] = $allConfigData['alias_array'];
 
         return $this->success($data);
     }

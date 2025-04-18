@@ -27,10 +27,10 @@
                             @node-drop="handleDrop"
                             :expand-on-click-node="false"
                         >
-                            <template #default="{ node, data }">
+                            <template #default="{ data }">
                                 <div class="custom-tree-node" @click="checkDir(data.id, data.type)">
                                     <i class="iconfont" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
-                                    <span>{{ data.name }}</span>
+                                    <span style="font-size: 16px">{{ data.name }}</span>
                                 </div>
                             </template>
                         </el-tree>
@@ -121,7 +121,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>
+<!--                                            <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>-->
+                                            <div class="edit-icon-container">
+                                                <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>
+                                            </div>
                                         </div>
                                     </template>
                                 </el-table-column>
@@ -582,29 +585,49 @@ const allowDrag = (draggingNode) => {
                 color: var(--main-color);
             }
         }
-        .material-table-item-name{
+        .material-table-item-name {
             display: flex;
             align-items: center;
-            .folder{
+            .folder {
                 width: 40px;
                 height: 40px;
                 margin-right: 10px;
                 font-size: 40px;
                 line-height: 40px;
             }
-            .material-img{
+            .material-img {
                 width: 40px;
                 height: 40px;
                 margin-right: 10px;
                 overflow: hidden;
                 border-radius: 3px;
-                img{
+                img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
                 }
             }
+        }
 
+        .edit-icon-container {
+            display: none; /* 默认隐藏图标 */
+            margin-left: 8px;
+            cursor: pointer;
+            &:hover {
+                color: var(--main-color);
+            }
+        }
+
+        .s-flex.ai-ct:hover .edit-icon-container {
+            display: block; /* 悬停时显示图标 */
+        }
+
+        .edit-icon {
+            margin-left: 8px;
+            cursor: pointer;
+            &:hover {
+                color: var(--main-color);
+            }
         }
     }
 }

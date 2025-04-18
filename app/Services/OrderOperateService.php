@@ -36,6 +36,8 @@ class OrderOperateService
             // 回退积分
             if ($order->integral > 0) {
                 app(UserDao::class)->incrementIntegralByDoneOrder($user, $order->integral, '用户取消订单，回退积分');
+                $order->integral = 0;
+                $order->save();
             }
             // 申请售后判断
             app(ApplyRefundDao::class)->getProgressDataByOrder($order, $user)->map(function (ApplyRefund $apply_refund) {
@@ -115,14 +117,16 @@ class OrderOperateService
      */
     public function receive(Order $order, User $user): void
     {
+        $now_datetime = now()->toDateTimeString();
+
         DB::beginTransaction();
 
         try {
-            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED->value, 'received_at' => now()->toDateTimeString()])) {
+            if (! $order->update(['ship_status' => ShippingStatusEnum::RECEIVED->value, 'received_at' => $now_datetime])) {
                 throw new BusinessException('确认收货失败');
             }
 
-            if (! $order->orderDelivery()->update(['status' => OrderDelivery::STATUS_SUCCESS])) {
+            if (! $order->orderDelivery()->update(['status' => OrderDelivery::STATUS_SUCCESS, 'received_at' => $now_datetime])) {
                 throw new BusinessException('确认收货失败~');
             }
 

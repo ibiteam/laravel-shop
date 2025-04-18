@@ -24,7 +24,7 @@ class SensitiveWordSeeder extends Seeder
         DB::beginTransaction();
 
         try {
-            $json = File::get(resource_path('File/sensitive_words.json'));
+            $json = File::get(resource_path('files/sensitive_words.json'));
             $regions = json_decode($json, true);
             SensitiveWord::insert($regions);
 

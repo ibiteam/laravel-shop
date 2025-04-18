@@ -52,8 +52,8 @@ Route::prefix('auth')->group(function () {
     Route::post('wechat', [WechatController::class, 'auth']); // 微信公众号授权
 });
 
-// 专题
-Route::get('special', [SpecialController::class, 'index']); // 专题页
+// 专题页
+Route::get('special', [SpecialController::class, 'index']); // 获取数据
 
 // 文章
 Route::prefix('article')->group(function () {

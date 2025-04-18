@@ -250,12 +250,16 @@ class ApplyRefundController extends BaseController
             $id = $validated['id'];
             $money = (float) $validated['money'];
 
-            $apply_refund = ApplyRefund::query()->whereId($id)
+            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundReason'])->whereId($id)
                 ->whereStatus(ApplyRefundStatusEnum::NOT_PROCESSED->value)
                 ->first();
 
             if (! $apply_refund) {
                 throw new BusinessException('申请记录不存在');
+            }
+
+            if ($apply_refund->transaction_id > 0) {
+                throw new BusinessException('已执行退款，请勿重复操作');
             }
 
             if ($money && $apply_refund->money != $money) {
@@ -268,19 +272,19 @@ class ApplyRefundController extends BaseController
             DB::beginTransaction();
 
             try {
-                $apply_refund->type = ApplyRefund::TYPE_REFUND_MONEY;
-                $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
-                $apply_refund->result = '卖家同意了退款';
-                $apply_refund->save();
+                // $apply_refund->type = ApplyRefund::TYPE_REFUND_MONEY;
+                // $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
+                // $apply_refund->result = '卖家同意了退款';
+                // $apply_refund->save();
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+                // $order = $apply_refund_dao->refundSuccessChangeOrder($apply_refund);
 
-                $order_log_dao->storeByAdminUser($current_user, $order, '卖家同意了退款');
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家同意了退款');
 
                 admin_operation_log("同意了退款申请记录：{$apply_refund->id}");
 
@@ -379,12 +383,16 @@ class ApplyRefundController extends BaseController
 
             $id = $validated['id'];
 
-            $apply_refund = ApplyRefund::query()->whereId($id)
+            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundReason'])->whereId($id)
                 ->whereStatus(ApplyRefundStatusEnum::BUYER_SEND_SHIP->value)
                 ->first();
 
             if (! $apply_refund) {
                 throw new BusinessException('未找到待申请记录');
+            }
+
+            if ($apply_refund->transaction_id > 0) {
+                throw new BusinessException('已执行退款，请勿重复操作');
             }
 
             // 微信退款
@@ -393,19 +401,19 @@ class ApplyRefundController extends BaseController
             DB::beginTransaction();
 
             try {
-                $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
-                $apply_refund->job_time = null;
-                $apply_refund->result = '款项已原路返回买家账号';
-                $apply_refund->save();
+                // $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
+                // $apply_refund->job_time = null;
+                // $apply_refund->result = '款项已原路返回买家账号';
+                // $apply_refund->save();
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 // 更新订单退款后的状态
-                $order = $apply_refund_dao->changeOrderStatus($apply_refund);
+                // $order = $apply_refund_dao->refundSuccessChangeOrder($apply_refund);
 
-                $order_log_dao->storeByAdminUser($current_user, $order, '卖家确认收货，已退款给买家');
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家确认收货，已退款给买家');
 
                 admin_operation_log("确认收货退款给买家，退款申请记录：{$apply_refund->id}");
 
@@ -506,6 +514,7 @@ class ApplyRefundController extends BaseController
                 $item->setAttribute('money', price_format($item->applyRefund->money));
                 $item->setAttribute('number', get_new_price($item->applyRefund->number));
                 $item->setAttribute('add_time', $item->created_at->toDateTimeString());
+
                 return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),
         ];

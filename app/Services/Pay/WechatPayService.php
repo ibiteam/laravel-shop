@@ -108,29 +108,36 @@ class WechatPayService implements PayInterface
 
         switch ($wechat_response['status'] ?? '') {
             case 'PROCESSING': // 退款处理中
-                app(TransactionDao::class)->storeByParentTransaction($parent_transaction, $refund_transaction_no, $refund_amount, remark: $reason);
+                $transaction = app(TransactionDao::class)->storeByParentTransaction($parent_transaction, $refund_transaction_no, $refund_amount, remark: $reason);
+
+                if (! $transaction) {
+                    throw new BusinessException('退款生成流水失败');
+                }
 
                 break;
 
             case 'SUCCESS': // 退款成功
-                app(TransactionDao::class)->storeByParentTransaction($parent_transaction, $refund_transaction_no, $refund_amount, Transaction::STATUS_SUCCESS, $reason);
+                $transaction = app(TransactionDao::class)->storeByParentTransaction($parent_transaction, $refund_transaction_no, $refund_amount, Transaction::STATUS_SUCCESS, $reason);
+
+                if (! $transaction) {
+                    throw new BusinessException('退款生成流水失败');
+                }
 
                 break;
 
             case 'CLOSED': // 退款关闭
                 throw new BusinessException('退款关闭，请联系管理员');
 
-                break;
-
             case 'ABNORMAL': // 退款异常
                 throw new BusinessException('退款异常，退款到银行发现用户的卡作废或者冻结了，导致原路退款银行卡失败，可前往商户平台-交易中心，手动处理此笔退款');
-
-                break;
 
             default:
                 throw new BusinessException('退款状态异常，请联系管理员');
         }
 
-        return $wechat_response;
+        return [
+            'wechat_response' => $wechat_response,
+            'transaction' => $transaction,
+        ];
     }
 }

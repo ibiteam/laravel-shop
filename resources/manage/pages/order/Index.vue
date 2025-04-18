@@ -76,12 +76,19 @@
     </search-form>
     <page-table
         :data="tableData"
+        :maxHeight="'700px'"
         v-loading="loading"
         @change="handlePageChange"
     >
-        <el-table-column label="订单ID" prop="id"></el-table-column>
-        <el-table-column label="订单编号" prop="order_sn"></el-table-column>
-        <el-table-column label="下单时间" width="400px">
+        <el-table-column label="订单ID" prop="id" width="80px"></el-table-column>
+        <el-table-column label="订单编号" width="180px">
+            <template #default="{ row }">
+                <el-button link type="primary" @click="copyOrderSn(row.order_sn)">
+                    {{ row.order_sn }}<el-icon><DocumentCopy /></el-icon>
+                </el-button>
+            </template>
+        </el-table-column>
+        <el-table-column label="下单时间" width="300px">
             <template #default="{ row }">
                 <div>{{ row.payer.user_name }}</div>
                 <div>{{ row.payer.done_time }}</div>
@@ -103,10 +110,10 @@
             </template>
         </el-table-column>
         <el-table-column label="来源" prop="source"></el-table-column>
-        <el-table-column label="订单状态" prop="status"></el-table-column>
+        <el-table-column label="订单状态" prop="status" width="180px"></el-table-column>
         <el-table-column label="操作">
             <template #default="{ row }">
-                <el-button link type="primary" size="large" @click="openDetail(row)">编辑</el-button>
+                <el-button link type="primary" size="large" @click="openDetail(row)">查看</el-button>
             </template>
         </el-table-column>
     </page-table>
@@ -118,6 +125,7 @@ import { useRouter } from 'vue-router'
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
 import { OrderStatus,PayStatus,ShipStatus } from '@/enums/model'
+import { DocumentCopy } from '@element-plus/icons-vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -199,6 +207,17 @@ const handlePageChange = (page:number,per_page:number) => {
 
 const openDetail = (row:any) => {
     router.push({name:'manage.order.detail', query: {id: row.id},params:{order_sn: row.order_sn}})
+}
+
+// 复制订单编号
+const copyOrderSn = (orderSn: string) => {
+    const tempInput = document.createElement('input')
+    tempInput.value = orderSn
+    document.body.appendChild(tempInput)
+    tempInput.select()
+    document.execCommand('copy')
+    document.body.removeChild(tempInput)
+    cns.$message.success('订单编号已复制')
 }
 
 onMounted( () => {

@@ -19,7 +19,7 @@ class RouterTableSeeder extends Seeder
         $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::PAY_SUCCESS, '支付成功', '/pay/success');
         $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::ORDER_SUCCESS, '下单成功', '/order/success');
         $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::HOME_PREVIEW, '首页预览', '/home/:id', sort: 1);
-        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::SPECIAL_PAGE, '专题页', '/special', ['alias' => '', 'cat_id' => '', 'title' => '']);
+        $this->addRouter(RouterCategoryEnum::BASE_LINK, RouterEnum::SUPERMARKET, '多多超市', '/special', ['alias' => RouterEnum::SUPERMARKET->value, 'cat_id' => '']);
     }
 
     private function addRouter(
