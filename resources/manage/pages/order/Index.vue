@@ -76,6 +76,7 @@
     </search-form>
     <page-table
         :data="tableData"
+        :maxHeight="'700px'"
         v-loading="loading"
         @change="handlePageChange"
     >
