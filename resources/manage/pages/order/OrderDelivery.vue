@@ -71,6 +71,7 @@
         </el-table-column>
         <el-table-column label="发货时间" prop="shipped_at" width="160px"></el-table-column>
         <el-table-column label="收货时间" prop="received_at" width="160px"></el-table-column>
+        <el-table-column label="更新时间" prop="updated_at" width="160px"></el-table-column>
         <el-table-column label="操作"width="160px">
             <template #default="scope">
                 <el-button link type="primary" size="large" @click="handleDelete(scope.row.id)">删除</el-button>
