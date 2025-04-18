@@ -96,7 +96,7 @@
     <el-dialog v-model="importVisible" title="导入发货" width="600" center :before-close="closeImportDialog">
         <div class="detail-item">
             <div class="detail-title">下载模板</div>
-            <el-button @click="downloadFile">点击下载模板</el-button>
+            <el-button ><a href="/files/excel/发货模板.xlsx">点击下载模板</a></el-button>
         </div>
         <div class="detail-item">
             <div class="detail-title">导入发货</div>
@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import importFilePath from '@/assets/xlsx/发货模板.xlsx'
+
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 
@@ -218,14 +218,6 @@ const openImportDialog = () => {
     importErrorNumber.value = 0
     importErrorData.value = [];
     importFileLoading.value = false;
-}
-const downloadFile = () => {
-    const link = document.createElement('a');
-    link.href = importFilePath;
-    link.download = '发货模板.xlsx';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 }
 const submitImport = (request) => {
     importFileLoading.value = true
