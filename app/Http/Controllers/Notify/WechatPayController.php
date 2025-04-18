@@ -72,13 +72,13 @@ class WechatPayController extends Controller
                     if ($order instanceof Order) {
                         $order->update(['money_paid' => 0]);
                     }
-                } elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::MANAGE_REFUND->value)) {
+                } /*elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::MANAGE_REFUND->value)) {
                     $order = Order::query()->whereId($transaction->type_id)->first();
 
                     if ($order instanceof Order) {
                         $order->update(['money_paid' => 0]);
                     }
-                } elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::APPLY_REFUND->value)) {
+                }*/ elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::APPLY_REFUND->value)) {
                     /* 申请售后退款成功 */
                     $apply_refund = ApplyRefund::query()->whereTransactionId($transaction->id)->first();
 
