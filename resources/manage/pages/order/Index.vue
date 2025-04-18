@@ -76,6 +76,7 @@
     </search-form>
     <page-table
         :data="tableData"
+        :maxHeight="'700px'"
         v-loading="loading"
         @change="handlePageChange"
     >
@@ -109,7 +110,7 @@
             </template>
         </el-table-column>
         <el-table-column label="来源" prop="source"></el-table-column>
-        <el-table-column label="订单状态" prop="status" width="160px"></el-table-column>
+        <el-table-column label="订单状态" prop="status" width="180px"></el-table-column>
         <el-table-column label="操作">
             <template #default="{ row }">
                 <el-button link type="primary" size="large" @click="openDetail(row)">查看</el-button>

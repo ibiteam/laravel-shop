@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property array                           $certificate     退款凭证,号分割
  * @property int                             $is_revoke       是否撤销：0否 1是
  * @property int                             $count           申请次数
+ * @property int                             $transaction_id  交易流水ID
  * @property string|null                     $result          结果
  * @property string|null                     $job_time        定时任务执行时间
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -34,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read \App\Models\ApplyRefundShip|null $applyRefundShip
  * @property-read \App\Models\Order|null $order
  * @property-read \App\Models\OrderDetail|null $orderDetail
+ * @property-read \App\Models\Transaction|null $transaction
  * @property-read \App\Models\User|null $user
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund newModelQuery()
@@ -54,6 +56,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereReasonId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereResult($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereTransactionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereUserId($value)
@@ -118,5 +121,10 @@ class ApplyRefund extends Model
     public function applyRefundShip(): HasOne
     {
         return $this->hasOne(ApplyRefundShip::class, 'apply_refund_id', 'id');
+    }
+
+    public function transaction(): BelongsTo
+    {
+        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
     }
 }

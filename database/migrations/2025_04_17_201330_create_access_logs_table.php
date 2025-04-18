@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('source', 30)->comment('来源')->index();
             $table->string('method', 10)->comment('请求方式')->index();
             $table->string('referer_url')->comment('来源URL');
-            $table->string('user_agent')->comment('用户代理');
+            $table->text('user_agent')->comment('用户代理');
             $table->string('browser')->comment('浏览器');
             $table->string('system')->comment('系统');
             $table->json('request_data')->comment('请求数据');

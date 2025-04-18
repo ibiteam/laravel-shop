@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Enums\OrderStatusEnum;
 use App\Enums\PaymentEnum;
+use App\Enums\PayStatusEnum;
+use App\Enums\ShippingStatusEnum;
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Exceptions\WeChatPayException;
 use App\Http\Dao\TransactionDao;
@@ -34,7 +38,7 @@ class TransactionController extends BaseController
         $paid_end_time = $request->get('paid_end_time', null);
         $number = (int) $request->get('number', 10);
         $list = Transaction::query()
-            ->with(['typeInfo', 'user:id,user_name', 'payment:id,name'])
+            ->with(['typeInfo', 'user:id,user_name', 'payment:id,name', 'parent'])
             ->latest()
             ->latest('id')
             ->when($transaction_no, fn (Builder $query) => $query->where('transaction_no', $transaction_no))
@@ -69,7 +73,7 @@ class TransactionController extends BaseController
                 'id' => '交易记录ID',
                 'reason' => '退款原因',
             ]);
-            $transaction = Transaction::query()->with('payment')->whereId($validated['id'])->first();
+            $transaction = Transaction::query()->with(['payment', 'typeInfo'])->whereId($validated['id'])->first();
 
             if (! $transaction instanceof Transaction) {
                 throw new BusinessException('交易记录不存在');
@@ -93,16 +97,32 @@ class TransactionController extends BaseController
                 throw new BusinessException('当前支付方式不支持退款');
             }
             // 负数 or 0
-            $old_refund_amount = $transaction->children()->sum('amount');
+            $old_refund_amount = $transaction->children()->where('status', Transaction::STATUS_SUCCESS)->sum('amount');
 
             $refund_amount = bcadd($transaction->amount, $old_refund_amount, 2);
 
             if ($refund_amount <= 0) {
                 throw new BusinessException('交易记录已退款完成');
             }
-            $out_refund_no = $transaction_dao->generateTransactionNo(config('app.manage_prefix').'_'.'refund');
+            $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::MANAGE_REFUND->value);
 
             $payment = $transaction->payment;
+
+            $order = $transaction->typeInfo;
+
+            if ($order instanceof Order) {
+                // 更新订单状态
+                if (! $order->update([
+                    'order_status' => OrderStatusEnum::CANCELLED->value,
+                    'pay_status' => PayStatusEnum::PAY_WAIT->value,
+                    'ship_status' => ShippingStatusEnum::UNSHIPPED->value,
+                    'paid_at' => null,
+                    'shipped_at' => null,
+                    'received_at' => null,
+                ])) {
+                    throw new BusinessException('取消订单失败');
+                }
+            }
 
             PayService::init($payment->alias)->refund(
                 $transaction,

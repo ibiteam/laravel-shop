@@ -16,10 +16,16 @@ class AccessLogMiddleware
         $user = get_user();
 
         $formatter = new AccessLogFormatter;
+
+        $referer_url = $request->server('HTTP_REFERER') ?? '';
+
+        if (strlen($referer_url) > 240) {
+            $referer_url = substr($referer_url, 240);
+        }
         $formatter->setUserId($user->id ?? 0);
         $formatter->setUrl($request->fullUrl());
         $formatter->setMethod($request->getMethod());
-        $formatter->setRefererUrl($request->server('HTTP_REFERER') ?? '');
+        $formatter->setRefererUrl($referer_url);
         $formatter->setUserAgent($request->server('HTTP_USER_AGENT') ?? '');
         $formatter->setRequestData($request->all());
 

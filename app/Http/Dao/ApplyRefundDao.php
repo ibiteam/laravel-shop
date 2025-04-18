@@ -6,13 +6,16 @@ use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\OrderStatusEnum;
 use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
+use App\Enums\PayPrefixEnum;
 use App\Exceptions\BusinessException;
 use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Payment;
 use App\Models\ShopConfig;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Services\Pay\PayService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -235,11 +238,19 @@ class ApplyRefundDao
     }
 
     /**
-     * 退款后 更新订单状态.
+     * 根据订单与用户获取正在进行中的申请售后数据.
+     */
+    public function getProgressDataByOrder(Order $order, User $user): EloquentCollection|Collection
+    {
+        return ApplyRefund::query()->whereOrderId($order->id)->whereUserId($user->id)->get();
+    }
+
+    /**
+     * 退款成功后 更新订单信息.
      *
      * @throws BusinessException
      */
-    public function changeOrderStatus(ApplyRefund $apply_refund)
+    public function refundSuccessChangeOrder(ApplyRefund $apply_refund)
     {
         $order = Order::query()->with('detail')->whereId($apply_refund->order_id)->first();
 
@@ -247,7 +258,9 @@ class ApplyRefundDao
             throw new BusinessException('未找到订单记录');
         }
 
-        // 这里看订单下所有明细的
+        $order->update(['money_paid' => $order->money_paid - $apply_refund->money]);
+
+        // 订单下 所有售后退款
         $apply_refund = ApplyRefund::whereOrderId($order->id)
             ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
             ->select(['money', 'number'])->get();
@@ -260,6 +273,7 @@ class ApplyRefundDao
             $order->order_status = OrderStatusEnum::CANCELLED->value;
             $order->pay_status = PayStatusEnum::PAY_WAIT->value;
             $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;
+            $order->money_paid = 0;
 
             if (! $order->save()) {
                 throw new BusinessException('更新订单信息失败');
@@ -267,14 +281,6 @@ class ApplyRefundDao
         }
 
         return $order;
-    }
-
-    /**
-     * 根据订单与用户获取正在进行中的申请售后数据.
-     */
-    public function getProgressDataByOrder(Order $order, User $user): EloquentCollection|Collection
-    {
-        return ApplyRefund::query()->whereOrderId($order->id)->whereUserId($user->id)->get();
     }
 
     /**
@@ -289,18 +295,32 @@ class ApplyRefundDao
 
             $pay_success_transaction = $this->refundTransactionCheck($apply_refund);
 
-            // TODO 微信退款逻辑
+            // 微信退款
+            $out_refund_no = app(TransactionDao::class)->generateTransactionNo(PayPrefixEnum::APPLY_REFUND);
 
-            // 创建退款流水记录
-            app(TransactionDao::class)->storeByRefund($apply_refund, $pay_success_transaction);
+            $payment = Payment::query()->whereId($pay_success_transaction->payment_id)->first();
+
+            $result = PayService::init($payment->alias)->refund(
+                $pay_success_transaction,
+                $out_refund_no,
+                $payment,
+                $apply_refund->money,
+                $apply_refund->applyRefundReason?->content
+            );
+
+            if (! $result['transaction'] ?? null) {
+                throw new BusinessException('退款生成流水失败');
+            }
+
+            $apply_refund->update(['transaction_id' => $result['transaction']->id ?? 0]);
 
             DB::commit();
         } catch (\Throwable $exception) {
             DB::rollBack();
 
-            Log::error('微信退款异常: '.$exception->getMessage());
+            Log::error('申请售后微信退款异常: '.$exception->getMessage());
 
-            throw new BusinessException('退款异常');
+            throw new BusinessException('申请售后微信退款异常');
         }
     }
 }

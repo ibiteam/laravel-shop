@@ -120,7 +120,7 @@ class ApplyRefundJob implements ShouldQueue
      */
     public function applyRefund($action, $type, $status): void
     {
-        $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
+        $apply_refund = ApplyRefund::query()->with(['order', 'user', 'applyRefundReason'])->whereId($this->apply_refund_id)->first();
 
         $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
         $apply_refund->result = '卖家超时未处理，退款成功';
@@ -144,7 +144,7 @@ class ApplyRefundJob implements ShouldQueue
             app(ApplyRefundDao::class)->wechatRefund($apply_refund);
 
             // 更新订单退款后的状态
-            app(ApplyRefundDao::class)->changeOrderStatus($apply_refund);
+            // app(ApplyRefundDao::class)->refundSuccessChangeOrder($apply_refund);
 
             DB::commit();
         } catch (BusinessException|\Exception $e) {

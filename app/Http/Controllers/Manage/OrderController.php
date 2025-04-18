@@ -66,8 +66,10 @@ class OrderController extends BaseController
                 $query->where('goods_id', $goods_id);
             }))
             ->when(! is_null($user_keywords), function (Builder $query) use ($user_keywords) {
-                $query->where('user_id', $user_keywords)->orWhereHas('user', function ($query) use ($user_keywords) {
-                    $query->whereLike('nickname', "%$user_keywords%");
+                $query->where(function ($query) use ($user_keywords) {
+                    $query->where('user_id', $user_keywords)->orWhereHas('user', function ($query) use ($user_keywords) {
+                        $query->whereLike('user_name', "%$user_keywords%");
+                    });
                 });
             })
             ->latest()
@@ -88,7 +90,7 @@ class OrderController extends BaseController
                 'id' => '订单ID',
             ]);
 
-            $order = Order::query()->with(['transactions', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->first();
+            $order = Order::query()->with(['transactions', 'transactions.payment', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->first();
 
             return $this->success([
                 'order_items' => $order->detail->map(function (OrderDetail $order_detail) {
@@ -176,7 +178,7 @@ class OrderController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败');
+            return $this->error('操作失败'.$throwable->getMessage());
         }
     }
 
