@@ -367,6 +367,7 @@ class CartController extends BaseController
         try {
             // 获取可以结算的商品数据
             $carts = Cart::query()->whereUserId($user->id)
+                ->with(['goods'])
                 ->whereHas('goods', function ($query) {
                     $query->show();
                 })
