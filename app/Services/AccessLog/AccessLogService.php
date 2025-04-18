@@ -14,7 +14,7 @@ class AccessLogService
         return match (config('custom.access_log_driver')) {
             'file' => new FileAccessLog,
             'mysql' => new MySQLAccessLog,
-            // 'clickhouse' => new ClickhouseAccessLog,
+            'clickhouse' => new ClickhouseAccessLog,
             default => null
         };
     }
