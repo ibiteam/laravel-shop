@@ -156,9 +156,9 @@
 import { Plus, QuestionFilled } from '@element-plus/icons-vue';
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { paymentMethodChangeField, paymentMethodIndex, paymentMethodUpdate } from '@/api/set';
-import { fileUpload } from '@/api/common';
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -272,7 +272,7 @@ const closeDetailDialog = () => {
 
 const uploadFile = async (request) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload',{ file: request.file });
         if (cns.$successCode(res.code)) {
             detailForm.icon = res.data.url;
         } else {

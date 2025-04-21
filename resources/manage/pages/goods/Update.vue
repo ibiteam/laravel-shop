@@ -466,7 +466,6 @@
 import Editor from '@/components/good/Editor.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
-import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
 import 'vue-cropper/dist/index.css'
@@ -1108,7 +1107,7 @@ const uploadImage = async (file, type, name='') => {
         currentFileCropBlob.value = dataUrl
         cropperDialogShow.value  = true
     }else {
-        fileUpload(file).then((res) => {
+        Http.doUpload('upload', file).then((res) => {
             if (res.code == 200) {
                 if (type === 'thumb') {
                     const sku_data = JSON.parse(JSON.stringify(updateForm.value.sku_data))
