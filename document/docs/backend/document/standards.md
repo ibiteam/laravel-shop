@@ -48,12 +48,12 @@ import OrderUpdate from '@/pages/order/Update.vue'
     </page-table>
 </template>
 <script setup lang="ts">
-import { orderIndex } from '@/api/order.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
 import { OrderStatus,PayStatus,ShipStatus } from '@/enums/model'
+import Http from '@/utils/http';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -104,13 +104,7 @@ const query = reactive({...defaultQuery})
 
 const getData = (page=defaultPage.page) => {
     loading.value = true
-    // 更新当前页码
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    }
-    orderIndex(params).then((res:any) => {
+    Http.doGet('order/info/index', { ...query, page: page, per_page: pagination.per_page }).then((res:any) => {
         loading.value = false
         if (cns.$successCode(res.code)) {
             tableData.value = res.data

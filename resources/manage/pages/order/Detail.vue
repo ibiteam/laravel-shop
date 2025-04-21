@@ -1,251 +1,3 @@
-<script setup>
-import { useRoute, useRouter } from 'vue-router';
-import {getCurrentInstance, onMounted, reactive, ref, watch} from 'vue';
-import {
-    orderDetail,
-    orderShipEdit,
-    orderShipUpdate,
-    orderAddressEdit,
-    orderAddressUpdate,
-    orderQueryExpress
-} from '@/api/order.js';
-import _ from 'lodash';
-
-const cns = getCurrentInstance().appContext.config.globalProperties
-
-const router = useRouter();
-const route = useRoute();
-import { useCommonStore } from '@/store'
-const commonStore = useCommonStore()
-/* 订单明细数据 */
-const orderItems = ref([]);
-/* 订单数据 */
-const orderData = ref([]);
-const orderInfo = ref({});
-/* 订单时间节点数据 */
-const orderTimeData = ref([]);
-/* 订单费用信息 */
-const orderAmountData = ref([]);
-/* 订单支付信息 */
-const orderPayData = ref([]);
-/* 订单购买者信息 */
-const orderBuyerInfo = ref({});
-/* 订单收货地址信息 */
-const orderConsigneeInfo = ref({});
-/* 积分名称 */
-const integralName = ref('')
-/* 商品合计金额 */
-const orderGoodsAmount = ref('')
-
-const loading = ref(false)
-
-const getData = (orderId) => {
-    orderDetail({id:orderId}).then(res => {
-        if (cns.$successCode(res.code)) {
-            integralName.value = res.data.integral_name
-            orderGoodsAmount.value = res.data.order_amount_data.goods_amount
-            orderInfo.value = res.data.order_info
-
-            orderPayData.value = res.data.order_pay_data
-            orderItems.value = res.data.order_items
-            orderData.value = [res.data.order_info]
-            orderTimeData.value = [res.data.order_time]
-            orderAmountData.value = [res.data.order_amount_data]
-            orderBuyerInfo.value = res.data.order_buyer_info
-            orderConsigneeInfo.value = res.data.order_consignee_info
-        } else {
-            cns.$message.error(res.message)
-        }
-    })
-}
-
-/* 发货修改开始 */
-const shipFormDialogVisible = ref(false)
-const shipFormInitLoading = ref(false)
-const submitShipFormLoading = ref(false)
-const shipFormRef = ref(null);
-const shipForm = reactive({
-    id: 0,
-    ship_status: 1,
-    ship_company_id: null,
-    ship_no: '',
-})
-const shipFormRules = ref({
-    ship_status: [
-        { required: true, message: '请选择发货状态', trigger: 'change' },
-    ],
-})
-const shipCompany = ref([]);
-const openShipFormDialog = (orderId) => {
-    shipFormDialogVisible.value = true
-    shipFormInitLoading.value = true;
-    orderShipEdit({ id: orderId }).then(res => {
-        shipFormInitLoading.value = false;
-        if (cns.$successCode(res.code)) {
-            shipForm.id = res.data.order_info.id;
-            shipForm.ship_status = res.data.order_info.ship_status;
-
-            shipCompany.value = res.data.ship_company;
-        }
-    });
-};
-const submitShipForm = _.throttle(() => {
-    shipFormRef.value.validate((valid) => {
-        if (valid) {
-            let orderId = shipForm.id
-            submitShipFormLoading.value = true;
-            orderShipUpdate(shipForm).then(res => {
-                submitShipFormLoading.value = false;
-                if (cns.$successCode(res.code)) {
-                    getData(orderId)
-                    closeShipFormDialog()
-                    cns.$message.success(res.message)
-                } else {
-                    cns.$message.error(res.message)
-                }
-            });
-        }
-    });
-}, 1000);
-const closeShipFormDialog = () => {
-    shipCompany.value = [];
-    shipFormDialogVisible.value = false
-    shipFormInitLoading.value = false
-    submitShipFormLoading.value = false
-
-    shipForm.id = 0
-    shipForm.ship_status = 1
-    shipForm.ship_company_id = null
-    shipForm.ship_no = ''
-}
-/* 发货修改结束 */
-/* 修改收货地址开始 */
-const addressFormDialogVisible = ref(false)
-const addressFormInitLoading = ref(false)
-const addressFormSubmitLoading = ref(false);
-const addressFormRef = ref(null);
-const addressForm = reactive({
-    id: 0,
-    consignee: '',
-    phone: '',
-    address: '',
-    region: [],
-});
-const addressFormRules = ref({
-    consignee: [
-        { required: true, message: '请输入收货人', trigger: 'blur' },
-    ],
-    phone: [
-        { required: true, message: '请输入收货人手机号', trigger: 'blur' },
-    ],
-    address: [
-        { required: true, message: '请输入收货人地址', trigger: 'blur' },
-    ],
-    region: [
-        { required: true, message: '请选择省份', trigger: 'change' }
-    ]
-})
-const regionData = ref([])
-const openAddressFormDialog = (orderId) => {
-    addressFormDialogVisible.value = true
-    addressFormInitLoading.value = true;
-    addressForm.id = orderId;
-    orderAddressEdit({ id: orderId }).then(res => {
-        addressFormInitLoading.value = false;
-        if (cns.$successCode(res.code)) {
-            // 收货地址信息
-            addressForm.consignee = res.data.info.consignee;
-            addressForm.phone = res.data.info.phone;
-            addressForm.address = res.data.info.address;
-            addressForm.region = [res.data.info.province_id,res.data.info.city_id,res.data.info.district_id];
-
-            regionData.value = res.data.regions;
-        }
-    });
-}
-const submitAddressForm = _.throttle(() => {
-    console.log('addressForm',addressForm);
-    addressFormRef.value.validate((valid) => {
-        if (valid) {
-            if (addressForm.region.length != 3) {
-                cns.$message.error('请选择省市区')
-                return false;
-            }
-            let orderId = addressForm.id;
-            let requestAddressData = {
-                id: addressForm.id,
-                consignee: addressForm.consignee,
-                phone: addressForm.phone,
-                address: addressForm.address,
-                province_id: addressForm.region[0],
-                city_id: addressForm.region[1],
-                district_id: addressForm.region[2],
-            }
-            addressFormSubmitLoading.value = true;
-            orderAddressUpdate(requestAddressData).then(res => {
-                addressFormSubmitLoading.value = false;
-                if (cns.$successCode(res.code)) {
-                    getData(orderId)
-                    closeAddressFormDialog()
-                    cns.$message.success(res.message)
-                } else {
-                    cns.$message.error(res.message)
-                }
-            });
-        }
-    });
-}, 1000);
-const closeAddressFormDialog = () => {
-    regionData.value = [];
-    addressFormDialogVisible.value = false
-    addressFormInitLoading.value = false
-    addressFormSubmitLoading.value = false
-
-    addressForm.id = 0
-    addressForm.consignee = '';
-    addressForm.phone = '';
-    addressForm.address = '';
-    addressForm.province_id = '';
-    addressForm.city_id = '';
-    addressForm.district_id = '';
-}
-/* 修改收货地址结束 */
-/* 物流轨迹开始 */
-const logisticsVisible = ref(false)
-const logisticsInitLoading = ref(false);
-const logisticsData = ref([])
-const openLogisticsDialog = (orderId) => {
-    logisticsInitLoading.value = true
-    orderQueryExpress({id: orderId}).then(res => {
-        logisticsInitLoading.value = false
-        if (cns.$successCode(res.code)) {
-            logisticsData.value = res.data
-            logisticsVisible.value = true
-        } else {
-            cns.$message.error(res.message)
-        }
-    })
-}
-const closeLogisticsDialog = () => {
-    logisticsVisible.value = false;
-    logisticsData.value = [];
-    logisticsInitLoading.value = false;
-}
-/* 物流轨迹结束 */
-
-onMounted(() => {
-    let title = '订单详情'
-    if (route.params.order_sn){
-        title = "订单详情-" + route.params.order_sn
-        commonStore.updateVisitedViewsTitle(route, title)
-    }
-    getData(route.query.id)
-})
-
-
-
-</script>
-
 <template>
     <div class="order-detail bg-fff manage-public-wrap pd20">
         <p class="tip-title"><a @click="router.push({name:'manage.order.index'})">订单列表 </a><span> > </span>订单详情<span> > </span><span>{{ orderInfo.order_sn }}</span></p>
@@ -387,7 +139,6 @@ onMounted(() => {
             </div>
         </div>
     </div>
-
     <!-- 发货修改 -->
     <el-dialog v-model="shipFormDialogVisible" title="发货修改" width="600" center :before-close="closeShipFormDialog">
         <div v-loading="shipFormInitLoading" class="s-flex jc-ct">
@@ -456,7 +207,240 @@ onMounted(() => {
         </template>
     </el-dialog>
 </template>
+<script setup lang="ts">
+import { useRoute, useRouter } from 'vue-router';
+import {getCurrentInstance, onMounted, reactive, ref} from 'vue';
+import { useCommonStore } from '@/store'
+import Http from '@/utils/http.js';
+const commonStore = useCommonStore()
 
+const cns = getCurrentInstance().appContext.config.globalProperties
+
+const router = useRouter();
+const route = useRoute();
+
+/* 订单明细数据 */
+const orderItems = ref([]);
+/* 订单数据 */
+const orderData = ref([]);
+const orderInfo = ref({});
+/* 订单时间节点数据 */
+const orderTimeData = ref([]);
+/* 订单费用信息 */
+const orderAmountData = ref([]);
+/* 订单支付信息 */
+const orderPayData = ref([]);
+/* 订单购买者信息 */
+const orderBuyerInfo = ref({});
+/* 订单收货地址信息 */
+const orderConsigneeInfo = ref({});
+/* 积分名称 */
+const integralName = ref('')
+/* 商品合计金额 */
+const orderGoodsAmount = ref('')
+
+const loading = ref(false)
+
+const getData = (orderId: number) => {
+    Http.doGet('order/info/detail',{id:orderId}).then((res: any) => {
+        if (cns.$successCode(res.code)) {
+            integralName.value = res.data.integral_name
+            orderGoodsAmount.value = res.data.order_amount_data.goods_amount
+            orderInfo.value = res.data.order_info
+
+            orderPayData.value = res.data.order_pay_data
+            orderItems.value = res.data.order_items
+            orderData.value = [res.data.order_info]
+            orderTimeData.value = [res.data.order_time]
+            orderAmountData.value = [res.data.order_amount_data]
+            orderBuyerInfo.value = res.data.order_buyer_info
+            orderConsigneeInfo.value = res.data.order_consignee_info
+        } else {
+            cns.$message.error(res.message)
+        }
+    })
+};
+
+/* 发货修改开始 */
+const shipCompany = ref([]);
+const shipFormDialogVisible = ref(false)
+const shipFormInitLoading = ref(false)
+const submitShipFormLoading = ref(false)
+const shipFormRef = ref(null);
+
+const defaultShipForm = {
+    id: 0,
+    ship_status: 1,
+    ship_company_id: null,
+    ship_no: '',
+}
+const shipForm = reactive({...defaultShipForm})
+
+const shipFormRules = ref({
+    ship_status: [
+        { required: true, message: '请选择发货状态', trigger: 'change' },
+    ],
+})
+
+const openShipFormDialog = (orderId: number) => {
+    shipFormDialogVisible.value = true
+    shipFormInitLoading.value = true;
+    Http.doGet('order/info/ship/edit',{ id: orderId }).then((res: any) => {
+        shipFormInitLoading.value = false;
+        if (cns.$successCode(res.code)) {
+            shipForm.id = res.data.order_info.id;
+            shipForm.ship_status = res.data.order_info.ship_status;
+
+            shipCompany.value = res.data.ship_company;
+        }
+    });
+};
+const closeShipFormDialog = () => {
+    shipCompany.value = [];
+    shipFormDialogVisible.value = false
+    shipFormInitLoading.value = false
+    submitShipFormLoading.value = false
+    Object.assign(shipForm, defaultShipForm)
+}
+const submitShipForm = () => {
+    shipFormRef.value.validate((valid) => {
+        if (valid) {
+            let orderId = shipForm.id
+            submitShipFormLoading.value = true;
+            Http.doPost('order/info/ship/update', shipForm).then(res => {
+                submitShipFormLoading.value = false;
+                if (cns.$successCode(res.code)) {
+                    getData(orderId)
+                    closeShipFormDialog()
+                    cns.$message.success(res.message)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            });
+        }
+    });
+};
+/* 发货修改结束 */
+/* 修改收货地址开始 */
+const regionData = ref([])
+const addressFormDialogVisible = ref(false)
+const addressFormInitLoading = ref(false)
+const addressFormSubmitLoading = ref(false);
+const addressFormRef = ref(null);
+
+const defaultAddressForm = {
+    id: 0,
+    consignee: '',
+    phone: '',
+    address: '',
+    region: [],
+}
+
+const addressForm = reactive({...defaultAddressForm});
+
+const addressFormRules = ref({
+    consignee: [
+        { required: true, message: '请输入收货人', trigger: 'blur' },
+    ],
+    phone: [
+        { required: true, message: '请输入收货人手机号', trigger: 'blur' },
+    ],
+    address: [
+        { required: true, message: '请输入收货人地址', trigger: 'blur' },
+    ],
+    region: [
+        { required: true, message: '请选择省份', trigger: 'change' }
+    ]
+})
+
+const openAddressFormDialog = (orderId: number) => {
+    addressFormDialogVisible.value = true
+    addressFormInitLoading.value = true;
+    addressForm.id = orderId;
+    Http.doGet('order/info/address/edit',{ id: orderId }).then((res: any) => {
+        addressFormInitLoading.value = false;
+        if (cns.$successCode(res.code)) {
+            // 收货地址信息
+            addressForm.consignee = res.data.info.consignee;
+            addressForm.phone = res.data.info.phone;
+            addressForm.address = res.data.info.address;
+            addressForm.region = [res.data.info.province_id,res.data.info.city_id,res.data.info.district_id];
+
+            regionData.value = res.data.regions;
+        }
+    });
+}
+const closeAddressFormDialog = () => {
+    regionData.value = [];
+    addressFormDialogVisible.value = false
+    addressFormInitLoading.value = false
+    addressFormSubmitLoading.value = false
+    Object.assign(addressForm, defaultAddressForm)
+}
+const submitAddressForm = () => {
+    addressFormRef.value.validate((valid) => {
+        if (valid) {
+            if (addressForm.region.length != 3) {
+                cns.$message.error('请选择省市区')
+                return false;
+            }
+            let orderId = addressForm.id;
+            let requestAddressData = {
+                id: addressForm.id,
+                consignee: addressForm.consignee,
+                phone: addressForm.phone,
+                address: addressForm.address,
+                province_id: addressForm.region[0],
+                city_id: addressForm.region[1],
+                district_id: addressForm.region[2],
+            }
+            addressFormSubmitLoading.value = true;
+            Http.doPost('order/info/address/update', requestAddressData).then(res => {
+                addressFormSubmitLoading.value = false;
+                if (cns.$successCode(res.code)) {
+                    getData(orderId)
+                    closeAddressFormDialog()
+                    cns.$message.success(res.message)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            });
+        }
+    });
+}
+/* 修改收货地址结束 */
+/* 物流轨迹开始 */
+const logisticsVisible = ref(false)
+const logisticsInitLoading = ref(false);
+const logisticsData = ref([])
+
+const openLogisticsDialog = (orderId: number) => {
+    logisticsInitLoading.value = true
+    Http.doGet('order/info/express/query',{id: orderId}).then((res: any) => {
+        logisticsInitLoading.value = false
+        if (cns.$successCode(res.code)) {
+            logisticsData.value = res.data
+            logisticsVisible.value = true
+        } else {
+            cns.$message.error(res.message)
+        }
+    })
+}
+const closeLogisticsDialog = () => {
+    logisticsVisible.value = false;
+    logisticsData.value = [];
+    logisticsInitLoading.value = false;
+}
+/* 物流轨迹结束 */
+onMounted(() => {
+    let title = '订单详情'
+    if (route.params.order_sn){
+        title = "订单详情-" + route.params.order_sn
+        commonStore.updateVisitedViewsTitle(route, title)
+    }
+    getData(route.query.id)
+})
+</script>
 <style scoped lang="scss">
 .order-detail{
     min-height: 100%;

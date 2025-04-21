@@ -119,13 +119,13 @@
     </page-table>
 </template>
 <script setup lang="ts">
-import { orderIndex } from '@/api/order.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue'
 import { useRouter,useRoute } from 'vue-router'
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
 import { OrderStatus,PayStatus,ShipStatus } from '@/enums/model'
 import { DocumentCopy } from '@element-plus/icons-vue';
+import Http from '@/utils/http';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 const route = useRoute()
@@ -184,12 +184,7 @@ const resetSearch = () => {
 /* 获取分页数据 */
 const getData = (page:number = defaultPage.page) => {
     loading.value = true
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    }
-    orderIndex(params).then((res:any) => {
+    Http.doGet('order/info/index', { ...query, page: page, per_page: pagination.per_page }).then((res:any) => {
         loading.value = false
         if (cns.$successCode(res.code)) {
             tableData.value = res.data

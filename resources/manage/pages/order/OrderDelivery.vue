@@ -128,11 +128,12 @@
     </el-dialog>
 </template>
 <script setup lang="ts">
-import { orderDeliveryIndex, orderQueryExpress, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
+import { orderDeliveryIndex, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -189,10 +190,10 @@ const handleChange = (page:number,per_page:number) => {
 const logisticsVisible = ref(false)
 const logisticsData = ref([])
 const logisticsInitLoading = ref(false)
-const openLogisticsDialog = (orderId) => {
+const openLogisticsDialog = (orderId: number) => {
     logisticsInitLoading.value = true
     logisticsVisible.value = true
-    orderQueryExpress({id: orderId}).then(res => {
+    Http.doGet('order/info/express/query',{id: orderId}).then((res: any) => {
         logisticsInitLoading.value = false
         if (cns.$successCode(res.code)) {
             logisticsData.value = res.data
