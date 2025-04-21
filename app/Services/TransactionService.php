@@ -64,17 +64,14 @@ class TransactionService
         $apply_refund = ApplyRefund::query()->whereTransactionId($transaction->id)->first();
 
         if ($apply_refund instanceof ApplyRefund) {
-            $apply_refund->update([
-                'status' => ApplyRefundStatusEnum::REFUND_SUCCESS->value,
-                'job_time' => null,
-                'result' => '款项已原路返回买家账号',
-            ]);
 
-            // 退款成功后更新订单信息
             try {
-                app(ApplyRefundDao::class)->refundSuccessChangeOrder($apply_refund);
+                // 申请售后退款成功 逻辑处理
+                app(OrderOperateService::class)->applyRefund($apply_refund);
             } catch (BusinessException $business_exception) {
                 Log::error('支付回调，处理申请售后逻辑报错：'.$business_exception->getMessage(), $business_exception->getTrace());
+            } catch (\Throwable $exception) {
+                Log::error('支付回调，处理申请售后逻辑异常：'.$exception->getMessage(), $exception->getTrace());
             }
         }
     }
