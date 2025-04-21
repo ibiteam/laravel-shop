@@ -151,9 +151,9 @@
 </template>
 <script setup lang="ts">
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
-import { orderEvaluateCheck, orderEvaluateDetail, orderEvaluateIndex } from '@/api/order.js';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -191,12 +191,7 @@ const resetSearch = () => {
 /* 获取分页数据 */
 const getData = (page:number = defaultPage.page) => {
     loading.value = true
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    }
-    orderEvaluateIndex(params).then((res:any) => {
+    Http.doGet('order/evaluate', { ...query, page: page, per_page: pagination.per_page }).then((res:any) => {
         loading.value = false
         if (cns.$successCode(res.code)) {
             tableData.value = res.data
@@ -217,9 +212,9 @@ const handleChange = (page:number,per_page:number) => {
 const detailVisible = ref(false)
 const detailInitLoading = ref(false);
 const detailData = ref({})
-const openDetailDialog = (orderEvaluateId) => {
+const openDetailDialog = (orderEvaluateId: number) => {
     detailInitLoading.value = true
-    orderEvaluateDetail({id: orderEvaluateId}).then(res => {
+    Http.doGet('manage/order/evaluate/detail', {id: orderEvaluateId}).then((res: any) => {
         detailInitLoading.value = false
         if (cns.$successCode(res.code)) {
             detailData.value = res.data
@@ -235,7 +230,6 @@ const closeDetailDialog = () => {
     detailInitLoading.value = false;
 }
 /* 查看弹窗结束 */
-
 const handleOrderEvaluateCheck = (orderEvaluateId:number,status:number,message:string) => {
     cns.$confirm(message, '提示', {
         confirmButtonText: '确定',
@@ -243,7 +237,7 @@ const handleOrderEvaluateCheck = (orderEvaluateId:number,status:number,message:s
         type: 'warning',
         center: true,
     }).then(() => {
-        orderEvaluateCheck({id: orderEvaluateId,status: status}).then(res => {
+        Http.doPost('order/evaluate/check', {id: orderEvaluateId,status: status}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success(res.message)
                 getData(pagination.page)

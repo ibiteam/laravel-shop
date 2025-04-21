@@ -8,7 +8,7 @@ use App\Utils\AppService\KuaiDi100Util;
 class ExpressService
 {
     /**
-     * @throws \Exception
+     * @throws BusinessException
      */
     public function queryExpress(string $ship_no, string $ship_company_code, string $phone = '', int $user_id = 0): array
     {
