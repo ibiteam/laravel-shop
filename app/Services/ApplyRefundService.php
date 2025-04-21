@@ -297,7 +297,7 @@ class ApplyRefundService
         }
 
         // 卖家超时未处理，自动退款给买家
-        ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.prefix'));
+        ApplyRefundJob::dispatch(ApplyRefundStatusEnum::NOT_PROCESSED->value, $apply_refund->id, '卖家超时未处理，自动退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time);
 
         return $apply_refund;
     }

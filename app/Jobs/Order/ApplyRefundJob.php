@@ -14,6 +14,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ApplyRefundJob implements ShouldQueue
 {
@@ -32,6 +33,8 @@ class ApplyRefundJob implements ShouldQueue
      */
     public function __construct($status, $apply_refund_id, $action, $type)
     {
+        $this->onQueue('order');    // 指定任务队列
+
         $this->status = $status;
         $this->apply_refund_id = $apply_refund_id;
         $this->action = $action;
@@ -108,7 +111,8 @@ class ApplyRefundJob implements ShouldQueue
                 app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
-        } catch (BusinessException|\Exception $e) {
+        } catch (BusinessException|\Exception $exception) {
+            Log::error('关闭退款队列异常~'.$exception->getMessage());
             DB::rollBack();
         }
     }
@@ -143,11 +147,10 @@ class ApplyRefundJob implements ShouldQueue
             // 微信退款
             app(ApplyRefundDao::class)->wechatRefund($apply_refund);
 
-            // 更新订单退款后的状态
-            // app(ApplyRefundDao::class)->refundSuccessChangeOrder($apply_refund);
-
             DB::commit();
-        } catch (BusinessException|\Exception $e) {
+        } catch (BusinessException|\Exception $exception) {
+            Log::error('执行退款队列异常~'.$exception->getMessage());
+
             DB::rollBack();
         }
     }

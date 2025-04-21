@@ -160,7 +160,7 @@ class ApplyRefundController extends BaseController
                 DB::commit();
 
                 // 添加job 等待买家在 5 天内操作退货流程
-                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE_EXAMINE->value, $apply_refund->id, '买家退货超时，退款流程系统自动关闭', ApplyRefundLog::TYPE_BUYER)->delay($job_time)->onQueue(config('cache.prefix'));
+                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE_EXAMINE->value, $apply_refund->id, '买家退货超时，退款流程系统自动关闭', ApplyRefundLog::TYPE_BUYER)->delay($job_time);
             } catch (\Exception $exception) {
                 DB::rollBack();
 
@@ -281,9 +281,6 @@ class ApplyRefundController extends BaseController
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
-                // 更新订单退款后的状态
-                // $order = $apply_refund_dao->refundSuccessChangeOrder($apply_refund);
-
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家同意了退款');
 
                 admin_operation_log("同意了退款申请记录：{$apply_refund->id}");
@@ -350,7 +347,7 @@ class ApplyRefundController extends BaseController
                 DB::commit();
 
                 // 添加job 等待买家再72小时内操作关闭了流程
-                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE->value, $apply_refund->id, '买家超时未申请，退款流程自动关闭', ApplyRefundLog::TYPE_SELLER)->delay($job_time)->onQueue(config('cache.default_prefix'));
+                ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE->value, $apply_refund->id, '买家超时未申请，退款流程自动关闭', ApplyRefundLog::TYPE_SELLER)->delay($job_time);
             } catch (\Exception $exception) {
                 DB::rollBack();
 
@@ -409,9 +406,6 @@ class ApplyRefundController extends BaseController
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
-
-                // 更新订单退款后的状态
-                // $order = $apply_refund_dao->refundSuccessChangeOrder($apply_refund);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家确认收货，已退款给买家');
 
