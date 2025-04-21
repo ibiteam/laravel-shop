@@ -92,7 +92,7 @@
                         <!-- <el-input-tag
                             v-model="export_data"
                             ref="inputTagRef"
-                            
+
                             placeholder="请输入商品ID,以逗号或者回车形式隔开"
                         /> -->
                         <div class="s-flex jc-fe mt-10">
@@ -150,8 +150,8 @@
 <script setup>
 import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { categoryIndex } from '@/api/goods.js';
 import { decorationGoodsList, decorationGoodsImport } from '@/api/decoration.js'
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -324,7 +324,7 @@ const getGoodsList = (params = {page: 1}) => {
 }
 
 const getCategory = () => {
-    categoryIndex().then(res => {
+    Http.doGet('goods/category')().then(res => {
         if (cns.$successCode(res.code)) {
             categoryOptions.value = res.data;
         }

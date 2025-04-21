@@ -2,7 +2,6 @@
 import { Plus } from '@element-plus/icons-vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import _ from 'lodash';
-import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
 import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
@@ -41,7 +40,7 @@ const openDetailDialog = (goodsCategoryId = 0) => {
     detailDialogVisible.value = true;
     detailDialogTitle.value = goodsCategoryId > 0 ? '编辑分类' : '添加分类';
     detailFormLoading.value = true;
-    categoryEdit({ id: goodsCategoryId }).then(res => {
+    Http.doGet('goods/category/edit', { id: goodsCategoryId }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             treeCategories.value = res.data.tree_categories;
@@ -98,7 +97,7 @@ const submitDetailForm = _.throttle(() => {
     detailFormRef.value.validate((valid) => {
         if (valid) {
             detailSubmitLoading.value = true;
-            categoryUpdate(detailForm).then(res => {
+            Http.doPost('goods/category/update', detailForm).then(res => {
                 detailSubmitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeDetailDialog();
@@ -118,7 +117,7 @@ const handleDestroy = (goodsCategoryId) => {
         type: 'warning',
         center: true
     }).then(() => {
-        categoryDestroy({ id: goodsCategoryId }).then(res => {
+        Http.doPost('goods/category/destroy', { id: goodsCategoryId }).then(res => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -132,7 +131,7 @@ const handleDestroy = (goodsCategoryId) => {
 };
 
 const changeShow = (row) => {
-    categoryChangeShow({
+    Http.doPost('goods/category/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
@@ -145,7 +144,7 @@ const changeShow = (row) => {
 };
 
 const getData = () => {
-    categoryIndex().then(res => {
+    Http.doGet('goods/category').then(res => {
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
         } else {

@@ -466,7 +466,6 @@
 import Editor from '@/components/good/Editor.vue'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import { ref, getCurrentInstance, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
-import { goodsDetailInit, getGoodsSkuTemplate, getGoodsParameterTemplate, goodsParameterTemplateStore, goodsParameterTemplateUpdate, goodsParameterTemplateDestroy, goodsSkuTemplateStore, goodsSkuTemplateUpdate, goodsSkuTemplateDestroy, goodsUpdate } from '@/api/goods';
 import { fileUpload } from '@/api/common'
 import _ from 'lodash'
 import { VueCropper }  from "vue-cropper";
@@ -475,6 +474,7 @@ import { VueDraggable } from 'vue-draggable-plus'
 import { tabRemove } from '@/router/tabs'
 import { useRoute,useRouter } from 'vue-router'
 import { useCommonStore } from '@/store'
+import Http from '@/utils/http';
 const commonStore = useCommonStore()
 const router = useRouter()
 const route = useRoute();
@@ -511,7 +511,7 @@ const parameterTemplateArr = ref([])
 const updateParameterTemplate = (item,i,type) => {
     if(type === 'edit'){
         cns.$dialog.prompt({message: '修改产品参数模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
-            goodsParameterTemplateUpdate({id: item.id, name: value}).then(res => {
+            Http.doPost('goods/parameter/template/update',{id: item.id, name: value}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('修改产品参数模板成功')
                     getParameterTemplate('')
@@ -523,7 +523,7 @@ const updateParameterTemplate = (item,i,type) => {
     }else {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
             parameterTemplateArr.value.splice(i, 1);
-            goodsParameterTemplateDestroy({id: item.id}).then(res => {
+            Http.doPost('goods/parameter/template/destroy', {id: item.id}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('删除产品参数模板成功')
                     getParameterTemplate('')
@@ -547,7 +547,7 @@ const selectedParameterTemplate = (value) => {
 const ctrlParameterTemplate = (type) => {
     if(type === 'save'){
         cns.$dialog.prompt({message: '添加产品参数模板',inputValue: '',inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
-            goodsParameterTemplateStore({ name: value, values: updateForm.value.parameters }).then(res => {
+            Http.doPost('goods/parameter/template/store', { name: value, values: updateForm.value.parameters }).then(res => {
                 if (cns.$successCode(res.code)) {
                     getParameterTemplate(res.data.id)
                     cns.$message.success('保存产品参数模板成功')
@@ -557,7 +557,7 @@ const ctrlParameterTemplate = (type) => {
             })
         })
     }else if(type === 'update'){
-        goodsParameterTemplateUpdate({ id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
+        Http.doPost('goods/parameter/template/update', { id: currentParameterTemplate.value, values: updateForm.value.parameters }).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success('更新产品参数模板成功')
             } else {
@@ -567,7 +567,7 @@ const ctrlParameterTemplate = (type) => {
     }
 }
 const getParameterTemplate = (id) => {
-    getGoodsParameterTemplate().then(res => {
+    Http.doGet('goods/parameter/template/small/index').then(res => {
         if (cns.$successCode(res.code)) {
             parameterTemplateArr.value = [...res.data]
             currentParameterTemplate.value = id
@@ -838,7 +838,7 @@ const moreIntegralPrice = (index) => {
 }
 /* 获取规格模板 */
 const getSkuTemplate = () => {
-    getGoodsSkuTemplate().then(res => {
+    Http.doGet('goods/sku/template/small/index').then(res => {
         if (cns.$successCode(res.code)) {
             specificationsArr.value = [...res.data]
         }
@@ -1158,7 +1158,7 @@ const ctrlSkuTemplate = (type) => {
             } else {
                 if (type === 'save') {
                     // 保存SKU模板
-                    goodsSkuTemplateStore(goodsSkuTemplate.value).then(res => {
+                    Http.doPost('goods/sku/template/store', goodsSkuTemplate.value).then(res => {
                         if (cns.$successCode(res.code)) {
                             cns.$message.success('保存模板成功')
                         } else {
@@ -1169,7 +1169,7 @@ const ctrlSkuTemplate = (type) => {
                     });
                 } else if (type === 'update') {
                     // 更新SKU模板
-                    goodsSkuTemplateUpdate(goodsSkuTemplate.value).then(res => {
+                    Http.doPost('goods/sku/template/update', goodsSkuTemplate.value).then(res => {
                         if (cns.$successCode(res.code)) {
                             cns.$message.success('更新模板成功')
                         } else {
@@ -1190,7 +1190,7 @@ const ctrlSkuTemplate = (type) => {
 const updateSkuTemplate = (item,i,type) => {
     if(type == 'update'){
         cns.$dialog.prompt({message: '修改商品规格模板',inputValue: item.name,inputPlaceholder: '请输入模板名称',inputValidator: validatorTemplateName}).then(({ value }) => {
-            goodsSkuTemplateUpdate({id: item.id, name: value}).then(res => {
+            Http.doPost('goods/sku/template/update', {id: item.id, name: value}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('修改商品规格模板成功')
                     getSkuTemplate()
@@ -1202,7 +1202,7 @@ const updateSkuTemplate = (item,i,type) => {
     }else {
         cns.$dialog.confirm({message: '确定删除该模板？'}).then(() => {
             parameterTemplateArr.value.splice(i, 1);
-            goodsSkuTemplateDestroy({id: item.id}).then(res => {
+            Http.doPost('goods/sku/template/destroy', {id: item.id}).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('删除商品规格模板成功')
                     getSkuTemplate()
@@ -1231,7 +1231,7 @@ const submitGoods = () => {
     loading.value = true
     updateFormRef.value.validate((valid) => {
         if (valid) {
-            goodsUpdate(updateForm.value).then(res => {
+            Http.doPost('goods/info/update', updateForm.value).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('保存商品成功')
                     loading.value = false
@@ -1255,7 +1255,7 @@ onMounted(() => {
         title = "编辑商品-" + route.params.id
     }
     commonStore.updateVisitedViewsTitle(route, title)
-    goodsDetailInit({id:route.params.id}).then(res => {
+    Http.doGet('goods/info/edit', {id:route.params.id}).then(res => {
         if (cns.$successCode(res.code)) {
             updateForm.value = {...res.data.info}
             category.value = res.data.category
