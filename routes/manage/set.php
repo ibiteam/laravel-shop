@@ -34,7 +34,7 @@ Route::prefix('permission')->group(function () {
         Route::get('/', [PermissionController::class, 'index'])->name(Permission::MANAGE_PERMISSION_INDEX);
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_UPDATE])->group(function () {
-        Route::post('store', [PermissionController::class, 'store']);
+        Route::post('update', [PermissionController::class, 'update']);
     });
 });
 
@@ -45,7 +45,7 @@ Route::prefix('role')->group(function () {
         Route::get('info', [RoleController::class, 'info']);
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_UPDATE])->group(function () {
-        Route::post('store', [RoleController::class, 'store']);
+        Route::post('update', [RoleController::class, 'update']);
         Route::post('change_show', [RoleController::class, 'changeShow']);
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_DELETE])->group(function () {
@@ -81,7 +81,7 @@ Route::prefix('set')->group(function () {
             Route::get('pages', [RouterCategoryController::class, 'getPages']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
-            Route::post('store', [RouterCategoryController::class, 'store']);
+            Route::post('update', [RouterCategoryController::class, 'update']);
             Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
@@ -96,7 +96,7 @@ Route::prefix('set')->group(function () {
             Route::get('categories', [RouterController::class, 'categories']);
         });
         Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_UPDATE])->group(function () {
-            Route::post('store', [RouterController::class, 'store']);
+            Route::post('update', [RouterController::class, 'update']);
             Route::post('change_show', [RouterController::class, 'changeShow']);
         });
     });

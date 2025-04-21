@@ -141,16 +141,9 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 import SearchForm from '@/components/common/SearchForm.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
-import {
-    articleCategoryIndex,
-    articleCategoryInfo,
-    articleCategoryStore,
-    articleCategoryDestroy,
-    articleCategoryChangeShow,
-    articleCategoryMove
-} from '@/api/article.js';
 
 const defaultQuery = reactive({
     name: ''
@@ -194,7 +187,7 @@ const submitFormRules = reactive({
 const openStoreDialog = (categoryId = 0) => {
     storeDialogTitle.value = categoryId > 0 ? '编辑分类' : '添加分类';
     detailFormLoading.value = true;
-    articleCategoryInfo({ id: categoryId }).then(res => {
+    Http.doGet('article/category/info', { id: categoryId }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             treeCategories.value = res.data.tree_categories;
@@ -247,7 +240,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            articleCategoryStore(submitForm).then(res => {
+            Http.doPost('article/category/update', submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -270,7 +263,7 @@ const openMoveDialog = (oldCategoryId) => {
         return false;
     }
     detailFormLoading.value = true;
-    articleCategoryInfo({ id: 0 }).then(res => {
+    Http.doGet('article/category/info', { id: 0 }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             treeCategories.value = res.data.tree_categories;
@@ -299,7 +292,7 @@ const closeMoveDialog = () => {
 // 转移文章
 const onMoveSubmit = () => {
     submitLoading.value = true;
-    articleCategoryMove(moveForm).then(res => {
+    Http.doPost('article/category/move', moveForm).then(res => {
         submitLoading.value = false;
         if (cns.$successCode(res.code)) {
             closeMoveDialog();
@@ -317,7 +310,7 @@ const handleDestroy = (categoryId) => {
         type: 'warning',
         center: true
     }).then(() => {
-        articleCategoryDestroy({ id: categoryId }).then(res => {
+        Http.doPost('article/category/destroy', { id: categoryId }).then(res => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -331,7 +324,7 @@ const handleDestroy = (categoryId) => {
 };
 
 const changeShow = (row) => {
-    articleCategoryChangeShow({
+    Http.doPost('article/category/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
@@ -345,7 +338,7 @@ const changeShow = (row) => {
 
 const getData = () => {
     loading.value = true;
-    articleCategoryIndex(query).then(res => {
+    Http.doGet('article/category', query).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

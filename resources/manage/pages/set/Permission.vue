@@ -144,7 +144,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            Http.doPost('permission/store', submitForm).then((res: any) => {
+            Http.doPost('permission/update', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     cns.$message.success(res.message);

@@ -28,7 +28,7 @@ class PermissionController extends BaseController
     /**
      * 编辑.
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         try {
             $validated = $request->validate([

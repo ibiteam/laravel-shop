@@ -7,7 +7,8 @@
             </el-form-item>
             <el-form-item label="内容" prop="content">
                 <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
-                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容" @change="handleChangeContent" v-else/>
+                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容"
+                        @change="handleChangeContent" v-else />
             </el-form-item>
             <el-form-item label="分类" prop="article_category_id">
                 <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
@@ -76,13 +77,13 @@
 
 <script setup>
 import Editor from '@/components/good/Editor.vue';
-import { articleInfo, articleStore, articleUpdateCover, articleDeleteCover } from '@/api/article.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCommonStore } from '@/store';
 import { Delete, Plus } from '@element-plus/icons-vue';
 import { fileUpload } from '@/api/common.js';
 import { tabRemove } from '@/router/tabs.js';
+import Http from '@/utils/http';
 
 const commonStore = useCommonStore();
 const router = useRouter();
@@ -163,10 +164,10 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            articleStore(submitForm.value).then(res => {
+            Http.doPost('article/update', submitForm.value).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
-                    tabRemove(String(router.currentRoute.value.name),{name: 'manage.article.index'})
+                    tabRemove(String(router.currentRoute.value.name), { name: 'manage.article.index' });
                 } else {
                     cns.$message.error(res.message);
                 }
@@ -186,13 +187,13 @@ const closeArticleForm = () => {
         type: 'warning',
         center: true
     }).then(() => {
-        tabRemove(String(router.currentRoute.value.name),{name: 'manage.article.index'})
+        tabRemove(String(router.currentRoute.value.name), { name: 'manage.article.index' });
     });
 };
 
 const getArticleInfo = () => {
     detailFormLoading.value = true;
-    articleInfo({ id: route.params.id }).then(res => {
+    Http.doGet('article/info', { id: route.params.id }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             treeCategories.value = res.data.tree_categories;
@@ -269,5 +270,4 @@ onMounted(() => {
         display: flex;
     }
 }
-
 </style>
