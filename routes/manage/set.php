@@ -16,6 +16,18 @@ use App\Http\Controllers\Manage\TransactionController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
+// 管理员列表
+Route::prefix('admin_user')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_INDEX])->group(function () {
+        Route::get('/', [AdminUserController::class, 'index']);
+        Route::get('roles', [AdminUserController::class, 'roles']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
+        Route::post('update', [AdminUserController::class, 'update']);
+        Route::post('change/field', [AdminUserController::class, 'changeField']);
+    });
+});
+
 Route::prefix('set')->group(function () {
     // 商店设置
     Route::prefix('shop_config')->group(function () {
@@ -74,17 +86,7 @@ Route::prefix('set')->group(function () {
         });
     });
 
-    // 管理员列表
-    Route::prefix('admin_user')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_INDEX])->group(function () {
-            Route::get('/', [AdminUserController::class, 'index'])->name(Permission::MANAGE_ADMIN_USER_INDEX);
-            Route::get('roles', [AdminUserController::class, 'roles']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
-            Route::post('store', [AdminUserController::class, 'store']);
-            Route::post('change/field', [AdminUserController::class, 'changeField']);
-        });
-    });
+
 
     // 权限菜单
     Route::prefix('permission')->group(function () {

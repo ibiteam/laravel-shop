@@ -62,8 +62,8 @@
                     <el-form-item label="登录密码" prop="password">
                         <el-input v-model="submitForm.password" show-password></el-input>
                     </el-form-item>
-                    <el-form-item label="确认密码" prop="confirm_password">
-                        <el-input v-model="submitForm.confirm_password" show-password></el-input>
+                    <el-form-item label="确认密码" prop="password_confirmation">
+                        <el-input v-model="submitForm.password_confirmation" show-password></el-input>
                     </el-form-item>
                     <el-form-item label="手机号" prop="phone">
                         <el-input v-model="submitForm.phone" autocomplete="off"></el-input>
@@ -97,14 +97,9 @@
         </el-dialog>
 </template>
 <script setup lang="ts">
-import {
-    adminUserIndex,
-    adminUserStore,
-    adminUserChangeStatus,
-    adminUserRoles
-} from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import Http from '@/utils/http'
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
 
@@ -116,7 +111,6 @@ const query = reactive({
     role_id: '',
     status: '1',
     page: 1,
-    number: 10
 });
 const defaultPage = {
     page: 1,
@@ -132,19 +126,20 @@ const storeDialogVisible = ref(false);
 const storeDialogTitle = ref('');
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
-const submitForm = reactive({
+const defaultSubmitForm = {
     id: 0,
     user_name: '',
     password: '',
-    confirm_password: '',
+    password_confirmation: '',
     phone: '',
     job_no: '',
     role_ids: [],
     status: 1
-});
+}
+const submitForm = reactive({...defaultSubmitForm});
 
 const validatorPassword = (rule, value, callback) => {
-    const fag1 = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
+    const password_rule = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
 
     if (!submitForm.id) {
         if (!value) {
@@ -155,18 +150,18 @@ const validatorPassword = (rule, value, callback) => {
             callback(new Error('密码不能小于6位'));
             return false;
         }
-        if (submitForm.confirm_password && value !== submitForm.confirm_password) {
+        if (submitForm.password_confirmation && value !== submitForm.password_confirmation) {
             callback(new Error('两次密码不同'));
             return false;
         }
-        if (!fag1.test(value)) {
+        if (!password_rule.test(value)) {
             callback(new Error('密码必须包含大写字母，小写字母，数字，特殊字符`@#$%^&*`~()-+=`中的任意三种'));
             return false;
         }
     }
-    if (fag1.test(value) && value.length >= 6 && value === submitForm.confirm_password) {
+    if (password_rule.test(value) && value.length >= 6 && value === submitForm.password_confirmation) {
         if (submitFormRef.value) {
-            submitFormRef.value.clearValidate(['password', 'confirm_password']);
+            submitFormRef.value.clearValidate(['password', 'password_confirmation']);
         }
     }
     callback();
@@ -205,11 +200,11 @@ const submitFormRules = reactive({
     user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
     phone: [{ required: true, validator: validatorPhone, trigger: 'blur' }],
     password: [{ validator: validatorPassword, trigger: 'blur' }],
-    confirm_password: [{ validator: validatorConfirmPassword, trigger: 'blur' }]
+    password_confirmation: [{ validator: validatorConfirmPassword, trigger: 'blur' }]
 });
 
 const openStoreDialog = (row = {}) => {
-    storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
+    storeDialogTitle.value = row.id > 0 ? '编辑管理员' : '添加管理员';
     if (row.id) {
         submitForm.id = row.id;
         submitForm.user_name = row.user_name;
@@ -218,14 +213,7 @@ const openStoreDialog = (row = {}) => {
         submitForm.role_ids = row.role_ids;
         submitForm.status = row.status;
     } else {
-        submitForm.id = 0;
-        submitForm.user_name = '';
-        submitForm.password = '';
-        submitForm.confirm_password = '';
-        submitForm.phone = '';
-        submitForm.job_no = '';
-        submitForm.role_ids = [];
-        submitForm.status = 1;
+        Object.assign(submitForm, defaultSubmitForm)
     }
 
     const checkedCount = submitForm.role_ids.length;
@@ -239,14 +227,7 @@ const openStoreDialog = (row = {}) => {
 };
 const closeStoreDialog = () => {
     storeDialogTitle.value = '';
-    submitForm.id = 0;
-    submitForm.user_name = '';
-    submitForm.password = '';
-    submitForm.confirm_password = '';
-    submitForm.phone = '';
-    submitForm.job_no = '';
-    submitForm.role_ids = [];
-    submitForm.status = 1;
+    Object.assign(submitForm, defaultSubmitForm)
     storeDialogVisible.value = false;
 };
 
@@ -265,7 +246,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            adminUserStore(submitForm).then(res => {
+            Http.doPost('admin_user/update',submitForm).then((res:any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -282,7 +263,7 @@ const onSubmit = () => {
 };
 
 const handleFieldChange = (scope:any) => {
-    adminUserChangeStatus({ id: scope.row.id, field: scope.column.property,name:scope.column.label }).then((res:any) => {
+    Http.doPost('admin_user/change/field',{ id: scope.row.id, field: scope.column.property,name:scope.column.label }).then((res:any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
@@ -298,7 +279,7 @@ const openAdminOperationLog = (admin_user_name) => {
 
 /* 获取角色 */
 const getRoles = () => {
-    adminUserRoles().then(res => {
+    Http.doGet('manage/admin_user/roles').then((res:any) => {
         if (cns.$successCode(res.code)) {
             rolesData.value = res.data;
         }
@@ -313,7 +294,7 @@ const getData = (page=defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    adminUserIndex(params).then(res => {
+    Http.doGet('manage/admin_user',params).then((res:any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
@@ -339,20 +320,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
-
 .role-checkbox-container {
     display: flex;
     flex-direction: column;
