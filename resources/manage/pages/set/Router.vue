@@ -103,7 +103,7 @@
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
-import { routerIndex, routerStore, routerChangeShow, routerCategories } from '@/api/set.js';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -202,7 +202,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            routerStore(submitForm).then((res: any) => {
+            Http.doPost('set/router/store', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -219,7 +219,7 @@ const onSubmit = () => {
 };
 
 const changeShow = (row) => {
-    routerChangeShow({
+    Http.doPost('set/router/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then((res: any) => {
@@ -233,7 +233,7 @@ const changeShow = (row) => {
 
 /* 获取分类 */
 const getCategories = () => {
-    routerCategories().then((res: any) => {
+    Http.doGet('set/router/categories').then((res: any) => {
         if (cns.$successCode(res.code)) {
             categoriesData.value = res.data;
         }
@@ -248,7 +248,7 @@ const getData = (page: number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     };
-    routerIndex(params).then((res: any) => {
+    Http.doGet('set/router', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

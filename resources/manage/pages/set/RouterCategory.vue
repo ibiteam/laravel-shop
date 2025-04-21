@@ -111,14 +111,7 @@
 <script setup>
 import SearchForm from '@/components/common/SearchForm.vue';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
-import {
-    routerCategoryIndex,
-    routerCategoryInfo,
-    routerCategoryStore,
-    routerCategoryDestroy,
-    routerCategoryChangeShow,
-    routerCategoryGetPages
-} from '@/api/set.js';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -159,7 +152,7 @@ const submitFormRules = reactive({
 const openStoreDialog = (categoryId = 0) => {
     storeDialogTitle.value = categoryId > 0 ? '编辑分类' : '添加分类';
     detailFormLoading.value = true;
-    routerCategoryInfo({ id: categoryId }).then(res => {
+    Http.doGet('set/router_category/info', { id: categoryId }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             topCategories.value = res.data.top_categories;
@@ -207,7 +200,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            routerCategoryStore(submitForm).then(res => {
+            Http.doPost('set/router_category/store', submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -231,7 +224,7 @@ const handleDestroy = (categoryId) => {
         type: 'warning',
         center: true
     }).then(() => {
-        routerCategoryDestroy({ id: categoryId }).then(res => {
+        Http.doPost('set/router_category/destroy', { id: categoryId }).then(res => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -245,7 +238,7 @@ const handleDestroy = (categoryId) => {
 };
 
 const changeShow = (row) => {
-    routerCategoryChangeShow({
+    Http.doPost('set/router_category/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
@@ -260,7 +253,7 @@ const changeShow = (row) => {
 const searchPages = (query) => {
     if (query !== '') {
         remoteLoading.value = true;
-        routerCategoryGetPages({ keywords: query }).then(res => {
+        Http.doGet('set/router_category/pages', { keywords: query }).then(res => {
             remoteLoading.value = false;
             if (cns.$successCode(res.code)) {
                 pagePermissions.value = res.data;
@@ -276,7 +269,7 @@ const changeCategory = (form) => {
 
 const getData = () => {
     loading.value = true;
-    routerCategoryIndex(query).then(res => {
+    Http.doGet('set/router_category', query).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

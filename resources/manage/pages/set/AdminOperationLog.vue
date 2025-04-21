@@ -57,7 +57,7 @@ import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { adminOperationLogIndex, adminUserRoles } from '@/api/set.js';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 const route = useRoute();
@@ -96,7 +96,7 @@ const loading = ref(false);
 
 /* 获取角色 */
 const getRoles = () => {
-    adminUserRoles().then((res: any) => {
+    Http.doGet('admin_user/roles').then((res: any) => {
         if (cns.$successCode(res.code)) {
             rolesData.value = res.data;
         }
@@ -111,7 +111,7 @@ const getData = (page: number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     };
-    adminOperationLogIndex(params).then((res: any) => {
+    Http.doGet('admin_operation_log', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

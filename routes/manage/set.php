@@ -28,6 +28,38 @@ Route::prefix('admin_user')->group(function () {
     });
 });
 
+// 权限菜单
+Route::prefix('permission')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_INDEX])->group(function () {
+        Route::get('/', [PermissionController::class, 'index'])->name(Permission::MANAGE_PERMISSION_INDEX);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_UPDATE])->group(function () {
+        Route::post('store', [PermissionController::class, 'store']);
+    });
+});
+
+// 角色管理
+Route::prefix('role')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_INDEX])->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name(Permission::MANAGE_ROLE_INDEX);
+        Route::get('info', [RoleController::class, 'info']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_UPDATE])->group(function () {
+        Route::post('store', [RoleController::class, 'store']);
+        Route::post('change_show', [RoleController::class, 'changeShow']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_DELETE])->group(function () {
+        Route::post('destroy', [RoleController::class, 'destroy']);
+    });
+});
+
+// 管理员日志
+Route::prefix('admin_operation_log')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX])->group(function () {
+        Route::get('/', [AdminOperationLogController::class, 'index'])->name(Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX);
+    });
+});
+
 Route::prefix('set')->group(function () {
     // 商店设置
     Route::prefix('shop_config')->group(function () {
@@ -83,40 +115,6 @@ Route::prefix('set')->group(function () {
     Route::prefix('app_service_log')->group(function () {
         Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
             Route::get('/', [AppServiceLogController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
-        });
-    });
-
-
-
-    // 权限菜单
-    Route::prefix('permission')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_INDEX])->group(function () {
-            Route::get('/', [PermissionController::class, 'index'])->name(Permission::MANAGE_PERMISSION_INDEX);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_PERMISSION_UPDATE])->group(function () {
-            Route::post('store', [PermissionController::class, 'store']);
-        });
-    });
-
-    // 角色管理
-    Route::prefix('role')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_INDEX])->group(function () {
-            Route::get('/', [RoleController::class, 'index'])->name(Permission::MANAGE_ROLE_INDEX);
-            Route::get('info', [RoleController::class, 'info']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_UPDATE])->group(function () {
-            Route::post('store', [RoleController::class, 'store']);
-            Route::post('change_show', [RoleController::class, 'changeShow']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROLE_DELETE])->group(function () {
-            Route::post('destroy', [RoleController::class, 'destroy']);
-        });
-    });
-
-    // 管理员日志
-    Route::prefix('admin_operation_log')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX])->group(function () {
-            Route::get('/', [AdminOperationLogController::class, 'index'])->name(Permission::MANAGE_ADMIN_OPERATION_LOG_INDEX);
         });
     });
 

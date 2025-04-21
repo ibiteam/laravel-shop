@@ -53,7 +53,7 @@
                     <el-form-item label="角色描述" prop="description">
                         <el-input v-model="submitForm.description" />
                     </el-form-item>
-                    <!--todo: 角色权限-->
+                    <!--角色权限-->
                     <div class="permission-main">
                         <div class="permission-main-title">角色权限（角色拥有的权限）</div>
                         <el-checkbox v-model="checkPermission" class="permission-check" @change="handleCheckAllChange">
@@ -82,9 +82,9 @@
 </template>
 
 <script setup lang="ts">
-import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -126,7 +126,7 @@ const defaultProps = {
 const openStoreDialog = (id = 0) => {
     storeDialogTitle.value = id > 0 ? '编辑' : '添加';
     detailFormLoading.value = true;
-    roleInfo({ id: id }).then(res => {
+    Http.doGet('role/info', { id: id }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             allPermissions.value = res.data.all_permissions;
@@ -191,7 +191,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            roleStore(submitForm).then(res => {
+            Http.doPost('role/store', submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -208,7 +208,7 @@ const onSubmit = () => {
 };
 
 const changeShow = (row) => {
-    roleChangeShow({
+    Http.doPost('role/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
@@ -227,7 +227,7 @@ const handleDestroy = (id) => {
         type: 'warning',
         center: true
     }).then(() => {
-        roleDestroy({ id: id }).then(res => {
+        Http.doPost('role/destroy', { id: id }).then(res => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -243,7 +243,7 @@ const handleDestroy = (id) => {
 const getData = (page = 1) => {
     loading.value = true;
     searchForm.page = page;
-    roleIndex(searchForm).then(res => {
+    Http.doGet('role', searchForm).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data.list;

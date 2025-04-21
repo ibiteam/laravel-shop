@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import SearchForm from '@/components/common/SearchForm.vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import { permissionIndex, permissionStore } from '@/api/set.js';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -144,7 +144,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            permissionStore(submitForm).then((res: any) => {
+            Http.doPost('permission/store', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     cns.$message.success(res.message);
@@ -162,7 +162,7 @@ const onSubmit = () => {
 
 const getData = () => {
     loading.value = true;
-    permissionIndex(query).then((res: any) => {
+    Http.doGet('permission', query).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             permissionData.value = res.data;
