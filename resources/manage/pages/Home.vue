@@ -288,9 +288,9 @@ const getUvChartOption = (item) => {
         xAxisData = item.pc.statistic_date;
         pc_uv = item.pc.uv_number;
     }
-    if (item?.ibi?.statistic_date && Array.isArray(item.ibi.statistic_date)) {
-        xAxisData = item.ibi.statistic_date;
-        app_uv = item.ibi.uv_number;
+    if (item?.h5?.statistic_date && Array.isArray(item.h5.statistic_date)) {
+        xAxisData = item.h5.statistic_date;
+        app_uv = item.h5.uv_number;
     }
     return {
         title: {
@@ -332,7 +332,7 @@ const getUvChartOption = (item) => {
         },
         series: [
             {
-                name: '订单数',
+                name: 'PC用户数',
                 type: 'line',
                 data: pc_uv,
                 lineStyle: {
@@ -349,7 +349,7 @@ const getUvChartOption = (item) => {
 
             },
             {
-                name: '销售额',
+                name: 'H5用户数',
                 type: 'line',
                 data: app_uv,
                 lineStyle: {
