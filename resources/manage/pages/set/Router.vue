@@ -1,12 +1,113 @@
-<script setup>
-import { Plus, Search } from '@element-plus/icons-vue';
-import Page from '@/components/common/Pagination.vue'
-import { routerIndex, routerStore, routerChangeShow, routerCategories } from '@/api/set.js';
+<template>
+    <search-form :model="query" :label-width="100">
+        <el-form-item label="名称" prop="name">
+            <el-input v-model="query.name" clearable placeholder="请输入" @keyup.enter="getData()" />
+        </el-form-item>
+        <el-form-item label="别名" prop="alias">
+            <el-input v-model="query.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
+        </el-form-item>
+        <el-form-item label="所属分类">
+            <el-select v-model="query.router_category_id" clearable filterable placeholder="请选择">
+                <el-option v-for="item in categoriesData"
+                           :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="是否显示">
+            <el-select v-model="query.is_show" placeholder="请选择">
+                <el-option label="全部" value="-1"></el-option>
+                <el-option label="显示" value="1"></el-option>
+                <el-option label="隐藏" value="0"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button @click="resetSearch">重置</el-button>
+            <el-button type="danger" @click="openStoreDialog()">添加</el-button>
+        </el-form-item>
+    </search-form>
+    <page-table
+        :data="tableData"
+        :maxHeight="'700px'"
+        v-loading="loading"
+        @change="handlePageChange"
+    >
+        <el-table-column label="ID" prop="id" width="80"></el-table-column>
+        <el-table-column label="名称" prop="name"></el-table-column>
+        <el-table-column label="所属分类" prop="category_name"></el-table-column>
+        <el-table-column label="别名" prop="alias"></el-table-column>
+        <el-table-column label="H5地址" prop="h5_url_show"></el-table-column>
+        <el-table-column label="排序" prop="sort" width="80"></el-table-column>
+        <el-table-column label="额外参数" prop="params"></el-table-column>
+        <el-table-column label="是否显示" prop="is_show">
+            <template #default="{ row }">
+                <el-switch
+                    v-model="row.is_show"
+                    :active-value="1" :inactive-value="0"
+                    active-color="#13ce66" inactive-color="#ff4949"
+                    @click="changeShow(row)">
+                </el-switch>
+            </template>
+        </el-table-column>
+        <el-table-column label="创建时间" prop="created_at"></el-table-column>
+        <el-table-column label="操作">
+            <template #default="{ row }">
+                <el-button link type="primary" size="large" @click="openStoreDialog(row)">编辑</el-button>
+            </template>
+        </el-table-column>
+    </page-table>
+
+    <el-dialog
+        width="700" center :before-close="closeStoreDialog"
+        v-model="storeDialogVisible" :title="storeDialogTitle">
+        <div class="s-flex jc-ct">
+            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
+                     style="width: 480px" size="default">
+                <el-form-item label="所属分类" prop="router_category_id">
+                    <el-select v-model="submitForm.router_category_id" clearable filterable placeholder="请选择">
+                        <el-option v-for="item in categoriesData"
+                                   :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="submitForm.name" />
+                </el-form-item>
+                <el-form-item label="别名" prop="alias">
+                    <el-input v-model="submitForm.alias" :disabled='submitForm.id > 0' />
+                </el-form-item>
+                <el-form-item label="H5地址" prop="h5_url">
+                    <el-input v-model="submitForm.h5_url" />
+                </el-form-item>
+                <el-form-item label="额外参数" prop="params">
+                    <el-input type="textarea" rows="3" v-model="submitForm.params" placeholder="json格式" />
+                </el-form-item>
+                <el-form-item label="排序" prop="sort">
+                    <el-input v-model="submitForm.sort" />
+                </el-form-item>
+                <el-form-item label="是否显示" prop="is_show">
+                    <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                </el-form-item>
+            </el-form>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closeStoreDialog()">取消</el-button>
+                <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup lang="ts">
+import SearchForm from '@/components/common/SearchForm.vue';
+import PageTable from '@/components/common/PageTable.vue';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import { routerIndex, routerStore, routerChangeShow, routerCategories } from '@/api/set.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
-const searchForm = reactive({
+const defaultQuery = reactive({
     name: '',
     alias: '',
     router_category_id: '',
@@ -14,11 +115,24 @@ const searchForm = reactive({
     number: 10,
     page: 1
 });
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
+const query = reactive({ ...defaultQuery });
+
+const resetSearch = () => {
+    Object.assign(query, defaultQuery);
+    Object.assign(pagination, defaultPage);
+    getData();
+};
+
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+const pagination = reactive({ ...defaultPage });
+const handlePageChange = (page: number, per_page: number) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
+
 const tableData = ref([]);
 const categoriesData = ref([]);
 const loading = ref(false);
@@ -34,15 +148,14 @@ const submitForm = reactive({
     h5_url: '',
     params: '',
     sort: 0,
-    is_show: 1,
+    is_show: 1
 });
 const submitFormRules = reactive({
     router_category_id: [{ required: true, message: '请选择所属分类', trigger: 'blur' }],
     name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
     alias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
-    h5_url: [{ required: true, message: '请输入H5地址', trigger: 'blur' }],
+    h5_url: [{ required: true, message: '请输入H5地址', trigger: 'blur' }]
 });
-
 
 const openStoreDialog = (row = {}) => {
     storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
@@ -89,7 +202,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            routerStore(submitForm).then(res => {
+            routerStore(submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -109,7 +222,7 @@ const changeShow = (row) => {
     routerChangeShow({
         id: row.id,
         is_show: row.is_show
-    }).then(res => {
+    }).then((res: any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
@@ -120,7 +233,7 @@ const changeShow = (row) => {
 
 /* 获取分类 */
 const getCategories = () => {
-    routerCategories().then(res => {
+    routerCategories().then((res: any) => {
         if (cns.$successCode(res.code)) {
             categoriesData.value = res.data;
         }
@@ -128,14 +241,17 @@ const getCategories = () => {
     });
 };
 
-const getData = (page = 1) => {
+const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    searchForm.page = page;
-    routerIndex(searchForm).then(res => {
+    const params = {
+        ...query,
+        page: page,
+        per_page: pagination.per_page
+    };
+    routerIndex(params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
-            tableData.value = res.data.list;
-            setPageInfo(res.data.meta);
+            tableData.value = res.data;
         } else {
             cns.$message.error(res.message);
         }
@@ -145,142 +261,12 @@ const getData = (page = 1) => {
     });
 };
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-};
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
-};
-// 每页条数改变
-const handleSizeChange = (val) => {
-    searchForm.number = val;
-    pageInfo.per_page = val;
-    getData(1);
-};
-
 onMounted(() => {
     getData();
     getCategories();
 });
 </script>
-<template>
-    <div>
-        <el-header style="padding-top: 10px;">
-            <el-form :inline="true" :model="searchForm" class="search-form">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item label="别名" prop="alias">
-                    <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item label="所属分类">
-                    <el-select v-model="searchForm.router_category_id" clearable filterable placeholder="请选择">
-                        <el-option v-for="item in categoriesData"
-                                   :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="是否显示">
-                    <el-select v-model="searchForm.is_show" placeholder="请选择">
-                        <el-option label="全部" value="-1"></el-option>
-                        <el-option label="显示" value="1"></el-option>
-                        <el-option label="隐藏" value="0"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <el-table
-            :data="tableData"
-            stripe border
-            v-loading="loading"
-            style="width: 100%;">
-            <el-table-column label="ID" prop="id"></el-table-column>
-            <el-table-column label="名称" prop="name"></el-table-column>
-            <el-table-column label="所属分类" prop="category_name"></el-table-column>
-            <el-table-column label="别名" prop="alias"></el-table-column>
-            <el-table-column label="H5地址" prop="h5_url_show"></el-table-column>
-            <el-table-column label="排序" prop="sort"></el-table-column>
-            <el-table-column label="额外参数" prop="params"></el-table-column>
-            <el-table-column label="是否显示" prop="is_show">
-                <template #default="scope">
-                    <el-switch
-                        v-model="scope.row.is_show"
-                        :active-value="1" :inactive-value="0"
-                        active-color="#13ce66" inactive-color="#ff4949"
-                        @click="changeShow(scope.row)">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="创建时间" prop="created_at"></el-table-column>
-            <el-table-column label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
-        <el-dialog
-            width="700" center :before-close="closeStoreDialog"
-            v-model="storeDialogVisible" :title="storeDialogTitle">
-            <div class="s-flex jc-ct">
-                <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto" style="width: 480px" size="default">
-                    <el-form-item label="所属分类" prop="router_category_id">
-                        <el-select v-model="submitForm.router_category_id" clearable filterable placeholder="请选择">
-                            <el-option v-for="item in categoriesData"
-                                       :key="item.value" :label="item.label" :value="item.value">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="名称" prop="name">
-                        <el-input v-model="submitForm.name" />
-                    </el-form-item>
-                    <el-form-item label="别名" prop="alias">
-                        <el-input v-model="submitForm.alias" :disabled = 'submitForm.id > 0'/>
-                    </el-form-item>
-                    <el-form-item label="H5地址" prop="h5_url">
-                        <el-input v-model="submitForm.h5_url" />
-                    </el-form-item>
-                    <el-form-item label="额外参数" prop="params">
-                        <el-input type="textarea" rows="3" v-model="submitForm.params" placeholder="json格式" />
-                    </el-form-item>
-                    <el-form-item label="排序" prop="sort">
-                        <el-input v-model="submitForm.sort" />
-                    </el-form-item>
-                    <el-form-item label="是否显示" prop="is_show">
-                        <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
-                    </el-form-item>
-                </el-form>
-            </div>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closeStoreDialog()">取消</el-button>
-                    <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
-                </div>
-            </template>
-        </el-dialog>
-    </div>
-</template>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
 
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
 </style>

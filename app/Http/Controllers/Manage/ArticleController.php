@@ -32,7 +32,7 @@ class ArticleController extends BaseController
         $number = (int) $request->get('number', 10);
         $keywords = $request->get('keywords', '');
 
-        $data = Article::query()->with(['articleCategory', 'adminUser'])->withCount(['articleViews'])
+        $data = Article::query()->with(['articleCategory', 'adminUser'])
             ->when($keywords, fn ($query) => $query->where(function ($query) use ($keywords) {
                 $query->where('title', 'like', "%{$keywords}%")
                     ->orWhere('id', $keywords);
@@ -61,11 +61,9 @@ class ArticleController extends BaseController
                 'is_top' => $article->is_top,
                 'is_login' => $article->is_login,
                 'click_count' => $article->click_count,
-                'article_view_count' => $article->article_views_count,
                 'sort' => $article->sort,
                 'admin_user_name' => $article->adminUser?->user_name,
                 'created_at' => $article->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $article->updated_at->format('Y-m-d H:i:s'),
             ];
         });
 

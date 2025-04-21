@@ -1,18 +1,19 @@
 <script setup>
-import { Plus, Delete, Search } from '@element-plus/icons-vue';
-import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
-import { fileUpload } from '@/api/common.js';
+import { Plus } from '@element-plus/icons-vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import _ from 'lodash';
+import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
+import { fileUpload } from '@/api/common.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
 const tableData = ref([]);
 const loading = ref(false);
-
 const detailDialogVisible = ref(false);
 const detailDialogTitle = ref('');
 const detailFormLoading = ref(false);
+const detailFormRef = ref(null);
+const detailSubmitLoading = ref(false);
 const treeCategories = ref([]);
 const detailForm = reactive({
     id: 0,
@@ -35,13 +36,10 @@ const detailFormRules = reactive({
     sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
     is_show: [{ required: true, message: '请设置是否显示', trigger: 'change' }]
 });
-const detailFormRef = ref(null);
-const detailSubmitLoading = ref(false);
-const uploadRef = ref(null);
 
 const openDetailDialog = (goodsCategoryId = 0) => {
     detailDialogVisible.value = true;
-    detailDialogTitle.value = goodsCategoryId > 0 ? '添加分类' : '编辑分类';
+    detailDialogTitle.value = goodsCategoryId > 0 ? '编辑分类' : '添加分类';
     detailFormLoading.value = true;
     categoryEdit({ id: goodsCategoryId }).then(res => {
         detailFormLoading.value = false;
@@ -163,7 +161,7 @@ onMounted(() => {
 <template>
     <div>
         <el-header style="padding-top: 10px;">
-            <el-button :icon="Plus" type="warning" @click="openDetailDialog()">添加</el-button>
+            <el-button type="danger" @click="openDetailDialog()">添加</el-button>
         </el-header>
         <el-table
             :data="tableData"
@@ -246,7 +244,7 @@ onMounted(() => {
                             :http-request="(request) => uploadFile(request)"
                             :with-credentials="true"
                         >
-                            <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" />
+                            <img v-if="detailForm.logo" :src="detailForm.logo" class="logo" alt="" />
                             <el-icon v-else class="logo-uploader-icon">
                                 <Plus />
                             </el-icon>
