@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -22,6 +20,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $allChildren
  * @property-read int|null $all_children_count
  * @property-read Category|null $allParent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Goods> $goods
+ * @property-read int|null $goods_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category newQuery()
@@ -42,7 +42,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Category extends BaseModel
 {
-
+    // 是否显示 1是 0否
+    public const IS_SHOW_YES = 1;
+    public const IS_SHOW_NO = 0;
 
     protected $guarded = [];
 
@@ -60,5 +62,10 @@ class Category extends BaseModel
     public function allChildren(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id', 'id')->with('allChildren');
+    }
+
+    public function goods(): HasMany
+    {
+        return $this->hasMany(Goods::class, 'category_id', 'id');
     }
 }

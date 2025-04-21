@@ -13,15 +13,12 @@ class UploadService
      *
      * @throws BusinessException
      */
-    public function uploadFile(UploadedFile $file, string $path_prefix = ''): string
+    public function uploadFile(UploadedFile $file): string
     {
         $storage = Storage::disk();
 
         $upload_path = date('Y/m/d');
 
-        if ($path_prefix) {
-            $upload_path = $path_prefix.'/'.$upload_path;
-        }
         $file_path = $storage->put($upload_path, $file);
 
         if (! $file_path) {

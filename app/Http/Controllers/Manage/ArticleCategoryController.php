@@ -79,7 +79,7 @@ class ArticleCategoryController extends BaseController
     /**
      * 添加/编辑.
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         try {
             $validated = $request->validate([

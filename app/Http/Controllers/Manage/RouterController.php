@@ -73,7 +73,7 @@ class RouterController extends BaseController
     /**
      * 添加编辑.
      */
-    public function store(Request $request)
+    public function update(Request $request)
     {
         try {
             $validated = $request->validate([

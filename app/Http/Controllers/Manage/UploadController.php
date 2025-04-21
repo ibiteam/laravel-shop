@@ -20,7 +20,7 @@ class UploadController extends BaseController
             return $this->error('文件上传失败');
         }
 
-        $url = $upload_service->uploadFile($file, config('app.manage_prefix'));
+        $url = $upload_service->uploadFile($file);
 
         return $this->success(['url' => $url]);
     }

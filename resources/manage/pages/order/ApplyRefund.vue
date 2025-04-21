@@ -108,7 +108,7 @@ import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { applyRefundIndex } from '@/api/order.js';
+import Http from '@/utils/http';
 
 const router = useRouter();
 const cns = getCurrentInstance().appContext.config.globalProperties;
@@ -165,12 +165,7 @@ const openDetail = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    };
-    applyRefundIndex(params).then((res: any) => {
+    Http.doGet('order/apply_refund', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

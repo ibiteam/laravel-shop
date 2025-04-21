@@ -72,9 +72,9 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import { wechatUserIndex } from '@/api/user.js';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -115,7 +115,7 @@ const getData = (page:number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    wechatUserIndex(query).then(res => {
+    Http.doGet('user/wechat', query).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data

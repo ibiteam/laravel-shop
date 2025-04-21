@@ -100,13 +100,7 @@ import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import {
-    articleIndex,
-    articleInfo,
-    articleChangeField,
-    articleCopy,
-    articleDestroy
-} from '@/api/article.js';
+import Http from '@/utils/http';
 
 const router = useRouter();
 const cns = getCurrentInstance().appContext.config.globalProperties;
@@ -144,7 +138,7 @@ const resetSearch = () => {
 };
 
 const changeField = (id: number, value: any, field: any) => {
-    articleChangeField({
+    Http.doPost('article/change_field', {
         id: id,
         value: value,
         field: field
@@ -159,7 +153,7 @@ const changeField = (id: number, value: any, field: any) => {
 
 // 获取分类
 const getCategories = () => {
-    articleInfo().then((res: any) => {
+    Http.doGet('article/info').then((res: any) => {
         if (cns.$successCode(res.code)) {
             treeCategories.value = res.data.tree_categories;
         }
@@ -180,7 +174,7 @@ const handleCopy = (articleId: number) => {
         type: 'warning',
         center: true
     }).then(() => {
-        articleCopy({ id: articleId }).then((res: any) => {
+        Http.doPost('article/copy', { id: articleId }).then((res: any) => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -201,7 +195,7 @@ const handleDestroy = (articleId: number) => {
         type: 'warning',
         center: true
     }).then(() => {
-        articleDestroy({ id: articleId }).then((res: any) => {
+        Http.doPost('article/destroy', { id: articleId }).then((res: any) => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -221,7 +215,7 @@ const getData = (page: number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     };
-    articleIndex(params).then((res: any) => {
+    Http.doGet('article', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

@@ -52,7 +52,7 @@
         <el-table-column label="快递单号" width="240px">
             <template #default="scope">
                 <span>{{ scope.row.ship_no }}</span>
-                <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" link type="primary" @click="openLogisticsDialog(scope.row.order_id)">查看物流</el-button>
+                <el-button v-if="scope.row.ship_no" class="s-flex ai-ct" link type="primary" @click="openLogisticsDialog(scope.row.id)">查看物流</el-button>
             </template>
         </el-table-column>
         <el-table-column label="状态">
@@ -128,9 +128,7 @@
     </el-dialog>
 </template>
 <script setup lang="ts">
-import { orderDeliveryIndex, orderDeliveryImport,orderDeliveryDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 import Http from '@/utils/http';
@@ -163,14 +161,9 @@ const resetSearch = () => {
     getData()
 }
 /* 获取分页数据 */
-const getData = (page:number = defaultPage.page) => {
+const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    }
-    orderDeliveryIndex(params).then(res => {
+    Http.doGet('order/delivery', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data
@@ -182,7 +175,7 @@ const getData = (page:number = defaultPage.page) => {
     })
 }
 /* 点击分页触发方法 */
-const handleChange = (page:number,per_page:number) => {
+const handleChange = (page:number, per_page:number) => {
     pagination.per_page = per_page
     getData(page)
 }
@@ -193,7 +186,7 @@ const logisticsInitLoading = ref(false)
 const openLogisticsDialog = (orderId: number) => {
     logisticsInitLoading.value = true
     logisticsVisible.value = true
-    Http.doGet('order/info/express/query',{id: orderId}).then((res: any) => {
+    Http.doGet('order/delivery/express/query',{id: orderId}).then((res: any) => {
         logisticsInitLoading.value = false
         if (cns.$successCode(res.code)) {
             logisticsData.value = res.data
@@ -226,7 +219,7 @@ const submitImport = (request) => {
     importSuccessNumber.value = 0
     importErrorNumber.value = 0
     importErrorData.value = [];
-    orderDeliveryImport({ import_file: request.file }).then(res => {
+    Http.doPost('order/delivery/import', { import_file: request.file }).then((res: any) => {
         importFileLoading.value = false
         if (cns.$successCode(res.code)) {
             importSuccessNumber.value = res.data.success_number
@@ -256,7 +249,7 @@ const handleDelete = (id) => {
         type: 'warning',
         center: true,
     }).then(() => {
-        orderDeliveryDestroy({id: id}).then(res => {
+        Http.doPost('order/delivery/destroy', {id: id}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success(res.message)
                 getData(pagination.page)
