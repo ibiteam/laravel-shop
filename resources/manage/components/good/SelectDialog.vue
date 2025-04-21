@@ -149,7 +149,6 @@
 <script setup>
 import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } from 'vue'
 import { VueDraggable } from 'vue-draggable-plus'
-import { decorationGoodsList, decorationGoodsImport } from '@/api/decoration.js'
 import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
