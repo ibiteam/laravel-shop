@@ -104,7 +104,7 @@ class TransactionController extends BaseController
             if ($refund_amount <= 0) {
                 throw new BusinessException('交易记录已退款完成');
             }
-            $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::MANAGE_REFUND->value);
+            $out_refund_no = $transaction_dao->generateTransactionNo(PayPrefixEnum::MANAGE_REFUND);
 
             $payment = $transaction->payment;
 
