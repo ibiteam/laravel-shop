@@ -3,6 +3,7 @@
 namespace App\Http\Dao;
 
 use App\Models\Category;
+use App\Models\Goods;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
@@ -10,15 +11,35 @@ use Illuminate\Support\Collection;
 class CategoryDao
 {
     /**
+     * 获取商品分类（分类下没商品的不返回）.
+     */
+    public function getGoodsCategory(): EloquentCollection|Collection
+    {
+        $categories = Category::query()
+            ->with('allChildren')
+            ->whereParentId(0)
+            ->whereIsShow(Category::IS_SHOW_YES)
+            ->whereHas('goods', function (Builder $query) {
+                $query->where('status', Goods::STATUS_ON_SALE);
+            })
+            ->get();
+
+        if ($categories->isEmpty()) {
+            return new Collection;
+        }
+
+        return $categories->map(fn (Category $category) => $this->categoryFormat($category));
+    }
+
+    /**
      * 获取树状分类.
      */
     public function getTreeList(): EloquentCollection|Collection
     {
-        return Category::query()
-            ->with('allChildren')
+        return Category::query()->with('allChildren')
             ->whereParentId(0)
-            ->get()
-            ->map(fn (Category $category) => $this->categoryFormat($category));
+            ->whereIsShow(Category::IS_SHOW_YES)
+            ->get()->map(fn (Category $category) => $this->categoryFormat($category));
     }
 
     /**

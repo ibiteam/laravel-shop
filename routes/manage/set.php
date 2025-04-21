@@ -7,6 +7,7 @@ use App\Http\Controllers\Manage\AppServiceConfigController;
 use App\Http\Controllers\Manage\AppServiceLogController;
 use App\Http\Controllers\Manage\PaymentController;
 use App\Http\Controllers\Manage\PermissionController;
+use App\Http\Controllers\Manage\RegionController;
 use App\Http\Controllers\Manage\RoleController;
 use App\Http\Controllers\Manage\RouterCategoryController;
 use App\Http\Controllers\Manage\RouterController;
@@ -139,6 +140,10 @@ Route::prefix('set')->group(function () {
             Route::post('update', [ShipCompanyController::class, 'update']);
             Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
         });
+    });
+    // 配送管理-地区
+    Route::prefix('region')->group(function () {
+        Route::get('tree', [RegionController::class, 'regionTree']);
     });
 
     // 移动端装修

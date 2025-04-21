@@ -1,70 +1,113 @@
-<script setup>
-import { Plus, Search, RefreshLeft} from '@element-plus/icons-vue';
-import { getUserIndex, userUpdate } from '@/api/user.js'
-import Page from '@/components/common/Pagination.vue'
+<template>
+    <search-form :model="query">
+        <el-form-item label="用户名" prop="user_name">
+            <el-input
+                v-model="query.user_name"
+                placeholder="请输入用户名"
+                clearable
+                @keyup.enter="getData()"
+            />
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button type="danger" @click="addUser()" >添加</el-button>
+        </el-form-item>
+    </search-form>
+    <page-table
+        :data="tableData"
+        :maxHeight="'700px'"
+        v-loading="loading"
+        @change="handlePageChange"
+    >
+        <el-table-column label="用户ID" prop="id"></el-table-column>
+        <el-table-column label="用户名" prop="username">
+            <template #default="scope" >
+                <div class="flex-user-information s_flex ai_ct">
+                    <div class="header-picture">
+                        <div class="imgs">
+                            <img :src="scope.row.avatar" alt="">
+                        </div>
+                    </div>
+                    <div class="header-user-names">
+                        <span> {{ scope.row.user_name }}</span>
+                    </div>
+                </div>
+            </template>
+        </el-table-column>
+        <el-table-column label="昵称" prop="nickname"></el-table-column>
+        <el-table-column label="手机号" prop="phone"></el-table-column>
+        <el-table-column label="来源" prop="source"></el-table-column>
+        <el-table-column label="创建时间" prop="created_at"></el-table-column>
+        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+        <el-table-column label="操作">
+            <template #default="scope">
+                <el-button type="primary" @click="modifyUser(scope.row)">编辑</el-button>
+                <el-button type="success" @click="userAddress(scope.row)">收货地址</el-button>
+            </template>
+        </el-table-column>
+    </page-table>
+    <!--  添加用户  -->
+    <el-dialog v-model="dialogFormVisible"
+               :close-on-click-modal="false"
+               :close-on-press-escape="false"
+               :title="updateTitle"
+               center
+               width="500">
+        <el-form :model="subForm" :rules="rules" ref="subFormRef">
+            <el-form-item label="用户名" prop="user_name" :label-width="formLabelWidth">
+                <el-input v-model="subForm.user_name" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
+                <el-input v-model="subForm.phone" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="密码" :prop="subForm.id ? '' : 'password'" :label-width="formLabelWidth">
+                <el-input v-model="subForm.password" type="password" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="确认密码" :prop="subForm.id ? '' : 'confirm_password'" :label-width="formLabelWidth">
+                <el-input v-model="subForm.confirm_password" type="password" autocomplete="off" />
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closePasswordDialog('subForm')">关闭</el-button>
+                <el-button type="primary" v-loading="updateLoading" @click="updateForm('subForm')">确认</el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+<script setup lang="ts">
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import Http from '@/utils/http.js';
+import SearchForm from '@/components/common/SearchForm.vue';
+import PageTable from '@/components/common/PageTable.vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
-
 const router = useRouter()
 
 // 添加查询参数对象，增加搜索条件
-const queryParams = reactive({
+const defaultQuery = {
+    user_name: '',
+}
+const query = reactive({...defaultQuery});
+/* 定义默认分页参数 */
+const defaultPage = {
     page: 1,
-    number: 10,
-    user_name: '', // 用户名称搜索
-});
-
-// 添加分页相关状态
-const pageInfo = reactive({
-    total: 0,
     per_page: 10,
-    current_page: 1
-});
-
-// 搜索方法
-const handleSearch = () => {
-    getData(1);
-};
-
-// 重置搜索条件
+}
+const pagination = reactive({...defaultPage})
+/* 重置搜索条件 */
 const resetSearch = () => {
-    queryParams.user_name = '';
-    getData(1);
-};
-
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
+    Object.assign(query, defaultQuery)
+    Object.assign(pagination, defaultPage)
+    getData()
 }
-
-// 每页条数改变
-const handleSizeChange = (val) => {
-    queryParams.number = val;
-    pageInfo.per_page = val;
-    getData(1);
-}
-
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
-
-const getData = (page = 1) => {
+const getData = (page:number = defaultPage.page) => {
     loading.value = true;
-    // 更新当前页码
-    queryParams.page = page;
-
-    getUserIndex(queryParams).then(res => {
+    Http.doGet('user/index', { ...query, page: page, per_page: pagination.per_page }).then(res => {
         loading.value = false;
         if (res.code === 200) {
-            tableData.value = res.data.list;
-            console.log(tableData.value);
-            // 更新分页信息
-            setPageInfo(res.data.meta);
+            tableData.value = res.data
         } else {
             cns.$message.error(res.message)
         }
@@ -72,14 +115,18 @@ const getData = (page = 1) => {
         loading.value = false;
     })
 }
-
+/* 点击分页触发方法 */
+const handlePageChange = (page:number,per_page:number) => {
+    pagination.per_page = per_page
+    getData(page)
+}
 
 
 const updateForm = () => {
     updateLoading.value = true
     subFormRef.value.validate((valid) => {
         if (valid) {
-            userUpdate(subForm.value).then(function (res) {
+            Http.doPost('manage/user/update', subForm.value).then(function (res) {
                 if (res.code === 200) {
                     dialogFormVisible.value = false;
                     cns.$message.success('保存成功');
@@ -186,109 +233,7 @@ const rules = reactive({
 
 </script>
 
-<template>
-        <el-header>
-            <el-form :inline="true" :model="queryParams" class="search-form">
-                <el-form-item label="用户名" prop="user_name">
-                    <el-input
-                        v-model="queryParams.user_name"
-                        placeholder="请输入用户名"
-                        clearable
-                        @keyup.enter="handleSearch"
-                    />
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="handleSearch()">搜索</el-button>
-                    <el-button type="danger" @click="addUser()" >添加</el-button>
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <el-table
-            :data="tableData"
-            stripe
-            border
-            v-loading="loading"
-            style="width: 100%;">
-            <el-table-column label="用户ID" prop="id"></el-table-column>
-            <el-table-column label="用户名" prop="username">
-                <template #default="scope" >
-                    <div class="flex-user-information s_flex ai_ct">
-                        <div class="header-picture">
-                            <div class="imgs">
-                                <img :src="scope.row.avatar" alt="">
-                            </div>
-                        </div>
-                        <div class="header-user-names">
-                            <span> {{ scope.row.user_name }}</span>
-                        </div>
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column label="昵称" prop="nickname"></el-table-column>
-            <el-table-column label="手机号" prop="phone"></el-table-column>
-            <el-table-column label="来源" prop="source"></el-table-column>
-            <el-table-column label="创建时间" prop="created_at"></el-table-column>
-            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-            <el-table-column label="操作">
-                <template #default="scope">
-                    <el-button type="primary" @click="modifyUser(scope.row)">编辑</el-button>
-                    <el-button type="success" @click="userAddress(scope.row)">收货地址</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <!-- 添加分页组件 -->
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
-        <!--  添加用户  -->
-        <el-dialog v-model="dialogFormVisible"
-                   :close-on-click-modal="false"
-                   :close-on-press-escape="false"
-                   :title="updateTitle"
-                   center
-                   width="500">
-            <el-form :model="subForm" :rules="rules" ref="subFormRef">
-                <el-form-item label="用户名" prop="user_name" :label-width="formLabelWidth">
-                    <el-input v-model="subForm.user_name" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
-                    <el-input v-model="subForm.phone" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="密码" :prop="subForm.id ? '' : 'password'" :label-width="formLabelWidth">
-                    <el-input v-model="subForm.password" type="password" autocomplete="off" />
-                </el-form-item>
-                <el-form-item label="确认密码" :prop="subForm.id ? '' : 'confirm_password'" :label-width="formLabelWidth">
-                    <el-input v-model="subForm.confirm_password" type="password" autocomplete="off" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closePasswordDialog('subForm')">关闭</el-button>
-                    <el-button type="primary" v-loading="updateLoading" @click="updateForm('subForm')">确认</el-button>
-                </div>
-            </template>
-        </el-dialog>
-</template>
-
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-}
-
 .header-picture {
     width: 36px;
     height: 36px;

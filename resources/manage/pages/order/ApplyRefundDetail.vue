@@ -187,17 +187,9 @@
 </template>
 
 <script setup lang="ts">
-import {
-    applyRefundDetail,
-    applyRefundAgreeApply,
-    applyRefundCloseApply,
-    applyRefundExecuteRefund,
-    applyRefundRefuseRefund,
-    applyRefundConfirmReceipt,
-    applyRefundQueryExpress
-} from '@/api/order.js';
-import { ref, reactive, getCurrentInstance, onMounted,nextTick } from 'vue';
+import { ref, getCurrentInstance, onMounted,nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import Http from '@/utils/http';
 
 const router = useRouter();
 const route = useRoute();
@@ -267,7 +259,7 @@ const server_time = ref(0)
 
 const getData = () => {
     detailFormLoading.value = true;
-    applyRefundDetail({ id: route.params.id }).then(res => {
+    Http.doGet('order/apply_refund/detail', { id: route.params.id }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             log.value = res.data.log
@@ -305,12 +297,12 @@ const inputPress = () =>{
 }
 
 const openShip = () => {
-    let params={
-        id:route.params.id
-    }
     showShip.value = true
     loadingSip.value = true
-    applyRefundQueryExpress(params).then((res) => {
+    let params = {
+        id: route.params.id
+    }
+    Http.doPost('order/apply_refund/query_express', params).then((res) => {
         loadingSip.value = false
         if (res.code === 200) {
             shipList.value = res.data.log.data
@@ -354,7 +346,7 @@ const agree = () =>{
         let params={
             id:route.params.id
         }
-        applyRefundExecuteRefund(params).then((res) => {
+        Http.doPost('order/apply_refund/execute_refund', params).then((res) => {
             refundIng.value = false
             if (cns.$successCode(res.code)) {
                 getData()
@@ -371,7 +363,7 @@ const agree = () =>{
                         id:route.params.id,
                         money:agreeForm.value.price
                     }
-                    applyRefundExecuteRefund(params).then((res) => {
+                    Http.doPost('order/apply_refund/execute_refund', params).then((res) => {
                         refundIng.value = false
                         if (cns.$successCode(res.code)) {
                             getData()
@@ -387,7 +379,7 @@ const agree = () =>{
                         type:agreeForm.value.type,
                         money:agreeForm.value.price
                     }
-                    applyRefundAgreeApply(params).then((res) => {
+                    Http.doPost('order/apply_refund/agree_apply', params).then((res) => {
                         refundIng.value = false
                         if (cns.$successCode(res.code)) {
                             getData()
@@ -418,7 +410,7 @@ const refuse = (e) => {
         let params={
             id:route.params.id
         }
-        applyRefundCloseApply(params).then((res) => {
+        Http.doPost('order/apply_refund/close_apply', params).then((res) => {
             if (cns.$successCode(res.code)) {
                 getData()
             }else {
@@ -433,7 +425,7 @@ const refuse = (e) => {
                     id:route.params.id,
                     comment:refuseForm.value.refuseReason
                 }
-                applyRefundRefuseRefund(params).then((res) => {
+                Http.doPost('order/apply_refund/refuse_refund', params).then((res) => {
                     if (cns.$successCode(res.code)) {
                         getData()
                         refuseVisible.value = false
@@ -449,10 +441,10 @@ const refuse = (e) => {
 }
 
 const receive = () =>{
-    let params={
-        id:route.params.id
+    let params = {
+        id: route.params.id
     }
-    applyRefundConfirmReceipt(params).then((res) => {
+    Http.doPost('order/apply_refund/confirm_receipt', params).then((res) => {
         if (cns.$successCode(res.code)) {
             getData()
         }else {
