@@ -17,13 +17,15 @@ use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property int         $id
- * @property string      $user_name  登录用户名
- * @property string      $password   登录密码
- * @property string|null $nickname   昵称
- * @property string|null $avatar     头像
- * @property string      $phone      手机号
- * @property string|null $job_no     工号
- * @property int         $status     状态：1启用 0禁用
+ * @property string      $user_name         登录用户名
+ * @property string      $password          登录密码
+ * @property string|null $nickname          昵称
+ * @property string|null $avatar            头像
+ * @property string      $phone             手机号
+ * @property string|null $job_no            工号
+ * @property int         $status            状态：1启用 0禁用
+ * @property string|null $latest_login_time 最新登录时间
+ * @property string|null $latest_login_ip   最新登录IP
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read \App\Models\AdminUserLoginLog|null $lastLoginLog
@@ -51,6 +53,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static Builder<static>|AdminUser whereCreatedAt($value)
  * @method static Builder<static>|AdminUser whereId($value)
  * @method static Builder<static>|AdminUser whereJobNo($value)
+ * @method static Builder<static>|AdminUser whereLatestLoginIp($value)
+ * @method static Builder<static>|AdminUser whereLatestLoginTime($value)
  * @method static Builder<static>|AdminUser whereNickname($value)
  * @method static Builder<static>|AdminUser wherePassword($value)
  * @method static Builder<static>|AdminUser wherePhone($value)
@@ -64,7 +68,6 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class AdminUser extends Authenticatable
 {
-
     use HasApiTokens;
     use HasRoles;
     public const STATUS_ENABLE = 1; // 启用
@@ -76,11 +79,6 @@ class AdminUser extends Authenticatable
     public function modelHasRole(): HasMany
     {
         return $this->hasMany(ModelHasRole::class, 'model_id', 'id');
-    }
-
-    protected function serializeDate(DateTimeInterface $date): string
-    {
-        return $date->format('Y-m-d H:i:s');
     }
     public function orderLog(): MorphMany
     {
@@ -110,6 +108,11 @@ class AdminUser extends Authenticatable
         $name = $this->getRawOriginal('user_name');
 
         return mb_substr($name, -2, null, 'UTF-8');
+    }
+
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 
     protected function casts(): array
