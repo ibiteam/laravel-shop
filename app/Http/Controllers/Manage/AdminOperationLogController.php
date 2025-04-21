@@ -68,7 +68,7 @@ class AdminOperationLogController extends BaseController
                 'role_name' => $role_names,
                 'description' => $admin_operation_log->description,
                 'ip' => $admin_operation_log->ip,
-                'created_at' => $admin_operation_log->created_at->format('Y-m-d H:i:s'),
+                'created_at' => $admin_operation_log->created_at,
             ];
         });
 

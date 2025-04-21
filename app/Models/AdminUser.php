@@ -110,6 +110,20 @@ class AdminUser extends Authenticatable
         return mb_substr($name, -2, null, 'UTF-8');
     }
 
+    protected function createdAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => $value instanceof DateTimeInterface ? $value->format('Y-m-d H:i:s') : $value,
+        );
+    }
+
+    protected function updatedAt(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => $value instanceof DateTimeInterface ? $value->format('Y-m-d H:i:s') : $value,
+        );
+    }
+
     protected function serializeDate(DateTimeInterface $date): string
     {
         return $date->format('Y-m-d H:i:s');

@@ -455,7 +455,7 @@ class ApplyRefundService
                 'certificate' => $apply_refund->certificate,
                 'apply_refund_shipping_id' => $apply_refund->applyRefundShip?->id,
                 'apply_refund_shipping_no' => $apply_refund->applyRefundShip?->no,
-                'updated_at' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
+                'updated_at' => $apply_refund->updated_at,
                 'result' => $temp_comment,
                 'job_time' => $apply_refund->job_time ? strtotime($apply_refund->job_time) : '',
                 'system_time' => time(),
