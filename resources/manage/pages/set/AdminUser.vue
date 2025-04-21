@@ -1,128 +1,119 @@
 <template>
-        <search-form :model="query">
-            <el-form-item label="用户名" prop="user_name">
-                <el-input v-model="query.user_name" clearable placeholder="请输入" @keyup.enter="getData()" />
-            </el-form-item>
-            <el-form-item label="所属角色">
-                <el-select v-model="query.role_id" clearable filterable placeholder="请选择">
-                    <el-option v-for="item in rolesData"
-                               :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item label="是否启用">
-                <el-select v-model="query.status" placeholder="请选择">
-                    <el-option label="全部" value="-1"></el-option>
-                    <el-option label="启用" value="1"></el-option>
-                    <el-option label="禁用" value="0"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button  type="primary" @click="getData()">搜索</el-button>
-                <el-button  type="danger" @click="openStoreDialog()">添加</el-button>
-            </el-form-item>
-        </search-form>
-        <page-table
-            :data="tableData"
-            v-loading="loading"
-            @change="handlePageChange"
-        >
-            <el-table-column label="ID" prop="id"></el-table-column>
-            <el-table-column label="用户名" prop="user_name"></el-table-column>
-            <el-table-column label="所属角色" prop="role_name"></el-table-column>
-            <el-table-column label="工号" prop="job_no"></el-table-column>
-            <el-table-column label="是否启用" prop="status">
-                <template #default="scope">
-                    <el-switch
-                        v-model="scope.row.status"
-                        :active-value="1" :inactive-value="0"
-                        @click="handleFieldChange(scope)">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="最新登录时间" prop="latest_login_time"></el-table-column>
-            <el-table-column label="创建时间" prop="created_at"></el-table-column>
-            <el-table-column label="操作">
-                <template #default="{row}">
-                    <el-button link type="primary" size="large" @click="openStoreDialog(row)">编辑</el-button>
-                    <el-button link type="primary" size="large" @click="openAdminOperationLog(row.user_name)">操作日志
-                    </el-button>
-                </template>
-            </el-table-column>
-        </page-table>
-        <el-dialog
-            width="700" center :before-close="closeStoreDialog"
-            v-model="storeDialogVisible" :title="storeDialogTitle">
-            <div class="s-flex jc-ct">
-                <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
-                         style="width: 480px" size="default">
-                    <el-form-item label="用户名" prop="user_name">
-                        <el-input v-model="submitForm.user_name" />
-                    </el-form-item>
-                    <el-form-item label="登录密码" prop="password">
-                        <el-input v-model="submitForm.password" show-password></el-input>
-                    </el-form-item>
-                    <el-form-item label="确认密码" prop="confirm_password">
-                        <el-input v-model="submitForm.confirm_password" show-password></el-input>
-                    </el-form-item>
-                    <el-form-item label="手机号" prop="phone">
-                        <el-input v-model="submitForm.phone" autocomplete="off"></el-input>
-                    </el-form-item>
-                    <el-form-item label="工号" prop="job_no">
-                        <el-input v-model="submitForm.job_no"></el-input>
-                    </el-form-item>
-                    <el-form-item label="所属角色" prop="role_ids">
-                        <div class="role-checkbox-container">
-                            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
-                                         @change="handleCheckAllChange">全选
-                            </el-checkbox>
-                            <el-checkbox-group v-model="submitForm.role_ids" @change="handleCheckedRolesChange">
-                                <el-checkbox v-for="role in rolesData" :label="role.value" :key="role.label">
-                                    {{ role.label }}
-                                </el-checkbox>
-                            </el-checkbox-group>
-                        </div>
-                    </el-form-item>
-                    <el-form-item label="是否启用" prop="status">
-                        <el-switch v-model="submitForm.status" :active-value="1" :inactive-value="0" />
-                    </el-form-item>
-                </el-form>
-            </div>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closeStoreDialog()">取消</el-button>
-                    <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
-                </div>
+    <search-form :model="query" :label-width="100">
+        <el-form-item label="用户名" prop="user_name">
+            <el-input v-model="query.user_name" clearable placeholder="请输入" @keyup.enter="getData()" />
+        </el-form-item>
+        <el-form-item label="所属角色">
+            <el-select v-model="query.role_id" clearable filterable placeholder="请选择">
+                <el-option v-for="item in rolesData"
+                           :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="是否启用">
+            <el-select v-model="query.status" placeholder="请选择">
+                <el-option label="全部" value="-1"></el-option>
+                <el-option label="启用" value="1"></el-option>
+                <el-option label="禁用" value="0"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button type="danger" @click="openStoreDialog()">添加</el-button>
+        </el-form-item>
+    </search-form>
+    <page-table
+        :data="tableData"
+        :maxHeight="'700px'"
+        v-loading="loading"
+        @change="handlePageChange"
+    >
+        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column label="用户名" prop="user_name"></el-table-column>
+        <el-table-column label="所属角色" prop="role_name"></el-table-column>
+        <el-table-column label="工号" prop="job_no"></el-table-column>
+        <el-table-column label="是否启用" prop="status">
+            <template #default="scope">
+                <el-switch
+                    v-model="scope.row.status"
+                    :active-value="1" :inactive-value="0"
+                    @click="handleFieldChange(scope)">
+                </el-switch>
             </template>
-        </el-dialog>
+        </el-table-column>
+        <el-table-column label="最新登录时间" prop="latest_login_time"></el-table-column>
+        <el-table-column label="创建时间" prop="created_at"></el-table-column>
+        <el-table-column label="操作">
+            <template #default="{row}">
+                <el-button link type="primary" @click="openStoreDialog(row)">编辑</el-button>
+                <el-button link type="primary" @click="openAdminOperationLog(row.user_name)">操作日志</el-button>
+            </template>
+        </el-table-column>
+    </page-table>
+
+    <el-dialog
+        width="700" center :before-close="closeStoreDialog"
+        v-model="storeDialogVisible" :title="storeDialogTitle">
+        <div class="s-flex jc-ct">
+            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
+                     style="width: 480px" size="default">
+                <el-form-item label="用户名" prop="user_name">
+                    <el-input v-model="submitForm.user_name" />
+                </el-form-item>
+                <el-form-item label="登录密码" prop="password">
+                    <el-input v-model="submitForm.password" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="确认密码" prop="confirm_password">
+                    <el-input v-model="submitForm.confirm_password" show-password></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="phone">
+                    <el-input v-model="submitForm.phone" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="工号" prop="job_no">
+                    <el-input v-model="submitForm.job_no"></el-input>
+                </el-form-item>
+                <el-form-item label="所属角色" prop="role_ids">
+                    <div class="role-checkbox-container">
+                        <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll"
+                                     @change="handleCheckAllChange">全选
+                        </el-checkbox>
+                        <el-checkbox-group v-model="submitForm.role_ids" @change="handleCheckedRolesChange">
+                            <el-checkbox v-for="role in rolesData" :label="role.value" :key="role.label">
+                                {{ role.label }}
+                            </el-checkbox>
+                        </el-checkbox-group>
+                    </div>
+                </el-form-item>
+                <el-form-item label="是否启用" prop="status">
+                    <el-switch v-model="submitForm.status" :active-value="1" :inactive-value="0" />
+                </el-form-item>
+            </el-form>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closeStoreDialog()">取消</el-button>
+                <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
+
 <script setup lang="ts">
+
+import PageTable from '@/components/common/PageTable.vue';
+import SearchForm from '@/components/common/SearchForm.vue';
+import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import {
     adminUserIndex,
     adminUserStore,
     adminUserChangeStatus,
     adminUserRoles
 } from '@/api/set.js';
-import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
-import { useRouter } from 'vue-router';
-import PageTable from '@/components/common/PageTable.vue'
-import SearchForm from '@/components/common/SearchForm.vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 const router = useRouter();
 
-const query = reactive({
-    user_name: '',
-    role_id: '',
-    status: '1',
-    page: 1,
-    number: 10
-});
-const defaultPage = {
-    page: 1,
-    per_page: 10,
-}
-const pagination = reactive({...defaultPage})
 const tableData = ref([]);
 const rolesData = ref([]);
 const loading = ref(false);
@@ -142,6 +133,25 @@ const submitForm = reactive({
     role_ids: [],
     status: 1
 });
+
+
+const query = reactive({
+    user_name: '',
+    role_id: '',
+    status: '1',
+    page: 1,
+    number: 10
+});
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+const pagination = reactive({ ...defaultPage });
+
+const handlePageChange = (page: number, per_page: number) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
 
 const validatorPassword = (rule, value, callback) => {
     const fag1 = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/;
@@ -265,7 +275,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            adminUserStore(submitForm).then(res => {
+            adminUserStore(submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -281,24 +291,28 @@ const onSubmit = () => {
     });
 };
 
-const handleFieldChange = (scope:any) => {
-    adminUserChangeStatus({ id: scope.row.id, field: scope.column.property,name:scope.column.label }).then((res:any) => {
+const handleFieldChange = (scope: any) => {
+    adminUserChangeStatus({
+        id: scope.row.id,
+        field: scope.column.property,
+        name: scope.column.label
+    }).then((res: any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
         }
     });
-}
+};
 
 // 跳转操作日志
-const openAdminOperationLog = (admin_user_name) => {
+const openAdminOperationLog = (admin_user_name: string) => {
     router.push({ name: 'manage.admin_operation_log.index', query: { admin_user_name: admin_user_name } });
 };
 
 /* 获取角色 */
 const getRoles = () => {
-    adminUserRoles().then(res => {
+    adminUserRoles().then((res: any) => {
         if (cns.$successCode(res.code)) {
             rolesData.value = res.data;
         }
@@ -306,14 +320,14 @@ const getRoles = () => {
     });
 };
 
-const getData = (page=defaultPage.page) => {
+const getData = (page: number = defaultPage.page) => {
     loading.value = true;
     const params = {
         ...query,
         page: page,
         per_page: pagination.per_page
-    }
-    adminUserIndex(params).then(res => {
+    };
+    adminUserIndex(params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
@@ -326,12 +340,6 @@ const getData = (page=defaultPage.page) => {
     });
 };
 
-// 页码改变
-const handlePageChange = (page:number,per_page:number) => {
-    pagination.per_page = per_page
-    getData(page)
-}
-
 onMounted(() => {
     getData();
     getRoles();
@@ -339,20 +347,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
-
 .role-checkbox-container {
     display: flex;
     flex-direction: column;

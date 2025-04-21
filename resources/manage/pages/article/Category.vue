@@ -1,5 +1,148 @@
+<template>
+    <search-form :model="query" :label-width="100">
+        <el-form-item label="分类名称" prop="name">
+            <el-input v-model="query.name" clearable placeholder="请输入" @keyup.enter="getData()" />
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button type="danger" @click="openStoreDialog()">添加</el-button>
+        </el-form-item>
+    </search-form>
+
+    <el-table
+        :data="tableData"
+        stripe border
+        v-loading="loading"
+        style="width: 100%;"
+        row-key="id"
+        :tree-props="{ children: 'all_children' }">
+        <el-table-column label="分类名称" min-width="120">
+            <template #default="scope">
+                <div class="s-flex ai-ct">
+                    {{ scope.row.name }}【{{ scope.row.id }}】
+                </div>
+            </template>
+        </el-table-column>
+        <el-table-column label="别名" prop="alias"></el-table-column>
+        <el-table-column label="类型" prop="type">
+            <template #default="scope">
+                <template v-if="scope.row.type === 1">普通分类</template>
+                <template v-if="scope.row.type === 2">系统分类</template>
+            </template>
+        </el-table-column>
+        <el-table-column label="是否显示" prop="is_show">
+            <template #default="scope">
+                <el-switch
+                    v-model="scope.row.is_show"
+                    :active-value="1" :inactive-value="0"
+                    active-color="#13ce66" inactive-color="#ff4949"
+                    @click="changeShow(scope.row)">
+                </el-switch>
+            </template>
+        </el-table-column>
+        <el-table-column label="排序(由大到小)" prop="sort"></el-table-column>
+        <el-table-column label="操作">
+            <template #default="scope">
+                <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
+                <el-button link type="warning" size="large" v-if="scope.row.is_show"
+                           @click="openMoveDialog(scope.row.id)">转移文章
+                </el-button>
+                <el-button link type="danger" size="large" v-if="!scope.row.alias"
+                           @click="handleDestroy(scope.row.id)">删除
+                </el-button>
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-dialog
+        width="700" center :before-close="closeStoreDialog"
+        v-model="storeDialogVisible" :title="storeDialogTitle">
+        <div v-loading="detailFormLoading" class="s-flex jc-ct">
+            <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
+                     style="width: 480px" size="default">
+                <el-form-item label="所属分类" prop="parent_id">
+                    <el-cascader v-model="submitForm.parent_id" placeholder="顶级分类" style="width: 400px;"
+                                 filterable clearable :options="treeCategories"
+                                 :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
+                    </el-cascader>
+                </el-form-item>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="submitForm.name" />
+                </el-form-item>
+                <el-form-item label="别名" prop="alias">
+                    <el-input v-model="submitForm.alias" />
+                </el-form-item>
+                <el-form-item label="标题" prop="title">
+                    <el-input v-model="submitForm.title" />
+                </el-form-item>
+                <el-form-item label="描述" prop="description">
+                    <el-input v-model="submitForm.description" />
+                </el-form-item>
+                <el-form-item label="关键字" prop="keywords">
+                    <el-input v-model="submitForm.keywords" />
+                </el-form-item>
+                <el-form-item label="类型" prop="type">
+                    <el-radio v-model="submitForm.type" label="1">普通分类</el-radio>
+                    <el-radio v-model="submitForm.type" label="2">系统分类</el-radio>
+                </el-form-item>
+                <el-form-item label="排序" prop="sort">
+                    <el-input v-model="submitForm.sort" />
+                </el-form-item>
+                <el-form-item label="是否显示" prop="is_show">
+                    <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
+                </el-form-item>
+            </el-form>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closeStoreDialog()">取消</el-button>
+                <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
+            </div>
+        </template>
+    </el-dialog>
+
+    <el-dialog
+        width="700" center :before-close="closeMoveDialog"
+        v-model="moveDialogVisible" title="转移文章">
+        <div style="margin: 20px 0;">
+            <p style="font-size: 18px; font-weight: bold">什么是转移文章?</p>
+            <p>在添加文章或文章管理中,如果需要对文章的分类进行变更,那么你可以通过此功能正确管理你的文章分类。</p>
+        </div>
+        <div v-loading="detailFormLoading" class="s-flex jc-ct">
+            <el-form :model="moveForm" ref="moveFormRef" label-width="auto" style="width: 480px" size="default">
+                <el-form-item label="当前分类" prop="old_category_id">
+                    <el-cascader v-model="moveForm.old_category_id" placeholder="请选择" disabled
+                                 filterable clearable
+                                 :options="treeCategories" :show-all-levels="false"
+                                 :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
+                    </el-cascader>
+                    <p>仅限转移当前分类下的文章，不含子类。</p>
+                </el-form-item>
+                <el-form-item label="目标分类" prop="new_category_id">
+                    <el-cascader v-model="moveForm.new_category_id" placeholder="请选择"
+                                 filterable clearable
+                                 :options="treeCategories" :show-all-levels="false"
+                                 :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
+                    </el-cascader>
+                    <p>目标分类:转移后，文章归属于该分类。</p>
+                </el-form-item>
+            </el-form>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="closeMoveDialog()">取消</el-button>
+                <el-button type="primary" :loading="submitLoading" @click="onMoveSubmit()">提交</el-button>
+            </div>
+        </template>
+    </el-dialog>
+
+</template>
+
 <script setup>
-import { Plus, Search } from '@element-plus/icons-vue';
+import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import SearchForm from '@/components/common/SearchForm.vue';
+
+const cns = getCurrentInstance().appContext.config.globalProperties;
 import {
     articleCategoryIndex,
     articleCategoryInfo,
@@ -8,13 +151,11 @@ import {
     articleCategoryChangeShow,
     articleCategoryMove
 } from '@/api/article.js';
-import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
 
-const cns = getCurrentInstance().appContext.config.globalProperties;
-
-const searchForm = reactive({
+const defaultQuery = reactive({
     name: ''
 });
+const query = reactive({ ...defaultQuery });
 
 const tableData = ref([]);
 const loading = ref(false);
@@ -101,7 +242,7 @@ const closeStoreDialog = () => {
     storeDialogVisible.value = false;
 };
 
-/* 新增编辑 提交 */
+// 提交
 const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
@@ -155,7 +296,7 @@ const closeMoveDialog = () => {
     moveDialogVisible.value = false;
 };
 
-/* 转移文章 提交 */
+// 转移文章
 const onMoveSubmit = () => {
     submitLoading.value = true;
     articleCategoryMove(moveForm).then(res => {
@@ -204,7 +345,7 @@ const changeShow = (row) => {
 
 const getData = () => {
     loading.value = true;
-    articleCategoryIndex(searchForm).then(res => {
+    articleCategoryIndex(query).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
@@ -221,161 +362,8 @@ onMounted(() => {
     getData();
 });
 </script>
-<template>
-    <div class="common-wrap">
-        <el-header style="padding-top: 10px;">
-            <el-form :inline="true" :model="searchForm" class="search-form">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <el-table
-            :data="tableData"
-            stripe border
-            v-loading="loading"
-            style="width: 100%;"
-            row-key="id"
-            :tree-props="{ children: 'all_children' }">
-            <el-table-column label="分类名称" min-width="120">
-                <template #default="scope">
-                    <div class="s-flex ai-ct">
-                        {{ scope.row.name }}【{{ scope.row.id }}】
-                    </div>
-                </template>
-            </el-table-column>
-            <el-table-column label="别名" prop="alias"></el-table-column>
-            <el-table-column label="类型" prop="type">
-                <template #default="scope">
-                    <template v-if="scope.row.type === 1">普通分类</template>
-                    <template v-if="scope.row.type === 2">系统分类</template>
-                </template>
-            </el-table-column>
-            <el-table-column label="是否显示" prop="is_show">
-                <template #default="scope">
-                    <el-switch
-                        v-model="scope.row.is_show"
-                        :active-value="1" :inactive-value="0"
-                        active-color="#13ce66" inactive-color="#ff4949"
-                        @click="changeShow(scope.row)">
-                    </el-switch>
-                </template>
-            </el-table-column>
-            <el-table-column label="排序(由大到小)" prop="sort"></el-table-column>
-            <el-table-column label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="large" @click="openStoreDialog(scope.row.id)">编辑</el-button>
-                    <el-button link type="warning" size="large" v-if="scope.row.is_show"
-                               @click="openMoveDialog(scope.row.id)">转移文章</el-button>
-                    <el-button link type="danger" size="large" v-if="!scope.row.alias"
-                               @click="handleDestroy(scope.row.id)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
-        <el-dialog
-            width="700" center :before-close="closeStoreDialog"
-            v-model="storeDialogVisible" :title="storeDialogTitle">
-            <div v-loading="detailFormLoading" class="s-flex jc-ct">
-                <el-form :model="submitForm" ref="submitFormRef" :rules="submitFormRules" label-width="auto"
-                         style="width: 480px" size="default">
-                    <el-form-item label="所属分类" prop="parent_id">
-                        <el-cascader v-model="submitForm.parent_id" placeholder="顶级分类" style="width: 400px;"
-                                     filterable clearable :options="treeCategories"
-                                     :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
-                        </el-cascader>
-                    </el-form-item>
-                    <el-form-item label="名称" prop="name">
-                        <el-input v-model="submitForm.name" />
-                    </el-form-item>
-                    <el-form-item label="别名" prop="alias">
-                        <el-input v-model="submitForm.alias" />
-                    </el-form-item>
-                    <el-form-item label="标题" prop="title">
-                        <el-input v-model="submitForm.title" />
-                    </el-form-item>
-                    <el-form-item label="描述" prop="description">
-                        <el-input v-model="submitForm.description" />
-                    </el-form-item>
-                    <el-form-item label="关键字" prop="keywords">
-                        <el-input v-model="submitForm.keywords" />
-                    </el-form-item>
-                    <el-form-item label="类型" prop="type">
-                        <el-radio v-model="submitForm.type" label="1">普通分类</el-radio>
-                        <el-radio v-model="submitForm.type" label="2">系统分类</el-radio>
-                    </el-form-item>
-                    <el-form-item label="排序" prop="sort">
-                        <el-input v-model="submitForm.sort" />
-                    </el-form-item>
-                    <el-form-item label="是否显示" prop="is_show">
-                        <el-switch v-model="submitForm.is_show" :active-value="1" :inactive-value="0" />
-                    </el-form-item>
-                </el-form>
-            </div>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closeStoreDialog()">取消</el-button>
-                    <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
-                </div>
-            </template>
-        </el-dialog>
-
-        <el-dialog
-            width="700" center :before-close="closeMoveDialog"
-            v-model="moveDialogVisible" title="转移文章">
-            <div style="margin: 20px 0;">
-                <p style="font-size: 18px; font-weight: bold">什么是转移文章?</p>
-                <p>在添加文章或文章管理中,如果需要对文章的分类进行变更,那么你可以通过此功能正确管理你的文章分类。</p>
-            </div>
-            <div v-loading="detailFormLoading" class="s-flex jc-ct">
-                <el-form :model="moveForm" ref="moveFormRef" label-width="auto" style="width: 480px" size="default">
-                    <el-form-item label="当前分类" prop="old_category_id">
-                        <el-cascader v-model="moveForm.old_category_id" placeholder="请选择" disabled
-                                     filterable clearable
-                                     :options="treeCategories" :show-all-levels="false"
-                                     :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
-                        </el-cascader>
-                        <p>仅限转移当前分类下的文章，不含子类。</p>
-                    </el-form-item>
-                    <el-form-item label="目标分类" prop="new_category_id">
-                        <el-cascader v-model="moveForm.new_category_id" placeholder="请选择"
-                                     filterable clearable
-                                     :options="treeCategories" :show-all-levels="false"
-                                     :props="{ value: 'id', label: 'name', checkStrictly: true, emitPath:false }">
-                        </el-cascader>
-                        <p>目标分类:转移后，文章归属于该分类。</p>
-                    </el-form-item>
-                </el-form>
-            </div>
-            <template #footer>
-                <div class="dialog-footer">
-                    <el-button @click="closeMoveDialog()">取消</el-button>
-                    <el-button type="primary" :loading="submitLoading" @click="onMoveSubmit()">提交</el-button>
-                </div>
-            </template>
-        </el-dialog>
-    </div>
-</template>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
-
 :deep(.el-table__row .cell) {
     display: flex;
     align-items: center;
