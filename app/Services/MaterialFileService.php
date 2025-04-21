@@ -66,7 +66,7 @@ class MaterialFileService
         $fileName = $file->getClientOriginalName();
         // 获取文件的 MIME 类型
         $mimeType = $file->getMimeType();
-        $file_url = app(UploadService::class)->uploadFile($file, config('app.manage_prefix'));
+        $file_url = app(UploadService::class)->uploadFile($file);
 
         // 初始化数据数组
         $data = [
