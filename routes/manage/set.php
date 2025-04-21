@@ -62,6 +62,64 @@ Route::prefix('admin_operation_log')->group(function () {
     });
 });
 
+
+// 外部服务
+Route::prefix('app_service')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_INDEX])->group(function () {
+        Route::get('/', [AppServiceConfigController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_CONFIG_INDEX);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_UPDATE])->group(function () {
+        Route::post('update', [AppServiceConfigController::class, 'update']);
+        Route::post('toggle/status', [AppServiceConfigController::class, 'toggleStatus']);
+    });
+});
+// 外部服务日志
+Route::prefix('app_service_log')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
+        Route::get('/', [AppServiceLogController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
+    });
+});
+
+// 配送管理-地区
+Route::prefix('region')->group(function () {
+    Route::get('tree', [RegionController::class, 'regionTree']);
+});
+
+// 移动端装修
+Route::prefix('app_decoration')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_DECORATION])->group(function () {
+        Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
+        Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
+        Route::post('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
+        Route::post('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
+        Route::get('/recommend/data', [AppDecorationController::class, 'recommendData']); // 为您推荐组件数据
+        Route::post('/goods/intelligent', [AppDecorationController::class, 'goodsForIntelligent']); // 商品推荐组件 - 智能推荐数据
+        Route::get('/history', [AppDecorationController::class, 'decorationHistory']); // 装修历史记录
+        Route::post('/history/restore', [AppDecorationController::class, 'historyRestore']); // 还原装修历史
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
+        Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
+    });
+});
+
+// App广告
+Route::prefix('app_ads')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_INDEX])->group(function () {
+        Route::get('/cate/names', [AppAdController::class, 'getCateNames'])->name(Permission::MANAGE_APP_ADVERT_INDEX); // 分类名称
+        Route::get('/cates', [AppAdController::class, 'getCates']); // 分类数据
+        Route::get('/app_ads', [AppAdController::class, 'getAppAds']); // 广告数据
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_UPDATE])->group(function () {
+        Route::get('/cate/update', [AppAdController::class, 'updateCate'])->name(Permission::MANAGE_APP_ADVERT_UPDATE); // 更新分类信息
+        Route::get('/update', [AppAdController::class, 'update']); // 更新广告信息
+        Route::get('/update/ad_image', [AppAdController::class, 'updateAdImage']); // 更换广告图
+        Route::get('/toggle/status', [AppAdController::class, 'toggleStatus']); // 切换广告图状态
+    });
+    Route::middleware(['manage.permission:'.Permission:: MANAGE_APP_ADVERT_DELETE])->group(function () {
+        Route::get('/delete', [AppAdController::class, 'delete'])->name(Permission:: MANAGE_APP_ADVERT_DELETE); // 删除广告图
+    });
+});
+
 Route::prefix('set')->group(function () {
     // 商店设置
     Route::prefix('shop_config')->group(function () {
@@ -103,22 +161,6 @@ Route::prefix('set')->group(function () {
         });
     });
 
-    // 外部服务
-    Route::prefix('app_service')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_INDEX])->group(function () {
-            Route::get('/', [AppServiceConfigController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_CONFIG_INDEX);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_UPDATE])->group(function () {
-            Route::post('update', [AppServiceConfigController::class, 'update']);
-            Route::post('toggle/status', [AppServiceConfigController::class, 'toggleStatus']);
-        });
-    });
-    // 外部服务日志
-    Route::prefix('app_service_log')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
-            Route::get('/', [AppServiceLogController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
-        });
-    });
 
     // 支付方式
     Route::prefix('payment')->group(function () {
@@ -142,43 +184,6 @@ Route::prefix('set')->group(function () {
             Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
         });
     });
-    // 配送管理-地区
-    Route::prefix('region')->group(function () {
-        Route::get('tree', [RegionController::class, 'regionTree']);
-    });
 
-    // 移动端装修
-    Route::prefix('app_decoration')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_DECORATION])->group(function () {
-            Route::get('/', [AppDecorationController::class, 'index'])->name(Permission::MANAGE_APP_DECORATION); // 移动端装修
-            Route::get('/decoration', [AppDecorationController::class, 'decoration']); // 移动端装修
-            Route::post('/goods/list', [AppDecorationController::class, 'goodsList']); // 商品推荐组件 - 弹窗中商品列表
-            Route::post('/goods/import', [AppDecorationController::class, 'importGoods']); // 商品推荐组件 - 商品导入
-            Route::get('/recommend/data', [AppDecorationController::class, 'recommendData']); // 为您推荐组件数据
-            Route::post('/goods/intelligent', [AppDecorationController::class, 'goodsForIntelligent']); // 商品推荐组件 - 智能推荐数据
-            Route::get('/history', [AppDecorationController::class, 'decorationHistory']); // 装修历史记录
-            Route::post('/history/restore', [AppDecorationController::class, 'historyRestore']); // 还原装修历史
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_MATERIAL_CENTER_UPDATE])->group(function () {
-            Route::post('/decoration/save', [AppDecorationController::class, 'decorationSave']); // 移动端装修
-        });
-    });
 
-    // App广告
-    Route::prefix('app_ads')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_INDEX])->group(function () {
-            Route::get('/cate/names', [AppAdController::class, 'getCateNames'])->name(Permission::MANAGE_APP_ADVERT_INDEX); // 分类名称
-            Route::get('/cates', [AppAdController::class, 'getCates']); // 分类数据
-            Route::get('/app_ads', [AppAdController::class, 'getAppAds']); // 广告数据
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_UPDATE])->group(function () {
-            Route::get('/cate/update', [AppAdController::class, 'updateCate'])->name(Permission::MANAGE_APP_ADVERT_UPDATE); // 更新分类信息
-            Route::get('/update', [AppAdController::class, 'update']); // 更新广告信息
-            Route::get('/update/ad_image', [AppAdController::class, 'updateAdImage']); // 更换广告图
-            Route::get('/toggle/status', [AppAdController::class, 'toggleStatus']); // 切换广告图状态
-        });
-        Route::middleware(['manage.permission:'.Permission:: MANAGE_APP_ADVERT_DELETE])->group(function () {
-            Route::get('/delete', [AppAdController::class, 'delete'])->name(Permission:: MANAGE_APP_ADVERT_DELETE); // 删除广告图
-        });
-    });
 });

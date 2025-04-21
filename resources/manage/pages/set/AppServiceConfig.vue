@@ -96,7 +96,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            Http.doPost('set/app_service/update',submitForm).then(res => {
+            Http.doPost('app_service/update',submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -113,7 +113,7 @@ const onSubmit = () => {
 };
 
 const toggleStatus = (row, sign) => {
-    Http.doPost('set/app_service/toggle/status', {
+    Http.doPost('app_service/toggle/status', {
         id: row.id,
         sign: sign
     }).then(res => {
@@ -128,7 +128,7 @@ const toggleStatus = (row, sign) => {
 const getData = (page = 1) => {
     loading.value = true;
     searchForm.page = page;
-    Http.doGet('set/app_service', searchForm).then(res => {
+    Http.doGet('app_service', searchForm).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

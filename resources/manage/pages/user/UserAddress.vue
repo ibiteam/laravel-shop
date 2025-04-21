@@ -94,7 +94,7 @@ const resetSearch = () => {
     getData()
 }
 const areasData = () => {
-    Http.doGet('set/region/tree').then(res => {
+    Http.doGet('region/tree').then(res => {
         if (res.code === 200) {
             areas.value = res.data;
         }

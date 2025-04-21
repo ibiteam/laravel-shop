@@ -22,11 +22,11 @@ Route::prefix('user')->group(function () {
     Route::prefix('wechat')->group(function () {
         Route::get('/', [WechatUserController::class, 'index'])->name(Permission::MANAGE_WECHAT_USER_INDEX)->middleware('manage.permission');
     });
-    // 积分管理
-    Route::middleware(['manage.permission:'.Permission::MANAGE_USER_INTEGRAL_INDEX])->prefix('integral')->group(function () {
-        // 用户积分
-        Route::get('/', [UserIntegralController::class, 'index'])->name(Permission::MANAGE_USER_INTEGRAL_INDEX);
-        // 积分明细
-        Route::get('/detail', [UserIntegralController::class, 'detail'])->name(Permission::MANAGE_INTEGRAL_DETAIL_INDEX);
-    });
+});
+// 积分管理
+Route::middleware(['manage.permission:'.Permission::MANAGE_USER_INTEGRAL_INDEX])->prefix('integral')->group(function () {
+    // 用户积分
+    Route::get('/', [UserIntegralController::class, 'index'])->name(Permission::MANAGE_USER_INTEGRAL_INDEX);
+    // 积分明细
+    Route::get('/detail', [UserIntegralController::class, 'detail'])->name(Permission::MANAGE_INTEGRAL_DETAIL_INDEX);
 });

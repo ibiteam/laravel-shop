@@ -299,7 +299,7 @@ const decorationSave = (params) => {
         }
         console.log(save_decoration_data)
         console.log(saveData)
-        Http.doPost('set/app_decoration/decoration/save', (saveData)).then(res => {
+        Http.doPost('app_decoration/decoration/save', (saveData)).then(res => {
             decoration.loading = false
             if (cns.$successCode(res.code)) {
                 cns.$message.success('保存成功')
@@ -335,7 +335,7 @@ const getDecorationHome = () => {
      * }
      * @returns
      */
-    Http.doGet('set/app_decoration/decoration', {id: cns.$route.query.id}).then(res => {
+    Http.doGet('app_decoration/decoration', {id: cns.$route.query.id}).then(res => {
         decoration.loading = false
         if (cns.$successCode(res.code)) {
             decoration.app_website_data = res.data.app_website_data
@@ -356,7 +356,7 @@ const getDecorationHome = () => {
 
 // 获取为您推荐数据
 const getDecorationRecommendData = () => {
-    Http.doGet('set/app_decoration/recommend/data').then(res => {
+    Http.doGet('app_decoration/recommend/data').then(res => {
         if (cns.$successCode(res.code)) {
             defaultRecommendData.value = res.data.list
         }

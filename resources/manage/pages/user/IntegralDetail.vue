@@ -35,7 +35,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    Http.doGet('user/integral/detail', queryParams).then(res => {
+    Http.doGet('integral/detail', queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data;

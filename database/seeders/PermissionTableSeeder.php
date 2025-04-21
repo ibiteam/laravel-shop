@@ -82,10 +82,10 @@ class PermissionTableSeeder extends Seeder
         $this->addPermission('移动端装修', Permission::MANAGE_APP_DECORATION, 1, Permission::IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);
         $this->addPermission('移动端保存装修', Permission::MANAGE_APP_DECORATION_UPDATE, 1, Permission::NOT_IS_LEFT_NAV, '', Permission::WEBSITE_MANAGE);
 
-        $this->addPermission('广告管理', Permission::WEBSITE_MANAGE, 97, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_SET);
-        $this->addPermission('app广告', Permission::MANAGE_APP_ADVERT_INDEX, 1, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::WEBSITE_MANAGE);
-        $this->addPermission('app广告新增|编辑', Permission::MANAGE_APP_ADVERT_UPDATE, 1, Permission::NOT_IS_LEFT_NAV, 'icon-caidan', Permission::WEBSITE_MANAGE);
-        $this->addPermission('app广告删除', Permission::MANAGE_APP_ADVERT_DELETE, 1, Permission::NOT_IS_LEFT_NAV, 'icon-caidan', Permission::WEBSITE_MANAGE);
+        $this->addPermission('广告管理', Permission::ADVERT_MANAGE, 97, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_SET);
+        $this->addPermission('app广告', Permission::MANAGE_APP_ADVERT_INDEX, 1, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::ADVERT_MANAGE);
+        $this->addPermission('app广告新增|编辑', Permission::MANAGE_APP_ADVERT_UPDATE, 1, Permission::NOT_IS_LEFT_NAV, 'icon-caidan', Permission::ADVERT_MANAGE);
+        $this->addPermission('app广告删除', Permission::MANAGE_APP_ADVERT_DELETE, 1, Permission::NOT_IS_LEFT_NAV, 'icon-caidan', Permission::ADVERT_MANAGE);
     }
 
     private function addGoodsPermission(): void

@@ -109,7 +109,7 @@ const getHistory = (params = {page: 1}) => {
     if (history.loading) return
     const {page} = params;
     history.loading = true
-    Http.doGet('set/app_decoration/history', {id: props.id, page, number: pageInfo.per_page}).then(res => {
+    Http.doGet('app_decoration/history', {id: props.id, page, number: pageInfo.per_page}).then(res => {
         if (cns.$successCode(res.code)) {
             history.data = res.data.list;
             // // 更新分页信息
@@ -128,7 +128,7 @@ const getHistory = (params = {page: 1}) => {
 // 点击还原
 const handleResetDecoration = (row) => {
     const { log_id } = row
-    Http.doPost('set/app_decoration/history/restore', {log_id}).then(res => {
+    Http.doPost('app_decoration/history/restore', {log_id}).then(res => {
         if (cns.$successCode(res.code)) {
             cns.$bus.emit('layoutReload')
         } else {

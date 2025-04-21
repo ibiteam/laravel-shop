@@ -30,7 +30,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    Http.doGet('set/app_service_log',queryParams).then((res : any) => {
+    Http.doGet('app_service_log',queryParams).then((res : any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

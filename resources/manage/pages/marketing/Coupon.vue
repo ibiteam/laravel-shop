@@ -42,7 +42,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    Http.doGet('marketing/coupon', queryParams).then(res => {
+    Http.doGet('coupon', queryParams).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

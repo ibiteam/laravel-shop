@@ -35,7 +35,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    Http.doGet('marketing/coupon/user', queryParams).then(res => {
+    Http.doGet('coupon/user', queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data;

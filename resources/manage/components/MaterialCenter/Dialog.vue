@@ -236,7 +236,7 @@ const handleConfirm = () => {
 
 // 获取文件树
 const getFolderData = () => {
-    Http.doGet('tool/material/folder/list', {dir_type: 1}).then(res => {
+    Http.doGet('material/folder/list', {dir_type: 1}).then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             getMaterialData()
@@ -251,7 +251,7 @@ const getMaterialData = (params = {page: 1, number: 10}) => {
     searchForm.page = page;
     searchForm.number = number;
     tableLoading.value = true
-    Http.doGet('tool/material', searchForm).then(res => {
+    Http.doGet('material', searchForm).then(res => {
         if (res.code === 200) {
             tableData.value = res.data.list;
             // 更新分页信息

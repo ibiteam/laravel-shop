@@ -270,7 +270,7 @@ const uploadFile = async (request) => {
         dir_type: searchForm.value.dir_type
     }
     try {
-        const res = await Http.doPost('tool/material/upload', info);
+        const res = await Http.doPost('material/upload', info);
         if (cns.$successCode(res.code)) {
             getFolderData()
         } else {
@@ -295,7 +295,7 @@ const getMaterialData = (page = 1) => {
     // 更新当前页码
     searchForm.value.page = page;
     tableListLoading.value = true;
-    Http.doGet('tool/material', searchForm.value).then(res => {
+    Http.doGet('material', searchForm.value).then(res => {
         if (cns.$successCode(res.code)) {
             tableList.value = res.data.list;
             // 更新分页信息
@@ -308,7 +308,7 @@ const getMaterialData = (page = 1) => {
 }
 
 const getFolderData = () => {
-    Http.doGet('tool/material/folder/list', {dir_type: tabValue.value}).then(res => {
+    Http.doGet('material/folder/list', {dir_type: tabValue.value}).then(res => {
         if (cns.$successCode(res.code)) {
             folderData.value = res.data;
             searchForm.value.dir_type = tabValue.value;
@@ -423,7 +423,7 @@ const disableAllChildren = (children) => {
 const handleRenameMaterial = () => {
     ctrlMaterialRef.value.validate((valid) => {
         if (valid) {
-            Http.doPost('tool/material/rename', currentCtrlMaterial.value).then(res => {
+            Http.doPost('material/rename', currentCtrlMaterial.value).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('保存成功')
                     getFolderData()
@@ -441,7 +441,7 @@ const handleEditMaterial = () => {
     currentCtrlMaterial.value.dir_type = tabValue.value
     ctrlMaterialRef.value.validate((valid) => {
         if (valid) {
-            Http.doPost('tool/material/new/folder', currentCtrlMaterial.value).then(res => {
+            Http.doPost('material/new/folder', currentCtrlMaterial.value).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('保存成功')
                     getFolderData()
@@ -457,7 +457,7 @@ const handleEditMaterial = () => {
 }
 const handleDelete = (id) => {
     cns.$dialog.confirm({ message:'此操作将删除本文件和关联所有子文件, 是否继续?', title:'提示' }).then(() => {
-        Http.doPost('tool/material/destory', {id: id}).then(res => {
+        Http.doPost('material/destory', {id: id}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success('删除成功')
                 getFolderData()
@@ -473,7 +473,7 @@ const handleDelete = (id) => {
 }
 const handleBatchDelete = () => {
     cns.$dialog.confirm({ message:'此操作将删除选中文件和关联所有子文件, 是否继续?', title:'提示' }).then(() => {
-        Http.doPost('tool/material/batch/destory', {ids: multipleSelection.value}).then(res => {
+        Http.doPost('material/batch/destory', {ids: multipleSelection.value}).then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$message.success('删除成功')
                 getFolderData()
@@ -492,7 +492,7 @@ const handleMove = () => {
         id: multipleSelectionId.value,
         target_directory_id: currentCtrlMaterial.value.parent_id
     }
-    Http.doPost('tool/material/move', info).then(res => {
+    Http.doPost('material/move', info).then(res => {
         if (cns.$successCode(res.code)) {
             editMaterialVisible.value = false
             cns.$message.success('保存成功')
@@ -509,7 +509,7 @@ const handleBatchMove = () => {
         ids: multipleSelection.value,
         target_directory_id: currentCtrlMaterial.value.parent_id
     }
-    Http.doPost('tool/material/batch/move', info).then(res => {
+    Http.doPost('material/batch/move', info).then(res => {
         if (cns.$successCode(res.code)) {
             editMaterialVisible.value = false
             cns.$message.success('保存成功')

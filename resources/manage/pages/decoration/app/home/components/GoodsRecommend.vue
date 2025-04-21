@@ -290,7 +290,7 @@ const updateGoodsComponentData = (res) => {
 }
 
 const getIntelligentRecommendData = () => {
-    Http.doPost('set/app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
+    Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
         if (cns.$successCode(res.code)) {
             form.content.goods['goods_data'] = res.data
         }

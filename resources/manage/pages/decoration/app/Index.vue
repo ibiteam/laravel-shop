@@ -29,7 +29,7 @@ const getData = (page = 1) => {
     // 更新当前页码
     queryParams.page = page;
     loading.value = true;
-    Http.doGet('set/app_decoration', queryParams).then(res => {
+    Http.doGet('app_decoration', queryParams).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

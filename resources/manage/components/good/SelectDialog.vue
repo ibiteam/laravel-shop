@@ -279,7 +279,7 @@ const handleImport = () => {
         exporting.value = false
         return
     }
-    Http.doPost('set/app_decoration/goods/import', {goods_ids: export_data.value, goods_nos: check.nos}).then(res => {
+    Http.doPost('app_decoration/goods/import', {goods_ids: export_data.value, goods_nos: check.nos}).then(res => {
         if (cns.$successCode(res.code)) {
             if (res.data.length > 0) {
                 export_data.value = []
@@ -306,7 +306,7 @@ const getGoodsList = (params = {page: 1}) => {
     if (tableLoading.value) return
     const {page} = params;
     tableLoading.value = true
-    Http.doPost('set/app_decoration/goods/list', {...queryParams, page}).then(res => {
+    Http.doPost('app_decoration/goods/list', {...queryParams, page}).then(res => {
         if (cns.$successCode(res.code)) {
             tableData.value = res.data.list;
             // // 更新分页信息
