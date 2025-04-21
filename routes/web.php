@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
-Route::get('/', function () {
-    return "hello";
-})->name('home');
+Route::get('/',function (){
+    return 'home';
+});
 
+Route::get(config('app.manage_prefix').'/{any?}', function () {
+    return view('manage');
+})->where('any', '^(?!api|storage).*$');

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('shop_configs', function (Blueprint $table) {
             $table->id();
-            $table->integer('parent_id')->comment('父级ID');
+            $table->string('group_name')->comment('分组名称')->index();
             $table->string('code', 50)->comment('标识')->unique();
             $table->json('value')->nullable()->comment('值');
             $table->timestamps();

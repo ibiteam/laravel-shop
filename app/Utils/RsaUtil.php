@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Log;
 
 class RsaUtil
 {
+    private function __construct() {}
+
     public static function getDecodeData($data, $referer = 'manage'): false|string
     {
         $private_key = match ($referer) {

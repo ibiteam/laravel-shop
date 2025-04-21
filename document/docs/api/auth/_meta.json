@@ -1,0 +1,9 @@
+[
+    "check-login",
+    "login-account",
+    "login-phone",
+    "logout",
+    "password-edit",
+    "password-forget",
+    "wechat-auth"
+]

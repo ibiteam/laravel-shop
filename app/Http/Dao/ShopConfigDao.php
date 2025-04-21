@@ -2,6 +2,7 @@
 
 namespace App\Http\Dao;
 
+use App\Enums\CacheNameEnum;
 use App\Models\ShopConfig;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -15,13 +16,13 @@ class ShopConfigDao
     public function getAll(): mixed
     {
         if (is_local_env()) {
-            return Cache::remember('shop_config_all_code', Carbon::now()->endOfDay(), function () {
-                return ShopConfig::query()->where('parent_id', '!=', 0)->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
+            return Cache::remember(CacheNameEnum::SHOP_CONFIG_ALL->value, Carbon::now()->endOfDay(), function () {
+                return ShopConfig::query()->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
             });
         }
 
-        return Cache::rememberForever('shop_config_all_code', function () {
-            return ShopConfig::query()->where('parent_id', '!=', 0)->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
+        return Cache::rememberForever(CacheNameEnum::SHOP_CONFIG_ALL->value, function () {
+            return ShopConfig::query()->get()->mapWithKeys(fn (ShopConfig $shop_config) => [$shop_config->code => $shop_config->value]);
         });
     }
 
@@ -46,5 +47,21 @@ class ShopConfigDao
         }
 
         return $collection;
+    }
+
+    /**
+     * 获取指定配置 返回code=>value.
+     */
+    public function getConfigByCodes(array $codes): array
+    {
+        return ShopConfig::whereIn('code', $codes)->pluck('value', 'code')->toArray();
+    }
+
+    /**
+     * 获取指定配置 返回code=>value.
+     */
+    public function getConfigByGroupName(string $group_name): array
+    {
+        return ShopConfig::whereGroupName($group_name)->pluck('value', 'code')->toArray();
     }
 }

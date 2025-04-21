@@ -1,12 +1,128 @@
 [
     {
+        "type": "file",
+        "name": "description",
+        "label": "说明",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "chat",
+        "label": "客服地址",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "send-sms",
+        "label": "发送短信",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "shop_config",
+        "label": "网站配置",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "upload",
+        "label": "文件上传",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "search",
+        "label": "导航搜索",
+        "collapsed": true
+    },
+    {
+        "type": "file",
+        "name": "check_action_code",
+        "label": "校验短信验证码",
+        "collapsed": true
+    },
+    {
         "type": "dir",
-        "name": "user",
-        "label": "用户"
+        "name": "auth",
+        "label": "授权",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "user_address",
+        "label": "用户地址",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "category",
+        "label": "商品分类",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "search",
+        "label": "搜索",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "account_set",
+        "label": "账户设置",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "goods",
+        "label": "商品详情",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "cart",
+        "label": "购物车",
+        "collapsed": true
     },
     {
         "type": "dir",
         "name": "order",
-        "label": "订单"
+        "label": "订单",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "pay",
+        "label": "支付",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "apply_refund",
+        "label": "申请售后/退款",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "delivery",
+        "label": "发货物流",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "decoration",
+        "label": "装修",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "my",
+        "label": "我的",
+        "collapsed": true
+    },
+    {
+        "type": "dir",
+        "name": "article",
+        "label": "文章",
+        "collapsed": true
     }
 ]

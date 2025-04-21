@@ -1,1 +1,15 @@
-["index"]
+[
+    "init_direct",
+    "done_direct",
+    "init_cart",
+    "done_cart",
+    "my_order_index",
+    "my_order_detail",
+    "my_order_address_edit",
+    "my_order_address_update",
+    "my_order_destroy",
+    "my_order_cancel",
+    "evaluate_init",
+    "evaluate_store",
+    "my_order_receive"
+]

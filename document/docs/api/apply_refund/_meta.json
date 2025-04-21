@@ -1,0 +1,12 @@
+[
+    "verify",
+    "init",
+    "show",
+    "store",
+    "list",
+    "detail",
+    "log",
+    "revoke",
+    "ship_info",
+    "ship_add"
+]

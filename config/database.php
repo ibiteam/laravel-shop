@@ -3,7 +3,6 @@
 use Illuminate\Support\Str;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Database Connection Name
@@ -30,7 +29,6 @@ return [
     */
 
     'connections' => [
-
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
@@ -111,7 +109,22 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
-
+        'clickhouse' => [
+            'driver' => 'clickhouse',
+            'host' => env('CLICKHOUSE_HOST'),
+            'port' => env('CLICKHOUSE_PORT', '8123'),
+            'database' => env('CLICKHOUSE_DATABASE', 'default'),
+            'username' => env('CLICKHOUSE_USERNAME', 'default'),
+            'password' => env('CLICKHOUSE_PASSWORD', ''),
+            'timeout_connect' => env('CLICKHOUSE_TIMEOUT_CONNECT', 5),
+            'timeout_query' => env('CLICKHOUSE_TIMEOUT_QUERY', 5),
+            'https' => (bool) env('CLICKHOUSE_HTTPS', true),
+            'retries' => env('CLICKHOUSE_RETRIES', 0),
+            'settings' => [
+                'max_partitions_per_insert_block' => 300,
+            ],
+            'fix_default_query_builder' => true,
+        ],
     ],
 
     /*
@@ -142,7 +155,6 @@ return [
     */
 
     'redis' => [
-
         'client' => env('REDIS_CLIENT', 'phpredis'),
 
         'options' => [
@@ -168,7 +180,5 @@ return [
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
         ],
-
     ],
-
 ];
