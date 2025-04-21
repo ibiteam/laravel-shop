@@ -149,7 +149,7 @@
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
-                                <div :key="route.path" :class="{'common-wrap': !['manage.home.index','decorationAppHome','manage.goods.update'].includes(route.name)}" style="height: 100%;overflow-y: auto">
+                                <div :key="route.path" :class="{'common-wrap': !['manage.home.index','decorationAppHome','manage.goods.update'].includes(route.name)}" style="min-height: 100%;">
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
