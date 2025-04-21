@@ -90,12 +90,14 @@
         <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="退款状态">
             <template #default="{ row }">
-                <el-button
-                    link type="primary" size="large"
-                    v-for="item in refundStatuses"
-                    @click="openDetail(row.id)">
-                    <span v-if="row.status == item.value">{{ item.label }}</span>
-                </el-button>
+                <template v-for="item in refundStatuses">
+                    <el-button
+                        link type="primary" size="large"
+                        v-if="row.status == item.value"
+                        @click="openDetail(row.id)">
+                        <span>{{ item.label }}</span>
+                    </el-button>
+                </template>
             </template>
         </el-table-column>
     </page-table>
