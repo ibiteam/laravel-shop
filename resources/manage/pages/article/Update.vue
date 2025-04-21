@@ -81,7 +81,6 @@ import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useCommonStore } from '@/store';
 import { Delete, Plus } from '@element-plus/icons-vue';
-import { fileUpload } from '@/api/common.js';
 import { tabRemove } from '@/router/tabs.js';
 import Http from '@/utils/http';
 
@@ -144,7 +143,7 @@ const handleChangeContent = () => {
 };
 const uploadFile = async (request) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload', { file: request.file });
         if (cns.$successCode(res.code)) {
             submitForm.value.cover = res.data.url;
         } else {

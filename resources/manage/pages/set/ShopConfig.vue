@@ -354,7 +354,6 @@
 
 <script setup>
 import { Plus, Delete } from '@element-plus/icons-vue';
-import { fileUpload } from '@/api/common.js';
 import Http from '@/utils/http';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
 
@@ -431,7 +430,7 @@ const setInfo = (group_name) => {
 
 const uploadFile = async (request, type) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload', { file: request.file });
         if (cns.$successCode(res.code)) {
             inputFrom[type] = res.data.url;
         } else {

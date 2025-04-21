@@ -17,7 +17,7 @@
 
 <script setup>
 import { getCurrentInstance, ref } from 'vue';
-import { fileUpload } from '@/api/common';
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -74,7 +74,7 @@ const beforeUpload = (event) => {
 }
 
 const uploadImage = async (file) => {
-    fileUpload({file}).then((res) => {
+    Http.doUpload('upload', {file}).then((res) => {
         uploading.value = false
         if (cns.$successCode(res.code)) {
             emit('local', res.data?.url)

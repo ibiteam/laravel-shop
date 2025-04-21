@@ -3,7 +3,7 @@ import { Plus } from '@element-plus/icons-vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import _ from 'lodash';
 import { categoryIndex, categoryUpdate, categoryEdit, categoryDestroy, categoryChangeShow } from '@/api/goods.js';
-import { fileUpload } from '@/api/common.js';
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -83,7 +83,7 @@ const closeDetailDialog = () => {
 };
 const uploadFile = async (request) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload', { file: request.file });
         if (cns.$successCode(res.code)) {
             detailForm.logo = res.data.url;
         } else {
