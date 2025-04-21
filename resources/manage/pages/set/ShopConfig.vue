@@ -195,6 +195,34 @@
                                         ></el-switch>
                                         <span class="co-999" style="width: 100%"><small>商品展示列表是否显示销量</small></span>
                                     </el-form-item>
+                                    <el-form-item label="是否显示评论：" prop="is_show_evaluate">
+                                        <el-switch
+                                            v-model="inputFrom.is_show_evaluate"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>商品详情是否展示评论</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="是否显示申请售后：" prop="is_show_after_sales">
+                                        <el-switch
+                                            v-model="inputFrom.is_show_after_sales"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>订单列表、订单详情是否展示申请售后按钮</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="价格格式化：" prop="currency_format">
+                                        <el-input v-model="inputFrom.currency_format" placeholder="请输入价格格式化格式"></el-input>
+                                        <span class="co-999" style="width: 100%"><small>价格格式化格式</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="小数点后小数位数：" prop="price_format">
+                                        <el-input v-model="inputFrom.price_format" placeholder="请输入保留小数点后几位小数"></el-input>
+                                        <span class="co-999" style="width: 100%"><small>价格保留几位小数</small></span>
+                                    </el-form-item>
                                     <el-form-item>
                                         <el-button type="primary" :class="{disable:loading}" :loading="loading"
                                                    @click="submitForm()">提交

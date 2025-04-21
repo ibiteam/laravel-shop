@@ -85,6 +85,7 @@ class ShopConfigTableSeeder extends Seeder
     {
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_SALES_VOLUME, '0');
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_AFTER_SALES, '1');
+        $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::IS_SHOW_EVALUATE, '0');
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::CURRENCY_FORMAT, '￥%s');
         $this->addItem(ShopConfig::GROUP_GOODS, ShopConfig::PRICE_FORMAT, '2');
     }

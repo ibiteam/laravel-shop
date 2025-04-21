@@ -85,6 +85,7 @@ class ShopConfig extends BaseModel
     public const IS_SHOW_AFTER_SALES = 'is_show_after_sales';    // 是否显示售后申请
     public const CURRENCY_FORMAT = 'currency_format'; // 对价格进行格式化
     public const PRICE_FORMAT = 'price_format'; // 保留几位小数
+    public const IS_SHOW_EVALUATE = 'is_show_evaluate'; // 是否显示评论
 
     // 退款售后
     public const SELLER_SHIPPED_TIME = 'seller_shipped_time'; // 卖家未发货退款申请响应时间（小时）

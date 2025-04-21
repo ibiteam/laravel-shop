@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Models\OrderDetail;
 use App\Models\ShipCompany;
+use App\Models\ShopConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -100,7 +101,9 @@ class OrderResource extends JsonResource
                 break;
 
             case OrderConstantEnum::STATUS_WAIT_SHIP:
-                $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+                if (shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
+                    $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+                }
 
                 if (app(OrderDao::class)->canEditAddress($this->resource)) {
                     $buttons[] = ['text' => '修改地址', 'action' => 'edit_address'];
@@ -109,7 +112,9 @@ class OrderResource extends JsonResource
                 break;
 
             case OrderConstantEnum::STATUS_PART:
-                $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+                if (shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
+                    $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
+                }
 
                 if ($has_logistics) {
                     $buttons[] = ['text' => '查看物流', 'action' => 'logistics'];
