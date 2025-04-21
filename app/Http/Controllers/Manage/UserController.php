@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\User;
@@ -14,15 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $is_show = $request->get('is_show', -1);
-        $number = (int) $request->get('number', 10);
         $list = User::query()->latest()
             ->when($user_name = $request->get('user_name'), fn (Builder $query) => $query->whereLike('user_name', "%{$user_name}%"))
             ->when($is_show >= 0, fn (Builder $query) => $query->where('is_show', $is_show))
             ->orderByDesc('id')
-            ->paginate($number);
+            ->paginate($request->per_page);
 
         return $this->success(new CommonResourceCollection($list));
     }

@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\User;
 use App\Models\UserIntegral;
-use Illuminate\Http\Request;
 
 class UserIntegralController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $keywords = $request->get('keywords');
         $data = User::query()
             ->when($keywords, fn ($query) => $query->where('name', 'like', "%{$keywords}%")->orWhere('id', 'like', "%{$keywords}%"))
             ->where('integral', '>', 0)
-            ->latest()->paginate(10);
+            ->latest()->paginate($request->per_page);
         $data->getCollection()->transform(function (User $item) {
             return [
                 'id' => $item->id,
@@ -28,7 +28,7 @@ class UserIntegralController extends BaseController
         return $this->success(new CommonResourceCollection($data));
     }
 
-    public function detail(Request $request)
+    public function detail(IndexRequest $request)
     {
         $user_name = $request->get('user_name');
         $type = $request->get('type');
@@ -38,7 +38,7 @@ class UserIntegralController extends BaseController
             )
             ->when($type, fn ($query) => $query->where('type', $type))
             ->with('user')
-            ->latest()->paginate(10);
+            ->latest()->paginate($request->per_page);
         $data->getCollection()->transform(function (UserIntegral $item) {
             return [
                 'id' => $item->id,

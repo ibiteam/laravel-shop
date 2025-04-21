@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Exceptions\BusinessException;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Requests\Manage\UserAddressRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
@@ -13,7 +14,7 @@ use Illuminate\Http\Request;
 
 class UserAddressController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $user_id = (int) $request->get('user_id', 0);
         $list = UserAddress::query()->latest()
@@ -21,7 +22,7 @@ class UserAddressController extends BaseController
             ->when($consignee = $request->get('consignee'), fn (Builder $query) => $query->whereLike('consignee', "%{$consignee}%"))
             ->when($user_id, fn (Builder $query) => $query->whereUserId($user_id))
             ->orderByDesc('id')
-            ->paginate((int) $request->get('number', 10));
+            ->paginate($request->per_page);
         $list->getCollection()->transform(function (UserAddress $user_address) {
             $user_address->area = [$user_address->province, $user_address->city, $user_address->district];
             $user_address->province_name = $user_address->regionProvince?->name;

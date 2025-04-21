@@ -3,20 +3,21 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\Bonus;
 use Illuminate\Http\Request;
 
 class BonusController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $name = $request->get('name');
         $type = $request->get('type');
         $data = Bonus::query()
             ->when($type > -1, fn ($query) => $query->where('type', $type))
             ->when($name, fn ($query) => $query->where('name', 'like', "%{$name}%"))
-            ->paginate(10);
+            ->paginate($request->per_page);
 
         $data->getCollection()->transform(function (Bonus $item) {
             return [

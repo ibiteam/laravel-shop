@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AdminOperationLog;
 use App\Models\AppServiceConfig;
@@ -10,7 +11,7 @@ use Illuminate\Http\Request;
 
 class AppServiceConfigController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $name = $request->input('name', '');
         $alias = $request->input('alias', '');
@@ -22,7 +23,7 @@ class AppServiceConfigController extends BaseController
             ->when($desc, fn (Builder $query) => $query->whereLike('desc',  '%'.$desc.'%'))
             ->when($is_enable != '-1', fn (Builder $query) => $query->whereIsEnable($is_enable))
             ->orderByDesc('id')
-            ->paginate((int) $request->get('number', 10));
+            ->paginate($request->per_page);
 
         $list->getCollection()->transform(function (AppServiceConfig $app_service_config) {
             $app_service_config->error_name = $app_service_config->error_number == 0 ? '无限制' : $app_service_config->error_number;

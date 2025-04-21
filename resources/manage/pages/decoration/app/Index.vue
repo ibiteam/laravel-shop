@@ -1,6 +1,6 @@
 <script setup>
-import { appDecoration } from '@/api/decoration.js';
-import Page from '@/components/common/Pagination.vue'
+import Http from '@/utils/http'
+import PageTable from '@/components/common/PageTable.vue'
 import { useRouter } from 'vue-router';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
@@ -10,45 +10,29 @@ const router = useRouter()
 // 添加查询参数对象，增加搜索条件
 const queryParams = reactive({
     page: 1,
-    number: 10,
-});
-
-// 添加分页相关状态
-const pageInfo = reactive({
-    total: 0,
     per_page: 10,
-    current_page: 1
 });
 
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
-}
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
 
-// 每页条数改变
-const handleSizeChange = (val) => {
-    queryParams.number = val;
-    pageInfo.per_page = val;
-    getData(1);
-}
+const pagination = reactive({ ...defaultPage });
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
+const handlePageChange = (page, per_page) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
 
 const getData = (page = 1) => {
     // 更新当前页码
     queryParams.page = page;
     loading.value = true;
-    appDecoration(queryParams).then(res => {
+    Http.doGet('set/app_decoration', queryParams).then(res => {
         loading.value = false;
-        if (res.code === 200) {
-            tableData.value = res.data.list;
-            // 更新分页信息
-            setPageInfo(res.data.meta);
+        if (cns.$successCode(res.code)) {
+            tableData.value = res.data;
         } else {
             cns.$message.error(res.message)
         }
@@ -71,12 +55,12 @@ const goDecoration = (row) => {
 </script>
 
 <template>
-    <el-table
+    <page-table
         :data="tableData"
         stripe
         border
-        v-loading="loading"
-        style="width: 100%;">
+        @change="handlePageChange"
+        v-loading="loading">
         <el-table-column label="用户ID" prop="id"></el-table-column>
         <el-table-column label="页面" prop="name"></el-table-column>
         <el-table-column label="页面标题" prop="title"></el-table-column>
@@ -96,65 +80,8 @@ const goDecoration = (row) => {
                 <el-button @click="goDecoration(scope.row)">页面装修</el-button>
             </template>
         </el-table-column>
-    </el-table>
-    <!-- 添加分页组件 -->
-    <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+    </page-table>
 </template>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-}
-
-.header-picture {
-    width: 36px;
-    height: 36px;
-    overflow: hidden;
-    border-radius: 50%;
-    background: #fff;
-    padding: 1px;
-    box-sizing: border-box;
-}
-.imgs {
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    border-radius: 50%;
-}
-.header-picture .imgs img {
-    width: 100%;
-    height: 100%;
-}
-.flex-user-information {
-    display: flex;align-items: center;
-}
-.flex-user-information .header-user-names {
-    margin: 0 5px;
-    width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.flex-user-information .header-user-names span {
-    font-size: 14px;
-    font-weight: 400;
-    color: #3D3D3D;
-}
 </style>

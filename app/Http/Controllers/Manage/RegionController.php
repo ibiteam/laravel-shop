@@ -6,7 +6,8 @@ use App\Http\Dao\RegionDao;
 
 class RegionController extends BaseController
 {
-    public function regionTree(RegionDao $regionDao)
+    // 获取地区数据
+    public function region(RegionDao $regionDao)
     {
         return $this->success($regionDao->getRegionTree());
     }

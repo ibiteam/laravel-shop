@@ -38,7 +38,7 @@
                             </el-table-column>
                         </PublicPageTable>
                     </el-popover>
-                    
+
                     <el-button text @click.stop="emit('pageSetting')">页面配置</el-button>
                     <el-button @click.stop="emit('pageSave', {button_type: 1})" type="primary">保存草稿</el-button>
                     <el-button plain @click.stop="handlePreview">预览</el-button>
@@ -55,8 +55,7 @@
 <script setup>
 import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
-import { appDecorationHistory,appDecorationHistoryRestore } from '@/api/decoration.js'
-
+import Http from '@/utils/http'
 const cns = getCurrentInstance().appContext.config.globalProperties
 const emit = defineEmits(['pageSetting', 'pageSave'])
 const props = defineProps({
@@ -110,7 +109,7 @@ const getHistory = (params = {page: 1}) => {
     if (history.loading) return
     const {page} = params;
     history.loading = true
-    appDecorationHistory({id: props.id, page, number: pageInfo.per_page}).then(res => {
+    Http.doGet('set/app_decoration/history', {id: props.id, page, number: pageInfo.per_page}).then(res => {
         if (cns.$successCode(res.code)) {
             history.data = res.data.list;
             // // 更新分页信息
@@ -129,7 +128,7 @@ const getHistory = (params = {page: 1}) => {
 // 点击还原
 const handleResetDecoration = (row) => {
     const { log_id } = row
-    appDecorationHistoryRestore({log_id}).then(res => {
+    Http.doPost('set/app_decoration/history/restore', {log_id}).then(res => {
         if (cns.$successCode(res.code)) {
             cns.$bus.emit('layoutReload')
         } else {
