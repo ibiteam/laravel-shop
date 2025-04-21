@@ -65,8 +65,8 @@
 <script setup lang="ts">
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
-import { applyRefundReasonIndex, applyRefundReasonStore, applyRefundReasonDestroy } from '@/api/order.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 const tableData = ref({});
@@ -75,12 +75,13 @@ const storeDialogVisible = ref(false);
 const storeDialogTitle = ref('');
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
-const submitForm = reactive({
+const defaultSubmitForm = {
     id: 0,
     type: null,
     content: '',
     sort: 0
-});
+}
+const submitForm = reactive({...defaultSubmitForm});
 const submitFormRules = reactive({
     content: [{ required: true, message: '请输入原因', trigger: 'blur' }],
     type: [{ required: true, message: '请选择类型', trigger: 'change' }]
@@ -110,11 +111,6 @@ const openStoreDialog = (row = {}) => {
         submitForm.type = row.type;
         submitForm.content = row.content;
         submitForm.sort = row.sort;
-    } else {
-        submitForm.id = 0;
-        submitForm.type = null;
-        submitForm.content = '';
-        submitForm.sort = 0;
     }
     storeDialogVisible.value = true;
     nextTick(() => {
@@ -123,11 +119,8 @@ const openStoreDialog = (row = {}) => {
 };
 const closeStoreDialog = () => {
     storeDialogTitle.value = '';
-    submitForm.id = 0;
-    submitForm.type = null;
-    submitForm.content = '';
-    submitForm.sort = 0;
     storeDialogVisible.value = false;
+    Object.assign(submitForm, defaultSubmitForm);
 };
 
 /* 提交 */
@@ -135,7 +128,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid: any) => {
         if (valid) {
             submitLoading.value = true;
-            applyRefundReasonStore(submitForm).then((res: any) => {
+            Http.doPost('order/apply_refund_reason/store', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -158,7 +151,7 @@ const handleDestroy = (id: number) => {
         type: 'warning',
         center: true
     }).then(() => {
-        applyRefundReasonDestroy({ id: id }).then((res: any) => {
+        Http.doPost('order/apply_refund_reason/destroy', { id: id }).then((res: any) => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -173,12 +166,7 @@ const handleDestroy = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    const params = {
-        ...query,
-        page: page,
-        per_page: pagination.per_page
-    };
-    applyRefundReasonIndex(params).then((res: any) => {
+    Http.doGet('order/apply_refund_reason', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
