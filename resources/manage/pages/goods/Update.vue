@@ -104,7 +104,7 @@
                                         </div>
                                         <div class="main" :class="{'main-img' : !imgIndex}" @click="setMain(imgIndex)">
                                             <span v-if="!imgIndex">主图</span>
-                                            <span v-else>设为主图</span>
+                                            <span v-else class="set-main-text">设为主图</span>
                                         </div>
                                     </div>
                                 </VueDraggable>
@@ -1271,11 +1271,11 @@ onMounted(() => {
     })
     getSkuTemplate()
     getParameterTemplate('')
-    wrapRef.value.parentElement.addEventListener('scroll', handleScroll);
+    wrapRef.value.parentElement.parentElement.addEventListener('scroll', handleScroll);
 })
 
 onBeforeUnmount(() => {
-    wrapRef.value.parentElement.removeEventListener('scroll', handleScroll);
+    wrapRef.value.parentElement.parentElement.removeEventListener('scroll', handleScroll);
 });
 </script>
 
@@ -1327,7 +1327,7 @@ onBeforeUnmount(() => {
 
 .update-box {
     position: relative;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
     .goods-footer-btn{
         width: 100%;
         height: 80px;
@@ -1662,6 +1662,13 @@ onBeforeUnmount(() => {
 .good-picture .main span {
     color: var(--red-color);
     font-size: 12px;
+    &.set-main-text{
+        display: none;
+    }
 }
-
+.good-picture .good-picture-list:hover{
+    .set-main-text{
+        display: inline-block;
+    }
+}
 </style>
