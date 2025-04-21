@@ -8,7 +8,7 @@
                             <em class=""></em>
                             <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
-                        <div class="quick-view-box s-flex">
+                        <div class="quick-view-box s-flex flex-wrap">
                             <div class="quick-view s-flex ai-ct" @click="openUser()">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/user.png" alt="">
@@ -374,8 +374,6 @@ const resizeFnc = () => {
     lineRef.resize()
 }
 
-const debounceResize = $public.debounce(resizeFnc,100)
-
 const closeCollect = () => {
     searchMenus.value = []
     searchtools.value = ''
@@ -516,10 +514,10 @@ const clearCache = () => {
 
 onMounted(() => {
     getData()
-    window.addEventListener('resize', debounceResize)
+    window.addEventListener('resize', resizeFnc)
 });
 onUnmounted(() => {
-    window.removeEventListener('resize', debounceResize)
+    window.removeEventListener('resize', resizeFnc)
 });
 </script>
 
@@ -542,6 +540,8 @@ onUnmounted(() => {
     .home-container {
         width: 100%;
         height: 100%;
+        min-width: 880px;
+        overflow-x: auto;
 
         .home-content {
 
@@ -571,7 +571,7 @@ onUnmounted(() => {
             }
 
             .home-left .information .quick-view-box {
-                padding: 20px 0;
+                padding: 20px 0 0;
                 border-bottom: 1px #f2f3f5 solid;
             }
 
@@ -590,6 +590,8 @@ onUnmounted(() => {
                 flex: 1;
                 position: relative;
                 cursor: pointer;
+                min-width: 200px;
+                margin-bottom: 20px;
             }
 
             .home-left .information .quick-view-box .quick-view &::after {

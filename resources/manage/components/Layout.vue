@@ -45,9 +45,13 @@
                                 <div class='menu-box'>
                                     <div class='s-flex'>
                                         <div class='menu-list s-flex jc-ct ai-ct' :class='{actived:index === menuIndex}' :key="item.index" v-for='(item,index) in menus'  @click="leftShow = true,menuIndex = index">
-                                            <el-icon v-if="item.icon" :size="20">
-                                                <component :is="item.icon"/>
-                                            </el-icon>
+                                            <template v-if="item.icon">
+                                                <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" >
+                                                <i v-if="item.icon.indexOf('icon-') > -1" class="iconfont" :class="item.icon" style="color: #ffffff"></i>
+                                                <el-icon v-else :size="20">
+                                                    <component :is="item.icon"/>
+                                                </el-icon>
+                                            </template>
                                             <div class="menu-first-name co-666"><span>{{item.title}}</span></div>
                                         </div>
                                     </div>
@@ -145,7 +149,7 @@
                     <div class='flex-1' id="shopLayoutView" style='height: 0;background: var(--page-bg-color);padding: 16px;overflow-y: auto;'>
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
-                                <div :key="route.path" :class="{'common-wrap': !['decorationAppHome','manage.goods.update'].includes(route.name)}" style="height: 100%;">
+                                <div :key="route.path" :class="{'common-wrap': !['manage.home.index','decorationAppHome','manage.goods.update'].includes(route.name)}" style="height: 100%;">
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
