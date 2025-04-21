@@ -9,13 +9,13 @@ use App\Exceptions\BusinessException;
 use App\Http\Dao\OrderDeliveryDao;
 use App\Http\Dao\OrderLogDao;
 use App\Http\Dao\ShipCompanyDao;
-use App\Http\Resources\CommonResourceCollection;
 use App\Models\Order;
 use App\Models\OrderDelivery;
 use App\Models\OrderDeliveryItem;
 use App\Models\OrderDetail;
 use App\Models\OrderLog;
 use App\Models\ShipCompany;
+use App\Services\ExpressService;
 use App\Utils\ExcelUtil;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -44,7 +44,30 @@ class OrderDeliveryController extends BaseController
             ->when(! is_null($created_end_time), fn (Builder $query) => $query->where('shipped_at', '<=', $created_end_time))
             ->paginate($number);
 
-        return $this->success(new CommonResourceCollection($list));
+        return $this->success($list);
+    }
+
+    /**
+     * 根据发货单查询快递信息.
+     *
+     * @throws BusinessException
+     */
+    public function queryExpress(Request $request, ExpressService $express_service): JsonResponse
+    {
+        $validated = $request->validate([
+            'id' => 'required|string',
+        ], [], [
+            'id' => '发货编号',
+        ]);
+        $order_delivery = OrderDelivery::query()->with(['order', 'shipCompany'])->whereId($validated['id'])->first();
+
+        if (! $order_delivery instanceof OrderDelivery) {
+            return $this->error('订单发货单不存在');
+        }
+
+        $data = $express_service->queryExpress($order_delivery->ship_no, $order_delivery->shipCompany->code ?? '', $order_delivery->ordeer->phone ?? '');
+
+        return $this->success($data);
     }
 
     /**
