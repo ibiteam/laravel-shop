@@ -86,7 +86,7 @@ class OrderOperateService
      */
     public function receive(Order $order, User $user): void
     {
-        $now_datetime = now()->toDateTimeString();
+        $now_datetime = now()->format('Y-m-d H:i:s');
 
         DB::beginTransaction();
 

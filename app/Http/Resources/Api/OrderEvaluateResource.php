@@ -34,7 +34,7 @@ class OrderEvaluateResource extends JsonResource
             'bus_rank' => $this->resource->bus_rank,
             'delivery_rank' => $this->resource->delivery_rank,
             'service_rank' => $this->resource->service_rank,
-            'comment_at' => $this->resource->comment_at instanceof DateTimeInterface ? $this->resource->comment_at->toDateTimeString() : '',
+            'comment_at' => $this->resource->comment_at instanceof DateTimeInterface ? $this->resource->comment_at->format('Y-m-d H:i:s') : '',
         ];
     }
 }

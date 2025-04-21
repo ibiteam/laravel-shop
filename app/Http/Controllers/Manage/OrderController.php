@@ -128,10 +128,10 @@ class OrderController extends BaseController
                     'remark' => $order->remark,
                 ],
                 'order_time' => [
-                    'created_at' => $order->created_at->toDateTimeString(),
-                    'paid_at' => $order->paid_at ? $order->paid_at->toDateTimeString() : '未付款',
-                    'shipped_at' => $order->shipped_at ? $order->shipped_at->toDateTimeString() : '未发货',
-                    'received_at' => $order->received_at ? $order->received_at->toDateTimeString() : '未收货',
+                    'created_at' => $order->created_at->format('Y-m-d H:i:s'),
+                    'paid_at' => $order->paid_at ? $order->paid_at->format('Y-m-d H:i:s') : '未付款',
+                    'shipped_at' => $order->shipped_at ? $order->shipped_at->format('Y-m-d H:i:s') : '未发货',
+                    'received_at' => $order->received_at ? $order->received_at->format('Y-m-d H:i:s') : '未收货',
                 ],
                 'order_amount_data' => [
                     'order_amount' => price_number_format($order->order_amount),
@@ -158,7 +158,7 @@ class OrderController extends BaseController
                         'pay_message' => $message,
                         'remark' => $transaction->remark,
                         'amount' => price_number_format($transaction->amount),
-                        'created_at' => $transaction->created_at->toDateTimeString(),
+                        'created_at' => $transaction->created_at->format('Y-m-d H:i:s'),
                     ];
                 }),
                 'order_buyer_info' => [

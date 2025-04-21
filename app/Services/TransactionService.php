@@ -15,7 +15,7 @@ class TransactionService
 {
     public function wechatRefund(Transaction $transaction): void
     {
-        $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->toDateTimeString()]);
+        $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->format('Y-m-d H:i:s')]);
 
         /* 用户手动取消订单，在支付回调减钱 */
         if (str_starts_with($transaction->transaction_no, PayPrefixEnum::USER_CANCEL_ORDER->value)) {

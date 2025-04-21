@@ -160,7 +160,7 @@ class EvaluateController extends BaseController
                     'status' => OrderEvaluate::STATUS_WAIT,
                     'comment' => $item['comment'],
                     'images' => $item['images'] ?? [],
-                    'comment_at' => now()->toDateTimeString(),
+                    'comment_at' => now()->format('Y-m-d H:i:s'),
                     'rank' => $validated['rank'],
                     'goods_rank' => $validated['goods_rank'],
                     'price_rank' => $validated['price_rank'],

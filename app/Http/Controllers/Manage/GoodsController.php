@@ -91,7 +91,7 @@ class GoodsController extends BaseController
                 $tmp_message = '上架成功';
             }
 
-            if (! $goods->update(['status' => $tmp_status, 'status_datetime' => Carbon::now()->toDateTimeString()])) {
+            if (! $goods->update(['status' => $tmp_status, 'status_datetime' => Carbon::now()->format('Y-m-d H:i:s')])) {
                 throw new BusinessException('修改上下架状态失败');
             }
             admin_operation_log("修改商品：{$goods->name}[{$goods->id}] 上下架状态：{$tmp_message}", AdminOperationLog::TYPE_UPDATE);

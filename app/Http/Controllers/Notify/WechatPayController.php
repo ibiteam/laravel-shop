@@ -150,7 +150,7 @@ class WechatPayController extends Controller
             if (! $transaction instanceof Transaction) {
                 throw new \Exception('未找到支付流水记录');
             }
-            $paid_at = Carbon::make($order_message['success_time'])->toDateTimeString();
+            $paid_at = Carbon::make($order_message['success_time'])->format('Y-m-d H:i:s');
 
             $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => $paid_at]);
 
