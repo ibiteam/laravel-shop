@@ -49,8 +49,8 @@ class RouterController extends BaseController
                 'params' => $router->params ? json_encode($router->params, JSON_UNESCAPED_UNICODE) : '',
                 'is_show' => $router->is_show,
                 'sort' => $router->sort,
-                'created_at' => $router->created_at,
-                'updated_at' => $router->updated_at,
+                'created_at' => $router->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $router->updated_at->format('Y-m-d H:i:s'),
             ];
         });
 

@@ -48,7 +48,7 @@ class AdminUserController extends BaseController
                 'role_ids' => $role_ids,
                 'status' => $admin_user->status,
                 'latest_login_time' => $admin_user->latest_login_time,
-                'created_at' => $admin_user->created_at,
+                'created_at' => $admin_user->created_at->format('Y-m-d H:i:s'),
             ];
         });
 

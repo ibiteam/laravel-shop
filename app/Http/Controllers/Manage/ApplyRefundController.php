@@ -64,8 +64,8 @@ class ApplyRefundController extends BaseController
                 'is_revoke' => strval($apply_refund->is_revoke),
                 'count' => $apply_refund->count,
                 'result' => $apply_refund->result,
-                'created_at' => $apply_refund->created_at,
-                'updated_at' => $apply_refund->updated_at,
+                'created_at' => $apply_refund->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
             ];
         });
 
@@ -485,7 +485,7 @@ class ApplyRefundController extends BaseController
         return [
             'buyer_name' => $user->user_name,
             'order_sn' => $order->order_sn,
-            'created_at' => $order->created_at,
+            'created_at' => $order->created_at->format('Y-m-d H:i:s'),
             'goods_number' => $orderDetail->goods_number,
             'goods_name' => $orderDetail->goods_name,
             'goods_image' => $orderDetail->goods->image ?? '',

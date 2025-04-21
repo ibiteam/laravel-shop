@@ -63,7 +63,7 @@ class ArticleController extends BaseController
                 'click_count' => $article->click_count,
                 'sort' => $article->sort,
                 'admin_user_name' => $article->adminUser?->user_name,
-                'created_at' => $article->created_at,
+                'created_at' => $article->created_at->format('Y-m-d H:i:s'),
             ];
         });
 

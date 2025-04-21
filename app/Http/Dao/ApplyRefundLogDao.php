@@ -70,7 +70,7 @@ class ApplyRefundLogDao
                 return [
                     'img' => $temp_img,
                     'name' => $temp_name,
-                    'created_at' => $apply_refund_log->created_at,
+                    'created_at' => $apply_refund_log->created_at->format('Y-m-d H:i:s'),
                     'action' => $apply_refund_log->action,
                     'type' => $apply_refund_log->type,
                     'reason' => $apply_refund_log->applyRefund->applyRefundReason->content,
