@@ -14,11 +14,10 @@ class CategoryDao
      */
     public function getTreeList(): EloquentCollection|Collection
     {
-        return Category::query()
-            ->with('allChildren')
+        return Category::query()->with('allChildren')
             ->whereParentId(0)
-            ->get()
-            ->map(fn (Category $category) => $this->categoryFormat($category));
+            ->whereIsShow(Category::IS_SHOW_YES)
+            ->get()->map(fn (Category $category) => $this->categoryFormat($category));
     }
 
     /**

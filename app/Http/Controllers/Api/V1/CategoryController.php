@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Http\Dao\CategoryDao;
 
 /**
- * 分类.
+ * 商品分类.
  */
 class CategoryController extends BaseController
 {
@@ -15,7 +15,7 @@ class CategoryController extends BaseController
         try {
             return $this->success($category_dao->getTreeList());
         } catch (\Throwable $throwable) {
-            return $this->error('获取分类异常');
+            return $this->error('获取商品分类异常');
         }
     }
 }

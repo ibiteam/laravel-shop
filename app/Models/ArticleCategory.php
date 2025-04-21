@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -46,8 +44,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class ArticleCategory extends BaseModel
 {
-
-
     // 是否显示
     public const IS_SHOW_YES = 1; // 显示
     public const IS_SHOW_NO = 0; // 不显示
