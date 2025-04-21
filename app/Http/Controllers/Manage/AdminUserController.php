@@ -39,10 +39,6 @@ class AdminUserController extends BaseController
 
             $role_ids = $admin_user->modelHasRole->pluck('role_id')->toArray();
 
-            // 最新登录时间
-            $login_log = $admin_user->loginLog->last();
-            $latest_login_time = $login_log ? $login_log->created_at->format('Y-m-d H:i:s') : '';
-
             return [
                 'id' => $admin_user->id,
                 'user_name' => $admin_user->user_name,
@@ -51,7 +47,7 @@ class AdminUserController extends BaseController
                 'role_name' => $role_names,
                 'role_ids' => $role_ids,
                 'status' => $admin_user->status,
-                'latest_login_time' => $latest_login_time,
+                'latest_login_time' => $admin_user->latest_login_time,
                 'created_at' => $admin_user->created_at->format('Y-m-d H:i:s'),
             ];
         });
