@@ -7,8 +7,8 @@
                               @keyup.enter="getData()" />
                 </el-form-item>
                 <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>
+                    <el-button type="primary" @click="getData()">搜索</el-button>
+                    <el-button type="danger" @click="openStoreDialog()">添加</el-button>
                 </el-form-item>
             </el-form>
         </el-header>
@@ -84,7 +84,6 @@
 <script setup lang="ts">
 import { roleIndex, roleInfo, roleStore, roleChangeShow, roleDestroy } from '@/api/set.js';
 import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
-import { Plus, Search } from '@element-plus/icons-vue';
 import PublicPageTable from '@/components/common/PublicPageTable.vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
