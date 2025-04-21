@@ -213,7 +213,7 @@ const openDetail = (id) => {
 }
 
 onMounted( () => {
-    Http.doGet('goods/category')().then(res => {
+    Http.doGet('goods/category').then(res => {
         if (cns.$successCode(res.code)) {
             categoryOptions.value = res.data;
         }
