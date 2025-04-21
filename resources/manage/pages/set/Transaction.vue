@@ -122,9 +122,9 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-import { transactionIndex, transactionRefund } from '@/api/set.js';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -175,7 +175,7 @@ const getData = (page:number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    transactionIndex(params).then(res => {
+    Http.doGet('set/payment/transaction', params).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data
@@ -215,7 +215,7 @@ const submitRefundForm = () => {
     refundFormRef.value.validate((valid) => {
         if (valid) {
             submitRefundFormLoading.value = true;
-            transactionRefund(refundForm).then(res => {
+            Http.doPost('set/payment/transaction/refund', refundForm).then(res => {
                 submitRefundFormLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     getData(pagination.page)
