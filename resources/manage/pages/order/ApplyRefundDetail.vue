@@ -12,7 +12,7 @@
                 <div style="margin-bottom: 10px;border-bottom: 1px solid #eee;padding-bottom: 10px;">
                     <div class="status" style="margin-bottom: 10px;">{{status[detail.status]}}
                         <span v-if="detail.status==0||detail.status==3">
-                            <img src="https://cdn.toodudu.com/uploads/2022/09/03/time-icon.png">还剩
+                            <img src="@/assets/images/refund/time-icon.png">还剩
                             <span class="co-red">
                                 <template v-if="countdown_data.day&&countdown_data.day!=='00'">{{ countdown_data.day }}天</template>
                                 {{ countdown_data.hour }}时{{ countdown_data.minute }}分{{countdown_data.second}}秒
@@ -38,7 +38,7 @@
 
                 </ul>
                 <div class="address" style="margin-bottom: 5px;padding-top: 10px;" v-if="(detail.status==2||detail.status==3)&&shopAddress">
-                    <div class="s-flex ai-ct" style="padding-bottom: 5px;"><img src="https://cdn.toodudu.com/uploads/2022/09/05/location-icon.png" alt=""><span>退货地址</span></div>
+                    <div class="s-flex ai-ct" style="padding-bottom: 5px;"><img src="@/assets/images/refund/location-icon.png" alt=""><span>退货地址</span></div>
                     <p class="co-333 fs14">收货人：{{ shopAddress.consignee }} &#12288;&#12288;&#12288;&#12288;{{ shopAddress.phone }}</p>
                     <p class="co-333 fs14">{{ shopAddress.province }}&#12288;{{ shopAddress.city }}&#12288;{{ shopAddress.district }}&#12288;{{ shopAddress.address }}</p>
                 </div>
@@ -53,7 +53,7 @@
                 <div v-if="log&&log.length">
                     <div class="log-item s-flex" v-for="(item,i) in log" :key="`${i}log`">
                         <div class="img-box">
-                            <img :src="item.avatar">
+                            <img :src="item.avatar" v-if="item.avatar">
                         </div>
                         <div class="flex-1">
                             <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
@@ -92,7 +92,7 @@
                 <div style="padding: 0 10px;">退款详情</div>
                 <div class="good s-flex">
                     <div class="good-img">
-                        <img :src="detail.goods_image">
+                        <img :src="detail.goods_image" v-if="detail.goods_image">
                     </div>
                     <div>
                         <div class="elli-2">
