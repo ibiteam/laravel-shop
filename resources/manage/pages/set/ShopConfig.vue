@@ -1,164 +1,3 @@
-<script setup>
-import { Plus, Delete } from '@element-plus/icons-vue';
-import { shopConfigIndex, shopConfigUpdate, shopConfigSearchArticle } from '@/api/set.js';
-import { fileUpload } from '@/api/common.js';
-import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
-import { getConfigAxios } from '@/api/home.js';
-
-const cns = getCurrentInstance().appContext.config.globalProperties;
-import { useCommonStore } from '@/store';
-
-const commonStore = useCommonStore();
-
-const firstActiveName = ref('site_setup');
-const secondActiveName = ref('site_info');
-let inputFrom = reactive({});
-const tabPosition = ref('left');
-const loading = ref(false);
-const inputFromRef = ref(null);
-const userAgreementData = ref([]);
-const userCancelAgreementData = ref([]);
-const privacyPolicyData = ref([]);
-const aboutUsData = ref([]);
-
-
-const tab_label = computed(() => {
-    switch (secondActiveName.value) {
-        case 'site_info':
-            return '站点信息';
-        case 'site_logo':
-            return '站点Logo';
-        case 'smtp_service':
-            return '邮件服务';
-        case 'group_integral':
-            return '积分设置';
-        case 'group_search':
-            return '搜索设置';
-        case 'group_goods':
-            return '商品设置';
-        case 'group_refund_after_sales':
-            return '退款售后';
-        case 'group_articles':
-            return '文章设置';
-        default:
-            return '';
-    }
-});
-
-const firstHandleClick = (tab, event) => {
-    if (firstActiveName.value === 'site_setup') {
-        secondActiveName.value = 'site_info';
-    } else if (firstActiveName.value === 'system_docking') {
-        secondActiveName.value = 'smtp_service';
-    }
-    secondHandleClick(tab, event);
-};
-
-const secondHandleClick = (tab, event) => {
-    inputFrom = reactive({});
-    setInfo(secondActiveName.value);
-};
-
-const setInfo = (group_name) => {
-    shopConfigIndex({ group_name: group_name }).then(res => {
-        if (cns.$successCode(res.code)) {
-            Object.assign(inputFrom, res.data.configs);
-
-            if (group_name === 'group_articles' && res.data.group_data) {
-                // 文章设置
-                userAgreementData.value = res.data.group_data.user_agreement;
-                userCancelAgreementData.value = res.data.group_data.user_cancel_agreement;
-                privacyPolicyData.value = res.data.group_data.privacy_policy;
-                aboutUsData.value = res.data.group_data.about_us;
-            }
-        } else {
-            cns.$message.error(res.message);
-        }
-    });
-};
-
-const uploadFile = async (request, type) => {
-    try {
-        const res = await fileUpload({ file: request.file });
-        if (cns.$successCode(res.code)) {
-            inputFrom[type] = res.data.url;
-        } else {
-            cns.$message.error(res.message);
-        }
-    } catch (error) {
-        console.error('Failed:', error);
-    }
-};
-
-const handleRemoveOne = (type) => {
-    inputFrom[type] = '';
-};
-
-const remoteSearchArticle = async (query, type) =>{
-    if (query !== '') {
-        try {
-            const res = await shopConfigSearchArticle({ keywords: query });
-            if (cns.$successCode(res.code)) {
-                if (type === 'user_agreement') {
-                    userAgreementData.value = res.data;
-                }
-                if (type === 'user_cancel_agreement') {
-                    userCancelAgreementData.value = res.data;
-                }
-                if (type === 'privacy_policy') {
-                    privacyPolicyData.value = res.data;
-                }
-                if (type === 'about_us') {
-                    aboutUsData.value = res.data;
-                }
-            }
-        } catch (error) {
-            console.error('Failed:', error);
-        }
-    }
-};
-
-// 提交表单
-const submitForm = () => {
-    inputFromRef.value.validate((valid) => {
-        if (valid) {
-            inputFrom.title = secondActiveName.value;
-            inputFrom.tab_label = tab_label;
-            loading.value = true;
-            shopConfigUpdate(inputFrom).then(res => {
-                if (cns.$successCode(res.code)) {
-                    cns.$message.success('提交成功');
-                    getConfigAxios().then(ret => {
-                        if (cns.$successCode(ret.code)) {
-                            commonStore.updateShopConfig(ret.data.shop_config);
-                            commonStore.updateAdminUser(ret.data.admin_user);
-                            const root = document.documentElement;
-                            root.style.setProperty('--manage-color', ret.data.shop_config.manage_color);
-                            root.style.setProperty('--manage-color-over', ret.data.shop_config.mouse_move_color);
-                        } else {
-                            cns.$message.error(ret.message);
-                        }
-                    });
-                } else {
-                    cns.$message.error(res.message);
-                }
-                loading.value = false;
-            }).catch(err => {
-                cns.$message.error('提交异常');
-                loading.value = false;
-            });
-        } else {
-            cns.$message.error('表单验证失败');
-            return false;
-        }
-    });
-};
-
-onMounted(() => {
-    firstHandleClick();
-});
-</script>
-
 <template>
     <div class="common-wrap shopConfig-wrap">
         <el-main>
@@ -307,7 +146,8 @@ onMounted(() => {
                                             :active-value="'1'"
                                             :inactive-value="'0'"
                                         ></el-switch>
-                                        <span class="co-999" style="width: 100%"><small>商品添加时是否展示积分</small></span>
+                                        <span class="co-999"
+                                              style="width: 100%"><small>商品添加时是否展示积分</small></span>
                                     </el-form-item>
                                     <el-form-item label="积分名称：" prop="integral_name">
                                         <el-input v-model="inputFrom.integral_name" placeholder="请输入积分名称"
@@ -365,11 +205,13 @@ onMounted(() => {
                         </el-tab-pane>
                         <el-tab-pane label="退款售后" name="group_refund_after_sales">
                             <el-form :model="inputFrom" ref="inputFromRef">
-                                <div style="margin:0 auto 0 50px;" >
-                                    <div style="padding: 10px 20px; margin-bottom: 30px; max-width: 1100px; background: #f6e8d5;color: #666;">
+                                <div style="margin:0 auto 0 50px;">
+                                    <div
+                                        style="padding: 10px 20px; margin-bottom: 30px; max-width: 1100px; background: #f6e8d5;color: #666;">
                                         <p>注：</p>
                                         <p>
-                                            用户提交售后申请后需要商家处理退款订单，请提前协商好填写，核实之前需要注意3个时间点的设定，核实后将不能更改。 此设定防止买家来不及付款而导致订单过期自动取消；给自己预留足够时间放货，防止买家在放货时间到达后没有货权发生纠纷；同时预留买家足够的时间来确认货权。
+                                            用户提交售后申请后需要商家处理退款订单，请提前协商好填写，核实之前需要注意3个时间点的设定，核实后将不能更改。
+                                            此设定防止买家来不及付款而导致订单过期自动取消；给自己预留足够时间放货，防止买家在放货时间到达后没有货权发生纠纷；同时预留买家足够的时间来确认货权。
                                         </p>
                                     </div>
                                     <div class="refund-item">
@@ -432,7 +274,8 @@ onMounted(() => {
                                     </el-form-item>
                                     <el-form-item label="用户注销协议：" prop="user_cancel_agreement">
                                         <el-select
-                                            v-model="inputFrom.user_cancel_agreement" placeholder="请输入文章Id|文章标题"
+                                            v-model="inputFrom.user_cancel_agreement"
+                                            placeholder="请输入文章Id|文章标题"
                                             clearable @clear="handleRemoveOne('user_cancel_agreement')"
                                             filterable remote reserve-keyword
                                             :remote-method="(e) => remoteSearchArticle(e, 'user_cancel_agreement')">
@@ -509,11 +352,171 @@ onMounted(() => {
     </div>
 </template>
 
+<script setup>
+import { Plus, Delete } from '@element-plus/icons-vue';
+import { fileUpload } from '@/api/common.js';
+import Http from '@/utils/http';
+import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
+
+const cns = getCurrentInstance().appContext.config.globalProperties;
+import { useCommonStore } from '@/store';
+
+const commonStore = useCommonStore();
+
+const firstActiveName = ref('site_setup');
+const secondActiveName = ref('site_info');
+let inputFrom = reactive({});
+const tabPosition = ref('left');
+const loading = ref(false);
+const inputFromRef = ref(null);
+const userAgreementData = ref([]);
+const userCancelAgreementData = ref([]);
+const privacyPolicyData = ref([]);
+const aboutUsData = ref([]);
+
+const tab_label = computed(() => {
+    switch (secondActiveName.value) {
+        case 'site_info':
+            return '站点信息';
+        case 'site_logo':
+            return '站点Logo';
+        case 'smtp_service':
+            return '邮件服务';
+        case 'group_integral':
+            return '积分设置';
+        case 'group_search':
+            return '搜索设置';
+        case 'group_goods':
+            return '商品设置';
+        case 'group_refund_after_sales':
+            return '退款售后';
+        case 'group_articles':
+            return '文章设置';
+        default:
+            return '';
+    }
+});
+
+const firstHandleClick = (tab, event) => {
+    if (firstActiveName.value === 'site_setup') {
+        secondActiveName.value = 'site_info';
+    } else if (firstActiveName.value === 'system_docking') {
+        secondActiveName.value = 'smtp_service';
+    }
+    secondHandleClick(tab, event);
+};
+
+const secondHandleClick = (tab, event) => {
+    inputFrom = reactive({});
+    setInfo(secondActiveName.value);
+};
+
+const setInfo = (group_name) => {
+    Http.doGet('set/shop_config', { group_name: group_name }).then(res => {
+        if (cns.$successCode(res.code)) {
+            Object.assign(inputFrom, res.data.configs);
+
+            if (group_name === 'group_articles' && res.data.group_data) {
+                // 文章设置
+                userAgreementData.value = res.data.group_data.user_agreement;
+                userCancelAgreementData.value = res.data.group_data.user_cancel_agreement;
+                privacyPolicyData.value = res.data.group_data.privacy_policy;
+                aboutUsData.value = res.data.group_data.about_us;
+            }
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+};
+
+const uploadFile = async (request, type) => {
+    try {
+        const res = await fileUpload({ file: request.file });
+        if (cns.$successCode(res.code)) {
+            inputFrom[type] = res.data.url;
+        } else {
+            cns.$message.error(res.message);
+        }
+    } catch (error) {
+        console.error('Failed:', error);
+    }
+};
+
+const handleRemoveOne = (type) => {
+    inputFrom[type] = '';
+};
+
+const remoteSearchArticle = async (query, type) => {
+    if (query !== '') {
+        try {
+            const res = await Http.doGet('set/shop_config/search_article', { keywords: query });
+            if (cns.$successCode(res.code)) {
+                if (type === 'user_agreement') {
+                    userAgreementData.value = res.data;
+                }
+                if (type === 'user_cancel_agreement') {
+                    userCancelAgreementData.value = res.data;
+                }
+                if (type === 'privacy_policy') {
+                    privacyPolicyData.value = res.data;
+                }
+                if (type === 'about_us') {
+                    aboutUsData.value = res.data;
+                }
+            }
+        } catch (error) {
+            console.error('Failed:', error);
+        }
+    }
+};
+
+// 提交表单
+const submitForm = () => {
+    inputFromRef.value.validate((valid) => {
+        if (valid) {
+            inputFrom.title = secondActiveName.value;
+            inputFrom.tab_label = tab_label;
+            loading.value = true;
+            Http.doPost('set/shop_config/update', inputFrom).then(res => {
+                if (cns.$successCode(res.code)) {
+                    cns.$message.success('提交成功');
+                    Http.doGet('home/config').then(ret => {
+                        if (cns.$successCode(ret.code)) {
+                            commonStore.updateShopConfig(ret.data.shop_config);
+                            commonStore.updateAdminUser(ret.data.admin_user);
+                            const root = document.documentElement;
+                            root.style.setProperty('--manage-color', ret.data.shop_config.manage_color);
+                            root.style.setProperty('--manage-color-over', ret.data.shop_config.mouse_move_color);
+                        } else {
+                            cns.$message.error(ret.message);
+                        }
+                    });
+                } else {
+                    cns.$message.error(res.message);
+                }
+                loading.value = false;
+            }).catch(err => {
+                cns.$message.error('提交异常');
+                loading.value = false;
+            });
+        } else {
+            cns.$message.error('表单验证失败');
+            return false;
+        }
+    });
+};
+
+onMounted(() => {
+    firstHandleClick();
+});
+</script>
+
 <style scoped lang="scss">
 .shopConfig-wrap {
-    :deep(.el-tabs--left.el-tabs--card .el-tabs__item.is-left.is-active){
+    :deep(.el-tabs--left.el-tabs--card .el-tabs__item.is-left.is-active) {
         border-right: 1px solid var(--el-border-color-light);
     }
+
     :deep(.shopConfig-tab) {
         width: 1300px;
     }

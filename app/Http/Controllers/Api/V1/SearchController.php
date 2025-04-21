@@ -8,6 +8,7 @@ use App\Http\Dao\SearchDao;
 use App\Http\Dao\SearchKeywordDao;
 use App\Http\Resources\CommonResourceCollection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class SearchController extends BaseController
@@ -43,7 +44,9 @@ class SearchController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('搜索商品异常~'.$throwable->getMessage());
+            Log::error('搜索商品异常~'.$throwable->getMessage());
+
+            return $this->error('搜索商品异常~');
         }
     }
 
@@ -67,7 +70,9 @@ class SearchController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('获取推荐关键字异常');
+            Log::error('获取推荐关键字异常~'.$throwable->getMessage());
+
+            return $this->error('获取推荐关键字异常~');
         }
     }
 }

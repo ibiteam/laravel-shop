@@ -1,16 +1,5 @@
 import $http from '../utils/http'
 
-// 商店设置
-export function shopConfigIndex(data) {
-    return $http.doGet('manage/set/shop_config', data)
-}
-export function shopConfigUpdate(data) {
-    return $http.doPost('manage/set/shop_config/update', data)
-}
-export function shopConfigSearchArticle(data) {
-    return $http.doGet('manage/set/shop_config/search_article', data)
-}
-
 // 访问地址分类
 export function routerCategoryIndex(data) {
     return $http.doGet('manage/set/router_category', data)

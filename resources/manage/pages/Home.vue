@@ -6,25 +6,26 @@
                     <div class="information">
                         <div class="welcome">
                             <em class=""></em>
-                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
+                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime()
+                                }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
                         <div class="quick-view-box s-flex flex-wrap">
                             <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.user.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/user.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info" >
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">用户数</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.user_number??0 }}</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.user_number ?? 0 }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.order.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/order.png" alt="">
                                 </div>
-                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info" >
+                                <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">订单数</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.order_number??0 }}</span>
+                                    <span class="fs22" style="color: #551A8B">{{ number_data.order_number ?? 0 }}</span>
                                 </div>
                             </div>
                             <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.transaction.index'})">
@@ -33,10 +34,12 @@
                                 </div>
                                 <div class="s-flex flex-dir ai-fs jc-bt quick-view-info">
                                     <span class="fs12">总交易额</span>
-                                    <span class="fs22" style="color: #551A8B">{{ number_data.total_transaction_value??0 }}</span>
+                                    <span class="fs22"
+                                          style="color: #551A8B">{{ number_data.total_transaction_value ?? 0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.admin_operation_log.index'})">
+                            <div class="quick-view s-flex ai-ct"
+                                 @click="toPage({name:'manage.admin_operation_log.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/log.png" alt="">
                                 </div>
@@ -52,7 +55,8 @@
                                     <span>用户数据</span>
                                     <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <div class="mores" style="margin-right: 50px" @click="toPage({name:'manage.user.index'})">
+                                <div class="mores" style="margin-right: 50px"
+                                     @click="toPage({name:'manage.user.index'})">
                                     <span>查看更多</span>
                                 </div>
                             </div>
@@ -62,7 +66,8 @@
                     <div class="module-main">
                         <div class="module-title">会员</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order_evaluate.index'})">
+                            <div class="module-model s-flex ai-ct jc-ct"
+                                 @click="toPage({name:'manage.order_evaluate.index'})">
                                 <div class="module-imgs" style="background-position: 0px -180px;"></div>
                                 <div class="module-text">订单评论</div>
                             </div>
@@ -75,19 +80,23 @@
                     <div class="module-main">
                         <div class="module-title">订单</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{pay_status:0}})">
+                            <div class="module-model s-flex ai-ct jc-ct"
+                                 @click="toPage({name:'manage.order.index',query:{pay_status:0}})">
                                 <div class="module-imgs" style="background-position: 0px -900px;"></div>
                                 <div class="module-text">待付款</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{shipping_status:0}})">
+                            <div class="module-model s-flex ai-ct jc-ct"
+                                 @click="toPage({name:'manage.order.index',query:{shipping_status:0}})">
                                 <div class="module-imgs" style="background-position: 0px -480px;"></div>
                                 <div class="module-text">待发货</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{shipping_status:1}})">
+                            <div class="module-model s-flex ai-ct jc-ct"
+                                 @click="toPage({name:'manage.order.index',query:{shipping_status:1}})">
                                 <div class="module-imgs" style="background-position: 0px -300px;"></div>
                                 <div class="module-text">待收货</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.apply_refund.index'})">
+                            <div class="module-model s-flex ai-ct jc-ct"
+                                 @click="toPage({name:'manage.apply_refund.index'})">
                                 <div class="module-imgs" style="background-position: 0px -780px;"></div>
                                 <div class="module-text">退款申请</div>
                             </div>
@@ -110,18 +119,20 @@
                                     <div class="opt-list" @click.stop="toPage(item)" v-if="index<12">
                                         <div class="icon">
                                             <template v-if="item.icon">
-                                                <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" style="width: 20px;height: 20px">
-                                                <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;" class="iconfont" :class="item.icon"></i>
+                                                <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt=""
+                                                     style="width: 20px;height: 20px">
+                                                <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;"
+                                                   class="iconfont" :class="item.icon"></i>
                                                 <el-icon v-else :size="20">
-                                                    <component :is="item.icon"/>
+                                                    <component :is="item.icon" />
                                                 </el-icon>
                                             </template>
                                             <el-icon :size="20" v-else>
-                                                <Document/>
+                                                <Document />
                                             </el-icon>
                                         </div>
                                         <div class="titles">
-                                            <span>{{item.title}}</span>
+                                            <span>{{ item.title }}</span>
                                         </div>
                                     </div>
                                 </template>
@@ -141,18 +152,20 @@
                                 <div class="opt-list" v-for="item in access_record" @click.stop="toPage(item)">
                                     <div class="icon">
                                         <template v-if="item.icon">
-                                            <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt="" style="width: 20px;height: 20px">
-                                            <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;" class="iconfont" :class="item.icon"></i>
+                                            <img v-if="item.icon.indexOf('http') > -1" :src="item.icon" alt=""
+                                                 style="width: 20px;height: 20px">
+                                            <i v-if="item.icon.indexOf('icon-') > -1" style="font-size:20px;"
+                                               class="iconfont" :class="item.icon"></i>
                                             <el-icon v-else :size="20">
-                                                <component :is="item.icon"/>
+                                                <component :is="item.icon" />
                                             </el-icon>
                                         </template>
                                         <el-icon :size="20" v-else>
-                                            <Document/>
+                                            <Document />
                                         </el-icon>
                                     </div>
                                     <div class="titles">
-                                        <span>{{item.title}}</span>
+                                        <span>{{ item.title }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -170,7 +183,9 @@
                             <div class="more-opt s-flex flex-wrap">
                                 <div class="opt-list" @click="clearCache">
                                     <div class="icon">
-                                        <el-icon :size="20"><DeleteFilled /></el-icon>
+                                        <el-icon :size="20">
+                                            <DeleteFilled />
+                                        </el-icon>
                                     </div>
                                     <div class="titles">
                                         <span>清除缓存</span>
@@ -203,7 +218,8 @@
                 </div>
                 <div class="left-collection">
                     <div class="search-menu">
-                        <el-input placeholder="请输入关键词" v-model="searchtools" ref='searchtoolsRef' @input='searchMenusFnc'>
+                        <el-input placeholder="请输入关键词" v-model="searchtools" ref='searchtoolsRef'
+                                  @input='searchMenusFnc'>
                             <template #prefix>
                                 <div style='font-size: 20px' class='s-flex ai-ct jc-ct'>
                                     <Search style='width: 1.5em;height: 1.5em;color: var(--main-color)' />
@@ -217,30 +233,47 @@
                                 <div class="menu-title"><span>{{ item.title }}</span></div>
                                 <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
                                     <template v-if="its.children && its.children.length > 0">
-                                        <div class="menu-title" ><span>{{ its.title }}</span></div>
+                                        <div class="menu-title"><span>{{ its.title }}</span></div>
                                         <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
                                             <template v-if="itas.children && itas.children.length > 0">
                                                 <div class="menu-title"><span>{{ itas.title }}</span></div>
-                                                <div class="menu-listRouter s-flex jc-bt ai-ct" v-for="(ite,idx) in itas.children" :key="ite.value" style="cursor: pointer;margin-left: 40px" @click="collectionFnc(ite,index,ids,idas,idx)">
+                                                <div class="menu-listRouter s-flex jc-bt ai-ct"
+                                                     v-for="(ite,idx) in itas.children" :key="ite.value"
+                                                     style="cursor: pointer;margin-left: 40px"
+                                                     @click="collectionFnc(ite,index,ids,idas,idx)">
                                                     <span>{{ ite.title }}</span>
-                                                    <el-icon style="color: #ff6a00" v-if="ite.is_collection"><StarFilled /></el-icon>
-                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                                    <el-icon style="color: #ff6a00" v-if="ite.is_collection">
+                                                        <StarFilled />
+                                                    </el-icon>
+                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                        <StarFilled />
+                                                    </el-icon>
                                                 </div>
                                             </template>
                                             <template v-else>
-                                                <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(itas,index,ids,idas)">
+                                                <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
+                                                     @click="collectionFnc(itas,index,ids,idas)">
                                                     <span>{{ itas.title }}</span>
-                                                    <el-icon style="color: #ff6a00" v-if="itas.is_collection"><StarFilled /></el-icon>
-                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                                    <el-icon style="color: #ff6a00" v-if="itas.is_collection">
+                                                        <StarFilled />
+                                                    </el-icon>
+                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                        <StarFilled />
+                                                    </el-icon>
                                                 </div>
                                             </template>
                                         </div>
                                     </template>
                                     <template v-else>
-                                        <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;" @click="collectionFnc(its,index,ids)">
+                                        <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
+                                             @click="collectionFnc(its,index,ids)">
                                             <span>{{ its.title }}</span>
-                                            <el-icon style="color: #ff6a00" v-if="its.is_collection"><StarFilled /></el-icon>
-                                            <el-icon style="color: rgb(204, 204, 204);display: none" v-else><StarFilled /></el-icon>
+                                            <el-icon style="color: #ff6a00" v-if="its.is_collection">
+                                                <StarFilled />
+                                            </el-icon>
+                                            <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                <StarFilled />
+                                            </el-icon>
                                         </div>
                                     </template>
                                 </div>
@@ -255,30 +288,33 @@
 </template>
 
 <script setup lang='ts'>
-import { nextTick, onMounted, ref, reactive, onUnmounted, computed,getCurrentInstance } from 'vue';
-const cns = getCurrentInstance().appContext.config.globalProperties
-import * as echarts from 'echarts'
-import $public from '@/utils/public'
-import {getCollectMenuAxios,clearCacheAxios, getHomeDashboardAxios, homeCollectMenuAxios} from "../api/home.js";
-import { useRoute,useRouter } from 'vue-router';
-const route = useRoute()
-const router =  useRouter()
+import { nextTick, onMounted, ref, reactive, onUnmounted, computed, getCurrentInstance } from 'vue';
 
-import { useCommonStore } from '@/store'
-const commonStore = useCommonStore()
+const cns = getCurrentInstance().appContext.config.globalProperties;
+import * as echarts from 'echarts';
+import $public from '@/utils/public';
+import { useRoute, useRouter } from 'vue-router';
 
-let lineRef = null
+const route = useRoute();
+const router = useRouter();
 
-const searchtoolsRef = ref(null)
-const searchtools = ref('')
+import { useCommonStore } from '@/store';
+import Http from '@/utils/http';
 
-const number_data = ref({})
-const access_record = ref([])
-const my_collect = ref([])
-const access_statistic = ref({})
-const collectionVisible = ref<boolean>(false)
-const menus = ref([])
-const searchMenus = ref([])
+const commonStore = useCommonStore();
+
+let lineRef = null;
+
+const searchtoolsRef = ref(null);
+const searchtools = ref('');
+
+const number_data = ref({});
+const access_record = ref([]);
+const my_collect = ref([]);
+const access_statistic = ref({});
+const collectionVisible = ref<boolean>(false);
+const menus = ref([]);
+const searchMenus = ref([]);
 
 const getUvChartOption = (item) => {
     let xAxisData = [];
@@ -368,103 +404,103 @@ const getUvChartOption = (item) => {
 
         ]
     };
-}
+};
 
 const resizeFnc = () => {
-    lineRef.resize()
-}
+    lineRef.resize();
+};
 
 const closeCollect = () => {
-    searchMenus.value = []
-    searchtools.value = ''
-}
+    searchMenus.value = [];
+    searchtools.value = '';
+};
 const openCollect = () => {
-    getCollectMenuAxios().then(res => {
+    Http.doGet('home/collect_manage').then(res => {
         if (cns.$successCode(res.code)) {
-            menus.value = res.data.menus
-            searchMenus.value = res.data.menus
-            my_collect.value = res.data.collect_permissions
-            collectionVisible.value = true
+            menus.value = res.data.menus;
+            searchMenus.value = res.data.menus;
+            my_collect.value = res.data.collect_permissions;
+            collectionVisible.value = true;
             setTimeout(() => {
-                searchtoolsRef.value.focus()
-            },500)
+                searchtoolsRef.value.focus();
+            }, 500);
         } else {
             cns.$message.error(res.message);
         }
     });
-}
-const mapData = (arrs,newArr) => {
-    for(let i=0;i<arrs.length;i++){
-        if(arrs[i].hasOwnProperty('children')){ // 下拉节点
-            if(arrs[i].title.indexOf(searchtools.value) > -1){
-                newArr.push(arrs[i])
-            }else{
-                let newData = mapData(arrs[i].children,[])
-                if(newData.length>0){
-                    newArr.push({...arrs[i],children:newData})
-                }else{
+};
+const mapData = (arrs, newArr) => {
+    for (let i = 0; i < arrs.length; i++) {
+        if (arrs[i].hasOwnProperty('children')) { // 下拉节点
+            if (arrs[i].title.indexOf(searchtools.value) > -1) {
+                newArr.push(arrs[i]);
+            } else {
+                let newData = mapData(arrs[i].children, []);
+                if (newData.length > 0) {
+                    newArr.push({ ...arrs[i], children: newData });
+                } else {
                     continue;
                 }
             }
-        }else{ // 最后一级
-            if(arrs[i].title.indexOf(searchtools.value) > -1){
-                newArr.push(arrs[i])
+        } else { // 最后一级
+            if (arrs[i].title.indexOf(searchtools.value) > -1) {
+                newArr.push(arrs[i]);
             }
             continue;
         }
     }
-    return newArr
-}
+    return newArr;
+};
 const searchMenusFnc = $public.debounce(() => {
-    let arrs = menus.value
-    let newArr = new Array()
-    for(let i=0;i<arrs.length;i++){
-        if(arrs[i].title.indexOf(searchtools.value) > -1){ // 如果顶级标题包含查询内容
-            newArr.push({...arrs[i]})
+    let arrs = menus.value;
+    let newArr = new Array();
+    for (let i = 0; i < arrs.length; i++) {
+        if (arrs[i].title.indexOf(searchtools.value) > -1) { // 如果顶级标题包含查询内容
+            newArr.push({ ...arrs[i] });
             continue;
-        }else if(arrs[i].hasOwnProperty('children')){
-            let mapDatas = mapData(arrs[i].children,[])
-            if(mapDatas.length>0){
-                newArr.push({...arrs[i],children:mapDatas})
+        } else if (arrs[i].hasOwnProperty('children')) {
+            let mapDatas = mapData(arrs[i].children, []);
+            if (mapDatas.length > 0) {
+                newArr.push({ ...arrs[i], children: mapDatas });
             }
         }
     }
-    searchMenus.value = newArr
-},500)
+    searchMenus.value = newArr;
+}, 500);
 
-const collectionFnc = (item,index,ids,idas,idx) =>{
-    let is_collect = item.is_collection
-    homeCollectMenuAxios(item.index).then(res => {
+const collectionFnc = (item, index, ids, idas, idx) => {
+    let is_collect = item.is_collection;
+    Http.doGet('home/collect_menu', item.index).then(res => {
         if (cns.$successCode(res.code)) {
-            if(is_collect){
-                let collectIndex = my_collect.value.findIndex(a => a.name === item.name)
-                my_collect.value.splice(collectIndex,1)
-            }else{
-                my_collect.value.push(item)
+            if (is_collect) {
+                let collectIndex = my_collect.value.findIndex(a => a.name === item.name);
+                my_collect.value.splice(collectIndex, 1);
+            } else {
+                my_collect.value.push(item);
             }
-            if (idx !== undefined){
-                searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect
-            }else if (idas !== undefined){
-                searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect
-            }else{
-                searchMenus.value[index].children[ids].is_collection = !is_collect
+            if (idx !== undefined) {
+                searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect;
+            } else if (idas !== undefined) {
+                searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect;
+            } else {
+                searchMenus.value[index].children[ids].is_collection = !is_collect;
             }
 
         } else {
             cns.$message.error(res.message);
         }
     });
-}
+};
 
 const getData = () => {
-    getHomeDashboardAxios().then(res => {
+    Http.doGet('home/dashboard').then(res => {
         if (cns.$successCode(res.code)) {
-            number_data.value = res.data.number_data
-            my_collect.value = res.data.my_collect
-            access_record.value = res.data.access_record
-            access_statistic.value = res.data.access_statistic
+            number_data.value = res.data.number_data;
+            my_collect.value = res.data.my_collect;
+            access_record.value = res.data.access_record;
+            access_statistic.value = res.data.access_statistic;
             nextTick(() => {
-                if (document.getElementById('access-data')){
+                if (document.getElementById('access-data')) {
                     lineRef = echarts.init(document.getElementById('access-data'));
                     lineRef.setOption(getUvChartOption(access_statistic.value));
                 }
@@ -473,43 +509,43 @@ const getData = () => {
             cns.$message.error(res.message);
         }
     });
-}
+};
 
 const firendlyTime = () => {
-    let hours = new Date().getHours()
-    if (hours < 11){
-        return '早上好'
-    }else if (hours < 13){
-        return '中午好'
-    }else if (hours < 17){
-        return '下午好'
-    }else{
-        return '晚上好'
+    let hours = new Date().getHours();
+    if (hours < 11) {
+        return '早上好';
+    } else if (hours < 13) {
+        return '中午好';
+    } else if (hours < 17) {
+        return '下午好';
+    } else {
+        return '晚上好';
     }
-}
+};
 
 const toPage = (item) => {
-    if (item.name){
-        router.push({name:item.name,query:item.query})
+    if (item.name) {
+        router.push({ name: item.name, query: item.query });
     }
-}
+};
 
 const clearCache = () => {
-    clearCacheAxios().then(res => {
+    Http.doGet('home/clear_cache').then(res => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
         }
     });
-}
+};
 
 onMounted(() => {
-    getData()
-    window.addEventListener('resize', resizeFnc)
+    getData();
+    window.addEventListener('resize', resizeFnc);
 });
 onUnmounted(() => {
-    window.removeEventListener('resize', resizeFnc)
+    window.removeEventListener('resize', resizeFnc);
 });
 </script>
 
@@ -517,6 +553,7 @@ onUnmounted(() => {
 .seller-home {
     transform: translate(0, 0);
     user-select: none;
+
     .container.member {
         overflow-y: hidden;
     }
@@ -573,7 +610,8 @@ onUnmounted(() => {
                 background: #f6f7fb;
                 border-radius: 50px;
             }
-            .home-left .information .quick-view-box .fonts img{
+
+            .home-left .information .quick-view-box .fonts img {
                 width: 32px;
                 height: 32px;
             }
@@ -625,25 +663,29 @@ onUnmounted(() => {
                 margin-top: 15px;
                 font-weight: 500;
             }
-            .home-left .information .quick-view-box .quick-view .quick-view-info{
+
+            .home-left .information .quick-view-box .quick-view .quick-view-info {
                 height: 100%;
             }
 
-            .module-main{
+            .module-main {
                 padding: 30px 40px;
                 background: #ffffff;
                 margin-top: 15px;
                 border-radius: 4px;
                 box-sizing: border-box;
             }
-            .module-main .module-title{
+
+            .module-main .module-title {
                 font-size: 16px;
                 color: #333333;
             }
-            .module-main .module-content{
+
+            .module-main .module-content {
 
             }
-            .module-main .module-content .module-model{
+
+            .module-main .module-content .module-model {
                 margin: 20px 30px 0;
                 width: 176px;
                 height: 70px;
@@ -652,17 +694,20 @@ onUnmounted(() => {
                 cursor: pointer;
                 user-select: none;
             }
-            .module-main .module-content .module-model:hover{
+
+            .module-main .module-content .module-model:hover {
                 box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
                 border: none;
             }
-            .module-main .module-content .module-model>.module-imgs{
+
+            .module-main .module-content .module-model > .module-imgs {
                 width: 40px;
                 height: 40px;
                 background: url('@/assets/images/home/home-menu.png');
                 background-repeat: no-repeat;
             }
-            .module-main .module-content .module-model>.module-text{
+
+            .module-main .module-content .module-model > .module-text {
                 margin-left: 10px;
                 font-size: 14px;
                 color: #333333;
@@ -727,7 +772,8 @@ onUnmounted(() => {
                 justify-content: center;
                 align-items: center;
             }
-            .home-right .shortcut .opt-list .icon svg{
+
+            .home-right .shortcut .opt-list .icon svg {
                 width: 30px;
                 height: 30px;
             }
@@ -759,6 +805,7 @@ onUnmounted(() => {
     }
 
 }
+
 /*  首页收藏弹窗  */
 :deep(.collection-drawer) {
     .collection-box {
@@ -824,13 +871,15 @@ onUnmounted(() => {
                 font-weight: 500;
                 padding: 0 20px;
             }
+
             .menu-third {
                 .menu-title {
                     padding: 0 20px;
                     height: 30px;
                     display: flex;
                     align-items: center;
-                    span{
+
+                    span {
                         color: #333;
                         font-size: 14px;
                         overflow: hidden;
@@ -858,27 +907,31 @@ onUnmounted(() => {
         }
     }
 
-    .menu-second-listRouter{
+    .menu-second-listRouter {
         height: 48px;
         border-radius: 10px;
         padding: 0 20px;
         cursor: pointer;
         display: flex;
         justify-content: space-between;
+
         &:hover {
             background-color: #f4f6f7;
+
             .el-icon {
                 display: block !important;
             }
         }
-        span{
+
+        span {
             font-size: 16px;
             color: #333;
             line-height: 3;
             font-weight: 500;
             cursor: pointer;
         }
-        i{
+
+        i {
             cursor: pointer;
             color: #333;
             font-size: 14px;
@@ -887,6 +940,7 @@ onUnmounted(() => {
             white-space: nowrap;
         }
     }
+
     .collection-box .menu-listRouter {
         height: 30px;
         align-items: center;
@@ -901,6 +955,7 @@ onUnmounted(() => {
     .collection-box .menu-listRouter {
         &:hover {
             background-color: #f4f6f7;
+
             .el-icon {
                 display: block !important;
             }
@@ -977,10 +1032,15 @@ onUnmounted(() => {
 
 
 /**/
-.no-data{
-    display: flex;align-items: center;justify-content: center;
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.no-data span{
-    font-size: 16px;color: #ccc;font-weight: 400;
+
+.no-data span {
+    font-size: 16px;
+    color: #ccc;
+    font-weight: 400;
 }
 </style>
