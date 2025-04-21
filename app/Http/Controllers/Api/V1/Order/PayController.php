@@ -67,7 +67,7 @@ class PayController extends BaseController
                 'order' => [
                     'order_sn' => $order->order_sn,
                     'order_amount' => $order->order_amount,
-                    'created_at' => $order->created_at->toDateTimeString(),
+                    'created_at' => $order->created_at->format('Y-m-d H:i:s'),
                 ],
                 'payments' => $payments,
             ]);

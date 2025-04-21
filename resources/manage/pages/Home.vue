@@ -8,8 +8,8 @@
                             <em class=""></em>
                             <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
-                        <div class="quick-view-box s-flex">
-                            <div class="quick-view s-flex ai-ct" @click="openUser()">
+                        <div class="quick-view-box s-flex flex-wrap">
+                            <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.user.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/user.png" alt="">
                                 </div>
@@ -18,7 +18,7 @@
                                     <span class="fs22" style="color: #551A8B">{{ number_data.user_number??0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct" @click="openOrder()">
+                            <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.order.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/order.png" alt="">
                                 </div>
@@ -27,7 +27,7 @@
                                     <span class="fs22" style="color: #551A8B">{{ number_data.order_number??0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct">
+                            <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.transaction.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/transcation.png" alt="">
                                 </div>
@@ -36,7 +36,7 @@
                                     <span class="fs22" style="color: #551A8B">{{ number_data.total_transaction_value??0 }}</span>
                                 </div>
                             </div>
-                            <div class="quick-view s-flex ai-ct"  @click="openLog()">
+                            <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.admin_operation_log.index'})">
                                 <div class="fonts s-flex ai-ct jc-ct">
                                     <img src="@/assets/images/home/log.png" alt="">
                                 </div>
@@ -49,10 +49,10 @@
                         <div class="access-data">
                             <div class="access-data-header s-flex jc-bt ai-ct">
                                 <div class="data-header">
-                                    <span>销售数据</span>
+                                    <span>用户数据</span>
                                     <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <div class="mores" style="margin-right: 50px">
+                                <div class="mores" style="margin-right: 50px" @click="toPage({name:'manage.user.index'})">
                                     <span>查看更多</span>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@
                     <div class="module-main">
                         <div class="module-title">会员</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct">
+                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order_evaluate.index'})">
                                 <div class="module-imgs" style="background-position: 0px -180px;"></div>
                                 <div class="module-text">订单评论</div>
                             </div>
@@ -75,19 +75,19 @@
                     <div class="module-main">
                         <div class="module-title">订单</div>
                         <div class="module-content s-flex flex-wrap">
-                            <div class="module-model s-flex ai-ct jc-ct">
+                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{pay_status:0}})">
                                 <div class="module-imgs" style="background-position: 0px -900px;"></div>
                                 <div class="module-text">待付款</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
+                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{shipping_status:0}})">
                                 <div class="module-imgs" style="background-position: 0px -480px;"></div>
                                 <div class="module-text">待发货</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
+                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.order.index',query:{shipping_status:1}})">
                                 <div class="module-imgs" style="background-position: 0px -300px;"></div>
                                 <div class="module-text">待收货</div>
                             </div>
-                            <div class="module-model s-flex ai-ct jc-ct">
+                            <div class="module-model s-flex ai-ct jc-ct" @click="toPage({name:'manage.apply_refund.index'})">
                                 <div class="module-imgs" style="background-position: 0px -780px;"></div>
                                 <div class="module-text">退款申请</div>
                             </div>
@@ -288,9 +288,9 @@ const getUvChartOption = (item) => {
         xAxisData = item.pc.statistic_date;
         pc_uv = item.pc.uv_number;
     }
-    if (item?.ibi?.statistic_date && Array.isArray(item.ibi.statistic_date)) {
-        xAxisData = item.ibi.statistic_date;
-        app_uv = item.ibi.uv_number;
+    if (item?.h5?.statistic_date && Array.isArray(item.h5.statistic_date)) {
+        xAxisData = item.h5.statistic_date;
+        app_uv = item.h5.uv_number;
     }
     return {
         title: {
@@ -332,7 +332,7 @@ const getUvChartOption = (item) => {
         },
         series: [
             {
-                name: '订单数',
+                name: 'PC用户数',
                 type: 'line',
                 data: pc_uv,
                 lineStyle: {
@@ -349,7 +349,7 @@ const getUvChartOption = (item) => {
 
             },
             {
-                name: '销售额',
+                name: 'H5用户数',
                 type: 'line',
                 data: app_uv,
                 lineStyle: {
@@ -373,8 +373,6 @@ const getUvChartOption = (item) => {
 const resizeFnc = () => {
     lineRef.resize()
 }
-
-const debounceResize = $public.debounce(resizeFnc,100)
 
 const closeCollect = () => {
     searchMenus.value = []
@@ -492,18 +490,10 @@ const firendlyTime = () => {
 
 const toPage = (item) => {
     if (item.name){
-        router.push({name:item.name})
+        router.push({name:item.name,query:item.query})
     }
 }
-const openUser = () => {
-    router.push({name: 'manage.user.index'})
-}
-const openOrder = () => {
-    router.push({name: 'manage.order.index'})
-}
-const openLog = () => {
-    router.push({name: 'manage.admin_operation_log.index'})
-}
+
 const clearCache = () => {
     clearCacheAxios().then(res => {
         if (cns.$successCode(res.code)) {
@@ -516,10 +506,10 @@ const clearCache = () => {
 
 onMounted(() => {
     getData()
-    window.addEventListener('resize', debounceResize)
+    window.addEventListener('resize', resizeFnc)
 });
 onUnmounted(() => {
-    window.removeEventListener('resize', debounceResize)
+    window.removeEventListener('resize', resizeFnc)
 });
 </script>
 
@@ -542,6 +532,8 @@ onUnmounted(() => {
     .home-container {
         width: 100%;
         height: 100%;
+        min-width: 880px;
+        overflow-x: auto;
 
         .home-content {
 
@@ -571,7 +563,7 @@ onUnmounted(() => {
             }
 
             .home-left .information .quick-view-box {
-                padding: 20px 0;
+                padding: 20px 0 0;
                 border-bottom: 1px #f2f3f5 solid;
             }
 
@@ -590,6 +582,8 @@ onUnmounted(() => {
                 flex: 1;
                 position: relative;
                 cursor: pointer;
+                min-width: 200px;
+                margin-bottom: 20px;
             }
 
             .home-left .information .quick-view-box .quick-view &::after {

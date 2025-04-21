@@ -28,6 +28,12 @@ class AdminUserService
             '账号密码登录成功~'
         );
 
+        // 更新最新登录信息
+        $admin_user->update([
+            'latest_login_time' => date('Y-m-d H:i:s'),
+            'latest_login_ip' => get_request_ip(),
+        ]);
+
         Cache::forget(CacheNameEnum::ADMIN_PERMISSION_MENUS->value.'_'.$admin_user->id);
 
         return [

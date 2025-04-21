@@ -203,7 +203,7 @@ class OrderService
 
             if ($order->order_amount == 0) {
                 $order->pay_status = PayStatusEnum::PAYED->value;
-                $order->paid_at = now()->toDateTimeString();
+                $order->paid_at = now()->format('Y-m-d H:i:s');
                 $order->save();
             }
             $destroy_cart_ids = [];

@@ -29,7 +29,7 @@ class OrderResource extends JsonResource
             'order_sn' => $this->resource->order_sn,
             'payer' => [
                 'user_name' => $this->resource->user?->user_name,
-                'done_time' => $this->resource->created_at->toDateTimeString(),
+                'done_time' => $this->resource->created_at->format('Y-m-d H:i:s'),
             ],
             'consignee' => $this->resource->consignee,
             'order_amount' => $this->resource->order_amount,

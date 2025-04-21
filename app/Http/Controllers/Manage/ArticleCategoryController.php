@@ -20,8 +20,22 @@ class ArticleCategoryController extends BaseController
     {
         $name = $request->get('name');
 
+        $search_ids = [];
+
+        if ($name) {
+            $search_ids = ArticleCategory::query()
+                ->where(function ($q) {
+                    $q->where('parent_id', '=', 0)->orWhere('parent_id', '>', 0);
+                })
+                ->where('name', 'like', '%'.$name.'%')
+                ->pluck('id')
+                ->merge(ArticleCategory::query()->where('name', 'like', '%'.$name.'%')->pluck('parent_id'))
+                ->unique()->values();
+        }
+
         $data = ArticleCategory::query()
-            ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
+            ->when($search_ids, fn ($query) => $query->whereIn('id', $search_ids))
+            // ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->with(['allChildren'])->whereParentId(0)
             ->get();
 

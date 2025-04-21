@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers\Notify;
 
-use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\PayFormEnum;
 use App\Enums\PaymentEnum;
 use App\Enums\PayPrefixEnum;
 use App\Enums\PayStatusEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
-use App\Http\Dao\ApplyRefundDao;
 use App\Http\Dao\PaymentDao;
-use App\Models\ApplyRefund;
 use App\Models\Goods;
 use App\Models\GoodsSku;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Transaction;
+use App\Services\TransactionService;
 use App\Utils\Wechat\WechatPayUtil;
 use Carbon\Carbon;
 use EasyWeChat\Kernel\ServerResponse;
@@ -33,7 +31,7 @@ class WechatPayController extends Controller
     /**
      * 退款回调.
      */
-    public function notifyRefund(Request $request, PaymentDao $payment_dao): ServerResponse|ResponseInterface
+    public function notifyRefund(Request $request, PaymentDao $payment_dao, TransactionService $transaction_service): ServerResponse|ResponseInterface
     {
         try {
             // 支付回调
@@ -63,36 +61,7 @@ class WechatPayController extends Controller
             $transaction = Transaction::query()->whereTransactionType(Transaction::TRANSACTION_TYPE_REFUND)->whereTransactionNo($order_message['out_refund_no'])->whereStatus(Transaction::STATUS_WAIT)->first();
 
             if ($transaction instanceof Transaction) {
-                $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => now()->toDateTimeString()]);
-
-                /* 用户手动取消订单，在支付回调减钱 */
-                if (str_starts_with($transaction->transaction_no, PayPrefixEnum::USER_CANCEL_ORDER->value)) {
-                    $order = Order::query()->whereId($transaction->type_id)->first();
-
-                    if ($order instanceof Order) {
-                        $order->update(['money_paid' => 0]);
-                    }
-                } /*elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::MANAGE_REFUND->value)) {
-                    $order = Order::query()->whereId($transaction->type_id)->first();
-
-                    if ($order instanceof Order) {
-                        $order->update(['money_paid' => 0]);
-                    }
-                }*/ elseif (str_starts_with($transaction->transaction_no, PayPrefixEnum::APPLY_REFUND->value)) {
-                    /* 申请售后退款成功 */
-                    $apply_refund = ApplyRefund::query()->whereTransactionId($transaction->id)->first();
-
-                    if ($apply_refund instanceof ApplyRefund) {
-                        $apply_refund->update([
-                            'status' => ApplyRefundStatusEnum::REFUND_SUCCESS->value,
-                            'job_time' => null,
-                            'result' => '款项已原路返回买家账号',
-                        ]);
-
-                        // 退款成功后更新订单信息
-                        app(ApplyRefundDao::class)->refundSuccessChangeOrder($apply_refund);
-                    }
-                }
+                $transaction_service->wechatRefund($transaction);
             }
 
             return $wechat_pay_util->server()->serve();
@@ -181,7 +150,7 @@ class WechatPayController extends Controller
             if (! $transaction instanceof Transaction) {
                 throw new \Exception('未找到支付流水记录');
             }
-            $paid_at = Carbon::make($order_message['success_time'])->toDateTimeString();
+            $paid_at = Carbon::make($order_message['success_time'])->format('Y-m-d H:i:s');
 
             $transaction->update(['status' => Transaction::STATUS_SUCCESS, 'paid_at' => $paid_at]);
 

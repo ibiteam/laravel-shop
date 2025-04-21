@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('phone')->comment('手机号')->unique();
             $table->string('job_no')->nullable()->comment('工号');
             $table->boolean('status')->default(1)->comment('状态：1启用 0禁用');
+            $table->dateTime('latest_login_time')->nullable()->comment('最新登录时间');
+            $table->string('latest_login_ip')->nullable()->comment('最新登录IP');
             $table->timestamps();
         });
     }

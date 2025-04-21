@@ -37,7 +37,7 @@ class TransactionResource extends JsonResource
             'user_name' => $this->resource->user?->user_name,
             'payment_name' => $this->resource->payment?->name,
             'status' => $this->resource->status,
-            'created_at' => $this->resource->created_at->toDateTimeString(),
+            'created_at' => $this->resource->created_at->format('Y-m-d H:i:s'),
             'paid_at' => $this->resource->paid_at,
             'remark' => $this->resource->remark,
             'can_refund' => $this->resource->can_refund,

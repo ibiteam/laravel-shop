@@ -246,44 +246,6 @@ class ApplyRefundDao
     }
 
     /**
-     * 退款成功后 更新订单信息.
-     *
-     * @throws BusinessException
-     */
-    public function refundSuccessChangeOrder(ApplyRefund $apply_refund)
-    {
-        $order = Order::query()->with('detail')->whereId($apply_refund->order_id)->first();
-
-        if (! $order instanceof Order) {
-            throw new BusinessException('未找到订单记录');
-        }
-
-        $order->update(['money_paid' => $order->money_paid - $apply_refund->money]);
-
-        // 订单下 所有售后退款
-        $apply_refund = ApplyRefund::whereOrderId($order->id)
-            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
-            ->select(['money', 'number'])->get();
-
-        $success_money = $apply_refund->sum('money');
-        $success_number = $apply_refund->sum('number');
-
-        // 交易关闭：退款数量大于等于 订单明细数量时 && 退款金额 大于等于 订单金额
-        if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount) {
-            $order->order_status = OrderStatusEnum::CANCELLED->value;
-            $order->pay_status = PayStatusEnum::PAY_WAIT->value;
-            $order->ship_status = ShippingStatusEnum::UNSHIPPED->value;
-            $order->money_paid = 0;
-
-            if (! $order->save()) {
-                throw new BusinessException('更新订单信息失败');
-            }
-        }
-
-        return $order;
-    }
-
-    /**
      * 微信退款.
      *
      * @throws BusinessException|\Throwable

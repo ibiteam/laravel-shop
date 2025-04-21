@@ -1,13 +1,117 @@
-<script setup>
-import { Plus, Search } from '@element-plus/icons-vue';
-import Page from '@/components/common/Pagination.vue';
-import { applyRefundIndex } from '@/api/order.js';
+<template>
+    <search-form :model="query" :label-width="100">
+        <el-form-item label="用户名称">
+            <el-input v-model="query.user_name" clearable placeholder="请输入" @keyup.enter="getData()"></el-input>
+        </el-form-item>
+        <el-form-item label="商品名称">
+            <el-input v-model="query.goods_name" clearable placeholder="请输入" @keyup.enter="getData()"></el-input>
+        </el-form-item>
+        <el-form-item label="订单号">
+            <el-input v-model="query.order_sn" clearable placeholder="请输入" @keyup.enter="getData()"></el-input>
+        </el-form-item>
+        <el-form-item label="退款单号">
+            <el-input v-model="query.no" clearable placeholder="请输入" @keyup.enter="getData()"></el-input>
+        </el-form-item>
+        <el-form-item label="类型">
+            <el-select v-model="query.type" clearable placeholder="请选择">
+                <el-option label="退款" value="0"></el-option>
+                <el-option label="退货退款" value="1"></el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+            <el-select v-model="query.status" clearable placeholder="请选择">
+                <el-option
+                    v-for="item in refundStatuses"
+                    :key="item.value" :label="item.label" :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="申请时间">
+            <el-date-picker
+                v-model="query.start_time"
+                type="datetime"
+                placeholder="开始时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+            <span>&nbsp;至&nbsp;</span>
+            <el-date-picker
+                v-model="query.end_time"
+                type="datetime"
+                placeholder="结束时间"
+                value-format="YYYY-MM-DD HH:mm:ss"
+            >
+            </el-date-picker>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" @click="getData()">搜索</el-button>
+            <el-button @click="resetSearch">重置</el-button>
+        </el-form-item>
+    </search-form>
+    <page-table
+        :data="tableData"
+        :maxHeight="'700px'"
+        v-loading="loading"
+        @change="handlePageChange"
+    >
+        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column label="用户名称" prop="user_name"></el-table-column>
+        <el-table-column label="商品名称" prop="goods_name"></el-table-column>
+        <el-table-column label="订单号" prop="order_sn"></el-table-column>
+        <el-table-column label="退款单号" prop="no"></el-table-column>
+        <el-table-column label="退款金额" prop="money"></el-table-column>
+        <el-table-column label="退款数量" prop="number"></el-table-column>
+        <el-table-column label="类型">
+            <template #default="{ row }">
+                <span v-if="row.type == 0">退款</span>
+                <span v-if="row.type == 1">退货退款</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="退款原因" prop="reason"></el-table-column>
+        <el-table-column label="退款描述" prop="description"></el-table-column>
+        <el-table-column label="退款凭证">
+            <template #default="{ row }">
+                <el-image
+                    style="width: 30px; height: 30px; margin-right: 10px"
+                    v-for="(item, index) in row.certificate" :key="index" :src="item" @click="imageShow(item)"
+                    fit="cover" lazy>
+                </el-image>
+            </template>
+        </el-table-column>
+        <el-table-column label="是否撤销">
+            <template #default="{ row }">
+                <span v-if="row.is_revoke == 0">否</span>
+                <span v-if="row.is_revoke == 1">是</span>
+            </template>
+        </el-table-column>
+        <el-table-column label="结果描述" prop="result"></el-table-column>
+        <el-table-column label="申请次数" prop="count"></el-table-column>
+        <el-table-column label="申请时间" prop="created_at"></el-table-column>
+        <el-table-column label="更新时间" prop="updated_at"></el-table-column>
+        <el-table-column label="退款状态">
+            <template #default="{ row }">
+                <el-button
+                    link type="primary" size="large"
+                    v-for="item in refundStatuses"
+                    @click="openDetail(row.id)">
+                    <span v-if="row.status == item.value">{{ item.label }}</span>
+                </el-button>
+            </template>
+        </el-table-column>
+    </page-table>
+</template>
+
+<script setup lang="ts">
+import SearchForm from '@/components/common/SearchForm.vue';
+import PageTable from '@/components/common/PageTable.vue';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { applyRefundIndex } from '@/api/order.js';
 
 const router = useRouter();
-
 const cns = getCurrentInstance().appContext.config.globalProperties;
+const tableData = ref([]);
+const loading = ref(false);
 
 const refundStatuses = [
     { label: '退款待处理', value: 0 },
@@ -19,7 +123,7 @@ const refundStatuses = [
     { label: '退款关闭', value: 6 }
 ];
 
-const searchForm = reactive({
+const defaultQuery = reactive({
     user_name: '',
     goods_name: '',
     order_sn: '',
@@ -31,30 +135,43 @@ const searchForm = reactive({
     number: 10,
     page: 1
 });
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
-const tableData = ref([]);
-const loading = ref(false);
+const query = reactive({ ...defaultQuery });
 
-const imageShow = (url) => {
+const resetSearch = () => {
+    Object.assign(query, defaultQuery);
+    Object.assign(pagination, defaultPage);
+    getData();
+};
+
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+const pagination = reactive({ ...defaultPage });
+const handlePageChange = (page: number, per_page: number) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
+
+const imageShow = (url: string) => {
     window.open(url);
 };
 
-const openDetail = (id) => {
+const openDetail = (id: number) => {
     router.push({ name: 'manage.apply_refund.detail', params: { id: id } });
 };
 
-const getData = (page = 1) => {
+const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    searchForm.page = page;
-    applyRefundIndex(searchForm).then(res => {
+    const params = {
+        ...query,
+        page: page,
+        per_page: pagination.per_page
+    };
+    applyRefundIndex(params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
-            tableData.value = res.data.list;
-            setPageInfo(res.data.meta);
+            tableData.value = res.data;
         } else {
             cns.$message.error(res.message);
         }
@@ -64,145 +181,11 @@ const getData = (page = 1) => {
     });
 };
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-};
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
-};
-// 每页条数改变
-const handleSizeChange = (val) => {
-    searchForm.number = val;
-    pageInfo.per_page = val;
-    getData(1);
-};
-
 onMounted(() => {
     getData();
 });
 </script>
-<template>
-    <div>
-        <el-header style="padding: 10px 0;height: auto;">
-            <el-form :inline="true" :model="searchForm" class="search-form" label-width="120px">
-                <el-form-item label="用户名称">
-                    <el-input v-model="searchForm.user_name" clearable placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="商品名称">
-                    <el-input v-model="searchForm.goods_name" clearable placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="订单号">
-                    <el-input v-model="searchForm.order_sn" clearable placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="退款单号">
-                    <el-input v-model="searchForm.no" clearable placeholder="请输入"></el-input>
-                </el-form-item>
-                <el-form-item label="类型">
-                    <el-select v-model="searchForm.type" clearable placeholder="请选择">
-                        <el-option label="退款" value="0"></el-option>
-                        <el-option label="退货退款" value="1"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="状态">
-                    <el-select v-model="searchForm.status" clearable placeholder="请选择">
-                        <el-option
-                            v-for="item in refundStatuses"
-                            :key="item.value" :label="item.label" :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="申请时间">
-                    <el-date-picker
-                        v-model="searchForm.start_time"
-                        type="datetime"
-                        placeholder="开始时间"
-                        value-format="YYYY-MM-DD HH:mm:ss"
-                    >
-                    </el-date-picker>
-                    <span>&nbsp;至&nbsp;</span>
-                    <el-date-picker
-                        v-model="searchForm.end_time"
-                        type="datetime"
-                        placeholder="结束时间"
-                        value-format="YYYY-MM-DD HH:mm:ss"
-                    >
-                    </el-date-picker>
-                </el-form-item>
-                <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <el-table
-            :data="tableData"
-            stripe border
-            v-loading="loading"
-            style="width: 100%;">
-            <el-table-column label="ID" prop="id"></el-table-column>
-            <el-table-column label="用户名称" prop="user_name"></el-table-column>
-            <el-table-column label="商品名称" prop="goods_name"></el-table-column>
-            <el-table-column label="订单号" prop="order_sn"></el-table-column>
-            <el-table-column label="退款单号" prop="no"></el-table-column>
-            <el-table-column label="退款金额" prop="money"></el-table-column>
-            <el-table-column label="退款数量" prop="number"></el-table-column>
-            <el-table-column label="类型">
-                <template #default="scope">
-                    <span v-if="scope.row.type == 0">退款</span>
-                    <span v-if="scope.row.type == 1">退货退款</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="退款原因" prop="reason"></el-table-column>
-            <el-table-column label="退款描述" prop="description"></el-table-column>
-            <el-table-column label="退款凭证">
-                <template #default="scope">
-                    <el-image
-                        style="width: 30px; height: 30px; margin-right: 10px"
-                        v-for="(item, index) in scope.row.certificate" :key="index" :src="item" @click="imageShow(item)"
-                        fit="cover" lazy>
-                    </el-image>
-                </template>
-            </el-table-column>
-            <el-table-column label="是否撤销">
-                <template #default="scope">
-                    <span v-if="scope.row.is_revoke == 0">否</span>
-                    <span v-if="scope.row.is_revoke == 1">是</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="结果描述" prop="result"></el-table-column>
-            <el-table-column label="申请次数" prop="count"></el-table-column>
-            <el-table-column label="申请时间" prop="created_at"></el-table-column>
-            <el-table-column label="更新时间" prop="updated_at"></el-table-column>
-            <el-table-column label="退款状态">
-                <template #default="scope">
-                    <el-button
-                        link type="primary" size="large"
-                        v-for="item in refundStatuses"
-                        @click="openDetail(scope.row.id)">
-                        <span v-if="scope.row.status == item.value">{{ item.label }}</span>
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
-    </div>
-</template>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
 
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
 </style>

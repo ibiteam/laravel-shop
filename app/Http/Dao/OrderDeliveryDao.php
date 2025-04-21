@@ -63,7 +63,7 @@ class OrderDeliveryDao
             'ship_company_id' => $ship_company->id,
             'ship_no' => $params['ship_no'],
             'status' => OrderDelivery::STATUS_WAIT,
-            'shipped_at' => $params['shipped_at'] ?? now()->toDateTimeString(),
+            'shipped_at' => $params['shipped_at'] ?? now()->format('Y-m-d H:i:s'),
             'remark' => $params['remark'] ?? '',
             'admin_user_id' => $admin_user->id,
         ]);

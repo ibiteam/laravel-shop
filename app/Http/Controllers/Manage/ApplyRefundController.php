@@ -505,7 +505,7 @@ class ApplyRefundController extends BaseController
             'status' => $apply_refund->status,
             'isShipped' => (bool) $apply_refund->applyRefundShip,
             // 'job_time' => strtotime($apply_refund->job_time),
-            // 'end_time' => $apply_refund->updated_at->toDateTimeString(),
+            // 'end_time' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
             'server_time' => time(),
             'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) {
                 $item->setAttribute('user_name', $item->action_name);
@@ -513,7 +513,7 @@ class ApplyRefundController extends BaseController
                 $item->setAttribute('unit', $item->applyRefund->orderDetail->goods_unit ?? '');
                 $item->setAttribute('money', price_format($item->applyRefund->money));
                 $item->setAttribute('number', get_new_price($item->applyRefund->number));
-                $item->setAttribute('add_time', $item->created_at->toDateTimeString());
+                $item->setAttribute('add_time', $item->created_at->format('Y-m-d H:i:s'));
 
                 return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
             })->toArray(),

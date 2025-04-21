@@ -121,13 +121,14 @@
 <script setup lang="ts">
 import { orderIndex } from '@/api/order.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
 import { OrderStatus,PayStatus,ShipStatus } from '@/enums/model'
 import { DocumentCopy } from '@element-plus/icons-vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
+const route = useRoute()
 
 /* 定义搜索下拉数据 */
 const orderStatusOptions = [
@@ -221,6 +222,12 @@ const copyOrderSn = (orderSn: string) => {
 }
 
 onMounted( () => {
+    if (route.query.pay_status !== undefined){
+        query.pay_status = Number(route.query.pay_status)
+    }
+    if (route.query.shipping_status !== undefined){
+        query.shipping_status = Number(route.query.shipping_status)
+    }
     getData()
 })
 </script>
