@@ -21,6 +21,7 @@ class ShopConfigTableSeeder extends Seeder
         $this->addGoodsSettings(); // 商品设置
         $this->addRefundAfterSales(); // 退款售后
         $this->addArticleSettings(); // 文章设置
+        $this->addSmsSettings(); // 短信设置
     }
 
     private function addItem(string $group_name, string $code, mixed $value = null): void
@@ -107,5 +108,14 @@ class ShopConfigTableSeeder extends Seeder
         $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::USER_CANCEL_AGREEMENT, '');
         $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::PRIVACY_POLICY, '');
         $this->addItem(ShopConfig::GROUP_ARTICLES, ShopConfig::ABOUT_US, '');
+    }
+
+    private function addSmsSettings(): void
+    {
+        $this->addItem(ShopConfig::GROUP_SMS, ShopConfig::SMS_DRIVER, 'aliyun');
+        $this->addItem(ShopConfig::GROUP_SMS, ShopConfig::SMS_ACCESS_KEY, '');
+        $this->addItem(ShopConfig::GROUP_SMS, ShopConfig::SMS_ACCESS_SECRET, '');
+        $this->addItem(ShopConfig::GROUP_SMS, ShopConfig::SMS_SIGN_NAME, '');
+        $this->addItem(ShopConfig::GROUP_SMS, ShopConfig::SMS_TEMPLATE_PHONE_CODE, '');
     }
 }

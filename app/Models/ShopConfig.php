@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-
-
-
 /**
  * @property int                             $id
  * @property string                          $group_name 分组名称
@@ -27,8 +24,6 @@ namespace App\Models;
  */
 class ShopConfig extends BaseModel
 {
-
-
     /**
      * group组名.
      */
@@ -41,6 +36,7 @@ class ShopConfig extends BaseModel
     public const GROUP_GOODS = 'group_goods'; // 商品设置
     public const GROUP_REFUND_AFTER_SALES = 'group_refund_after_sales'; // 退款售后
     public const GROUP_ARTICLES = 'group_articles'; // 文章设置
+    public const GROUP_SMS = 'group_sms'; // 短信管理
 
     /**
      * code值.
@@ -101,6 +97,13 @@ class ShopConfig extends BaseModel
     public const USER_CANCEL_AGREEMENT = 'user_cancel_agreement'; // 用户注销协议
     public const PRIVACY_POLICY = 'privacy_policy'; // 隐私政策
     public const ABOUT_US = 'about_us'; // 关于我们
+
+    // 短信设置
+    public const SMS_DRIVER = 'sms_driver'; // 短信通道
+    public const SMS_ACCESS_KEY = 'sms_access_key'; // 短信 ACCESS KEY
+    public const SMS_ACCESS_SECRET = 'sms_access_secret'; // 短信密钥
+    public const SMS_SIGN_NAME = 'sms_sign_name'; // 短信签名
+    public const SMS_TEMPLATE_PHONE_CODE = 'sms_template_phone_code'; // 短信模板：验证码
 
     protected $guarded = [];
 

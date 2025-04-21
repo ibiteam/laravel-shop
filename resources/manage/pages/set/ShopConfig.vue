@@ -345,6 +345,30 @@
                                 </div>
                             </el-form>
                         </el-tab-pane>
+                        <el-tab-pane label="短信设置" name="group_sms">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="220px">
+                                <div style="margin:0 auto 0 50px;width: 800px">
+                                    <el-form-item label="短信驱动：" prop="sms_driver">
+                                        <el-radio v-model="inputFrom.sms_driver" label="aliyun">阿里云</el-radio>
+                                    </el-form-item>
+                                    <el-form-item label="短信服务商 ACCESS KEY：" prop="sms_access_key">
+                                        <el-input v-model="inputFrom.sms_access_key" placeholder="短信服务商平台 access key"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信服务商 ACCESS SECRET：" prop="sms_access_secret">
+                                        <el-input v-model="inputFrom.sms_access_secret" placeholder="短信服务商平台 access secret"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信签名：" prop="sms_sign_name">
+                                        <el-input v-model="inputFrom.sms_sign_name" placeholder="短信签名"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信模板-验证码：" prop="sms_template_phone_code">
+                                        <el-input v-model="inputFrom.sms_template_phone_code" placeholder="短信验证码模板"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" :class="{disable:loading}" :loading="loading" @click="submitForm()">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
                     </el-tabs>
                 </el-tab-pane>
                 <el-tab-pane label="系统对接" name="system_docking">
@@ -419,6 +443,8 @@ const tab_label = computed(() => {
             return '退款售后';
         case 'group_articles':
             return '文章设置';
+        case 'group_sms':
+            return '短信设置';
         default:
             return '';
     }

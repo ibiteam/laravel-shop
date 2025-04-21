@@ -3,8 +3,10 @@
 namespace App\Utils;
 
 use App\Exceptions\BusinessException;
+use App\Http\Dao\ShopConfigDao;
 use App\Messages\BaseMessage;
 use App\Models\PhoneMsg;
+use App\Models\ShopConfig;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Overtrue\EasySms\EasySms;
@@ -67,20 +69,27 @@ class SmsUtil
 
     private function config(): array
     {
+        $shop_configs = app(ShopConfigDao::class)->multipleConfig(
+            ShopConfig::SMS_DRIVER,
+            ShopConfig::SMS_ACCESS_KEY,
+            ShopConfig::SMS_ACCESS_SECRET,
+            ShopConfig::SMS_SIGN_NAME
+        );
+
         return [
             'timeout' => 10.0,
             'default' => [
                 'strategy' => OrderStrategy::class,
-                'gateways' => ['aliyun'],
+                'gateways' => [$shop_configs[ShopConfig::SMS_DRIVER]],
             ],
             'gateways' => [
                 'errorlog' => [
                     'file' => storage_path('logs/message.log'),
                 ],
                 'aliyun' => [
-                    'access_key_id' => config('custom.sms_access_key'),
-                    'access_key_secret' => config('custom.sms_access_secret'),
-                    'sign_name' => config('custom.sms_sign_name'),
+                    'access_key_id' => $shop_configs[ShopConfig::SMS_ACCESS_KEY],
+                    'access_key_secret' => $shop_configs[ShopConfig::SMS_ACCESS_SECRET],
+                    'sign_name' => $shop_configs[ShopConfig::SMS_SIGN_NAME],
                 ],
             ],
         ];
