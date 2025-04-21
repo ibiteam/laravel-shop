@@ -2,8 +2,8 @@
 
 it('search goods', function () {
     $response = $this->doPost('api/v1/search/goods', [
-        'keywords' => '智能手机',
-        'category_id' => 1,
+        'keywords' => '',
+        'category_id' => 7,
         // 'sort_type' => 'price_desc',
         'page' => 1,
         'number' => 2,

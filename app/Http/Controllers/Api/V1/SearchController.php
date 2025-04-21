@@ -46,7 +46,7 @@ class SearchController extends BaseController
         } catch (\Throwable $throwable) {
             Log::error('搜索商品异常~'.$throwable->getMessage());
 
-            return $this->error('搜索商品异常~');
+            return $this->error('搜索商品异常~'. $throwable->getMessage());
         }
     }
 

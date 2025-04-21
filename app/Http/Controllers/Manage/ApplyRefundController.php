@@ -80,7 +80,7 @@ class ApplyRefundController extends BaseController
         $id = $request->get('id');
 
         $apply_refund = ApplyRefund::query()
-            ->with('applyRefundLogs', 'applyRefundLogs.applyRefundShip', 'applyRefundShip', 'applyRefundReason')
+            ->with('applyRefundLogs', 'applyRefundLogs.applyRefundShip', 'applyRefundLogs.applyRefund', 'applyRefundShip', 'applyRefundReason')
             ->with(['user' => function ($query) {
                 return $query->select('id', 'user_name', 'avatar');
             }])

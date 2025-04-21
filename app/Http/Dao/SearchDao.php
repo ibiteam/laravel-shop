@@ -32,7 +32,10 @@ class SearchDao
             ];
 
             if (! empty($params['category_id'])) {
-                $options['filter'][] = 'category_id = '.$params['category_id'];
+                // $options['filter'][] = 'category_id = '.$params['category_id'];
+                $search_category_ids = $this->getCategoryAndChildrenIds($params['category_id']);
+                $category_ids_string = implode(',', $search_category_ids);
+                $options['filter'][] = 'category_id IN ['.$category_ids_string.']';
             }
 
             if (! empty($params['sort_type'])) {
@@ -55,7 +58,8 @@ class SearchDao
             }
 
             if (! empty($params['category_id'])) {
-                $query->where('category_id', $params['category_id']);
+                $search_category_ids = $this->getCategoryAndChildrenIds($params['category_id']);
+                $query->whereIn('category_id', $search_category_ids);
             }
 
             if (! empty($params['sort_type'])) {
@@ -145,5 +149,23 @@ class SearchDao
         app(SearchKeywordDao::class)->add($keywords);
 
         return true;
+    }
+
+    // 获取分类及子分类ID
+    private function getCategoryAndChildrenIds(int $categoryId): array
+    {
+        $category = Category::with('allChildren')->find($categoryId);
+
+        if (! $category) {
+            return [];
+        }
+
+        $ids = [$category->id];
+
+        foreach ($category->allChildren as $child) {
+            $ids = array_merge($ids, $this->getCategoryAndChildrenIds($child->id));
+        }
+
+        return $ids;
     }
 }
