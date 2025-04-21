@@ -5,6 +5,7 @@
 /public/hot
 /public/storage
 /public/clickhouse.txt
+/public/nginx.htaccess
 /storage/*.key
 /storage/pail
 /vendor
