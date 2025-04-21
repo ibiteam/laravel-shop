@@ -1,17 +1,5 @@
 import $http from '../utils/http'
 
-export function accountLogin(data) {
-    return $http.doPost('manage/login', data)
-}
-
-export function getLoginInfo() {
-    return $http.doGet('manage/login')
-}
-
-export function accountLogout() {
-    return $http.doGet('manage/logout')
-}
-
 export function getUserIndex(data) {
     return $http.doGet('manage/user/index', data)
 }

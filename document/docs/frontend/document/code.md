@@ -16,7 +16,7 @@
 import { isSuccess } from '@/utils/constants'
 
 //调用
-getLoginInfo().then(res => {
+Http.doGet('login').then(res => {
     if(isSuccess(res.code)){
         pageData.value = res.data?.config;
         if (res.data?.is_login) {

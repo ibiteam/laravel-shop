@@ -44,16 +44,19 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, getCurrentInstance, onMounted,onUnmounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
-import { accountLogin, getLoginInfo } from '@/api/user.js';
 import { useRouter } from 'vue-router'
-import _ from 'lodash'
-// 导入图片资源
+import Http from '@/utils/http.js';
 import logoImage from '@/assets/images/user/login-logo-sitting.png'
 import leftBgImage from '@/assets/images/user/login-left-bg-img.png'
-const loginForm = reactive({ username: '', password: '' });
+
+const defaultLoginForm = {
+    username: '',
+    password: ''
+}
+const loginForm = reactive({ ...defaultLoginForm });
 const passwordVisible = ref(false);
 const loading = ref(false);
 const loginFormRef = ref(null);
@@ -86,8 +89,7 @@ const loginRules = reactive({
         { validator: validatePassword, trigger: 'blur' }
     ]
 })
-const handleLogin = _.throttle(() => {
-    console.log(1)
+const handleLogin = () => {
     loginFormRef.value.validate((valid) => {
         if (valid) {
             loading.value = true;
@@ -95,14 +97,14 @@ const handleLogin = _.throttle(() => {
         }else {
         }
     })
-},1000)
+}
 
 const changePasswordShow = () => {
     passwordVisible.value = !passwordVisible.value;
 }
 
 const submitLogin = () => {
-    accountLogin({user_name:loginForm.username,password:loginForm.password}).then(res=>{
+    Http.doPost('login',{user_name:loginForm.username,password:loginForm.password}).then((res: any)=>{
         loading.value = false;
         if (cns.$successCode(res.code)) {
             cns.$cookies.set('manage-token', res.data.token, res.data.expires_at)
@@ -112,7 +114,7 @@ const submitLogin = () => {
         }
     })
 };
-const listenerKeydowm = (event) => {
+const listenerKeyDown = (event: any) => {
     if (event.key === 'Enter') {
         handleLogin()
     }
@@ -120,8 +122,8 @@ const listenerKeydowm = (event) => {
 
 onMounted(() => {
     // 监听回车键按下
-    document.addEventListener('keydown', listenerKeydowm, false);
-    getLoginInfo().then(res => {
+    document.addEventListener('keydown', listenerKeyDown, false);
+    Http.doGet('login').then((res: any) => {
         if(cns.$successCode(res.code)){
             pageData.value = res.data?.config;
             if (res.data?.is_login) {
@@ -133,7 +135,7 @@ onMounted(() => {
     })
 })
 onUnmounted(() => {
-    document.removeEventListener('keydown', listenerKeydowm, false)
+    document.removeEventListener('keydown', listenerKeyDown, false)
 })
 </script>
 

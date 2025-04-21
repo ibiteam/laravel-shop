@@ -206,7 +206,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { ArrowRight } from '@element-plus/icons-vue';
 import { useCommonStore } from '@/store';
 import { tabRemove } from '@/router/tabs';
-import { accountLogout } from '../api/user.js';
 import Http from '@/utils/http';
 
 const commonStore = useCommonStore();
@@ -452,7 +451,7 @@ const logOut = () => {
         type: 'warning',
         center: true
     }).then(() => {
-        accountLogout().then(res => {
+        Http.doGet('logout').then(res => {
             if (cns.$successCode(res.code)) {
                 cns.$cookies.remove('manage-token');
                 router.push({ name: 'login' });
