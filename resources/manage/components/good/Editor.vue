@@ -1,20 +1,23 @@
 <template>
-    <div style="border: 1px solid #ccc;max-width: 800px;" class="editor-wrap">
+    <div style="border: 1px solid #ccc;max-width:100%;position: relative;" class="editor-wrap" ref="editorDomRef">
         <Toolbar
+            ref="toolbarRef"
             style="border-bottom: 1px solid #ccc"
             :editor="editorRef"
             :defaultConfig="toolbarConfig"
             :mode="mode"
         />
         <Editor
-            style="height: 500px; overflow-y: hidden;"
+            class="resizable-editor"
             :value="modelValue"
             :defaultConfig="editorConfig"
             :mode="mode"
             @customPaste="customPasteSet"
             @onChange="handleChange"
             @onCreated="handleCreated"
-        />
+        >
+        </Editor>
+        <div ref="resizeHandle" class="resize-handle"></div>
         <input type="file" :accept="editor_upload_accept" @change="handleChangeUploadFile" :multiple="file_upload_type === 'image'" value="" style="display: none;" ref="uploadFileRef" />
         <el-dialog
             title="上传图片"
@@ -131,7 +134,7 @@ const uploadValidateType  = ref('1');
 const editor_upload_accept = ref('image/gif,image/jpeg,image/png,image/jpg,image/bmp')
 //  记录当前富文本光标对象
 const img_width = ref(''); // 图片宽度
-const exclude_keys = ['code', 'blockquote', 'fontFamily', 'codeBlock' , 'fullScreen']
+const exclude_keys = ['code', 'blockquote', 'fontFamily', 'codeBlock']
 const mode = ref('default')
 const msgErr = ref(null)
 
@@ -389,6 +392,46 @@ onBeforeUnmount(() => {
     const editor = editorRef.value
     if (editor == null) return
     editor.destroy()
+    if (resizeHandle.value) {
+        resizeHandle.value.removeEventListener('mousedown', (e) => {});
+    }
+})
+const toolbarRef = ref(null);
+const editorDomRef = ref(null);
+const resizeHandle = ref(null);
+
+let isDragging = false;
+let startX;
+let startY;
+let startWidth;
+let startHeight;
+onMounted(()=>{
+    const handleMouseDown = (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = editorDomRef.value.offsetWidth;
+        startHeight = editorDomRef.value.offsetHeight;
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
+    const handleMouseMove = (e) => {
+        if (isDragging) {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            editorDomRef.value.style.width = `${startWidth + dx}px`;
+            editorDomRef.value.style.height = `${startHeight + dy}px`;
+        }
+    };
+
+    const handleMouseUp = () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    resizeHandle.value.addEventListener('mousedown', handleMouseDown);
 })
 /** 点击记录图片上传类型 **/
 const handleClickUploadFile = (data)=> {
@@ -651,6 +694,22 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
 </script>
 
 <style scoped lang="scss">
+    .w-e-full-screen-container{
+        z-index: 9999;
+        position: fixed!important;
+    }
+    .resizable-editor{
+        height: max-content!important;
+    }
+    .resize-handle {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        background-color: #666;
+        cursor: nwse-resize;
+    }
     .editor-wrap{
         :deep(.w-e-text-placeholder){
             font-style: normal;
