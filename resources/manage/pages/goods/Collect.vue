@@ -1,8 +1,8 @@
 <script setup>
 import { Search} from '@element-plus/icons-vue';
 import Page from '@/components/common/Pagination.vue'
-import { getGoodsCollect } from '@/api/collect.js'
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -42,7 +42,7 @@ const getData = (page = 1) => {
     loading.value = true;
     // 更新当前页码
     queryParams.page = page;
-    getGoodsCollect(queryParams).then(res => {
+    Http.doGet('goods/collect', queryParams).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data.list;
