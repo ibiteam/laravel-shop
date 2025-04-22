@@ -1,5 +1,5 @@
 <template>
-    <div style="border: 1px solid #ccc;max-width:100%;position: relative;" class="editor-wrap" ref="editorDomRef">
+    <div style="border: 1px solid #ccc;max-width:100%;position: relative;overflow: hidden;display: flex;flex-direction: column;flex-wrap: nowrap;" class="editor-wrap" ref="editorDomRef">
         <Toolbar
             ref="toolbarRef"
             style="border-bottom: 1px solid #ccc"
@@ -421,7 +421,7 @@ onMounted(()=>{
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
             editorDomRef.value.style.width = `${startWidth + dx}px`;
-            editorDomRef.value.style.minHeight = `${startHeight + dy}px`;
+            editorDomRef.value.style.height = `${startHeight + dy}px`;
         }
     };
 
@@ -701,6 +701,8 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
     .resizable-editor{
         flex: 1;
         height: auto!important;
+        max-height: 100%;
+        overflow-y: hidden;
     }
     .resize-handle {
         position: absolute;
