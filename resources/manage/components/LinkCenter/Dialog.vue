@@ -30,7 +30,7 @@
                         </template>
                     </el-tree>
                 </div>
-                <el-link class="link-button" :underline="false" href="/manage/set/router">前往访问地址</el-link>
+                <el-link class="link-button" :underline="false" href="/set/router">前往访问地址</el-link>
             </div>
             <div class="right-wrapper">
                 <div class="search-wrapper s-flex ai-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">
@@ -232,13 +232,13 @@ const searchInfoData = () => {
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     } else if (searchForm.page_name == 'manage.category.index') {//商品分类
-        searchInfo.url = 'goods/category';
+        searchInfo.url = 'manage/goods/category';
     } else if (searchForm.page_name == 'manage.goods.index') {//商品列表
-        searchInfo.url = 'goods/info';
+        searchInfo.url = 'manage/goods/info';
         searchInfo.keywords = searchForm.name;
         searchInfo.status = 1;
     } else if (searchForm.page_name == 'manage.article_category.index') {//文章分类
-        searchInfo.url = 'article/category';
+        searchInfo.url = 'manage/article/category';
     } else if (searchForm.page_name == 'manage.article.index') {//文章列表
         searchInfo.url = 'article';
         searchInfo.keywords = searchForm.name;

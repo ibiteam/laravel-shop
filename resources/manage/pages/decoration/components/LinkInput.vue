@@ -1,9 +1,9 @@
 <template>
     <div>
-        <el-input v-model="link.name" :readonly="readOnly" clearable @clear="emit('clear', LinkDataItemField())" @input="handleInput">
+        <el-input v-model="link.name" :readonly="readOnly" @clear="emit('clear', LinkDataItemField())" @input="handleInput">
             <template #suffix>
+                <em class="iconfont icon-guanbi link-btn" v-show="link.name" @click.stop="handleClear" title="清空"></em>
                 <em class="iconfont icon-link link-btn" @click.stop="emit('select')" title="路由中心"></em>
-                <em class="iconfont icon-guanbi link-btn" v-if="readOnly" @click.stop="handleClear" title="清空"></em>
             </template>
         </el-input>
         <el-input v-model="link.value" style="display: none;">
