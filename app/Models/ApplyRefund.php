@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use App\Enums\ApplyRefundStatusEnum;
-
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -65,8 +63,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class ApplyRefund extends BaseModel
 {
-
-
     // 类型 0退款；1退货退款
     public const TYPE_REFUND_MONEY = 0;
     public const TYPE_REFUND_GOODS = 1;

@@ -80,7 +80,7 @@ class ApplyRefundController extends BaseController
         $id = $request->get('id');
 
         $apply_refund = ApplyRefund::query()
-            ->with('applyRefundLogs', 'applyRefundLogs.applyRefundShip', 'applyRefundLogs.applyRefund', 'applyRefundShip', 'applyRefundReason')
+            ->with('applyRefundLogs', 'applyRefundShip', 'applyRefundShip.shipCompany', 'applyRefundReason')
             ->with(['user' => function ($query) {
                 return $query->select('id', 'user_name', 'avatar');
             }])
@@ -454,7 +454,10 @@ class ApplyRefundController extends BaseController
                 throw new BusinessException('未找到发货信息');
             }
 
-            $data = $express_service->queryExpress($shipping->no, $shipping->shipCompany->code, $shipping->phone);
+            $ship_list = $express_service->queryExpress($shipping->no, $shipping->shipCompany->code, $shipping->phone);
+
+            $data['ship_list'] = $ship_list;
+            $data['ship_no'] = $shipping->no;
 
             return $this->success($data);
         } catch (ValidationException $validation_exception) {
@@ -483,10 +486,9 @@ class ApplyRefundController extends BaseController
             'goods_number' => $orderDetail->goods_number,
             'goods_name' => $orderDetail->goods_name,
             'goods_image' => $orderDetail->goods->image ?? '',
-            'goods_sku_value' => $orderDetail->goods_sku_value,
             'goods_price' => price_format($orderDetail->goods_price),
             'goods_amount' => price_format($orderDetail->goods_amount),
-            'unit' => $orderDetail->goods_unit,
+            'goods_attr' => $orderDetail->skuValue(),
             'no' => $apply_refund->no,
             'type' => $apply_refund->type,
             'number' => get_new_price($apply_refund->number),
@@ -498,18 +500,32 @@ class ApplyRefundController extends BaseController
             'result' => $apply_refund->result,
             'status' => $apply_refund->status,
             'isShipped' => (bool) $apply_refund->applyRefundShip,
-            // 'job_time' => strtotime($apply_refund->job_time),
-            // 'end_time' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
+            'time' => intval(strtotime($apply_refund->job_time)),
+            'end_time' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
             'server_time' => time(),
-            'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) {
-                $item->setAttribute('user_name', $item->action_name);
-                $item->setAttribute('avatar', '');
-                $item->setAttribute('unit', $item->applyRefund->orderDetail->goods_unit ?? '');
-                $item->setAttribute('money', price_format($item->applyRefund->money));
-                $item->setAttribute('number', get_new_price($item->applyRefund->number));
+            'log' => $apply_refund->applyRefundLogs->map(function (ApplyRefundLog $item) use ($apply_refund, $user) {
+                if ($item->type == ApplyRefundLog::TYPE_BUYER) {
+                    $item->setAttribute('avatar', $user->avatar);
+                    $item->setAttribute('user_name', $user->user_name);
+                } else {
+                    $item->setAttribute('avatar', '');
+                    $item->setAttribute('user_name', $item->action_name);
+                }
+                $item->setAttribute('money', price_format($apply_refund->money));
+                $item->setAttribute('number', get_new_price($apply_refund->number));
+                $item->setAttribute('reason', $apply_refund->applyRefundReason?->content);
+                $item->setAttribute('result', $apply_refund->result);
+                $item->setAttribute('certificate', $apply_refund->certificate);
                 $item->setAttribute('add_time', $item->created_at->format('Y-m-d H:i:s'));
 
-                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'unit', 'add_time', 'applyRefund', 'applyRefundShip');
+                if ($item->apply_refund_ship_id > 0) {
+                    $item->setAttribute('applyRefundShip', $apply_refund->applyRefundShip);
+                    $item->setAttribute('applyRefundShip', $apply_refund->applyRefundShip);
+                } else {
+                    $item->setAttribute('applyRefundShip', null);
+                }
+
+                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'reason', 'result', 'certificate', 'add_time', 'applyRefundShip');
             })->toArray(),
         ];
     }
