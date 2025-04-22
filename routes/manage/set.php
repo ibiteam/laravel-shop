@@ -18,6 +18,46 @@ use App\Http\Controllers\Manage\TransactionController;
 use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
+// 商店设置
+Route::prefix('shop_config')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_INDEX])->group(function () {
+        Route::get('/', [ShopConfigController::class, 'index'])->name(Permission::MANAGE_SHOP_CONFIG_INDEX);
+        Route::get('search_article', [ShopConfigController::class, 'searchArticle']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_UPDATE])->group(function () {
+        Route::post('update', [ShopConfigController::class, 'update']);
+    });
+});
+
+// 访问地址分类
+Route::prefix('router_category')->group(function () {
+    Route::get('tree', [RouterCategoryController::class, 'getTreeList']);  // 访问地址弹窗 左侧树状数据
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
+        Route::get('/', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
+        Route::get('info', [RouterCategoryController::class, 'info']);
+        Route::get('pages', [RouterCategoryController::class, 'getPages']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
+        Route::post('update', [RouterCategoryController::class, 'update']);
+        Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
+        Route::post('destroy', [RouterCategoryController::class, 'destroy']);
+    });
+});
+
+// 访问地址
+Route::prefix('router')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_INDEX])->group(function () {
+        Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_ROUTER_INDEX);
+        Route::get('categories', [RouterController::class, 'categories']);
+    });
+    Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_UPDATE])->group(function () {
+        Route::post('update', [RouterController::class, 'update']);
+        Route::post('change_show', [RouterController::class, 'changeShow']);
+    });
+});
+
 // 管理员列表
 Route::prefix('admin_user')->group(function () {
     Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_INDEX])->group(function () {
@@ -120,70 +160,25 @@ Route::prefix('app_ads')->group(function () {
     });
 });
 
-Route::prefix('set')->group(function () {
-    // 商店设置
-    Route::prefix('shop_config')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_INDEX])->group(function () {
-            Route::get('/', [ShopConfigController::class, 'index'])->name(Permission::MANAGE_SHOP_CONFIG_INDEX);
-            Route::get('search_article', [ShopConfigController::class, 'searchArticle']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_SHOP_CONFIG_UPDATE])->group(function () {
-            Route::post('update', [ShopConfigController::class, 'update']);
-        });
+// 支付方式
+Route::prefix('payment')->group(function () {
+    Route::get('/', [PaymentController::class, 'index'])->name(Permission::MANAGE_PAYMENT_INDEX)->middleware('manage.permission');
+    Route::middleware('manage.permission:'.Permission::MANAGE_PAYMENT_UPDATE)->group(function () {
+        Route::post('update', [PaymentController::class, 'update']);
+        Route::post('change/field', [PaymentController::class, 'changeField']);
     });
-
-    // 访问地址分类
-    Route::prefix('router_category')->group(function () {
-        Route::get('tree', [RouterCategoryController::class, 'getTreeList']);  // 访问地址弹窗 左侧树状数据
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_INDEX])->group(function () {
-            Route::get('/', [RouterCategoryController::class, 'index'])->name(Permission::MANAGE_ROUTER_CATEGORY_INDEX);
-            Route::get('info', [RouterCategoryController::class, 'info']);
-            Route::get('pages', [RouterCategoryController::class, 'getPages']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_UPDATE])->group(function () {
-            Route::post('update', [RouterCategoryController::class, 'update']);
-            Route::post('change_show', [RouterCategoryController::class, 'changeShow']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_CATEGORY_DELETE])->group(function () {
-            Route::post('destroy', [RouterCategoryController::class, 'destroy']);
-        });
+    Route::prefix('transaction')->group(function () {
+        Route::get('/', [TransactionController::class, 'index'])->name(Permission::MANAGE_TRANSACTION_INDEX)->middleware('manage.permission');
+        Route::post('refund', [TransactionController::class, 'refund'])->name(Permission::MANAGE_TRANSACTION_REFUND)->middleware('manage.permission');
     });
+});
 
-    // 访问地址
-    Route::prefix('router')->group(function () {
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_INDEX])->group(function () {
-            Route::get('/', [RouterController::class, 'index'])->name(Permission::MANAGE_ROUTER_INDEX);
-            Route::get('categories', [RouterController::class, 'categories']);
-        });
-        Route::middleware(['manage.permission:'.Permission::MANAGE_ROUTER_UPDATE])->group(function () {
-            Route::post('update', [RouterController::class, 'update']);
-            Route::post('change_show', [RouterController::class, 'changeShow']);
-        });
+// 配送管理-快递公司
+Route::prefix('ship_company')->group(function () {
+    Route::get('/', [ShipCompanyController::class, 'index'])->name(Permission::MANAGE_SHIP_COMPANY_INDEX)->middleware('manage.permission');
+    Route::middleware('manage.permission:'.Permission::MANAGE_SHIP_COMPANY_UPDATE)->group(function () {
+        Route::get('edit', [ShipCompanyController::class, 'edit']);
+        Route::post('update', [ShipCompanyController::class, 'update']);
+        Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
     });
-
-
-    // 支付方式
-    Route::prefix('payment')->group(function () {
-        Route::get('/', [PaymentController::class, 'index'])->name(Permission::MANAGE_PAYMENT_INDEX)->middleware('manage.permission');
-        Route::middleware('manage.permission:'.Permission::MANAGE_PAYMENT_UPDATE)->group(function () {
-            Route::post('update', [PaymentController::class, 'update']);
-            Route::post('change/field', [PaymentController::class, 'changeField']);
-        });
-        Route::prefix('transaction')->group(function () {
-            Route::get('/', [TransactionController::class, 'index'])->name(Permission::MANAGE_TRANSACTION_INDEX)->middleware('manage.permission');
-            Route::post('refund', [TransactionController::class, 'refund'])->name(Permission::MANAGE_TRANSACTION_REFUND)->middleware('manage.permission');
-        });
-    });
-
-    // 配送管理-快递公司
-    Route::prefix('ship_company')->group(function () {
-        Route::get('/', [ShipCompanyController::class, 'index'])->name(Permission::MANAGE_SHIP_COMPANY_INDEX)->middleware('manage.permission');
-        Route::middleware('manage.permission:'.Permission::MANAGE_SHIP_COMPANY_UPDATE)->group(function () {
-            Route::get('edit', [ShipCompanyController::class, 'edit']);
-            Route::post('update', [ShipCompanyController::class, 'update']);
-            Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
-        });
-    });
-
-
 });
