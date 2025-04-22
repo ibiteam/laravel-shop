@@ -306,6 +306,10 @@ class GoodsService
             throw new BusinessException('商品规格不存在');
         }
 
+        if ($goods_sku->is_show !== GoodsSku::SHOW) {
+            throw new BusinessException('商品规格已下架');
+        }
+
         return $this->skuItemFormat($goods_sku);
     }
 
