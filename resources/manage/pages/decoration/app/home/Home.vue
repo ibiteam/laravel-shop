@@ -210,6 +210,7 @@ const handlematerialCenterDialogConfirm = (res) => {
 
 // 接收路由中心弹窗数据
 const handleLinkCenterDialogConfirm = (res) => {
+    console.log(res)
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,

@@ -54,8 +54,7 @@ class ArticleController extends BaseController
                 'article_category_id' => $article->article_category_id,
                 'title' => $article->title,
                 'cover' => $article->cover,
-                // 'h5_url' => $vue_app_url.'/article?id='.$article->id,
-                'h5_url' => '',
+                'h5_url' => $vue_app_url.'/article/agreement?article_id='.$article->id,
                 'author' => $article->author,
                 'is_show' => $article->is_show,
                 'is_top' => $article->is_top,
@@ -128,15 +127,13 @@ class ArticleController extends BaseController
                 'cover' => 'required|string',
                 'keywords' => 'required|string',
                 'description' => 'nullable|string',
-                'is_top' => 'required|boolean',
-                'is_login' => 'required|boolean',
-                'is_show' => 'required|boolean',
-                'is_recommend' => 'required|boolean',
+                'is_top' => 'nullable|boolean',
+                'is_login' => 'nullable|boolean',
+                'is_show' => 'nullable|boolean',
+                'is_recommend' => 'nullable|boolean',
                 'author' => 'nullable|string',
                 'sort' => 'nullable|integer',
                 'click_count' => 'nullable|integer',
-                'file_url' => 'nullable|string',
-                'goods_category_id' => 'nullable|integer',
             ], [], [
                 'id' => '文章ID',
                 'content' => '内容',
@@ -152,8 +149,6 @@ class ArticleController extends BaseController
                 'author' => '作者',
                 'sort' => '排序',
                 'click_count' => '点击次数',
-                'file_url' => '文件路径',
-                'goods_category_id' => '商品分类ID',
             ]);
 
             $id = $validated['id'] ?? 0;
@@ -165,7 +160,7 @@ class ArticleController extends BaseController
                     throw new BusinessException('文章不存在');
                 }
 
-                if (Article::where('id', '!=', $id)->whereTitle($validated['title'])->first()) {
+                if (Article::query()->where('id', '!=', $id)->whereTitle($validated['title'])->first()) {
                     throw new BusinessException('文章标题已存在');
                 }
             } else {
@@ -183,15 +178,13 @@ class ArticleController extends BaseController
                 $article->cover = $validated['cover'] ?? '';
                 $article->keywords = $validated['keywords'] ?? '';
                 $article->description = $validated['description'] ?? '';
-                $article->is_top = intval($validated['is_top']);
-                $article->is_login = intval($validated['is_login']);
-                $article->is_show = intval($validated['is_show']);
-                $article->is_recommend = intval($validated['is_recommend']);
+                $article->is_top = $validated['is_top'] ?? 0;
+                $article->is_login = $validated['is_login'] ?? 0;
+                $article->is_show = $validated['is_show'] ?? 0;
+                $article->is_recommend = $validated['is_recommend'] ?? 0;
                 $article->author = $validated['author'] ?? '';
                 $article->sort = $validated['sort'] ?? 0;
                 $article->click_count = $validated['click_count'] ?? 0;
-                $article->file_url = $validated['file_url'] ?? '';
-                $article->goods_category_id = $validated['goods_category_id'] ?? 0;
                 $article->admin_user_id = get_admin_user()->id;
 
                 if (! $article->save()) {

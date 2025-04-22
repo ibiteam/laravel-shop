@@ -35,7 +35,6 @@ class ArticleCategoryController extends BaseController
 
         $data = ArticleCategory::query()
             ->when($search_ids, fn ($query) => $query->whereIn('id', $search_ids))
-            // ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->with(['allChildren'])->whereParentId(0)
             ->orderByDesc('sort')
             ->get();
