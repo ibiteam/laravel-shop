@@ -146,8 +146,8 @@ const validatorPassword = (rule, value, callback) => {
             callback(new Error('请输入登录密码'));
             return false;
         }
-        if (value.length < 6) {
-            callback(new Error('密码不能小于6位'));
+        if (value.length < 8 || value.length > 20) {
+            callback(new Error('密码长度需8-20位之间'));
             return false;
         }
         if (submitForm.password_confirmation && value !== submitForm.password_confirmation) {

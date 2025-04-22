@@ -32,7 +32,7 @@ class OrderDetailResource extends JsonResource
             'logistics' => $this->resource->order_delivery_count > 0 ? [
                 'title' => '运输中',
                 'description' => '当前订单已拆分成'.$this->resource->order_delivery_count.'个运单运输，点击可以查看物流轨迹',
-                'shipped_at' => $this->resource->shipped_at,
+                'shipped_at' => $this->resource->shipped_at ? $this->resource->shipped_at->format('Y-m-d H:i:s') : '',
                 'delivery_no' => $this->resource->orderDelivery->first()?->delivery_no,
             ] : null,
             'logistics_number' => $this->resource->order_delivery_count,

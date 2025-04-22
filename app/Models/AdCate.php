@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property string $name 广告分类名称
@@ -26,6 +26,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdCate whereUpdatedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AppAd> $app_ad
  * @property-read int|null $app_ad_count
+ * @property int $width 宽度
+ * @property int $height 高度
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdCate whereHeight($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AdCate whereWidth($value)
  * @mixin \Eloquent
  */
 class AdCate extends Model

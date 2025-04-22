@@ -5,7 +5,8 @@
             <div class="step flex-1 s-flex ai-ct jc-ct complete">
                 <span>1</span>买家申请{{ detail.type == 0 ? '仅退款' : '退货退款' }}
             </div>
-            <div class="step flex-1" :class="{active:detail.status==0,complete:detail.status!=0}"><span>2</span>卖家处理退款申请
+            <div class="step flex-1" :class="{active:detail.status==0,complete:detail.status!=0}">
+                <span>2</span>卖家处理退款申请
             </div>
             <div class="step flex-1" v-if="detail.type == 1"
                  :class="{active:detail.status==2||detail.status==3,complete:detail.status==1||detail.status==4||detail.status==5||detail.status==6}">
@@ -19,19 +20,18 @@
         <div class="content s-flex">
             <div class="content-left">
                 <div style="margin-bottom: 10px;border-bottom: 1px solid #eee;padding-bottom: 10px;">
-                    <div class="status" style="margin-bottom: 10px;">{{ status[detail.status] }}
+                    <div class="status" style="margin-bottom: 10px;">
+                        {{ status[detail.status] }}
                         <span v-if="detail.status==0||detail.status==3">
                             <img src="@/assets/images/refund/time-icon.png">还剩
                             <span class="co-red">
-                                <template v-if="countdown_data.day&&countdown_data.day!=='00'">{{ countdown_data.day
-                                    }}天</template>
+                                <template v-if="countdown_data.day&&countdown_data.day!=='00'">{{ countdown_data.day }}天</template>
                                 {{ countdown_data.hour }}时{{ countdown_data.minute }}分{{ countdown_data.second }}秒
                             </span>
                         </span>
                     </div>
-                    <h5 v-if="detail.status==5||detail.status==6">退款{{ detail.status == 5 ? '成功' : '关闭'
-                        }}时间:{{ detail.end_time }}</h5>
-                    <h5 v-if="detail.comment">{{ detail.comment }}</h5>
+                    <h5 v-if="detail.status==5||detail.status==6">退款{{ detail.status == 5 ? '成功' : '关闭' }}时间:{{ detail.end_time }}</h5>
+                    <h5 v-if="detail.result">{{ detail.result }}</h5>
                     <h5 v-if="detail.status==5">退款金额：{{ detail.format_money }}</h5>
                 </div>
 
@@ -46,73 +46,72 @@
                         <li>如果您拒绝退款，买家可以修改退款申请后再次发起</li>
                         <li>如果您逾期未响应申请，视作同意买家申请，系统会自动退款给买家</li>
                     </template>
-
                 </ul>
+
                 <div class="address" style="margin-bottom: 5px;padding-top: 10px;"
                      v-if="(detail.status==2||detail.status==3)&&shopAddress">
                     <div class="s-flex ai-ct" style="padding-bottom: 5px;"><img
                         src="@/assets/images/refund/location-icon.png" alt=""><span>退货地址</span></div>
                     <p class="co-333 fs14">收货人：{{ shopAddress.consignee }}
                         &#12288;&#12288;&#12288;&#12288;{{ shopAddress.phone }}</p>
-                    <p class="co-333 fs14">{{ shopAddress.province }}&#12288;{{ shopAddress.city
-                        }}&#12288;{{ shopAddress.district }}&#12288;{{ shopAddress.address }}</p>
+                    <p class="co-333 fs14">{{ shopAddress.province }}&#12288;{{ shopAddress.city }}&#12288;{{ shopAddress.district }}&#12288;{{ shopAddress.address }}</p>
                 </div>
+
                 <div class="btn" style="margin-bottom: 10px;">
                     <el-button type="danger" @click="agree" v-if="detail.status==0&&detail.type==0">同意退款</el-button>
-                    <el-button type="danger" @click="agreeOpen" v-if="detail.status==0&&detail.type==1">同意退款
-                    </el-button>
+                    <el-button type="danger" @click="agreeOpen" v-if="detail.status==0&&detail.type==1">同意退款</el-button>
                     <el-button type="info" @click="refuse(1)" v-if="detail.status==0&&detail.type==0">已发货</el-button>
-                    <el-button type="info" @click="openRefuse" v-if="detail.status==0&&detail.type==1">拒绝退款
-                    </el-button>
+                    <el-button type="info" @click="openRefuse" v-if="detail.status==0&&detail.type==1">拒绝退款</el-button>
                     <el-button type="danger" @click="receive" v-if="detail.status==3">确认收货</el-button>
                 </div>
+
                 <div class="fs16 co-333" style="padding: 20px 0 10px;" v-if="log&&log.length">协商记录</div>
                 <div v-if="log&&log.length">
                     <div class="log-item s-flex" v-for="(item,i) in log" :key="`${i}log`">
                         <div class="img-box">
-                            <img :src="item.avatar" v-if="item.avatar">
+                            <img :src="item.avatar" v-if="item.avatar" alt="">
                         </div>
                         <div class="flex-1">
-                            <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span>
-                            </div>
+                            <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
                             <div>{{ item.action }}</div>
                             <div v-if="item.money">退款金额：{{ item.money }}</div>
                             <div v-if="item.reason">退款原因：{{ item.reason }}</div>
-                            <div v-if="item.comment">退款描述：{{ item.comment }}</div>
-                            <template v-if="item.apply_refund_data">
-                                <div class="log-img" v-if="item.apply_refund_data&&item.apply_refund_data.certificate">
+                            <div v-if="item.result">退款描述：{{ item.result }}</div>
+                            <template v-if="item.certificate">
+                                <div class="log-img" v-if="item.certificate">
                                     <el-image
-                                        style="width: 87px; height: 87px"
-                                        :src="c"
-                                        v-for="c in item.apply_refund_data.certificate"
-                                        :preview-src-list="item.apply_refund_data.certificate">
+                                        style="width: 87px; height: 87px" :src="c"
+                                        v-for="c in item.certificate"
+                                        :preview-src-list="item.certificate">
                                     </el-image>
                                 </div>
                             </template>
 
-                            <div v-if="item.applyRefundShipping">物流公司：{{ item.applyRefundShipping.company }}</div>
-                            <div v-if="item.applyRefundShipping">物流单号：{{ item.applyRefundShipping.sn }}</div>
-                            <div v-if="item.applyRefundShipping">联系电话：{{ item.applyRefundShipping.phone }}</div>
-                            <div class="log-img" v-if="item.applyRefundShipping&&item.applyRefundShipping.certificate">
-                                <el-image
-                                    style="width: 87px; height: 87px"
-                                    :src="c"
-                                    v-for="c in item.applyRefundShipping.certificate"
-                                    :preview-src-list="item.applyRefundShipping.certificate">
-                                </el-image>
-                            </div>
-                            <div v-if="item.applyRefundShipping&&item.applyRefundShipping.commit">
-                                补充描述：{{ item.applyRefundShipping.commit }}
-                            </div>
+                            <template v-if="item.applyRefundShip">
+                                <div>物流公司：{{ item.applyRefundShip.ship_company.name }}</div>
+                                <div>物流单号：{{ item.applyRefundShip.no }}</div>
+                                <div>联系电话：{{ item.applyRefundShip.phone }}</div>
+                                <div class="log-img" v-if="item.applyRefundShip.certificate">
+                                    <el-image
+                                        style="width: 87px; height: 87px" :src="c"
+                                        v-for="c in item.applyRefundShip.certificate"
+                                        :preview-src-list="item.applyRefundShip.certificate">
+                                    </el-image>
+                                </div>
+                                <div v-if="item.applyRefundShip.description">
+                                    补充描述：{{ item.applyRefundShip.description }}
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>
             </div>
+
             <div class="content-right">
                 <div style="padding: 0 10px;">退款详情</div>
                 <div class="good s-flex">
                     <div class="good-img">
-                        <img :src="detail.goods_image" v-if="detail.goods_image">
+                        <img :src="detail.goods_image" v-if="detail.goods_image" alt="">
                     </div>
                     <div>
                         <div class="elli-2">
@@ -130,24 +129,25 @@
                     <p><span>单&#12288;&#12288;价：</span>{{ detail.goods_price }}*{{ detail.goods_number }}</p>
                     <p><span>商品总价：</span>{{ detail.goods_amount }}</p>
                     <div class="slide"></div>
-                    <p v-if="detail.refund_sn"><span>退款编号：</span>{{ detail.refund_sn }}</p>
+                    <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
                          v-if="detail.certificate&&detail.certificate.length">
                         <el-image
-                            style="width: 87px; height: 87px"
-                            :src="c"
+                            style="width: 87px; height: 87px" :src="c"
                             v-for="c in detail.certificate"
                             :preview-src-list="detail.certificate">
                         </el-image>
                     </div>
-                    <p v-if="detail.apply_comment"><span>说&#12288;&#12288;明：</span>{{ detail.apply_comment }}</p>
+                    <p v-if="detail.description"><span>说&#12288;&#12288;明：</span>{{ detail.description }}</p>
                 </div>
                 <div class="ship" v-if="detail.isShipped">
-                    <div class="co-333 fs14 title s-flex ai-ct" style="padding: 0 10px;"><span>物流跟踪</span><i
-                        class="iconfont icon-icon-check_top-copy" v-if="!showShip" @click="openShip"></i></div>
-                    <!--                 <i class="iconfont icon-check_top"></i>   -->
+                    <div class="co-333 fs14 title s-flex ai-ct" style="padding: 0 10px;">
+                        <span>物流跟踪</span>
+                        <i class="iconfont icon-icon-check_top-copy" v-if="!showShip" @click="openShip"></i>
+                    </div>
+                    <!-- <i class="iconfont icon-check_top"></i>  -->
                     <div v-if="showShip">
                         <div class="ship-title">
                             <span>物流单号：{{ shipCode }}</span>
@@ -163,14 +163,12 @@
                                 </dl>
                                 <p v-else class="text-center co-999">暂无物流信息</p>
                             </template>
-
                         </div>
                     </div>
-
                 </div>
             </div>
-
         </div>
+
         <el-dialog title="拒绝退款" :visible.sync="refuseVisible" width="30%">
             <el-form ref="refuseFormRef" :rules="reasonRule" :model="refuseForm">
                 <el-form-item label="原因：" label-width="100px" prop="refuseReason">
@@ -242,7 +240,7 @@ const status = ref({ // 状态配置
     1: '卖家已拒绝退款',
     2: '等待买家退货',
     3: '买家退货',
-    4: '退款成功',
+    4: '卖家已收货',
     5: '退款成功',
     6: '退款关闭'
 });
@@ -329,8 +327,8 @@ const openShip = () => {
     Http.doPost('apply_refund/query_express', params).then((res) => {
         loadingSip.value = false;
         if (res.code === 200) {
-            shipList.value = res.data.log.data;
-            shipCode.value = res.data.log.nu;
+            shipList.value = res.data.ship_list;
+            shipCode.value = res.data.ship_no;
         } else {
             cns.$message(res.message);
         }
@@ -447,7 +445,7 @@ const refuse = (e) => {
             if (validated) {
                 let params = {
                     id: route.params.id,
-                    comment: refuseForm.value.refuseReason
+                    result: refuseForm.value.refuseReason
                 };
                 Http.doPost('apply_refund/refuse_refund', params).then((res) => {
                     if (cns.$successCode(res.code)) {

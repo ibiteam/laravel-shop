@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name')->comment('广告分类名称');
             $table->string('alias')->default('')->comment('别名');
+            $table->integer('width')->default(0)->comment('宽度');
+            $table->integer('height')->default(0)->comment('高度');
             $table->tinyInteger('type')->default(1)->comment('类型 1、移动端 2、PC端');
-            $table->tinyInteger('is_show')->default(1)->comment('是否展示 1、是 0、否');
             $table->timestamps();
         });
     }

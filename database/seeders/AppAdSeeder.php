@@ -20,6 +20,8 @@ class AppAdSeeder extends Seeder
             $ad_cate->name = 'App超市顶部banner';
             $ad_cate->alias = AdCate::APP_SHOP_TOP_BANNER;
             $ad_cate->type = AdCate::MOBILE_TYPE;
+            $ad_cate->width = 750;
+            $ad_cate->height = 256;
             $ad_cate->save();
         }
     }

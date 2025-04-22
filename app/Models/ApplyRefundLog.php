@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -34,8 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ApplyRefundLog extends BaseModel
 {
-
-
     // 类型 0:买方，1:卖方
     public const TYPE_BUYER = 0;
     public const TYPE_SELLER = 1;

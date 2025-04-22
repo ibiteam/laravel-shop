@@ -3,6 +3,8 @@
 namespace App\Http\Dao;
 
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 class CategoryDao
 {
@@ -13,9 +15,20 @@ class CategoryDao
     {
         return Category::query()->with('allChildren')
             ->whereParentId(0)
-            ->whereIsShow(Category::IS_SHOW_YES)
             ->orderByDesc('sort')
             ->get()->map(fn (Category $category) => $this->categoryFormat($category));
+    }
+
+    /**
+     * 获取显示的商品分类.
+     */
+    public function getShowTreeList(): EloquentCollection|Collection
+    {
+        return Category::query()->with('showAllChildren')
+            ->whereParentId(0)
+            ->whereIsShow(Category::IS_SHOW_YES)
+            ->orderByDesc('sort')
+            ->get()->map(fn (Category $category) => $this->showCategoryFormat($category));
     }
 
     /**
@@ -36,7 +49,28 @@ class CategoryDao
             'id' => $category->id,
             'parent_id' => $category->parent_id,
             'name' => $category->name,
+            'logo' => $category->logo,
             'children' => $category->allChildren->map(fn (Category $category) => $this->categoryFormat($category))->toArray(),
+        ];
+    }
+
+    private function showCategoryFormat(Category $category): array
+    {
+        if ($category->showAllChildren->isEmpty()) {
+            return [
+                'id' => $category->id,
+                'parent_id' => $category->parent_id,
+                'name' => $category->name,
+                'logo' => $category->logo,
+            ];
+        }
+
+        return [
+            'id' => $category->id,
+            'parent_id' => $category->parent_id,
+            'name' => $category->name,
+            'logo' => $category->logo,
+            'children' => $category->showAllChildren->map(fn (Category $category) => $this->showCategoryFormat($category))->toArray(),
         ];
     }
 }

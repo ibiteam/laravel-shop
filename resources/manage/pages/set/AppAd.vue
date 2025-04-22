@@ -67,7 +67,7 @@
                 <el-button type="primary" size="small" style="margin-left: 10px;" @click="openDetail(ad_cate.id)">刷新</el-button>
             </div>
             <div style="font-size: 15px;color: red;margin-bottom: 10px">
-                <p>建议尺寸：n * n，图片尺寸会按宽度 width 进行等比比例</p>
+                <p>建议尺寸：{{ ad_cate.width }} * {{ ad_cate.height }}，图片尺寸会按宽度 {{ ad_cate.width }} 进行等比比例</p>
             </div>
             <page-table :data="app_ads"
                         stripe
@@ -107,7 +107,7 @@
                                     class="logo-uploader"
                                     :accept="'image/jpeg,image/jpg,image/png,image/gif'"
                                     :show-file-list="false"
-                                    :http-request="(request) => uploadFile(request)"
+                                    :http-request="(request) => uploadFile(request, scope.row.id)"
                                     :with-credentials="true"
                                 >
                                     <el-button type="primary" size="small">更换图片</el-button>
@@ -340,13 +340,19 @@ const handleClick = () => {
     getData()
 }
 
-const uploadFile = async (request) => {
+const uploadFile = async (request, id) => {
     try {
         const res = await Http.doPost('upload', {
             file: request.file,
         })
         if (cns.$successCode(res.code)) {
-            openDetail(ad_cate_id.value)
+            Http.doPost('app_ads/update/ad_image', {id: id, image:res.data.url}).then(res => {
+                if (cns.$successCode(res.code)) {
+                    openDetail(ad_cate_id.value)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
         } else {
             cns.$message.error(res.message)
         }
@@ -487,8 +493,8 @@ const openDetail = (cate_id, page = 1) => {
     Http.doGet('app_ads', { cate_id, page }).then((res) => {
         if (cns.$successCode(res.code)) {
             ad_cate.value = res.data.ad_cate
+            console.log(ad_cate);
             app_ads.value = res.data
-            // routes.value = res.data.routes
             editVisible.value = true
         } else {
             cns.$message.error('数据获取失败')
