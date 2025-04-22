@@ -259,15 +259,19 @@ class GoodsService
         $goods->sku_params_list = $sku_params_list;
 
         // 商品评价处理
-        $tmp_evaluate = null;
+        $tmp_evaluate = [
+            'total' => 0,
+            'tag_data' => [],
+            'items' => [],
+        ];
 
         if (shop_config(ShopConfig::IS_SHOW_EVALUATE)) {
             [$evaluate_total, $evaluate_list] = app(OrderEvaluateDao::class)->getEvaluateByGoodsId($goods->id);
-            $tmp_evaluate = [
+            $tmp_evaluate = array_merge($tmp_evaluate, [
                 'total' => $evaluate_total,
                 'tag_data' => $evaluate_total > 0 ? app(OrderEvaluateDao::class)->getTagListByGoodsId($goods->id) : [],
                 'items' => $evaluate_list,
-            ];
+            ]);
         }
         $goods->evaluate = $tmp_evaluate;
 
