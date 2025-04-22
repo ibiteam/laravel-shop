@@ -178,8 +178,12 @@
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
                                 <div :key="route.path"
-                                     :class="{'common-wrap': !['manage.home.index','manage.app_decoration.home','manage.goods.update'].includes(route.name)}"
+                                    v-if="route.name != 'manage.app_decoration.home'"
+                                     :class="{'common-wrap': !['manage.home.index','manage.goods.update'].includes(route.name)}"
                                      style="min-height: 100%;">
+                                    <component :is="Component"></component>
+                                </div>
+                                <div style="height: 100%" :key="route.path" v-else>
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
