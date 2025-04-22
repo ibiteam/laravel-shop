@@ -165,7 +165,7 @@
                         </el-form-item>
                         <el-form-item label="商品详情" prop="content">
                             <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="pageDataLoading"></div>
-                            <Editor v-model="updateForm.content" @change="handleChangeGoodsDetail" height="500px" min-height="500px" v-else/>
+                            <Editor v-model="updateForm.content" @change="handleChangeGoodsDetail" style="min-height: 500px;" v-else/>
                         </el-form-item>
                     </div>
                 </div>
