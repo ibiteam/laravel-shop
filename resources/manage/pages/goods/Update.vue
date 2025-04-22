@@ -1326,7 +1326,7 @@ onBeforeUnmount(() => {
 
 .update-box {
     position: relative;
-    padding-bottom: 100px;
+    padding-bottom: 80px;
     .goods-footer-btn{
         width: 100%;
         height: 80px;
