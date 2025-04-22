@@ -1,21 +1,17 @@
 import { ElMessage } from 'element-plus';
 /** 手机号校验 **/
-function isTelPhone (value) {
-    let isPhone = /^(13|14|15|17|18|16|19)\d{9}$/
-    if (!isPhone.test(value)) {
-        return false
-    } else {
-        return true
-    }
+export const  isTelPhone = function(value) {
+    const isPhone = /^(13|14|15|17|18|16|19)\d{9}$/
+    return isPhone.test(value);
 }
 
 /** 密码类型校验 **/
-function isPassWord (value) {
+function isPassword (value) {
     let status = 0
-    let isPwdLen = value.length >= 16 || value.length < 6
-    let isTrim = /^[^\s].*[^\s]$/
-    let isLetterNumber = /^(?!\d{6,8}$)(?! )(?=.*[A-Za-z])[a-zA-Z0-9_]|[^a-zA-Z0-9-=+_., *]{6,16}$/
-    let test = /[`~!@#$%^&*()<>?:"{}\/;'[\]]/im
+    const isPwdLen = value.length >= 16 || value.length < 6
+    const isTrim = /^[^\s].*[^\s]$/
+    const isLetterNumber = /^(?!\d{6,8}$)(?! )(?=.*[A-Za-z])[a-zA-Z0-9_]|[^a-zA-Z0-9-=+_., *]{6,16}$/
+    const test = /[`~!@#$%^&*()<>?:"{}\/;'[\]]/im
     if (isPwdLen || !isTrim.test(value)) {
         status = 1
     } else if (!isLetterNumber.test(value) && (!isLetterNumber.test(value) || test.test(value))) {
@@ -32,7 +28,7 @@ export function copyText(text){ //复制到剪切栏
         // clipboard api 复制
         navigator.clipboard.writeText(text);
     } else {
-        var textarea = document.createElement('textarea');
+        const textarea = document.createElement('textarea');
         document.body.appendChild(textarea);
         // 隐藏此输入框
         textarea.style.position = 'fixed';
@@ -50,12 +46,8 @@ export function copyText(text){ //复制到剪切栏
 }
 
 export function isEmail(value) {
-    let email = /^([a-zA-Z\d])((\w|-)+\.?)+@([a-zA-Z\d]+\.)+[a-zA-Z]{2,6}$/
-    if (!email.test(value)) {
-        return false
-    } else {
-        return true
-    }
+    const email = /^([a-zA-Z\d])((\w|-)+\.?)+@([a-zA-Z\d]+\.)+[a-zA-Z]{2,6}$/
+    return email.test(value);
 }
 
 /**
@@ -69,12 +61,12 @@ export function getPrivacyPhone(phone){
 }
 
 const throttle = (fnc,delay) => {
-    let lasttimer:number|null = null
+    let last_timer:number|null = null
     return function (...args){
         const nowDate:number = Date.now()
-        if(nowDate - lasttimer > delay){
+        if(nowDate - last_timer > delay){
             fnc.apply(this,args)
-            lasttimer = nowDate
+            last_timer = nowDate
         }
     }
 }
@@ -120,7 +112,7 @@ const verifyFile = (file, type= 'img') => {
 
 export default {
     isTelPhone,
-    isPassWord,
+    isPassword,
     isEmail,
     getPrivacyPhone,
     throttle,

@@ -66,7 +66,7 @@ Route::prefix('admin_user')->group(function () {
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
         Route::post('update', [AdminUserController::class, 'update']);
-        Route::post('change/field', [AdminUserController::class, 'changeField']);
+        Route::post('change_field', [AdminUserController::class, 'changeField']);
     });
 });
 
