@@ -3,7 +3,7 @@
 namespace App\Models;
 
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name 标题
@@ -34,9 +34,22 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppAd whereUpdatedAt($value)
  * @property int $ad_cate_id 广告分类id
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AppAd whereAdCateId($value)
+ * @property-read \App\Models\AdCate|null $ad_cate
  * @mixin \Eloquent
  */
 class AppAd extends BaseModel
 {
     protected $guarded = [];
+
+    public const IS_SHOW = 1; // 展示
+    public const IS_NOT_SHOW = 0; // 不展示
+
+
+    public const AD_TYPE_TIME_LIMIT = 1; // 限时广告
+    public const AD_TYPE_LONG_TERM = 2; // 长久广告
+
+    public function ad_cate()
+    {
+        return $this->belongsTo(AdCate::class, 'ad_cate_id', 'id');
+    }
 }
