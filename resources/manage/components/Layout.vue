@@ -1,7 +1,7 @@
 <template>
     <div class='seller-layout' v-if="pageLoad">
         <el-container>
-            <el-aside :class="{'left-hidden':!leftShow}">
+            <el-aside :class="{'left-hidden':!leftShow}" v-if="!is_mobile_plat">
                 <div class='layout-left-header s-flex ai-ct jc-bt' @click="router.push({name:'manage.home.index'})">
                     <div class='seller-picture s-flex ai-ct jc-ct flex-1'>
                         <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
@@ -27,7 +27,7 @@
                                         <img v-if="data.icon.indexOf('http') > -1" :src="data.icon" alt="">
                                         <i v-if="data.icon.indexOf('icon-') > -1" class="iconfont"
                                            :class="data.icon"></i>
-                                        <el-icon v-else :size="20">
+                                        <el-icon v-else>
                                             <component :is="data.icon" />
                                         </el-icon>
                                     </template>
@@ -41,7 +41,7 @@
             <el-container>
                 <el-header>
                     <div class='seller-header s-flex jc-bt ai-ct'>
-                        <div class='header-left s-flex ai-ct'>
+                        <div class='header-left s-flex ai-ct' v-if="!is_mobile_plat">
                             <div class='flow-menu s-flex'>
                                 <div class='menu-box'>
                                     <div class='s-flex'>
@@ -60,6 +60,12 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class='header-left s-flex ai-ct' v-else>
+                            <i class="iconfont icon-a-zhankai" style="color: #ffffff;margin-left: 10px" @click="visiblePhone = !visiblePhone"></i>
+                            <div class='mobile-logo s-flex ai-ct jc-ct flex-1'>
+                                <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
                             </div>
                         </div>
                         <div class='header-right s-flex ai-ct'>
@@ -176,25 +182,55 @@
                     </div>
                 </el-main>
             </el-container>
-            <div class="narrow-box" :class="{'narrow-launch' : !leftShow}">
-                <svg v-if="leftShow" @click="leftShow = !leftShow" t="1741575361343" class="icon"
-                     viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2301" width="16"
-                     height="16">
-                    <path
-                        d="M935.27 12.34H89.78c-41.38 0-75.23 33.85-75.23 75.23S48.4 162.8 89.78 162.8h845.49c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 295.17H496.64c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h438.63c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 578.27H496.64c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h438.63c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM935.27 861.64H89.78c-41.38 0-75.23 33.85-75.23 75.23s33.85 75.23 75.23 75.23h845.49c41.38 0 75.23-33.85 75.23-75.23 0-41.37-33.85-75.23-75.23-75.23zM26.95 544.85l235.2 176.67c25.2 18.93 61.19 0.95 61.19-30.57V332.96c0-31.74-36.44-49.65-61.57-30.28L26.57 484.01c-20.01 15.42-19.82 45.67 0.38 60.84z"
-                        fill="#2c2c2c" p-id="2302"></path>
-                </svg>
-                <svg v-else @click="leftShow = !leftShow" t="1741574477397" class="icon" viewBox="0 0 1024 1024"
-                     version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2610" width="16" height="16">
-                    <path d="M51.2 819.2l921.601 0 0 102.4-921.601-1e-8 0-102.39999999z" p-id="2611"></path>
-                    <path d="M358.4 563.199l614.39899999 0 1e-8 103.253-614.399 0 0-103.253z" p-id="2612"></path>
-                    <path d="M358.4 358.4l614.39899999 0 1e-8 103.253-614.399 0 0-103.253z" p-id="2613"></path>
-                    <path d="M51.2 102.40000001l921.601-1e-8 0 103.253-921.601-1e-8c0 0 0-103.253 0-103.25299998z"
-                          p-id="2614"></path>
-                    <path d="M51.2 332.8l205.653 205.653-205.653 153.6 0-359.253z" p-id="2615"></path>
-                </svg>
+            <div class="narrow-box" :class="{'narrow-launch' : !leftShow}" v-if="!is_mobile_plat">
+                <i v-if="leftShow" @click="leftShow = !leftShow" class="iconfont icon-a-shouqi" style="color: #000000;"></i>
+                <i v-else @click="leftShow = !leftShow" class="iconfont icon-a-zhankai" style="color: #000000;"></i>
             </div>
         </el-container>
+        <template v-if="is_mobile_plat">
+            <el-drawer
+                class="phone-tree"
+                v-model="visiblePhone"
+                :show-close="false"
+                :with-header="false"
+                direction="ltr"
+                size="60%">
+                <div class="drawer-search" @click="visiblePhone = false,openSearchShow()">
+                    <span>快速搜索</span>
+                    <i class="el-icon-search"></i>
+                </div>
+                <div class="menu-treeBox">
+                    <el-tree
+                        ref="menuTreeRef"
+                        :data="menus"
+                        :props="{
+					  children: 'children',
+					  label: 'title'
+					}"
+                        node-key="index"
+                        :highlight-current="false"
+                        icon-class="el-icon-arrow-down"
+                        accordion
+                        @node-click="(e,data,el) => openMenu(e)">
+                        <template  #default="{ node, data }">
+                            <div :class="{'custom-tree-node' : true,'custom-tree-node-select' : !data.children}">
+                                <div class="tree-icon" style="margin-right: 8px;">
+                                    <template v-if="data.icon">
+                                        <img v-if="data.icon.indexOf('http') > -1" :src="data.icon" alt="" style="width:16px;height:16px">
+                                        <i v-if="data.icon.indexOf('icon-') > -1" class="iconfont"
+                                           :class="data.icon"></i>
+                                        <el-icon v-else>
+                                            <component :is="data.icon" />
+                                        </el-icon>
+                                    </template>
+                                </div>
+                                <span>{{ node.label }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
+            </el-drawer>
+        </template>
     </div>
 </template>
 
@@ -216,7 +252,6 @@ const router = useRouter();
 const pageLoad = ref(false);
 const menus = ref([]);
 const menuIndex = ref(0);
-const is_mobile_plat = ref(false)
 
 const leftShow = ref(true);
 
@@ -234,6 +269,10 @@ const top = ref(0);
 const left = ref(0);
 const selectedTag = ref({});
 const isRendered = ref(true);
+
+// 移动端打开
+const is_mobile_plat = ref(false)
+const visiblePhone = ref(false)
 
 watch(() => route.path, (to) => {
     for (const index in commonStore.visitedViews) {
@@ -567,6 +606,9 @@ onUnmounted(() => {
                             .tree-icon {
                                 width: 16px;
                                 font-size: 16px;
+                                .el-icon svg{
+                                    font-size: 16px;
+                                }
                             }
                         }
 
@@ -861,6 +903,72 @@ img {
 
 .narrow-box .icon {
     cursor: pointer;
+}
+
+/*移动端tree*/
+:deep(.phone-tree){
+    &.el-drawer{
+        width: 40% !important;
+    }
+    .el-drawer__body{
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 0;
+    }
+    .el-drawer__body::-webkit-scrollbar{
+        width: 0;
+        height: 0;
+    }
+    .el-drawer__body::-webkit-scrollbar-track{
+        display: none;
+    }
+    .menu-treeBox .el-tree-node__content{
+        height: 40px !important;
+        .custom-tree-node {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            margin: 0 5px;
+            border-radius: 4px;
+        }
+        .el-tree-node__expand-icon {
+            position: absolute;
+            right: 10px;
+            transform: rotate(270deg);
+            color: #31373D;
+            font-size: 14px;
+        }
+    }
+    .drawer-search{
+        width: 90%;
+        height: 40px;
+        border-radius: 50px;
+        background: rgba(51, 51, 51, 0.05);
+        margin: 20px auto 10px;
+        padding: 0 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .drawer-search span{
+        font-size: 14px;
+        color: rgba(51, 51, 51, 0.5);
+    }
+    .drawer-search i{
+        font-size: 18px;
+        color: #333;
+    }
+}
+/**/
+.mobile-logo{
+    width: 113px;
+    height: 40px;
+}
+.mobile-logo img{
+    max-width: 100%;
+    max-height: 100%;
 }
 </style>
 <style>
