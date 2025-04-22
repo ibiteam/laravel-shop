@@ -107,7 +107,7 @@
                                     class="logo-uploader"
                                     :accept="'image/jpeg,image/jpg,image/png,image/gif'"
                                     :show-file-list="false"
-                                    :http-request="(request) => uploadFile(request)"
+                                    :http-request="(request) => uploadFile(request, scope.row.id)"
                                     :with-credentials="true"
                                 >
                                     <el-button type="primary" size="small">更换图片</el-button>
@@ -340,13 +340,19 @@ const handleClick = () => {
     getData()
 }
 
-const uploadFile = async (request) => {
+const uploadFile = async (request, id) => {
     try {
         const res = await Http.doPost('upload', {
             file: request.file,
         })
         if (cns.$successCode(res.code)) {
-            openDetail(ad_cate_id.value)
+            Http.doPost('app_ads/update/ad_image', {id: id, image:res.data.url}).then(res => {
+                if (cns.$successCode(res.code)) {
+                    openDetail(ad_cate_id.value)
+                } else {
+                    cns.$message.error(res.message)
+                }
+            })
         } else {
             cns.$message.error(res.message)
         }
