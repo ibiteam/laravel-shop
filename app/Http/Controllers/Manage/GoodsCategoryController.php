@@ -43,7 +43,7 @@ class GoodsCategoryController extends BaseController
     {
         $id = $request->get('id') ?? 0;
 
-        $tree_categories = $category_dao->getTreeList();
+        $tree_categories = $category_dao->getShowTreeList();
 
         $info = null;
 
@@ -206,6 +206,10 @@ class GoodsCategoryController extends BaseController
                 $children_category = Category::query()->whereParentId($category->id)->whereIsShow(Category::IS_SHOW_YES)->first();
                 if ($children_category) {
                     throw new BusinessException('请先关闭子分类');
+                }
+
+                if (Goods::query()->whereCategoryId($category->id)->whereStatus(Goods::STATUS_ON_SALE)->exists()) {
+                    throw new BusinessException('该分类下存在有效商品，不能关闭');
                 }
             }
 

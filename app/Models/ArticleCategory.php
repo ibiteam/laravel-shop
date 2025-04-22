@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read ArticleCategory|null $allParent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Article> $articles
  * @property-read int|null $articles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ArticleCategory> $showAllChildren
+ * @property-read int|null $show_all_children_count
  *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArticleCategory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ArticleCategory newQuery()
@@ -68,6 +70,11 @@ class ArticleCategory extends BaseModel
     public function allChildren(): HasMany
     {
         return $this->hasMany(ArticleCategory::class, 'parent_id', 'id')->with('allChildren');
+    }
+
+    public function showAllChildren(): HasMany
+    {
+        return $this->hasMany(ArticleCategory::class, 'parent_id', 'id')->where('is_show', self::IS_SHOW_YES)->with('showAllChildren');
     }
 
     public function articles(): HasMany

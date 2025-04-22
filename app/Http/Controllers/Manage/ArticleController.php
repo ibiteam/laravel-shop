@@ -96,7 +96,7 @@ class ArticleController extends BaseController
                 $article->content = $article->articleContent->content ?? '';
             }
 
-            $tree_categories = $article_category_dao->getTreeList();
+            $tree_categories = $article_category_dao->getShowTreeList();
 
             $article_covers = ArticleCover::query()->select(['id', 'img_url'])->get()->toArray();
 

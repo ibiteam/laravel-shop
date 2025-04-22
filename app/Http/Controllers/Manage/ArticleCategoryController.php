@@ -57,7 +57,7 @@ class ArticleCategoryController extends BaseController
     {
         $id = $request->get('id') ?? 0;
 
-        $tree_categories = $article_category_dao->getTreeList();
+        $tree_categories = $article_category_dao->getShowTreeList();
 
         $info = null;
 
@@ -234,6 +234,10 @@ class ArticleCategoryController extends BaseController
                 $children_category = ArticleCategory::query()->whereParentId($article_category->id)->whereIsShow(ArticleCategory::IS_SHOW_YES)->first();
                 if ($children_category) {
                     throw new BusinessException('请先关闭子分类');
+                }
+
+                if (Article::query()->whereArticleCategoryId($article_category->id)->whereIsShow(Article::IS_SHOW_YES)->exists()) {
+                    throw new BusinessException('该分类下存在有效文章，不能关闭');
                 }
             }
 

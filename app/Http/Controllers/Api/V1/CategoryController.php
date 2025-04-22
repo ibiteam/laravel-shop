@@ -14,9 +14,8 @@ class CategoryController extends BaseController
     public function index(CategoryDao $category_dao)
     {
         try {
-            return $this->success($category_dao->getTreeList());
+            return $this->success($category_dao->getShowTreeList());
         } catch (\Throwable $throwable) {
-            Log::error('获取商品分类异常'.$throwable->getMessage());
             return $this->error('获取商品分类异常');
         }
     }
