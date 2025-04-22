@@ -7,7 +7,7 @@
         width="1000"
         :before-close="handleClose">
         <template #header>
-            <p class="custom-dialog-title fs16">选择图片</p>
+            <p class="custom-dialog-title fs16">选择{{ dir_type == 1 ? '图片' : '视频' }}</p>
         </template>
         <div class="custom-dialog-content s-flex jc-bt">
             <div class="left-wrapper">
@@ -61,15 +61,16 @@
                                 <div class="s-flex ai-ct">
                                     <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.file_path" fit="scale-down" @click="handleClickViewer(scope)">
                                         <template #error>
-                                            <img src="@/assets/images/decoration/app-nopic.png" width="35" height="35"/>
+                                            <img src="@/assets/images/decoration/app-nopic.png" width="35" height="35" v-if="dir_type == 1"/>
+                                            <img src="@/assets/images/decoration/video.png" width="35" height="35" v-else/>
                                         </template>
                                     </el-image>
                                     <p class="elli-1" style="max-width: 70%;">{{scope.row.name}}</p>
                                 </div>
                             </template>
                         </el-table-column>
-                        <el-table-column property="size" label="尺寸" />
-                        <el-table-column label="大小">
+                        <el-table-column property="size" label="大小" />
+                        <el-table-column label="尺寸" v-if="dir_type == 1">
                             <template #default="scope">{{ scope.row.width }}*{{ scope.row.height }}px</template>
                         </el-table-column>
                         <el-table-column property="updated_at" label="更新时间" />
@@ -236,7 +237,7 @@ const handleConfirm = () => {
 
 // 获取文件树
 const getFolderData = () => {
-    Http.doGet('material/folder/list', {dir_type: 1}).then(res => {
+    Http.doGet('material/folder/list', {dir_type: props.dir_type}).then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             getMaterialData()
