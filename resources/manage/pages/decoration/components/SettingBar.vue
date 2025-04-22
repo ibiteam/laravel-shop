@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, defineEmits, onMounted, nextTick } from 'vue'
+import { ref, getCurrentInstance, defineEmits, onMounted, nextTick, onUnmounted } from 'vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -34,12 +34,21 @@ const handleCancle = () => {
     // cns.$bus.emit('chooseDragItem', {temp_index: ''})
 }
 
-onMounted(() => {
+const resizeHandler = () => {
     nextTick(() => {
         const element = document.querySelector('.decoration-layout-container')
         clientHeight.value = element.clientHeight
         computedStyle.value = window.getComputedStyle(document.getElementById('shopLayoutView'))
     })
+}
+
+onMounted(() => {
+    resizeHandler()
+    window.addEventListener('resize', resizeHandler)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', resizeHandler)
 })
 
 </script>
