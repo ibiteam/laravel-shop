@@ -7,7 +7,7 @@
             </el-form-item>
             <el-form-item label="内容" prop="content">
                 <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
-                <Editor v-model="submitForm.content" style="min-height: 500px;" placeholder="请输入内容" v-else />
+                <Editor v-model="submitForm.content" style="height: 800px;" placeholder="请输入内容" v-else />
             </el-form-item>
             <el-form-item label="分类" prop="article_category_id">
                 <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
@@ -210,6 +210,9 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.resizable-editor){
+    height: calc(100% - 41px)!important;
+}
 :deep(.logo-uploader .el-upload) {
     border: none;
     border-radius: 6px;
