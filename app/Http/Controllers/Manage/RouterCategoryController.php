@@ -29,7 +29,6 @@ class RouterCategoryController extends BaseController
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
             ->with('allChildren')->whereParentId(0)
             ->orderByDesc('sort')
-            ->orderByDesc('id')
             ->get();
 
         // 批量获取权限名称以减少查询次数
