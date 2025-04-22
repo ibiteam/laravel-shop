@@ -25,8 +25,9 @@
                                 <el-form-item :label="`热区${index+1}`" :prop="['data', index, 'url', 'name']" v-for="(area, index) in hotZoneDialog.data" :key="index"
                                     :rules="{ required: true, message: '请输入热区链接', trigger: 'change' }"
                                 >
-                                    <div class="s-flex ai-ct">
+                                    <div class="s-flex ai-ct" style="width: 100%;">
                                         <LinkInput
+                                            style="width: 80%;"
                                             :name="area.url?.name"
                                             :value="area.url?.value"
                                             @select="handleOpenLink([index, 'url'])"
