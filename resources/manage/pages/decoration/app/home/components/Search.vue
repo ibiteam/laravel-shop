@@ -88,7 +88,7 @@
                                 v-model="form.content.data"
                                 :animation="1000"
                                 :group="{name: form.id, pull: true, put: true}"
-                                handle=".icon-bars"
+                                handle=".icon-drag"
                                 >
                                 <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="item">
                                     <em class="iconfont icon-drag" style="font-size:20px"></em>
