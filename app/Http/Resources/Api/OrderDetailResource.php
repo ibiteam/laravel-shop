@@ -25,7 +25,7 @@ class OrderDetailResource extends JsonResource
             'status' => $this->resource->custom_status,
             'order' => [
                 'order_sn' => $this->resource->order_sn,
-                'paid_at' => $this->resource->paid_at,
+                'paid_at' => $this->resource->paid_at ? $this->resource->paid_at->format('Y-m-d H:i:s') : '',
                 'remark' => $this->resource->remark,
                 'status' => $this->resource->custom_status,
             ],
