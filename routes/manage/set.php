@@ -147,16 +147,16 @@ Route::prefix('app_ads')->group(function () {
     Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_INDEX])->group(function () {
         Route::get('/cate/names', [AppAdController::class, 'getCateNames'])->name(Permission::MANAGE_APP_ADVERT_INDEX); // 分类名称
         Route::get('/cates', [AppAdController::class, 'getCates']); // 分类数据
-        Route::get('/app_ads', [AppAdController::class, 'getAppAds']); // 广告数据
+        Route::get('/', [AppAdController::class, 'getAppAds']); // 广告数据
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_UPDATE])->group(function () {
-        Route::get('/cate/update', [AppAdController::class, 'updateCate'])->name(Permission::MANAGE_APP_ADVERT_UPDATE); // 更新分类信息
-        Route::get('/update', [AppAdController::class, 'update']); // 更新广告信息
-        Route::get('/update/ad_image', [AppAdController::class, 'updateAdImage']); // 更换广告图
-        Route::get('/toggle/status', [AppAdController::class, 'toggleStatus']); // 切换广告图状态
+        Route::post('/cate/update', [AppAdController::class, 'updateCate'])->name(Permission::MANAGE_APP_ADVERT_UPDATE); // 更新分类信息
+        Route::post('/update', [AppAdController::class, 'update']); // 更新广告信息
+        Route::post('/update/ad_image', [AppAdController::class, 'updateAdImage']); // 更换广告图
+        Route::post('/toggle/status', [AppAdController::class, 'toggleStatus']); // 切换广告图状态
     });
     Route::middleware(['manage.permission:'.Permission:: MANAGE_APP_ADVERT_DELETE])->group(function () {
-        Route::get('/delete', [AppAdController::class, 'delete'])->name(Permission:: MANAGE_APP_ADVERT_DELETE); // 删除广告图
+        Route::post('/delete', [AppAdController::class, 'delete'])->name(Permission:: MANAGE_APP_ADVERT_DELETE); // 删除广告图
     });
 });
 
