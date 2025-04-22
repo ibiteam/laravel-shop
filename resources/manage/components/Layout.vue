@@ -399,6 +399,7 @@ const formatMenu = () => {
 const openMenu = (e) => {
     if (typeof (e.children) === 'undefined' || e.children.length === 0) {
         router.push({ name: e.name });
+        visiblePhone.value = false
     } else {
         return false;
     }
@@ -959,6 +960,11 @@ img {
                 color: #1050a9!important;
                 padding: 0 10px!important;
             }
+        }
+    }
+    :deep(.el-pagination){
+        .el-pagination__sizes, .el-pagination__total,.el-pagination__jump{
+            display: none!important;
         }
     }
 }
