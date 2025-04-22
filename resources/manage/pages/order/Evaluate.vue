@@ -214,7 +214,7 @@ const detailInitLoading = ref(false);
 const detailData = ref({})
 const openDetailDialog = (orderEvaluateId: number) => {
     detailInitLoading.value = true
-    Http.doGet('manage/order/evaluate/detail', {id: orderEvaluateId}).then((res: any) => {
+    Http.doGet('order/evaluate/detail', {id: orderEvaluateId}).then((res: any) => {
         detailInitLoading.value = false
         if (cns.$successCode(res.code)) {
             detailData.value = res.data
