@@ -88,13 +88,15 @@
             <el-table-column label="分类" prop="category.name"></el-table-column>
             <el-table-column label="商品" width="400px">
                 <template #default="{row}">
-                    <div style="display:flex;">
-                        <el-image style="width: 50px; height: 50px" :src="row.image" :preview-src-list="[row.image]" :z-index="9999"></el-image>
-                        <div style="padding-left: 20px;">
-                            <div>{{ row.name }}</div>
-                            <div>{{ row.no }}</div>
+                    <a :href="row.h5_url" target="_blank">
+                        <div style="display:flex;">
+                            <el-image style="width: 50px; height: 50px" :src="row.image" :preview-src-list="[row.image]" :z-index="9999"></el-image>
+                            <div style="padding-left: 20px;">
+                                <div>{{ row.name }}</div>
+                                <div>{{ row.no }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </template>
             </el-table-column>
             <el-table-column label="商品单价" prop="price"></el-table-column>

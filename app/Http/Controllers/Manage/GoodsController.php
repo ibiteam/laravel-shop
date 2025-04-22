@@ -173,7 +173,7 @@ class GoodsController extends BaseController
             }
 
             return $this->success([
-                'category' => $category_dao->getTreeList(),
+                'category' => $category_dao->getShowTreeList(),
                 'info' => $info,
                 'settings' => [
                     'is_open_integral' => shop_config(ShopConfig::IS_OPEN_INTEGRAL),
