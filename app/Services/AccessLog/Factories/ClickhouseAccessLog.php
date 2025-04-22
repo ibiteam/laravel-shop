@@ -4,6 +4,7 @@ namespace App\Services\AccessLog\Factories;
 
 use App\Models\Clickhouse\AccessLog;
 use App\Services\AccessLog\AccessLogFormatter;
+use DateTimeInterface;
 use Illuminate\Support\Facades\DB;
 
 class ClickhouseAccessLog implements AccessLogInterface
@@ -31,6 +32,11 @@ class ClickhouseAccessLog implements AccessLogInterface
             AccessLog::create($log_formatter->toArray());
         } catch (\Throwable) {
         }
+    }
+
+    public function read(?string $sql = null, ?DateTimeInterface $date = null): array
+    {
+        return DB::connection('clickhouse')->select($sql);
     }
 
     private function existsTableFile(): bool

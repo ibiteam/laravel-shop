@@ -30,7 +30,7 @@
                         </template>
                     </el-tree>
                 </div>
-                <el-link class="link-button" :underline="false" href="/manage/set/router">前往访问地址</el-link>
+                <el-link class="link-button" :underline="false" href="/manage/router">前往访问地址</el-link>
             </div>
             <div class="right-wrapper">
                 <div class="search-wrapper s-flex ai-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">
@@ -217,7 +217,7 @@ const searchInfoData = () => {
         // page_name:searchForm.page_name
     }
     if (searchForm.page_name == 'manage.router.index') {//基础连接,自定义链接
-        searchInfo.url = 'manage/set/router';
+        searchInfo.url = 'manage/router';
         searchInfo.router_category_id = searchForm.id;
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
@@ -230,7 +230,7 @@ const searchInfoData = () => {
     } else if (searchForm.page_name == 'manage.article_category.index') {//文章分类
         searchInfo.url = 'manage/article/category';
     } else if (searchForm.page_name == 'manage.article.index') {//文章列表
-        searchInfo.url = 'manage/article/article';
+        searchInfo.url = 'manage/article';
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     }
@@ -238,7 +238,7 @@ const searchInfoData = () => {
 }
 // 获取文件树
 const getLinkTreeData = () => {
-    Http.doGet('set/router_category/tree').then(res => {
+    Http.doGet('router_category/tree').then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             searchForm.page_name = res.data[0].page_name

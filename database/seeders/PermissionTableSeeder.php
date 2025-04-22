@@ -171,6 +171,9 @@ class PermissionTableSeeder extends Seeder
     private function addDataPermission(): void
     {
         $this->addPermission('数据', Permission::MODULE_DATA, 94, Permission::IS_LEFT_NAV, 'DataAnalysis');
+
+        $this->addPermission('网站数据统计', Permission::STATISTIC_MANAGE, 0, Permission::IS_LEFT_NAV, 'icon-caidan', Permission::MODULE_DATA);
+        $this->addPermission('访问统计', Permission::MANAGE_ACCESS_STATISTIC_INDEX, 0, Permission::IS_LEFT_NAV, '', Permission::STATISTIC_MANAGE);
     }
 
     private function addMarketingPermission(): void
