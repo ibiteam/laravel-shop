@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 class AdCate extends Model
 {
     public const MOBILE_TYPE = 1;   // 移动端
-    public const APP_SUPERMARKET = 'app_supermarket';   //
+    public const APP_SHOP_TOP_BANNER = 'app_shop_top_banner'; // 移动端超市顶部banner
 
     public function app_ad()
     {
@@ -42,14 +42,14 @@ class AdCate extends Model
     public static function getCateNames($type)
     {
         if ($type == AdCate::MOBILE_TYPE) {
-            $data['app_cate']['alias'] = '分类|专场';
+            $data['supermarket']['alias'] = '超市';
         }
 
         return $data;
     }
 
     // 获取app广告图 -- 默认获取首页
-    public static function getCates($activeName = 'home', $name = '')
+    public static function getCates($adCateName = 'supermarket', $name = '')
     {
         $query = self::query();
 
@@ -57,10 +57,10 @@ class AdCate extends Model
             $query = $query->where('name', 'like', '%'.$name.'%');
         }
 
-        switch ($activeName) {
-            case $activeName == 'app_cate': // app 分类
+        switch ($adCateName) {
+            case $adCateName == 'supermarket': // app 分类
                 $alias = [
-                    self::APP_SUPERMARKET, // APP 分类专场 banner
+                    self::APP_SHOP_TOP_BANNER, // APP 分类专场 banner
                 ];
 
                 break;

@@ -19,7 +19,7 @@ class AppAdController extends BaseController
     // 分类名称列表
     public function getCateNames()
     {
-        $adCateName = 'app_cate';
+        $adCateName = 'supermarket';
         $adCateNames = AdCate::getCateNames(AdCate::MOBILE_TYPE);
 
         return $this->success(compact('adCateName', 'adCateNames'));
@@ -28,9 +28,9 @@ class AppAdController extends BaseController
     // 获取分类信息
     public function getCates(Request $request)
     {
-        $activeName = $request->get('activeName');
+        $adCateName = $request->get('adCateName');
         $name = $request->get('name');
-        $data = AdCate::getCates($activeName, $name);
+        $data = AdCate::getCates($adCateName, $name);
 
         return $this->success($data);
     }
@@ -87,15 +87,15 @@ class AppAdController extends BaseController
             $app_ad = new AppAd;
         }
         $app_ad->id = $id;
-        $app_ad->name = $validated['name'];
+        $app_ad->ad_cate_id = $validated['ad_cate_id'];
+        $app_ad->name = $validated['name'] ?? '';
         $app_ad->image = $validated['image'];
         $app_ad->sort = $validated['sort'];
-        $app_ad->link_type = $validated['link_type'];
-        $app_ad->link = $validated['link'];
+        $app_ad->link = $validated['link'] ?? '';
         $app_ad->is_show = $validated['is_show'];
         $app_ad->type = $validated['type'];
-        $app_ad->start_time = $validated['start_time'];
-        $app_ad->end_time = $validated['end_time'];
+        $app_ad->start_time = $validated['start_time'] ?? null;
+        $app_ad->end_time = $validated['end_time'] ?? null;
 
         if (! $app_ad->save()) {
             return $this->error('保存失败');

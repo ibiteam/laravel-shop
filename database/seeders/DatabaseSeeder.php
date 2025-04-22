@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RouterCategoryTableSeeder::class);
         $this->call(RouterTableSeeder::class);
         $this->call(AppServiceConfigTableSeeder::class);
+        $this->call(AppAdSeeder::class);
     }
 }

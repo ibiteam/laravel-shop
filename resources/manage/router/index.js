@@ -40,6 +40,7 @@ import Coupon from '@/pages/marketing/Coupon.vue';
 import UserCoupon from '@/pages/marketing/UserCoupon.vue';
 import AppServiceConfig from '@/pages/set/AppServiceConfig.vue';
 import AppServiceConfigLog from '@/pages/set/AppServiceConfigLog.vue';
+import AppAd from '@/pages/set/AppAd.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -65,6 +66,7 @@ const router = createRouter({
                 { path: '/set/payment', component: Payment, name: 'manage.payment.index',meta:{title:'支付方式'} },
                 { path: '/set/transaction', component: Transaction, name: 'manage.transaction.index',meta:{title:'交易记录'} },
                 { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
+                { path: '/set/app_ad', component: AppAd, name: 'manage.app_advert.index',meta:{title:'App广告'} },
                 // 商品
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},
                 { path: '/goods/update/:id', component: GoodsUpdate , name: 'manage.goods.update',meta:{title:'添加商品'} },

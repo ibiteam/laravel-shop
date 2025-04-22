@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('name')->nullable()->comment('标题');
             $table->string('image')->comment('广告图');
             $table->integer('sort')->default(1)->comment('排序');
-            $table->tinyInteger('link_type')->default(1)->comment('链接类型 1、https 2、移动端链接');
             $table->string('link')->nullable()->comment('链接');
             $table->tinyInteger('is_show')->default(1)->comment('是否展示 1、是 0、否');
             $table->tinyInteger('type')->default(1)->comment('广告类型 1、时间限制 2、长久广告');
