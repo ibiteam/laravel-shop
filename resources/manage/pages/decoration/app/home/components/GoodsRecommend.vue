@@ -223,9 +223,9 @@ import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import GoodsPrice from '@/pages/decoration/components/GoodsPrice.vue'
 import { Tag } from 'vant';
 import { ref, reactive, watch, getCurrentInstance } from 'vue'
-// import { VueDraggable } from 'vue-draggable-plus'
 import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, RuleOption, SortTypeOption, RecommendGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
 import { updateNested } from '@/pages/decoration/utils/common.js'
+import Http from '@/utils/http'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
