@@ -165,7 +165,7 @@ const openDetail = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    Http.doGet('order/apply_refund', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
+    Http.doGet('apply_refund', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

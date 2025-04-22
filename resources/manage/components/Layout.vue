@@ -167,7 +167,7 @@
                             <transition name="fade" mode="out-in">
                                 <div :key="route.path"
                                      :class="{'common-wrap': !['manage.home.index','manage.app_decoration.home','manage.goods.update'].includes(route.name)}"
-                                     style="height: 100%;">
+                                     style="height: 100%;overflow-y: auto">
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
@@ -216,6 +216,7 @@ const router = useRouter();
 const pageLoad = ref(false);
 const menus = ref([]);
 const menuIndex = ref(0);
+const is_mobile_plat = ref(false)
 
 const leftShow = ref(true);
 
@@ -258,6 +259,15 @@ watch(() => visible.value, (value) => {
         document.body.removeEventListener('click', closeMenu);
     }
 });
+
+const initPlat = () => {
+    let desktopWidthThreshold = 768;
+    if (window.innerWidth <= desktopWidthThreshold){
+        is_mobile_plat.value = true
+    }else{
+        is_mobile_plat.value = false
+    }
+}
 
 const getConfig = () => {
     Http.doGet('home/config').then(res => {
@@ -464,6 +474,7 @@ const logOut = () => {
 };
 
 onMounted(() => {
+    initPlat()
     getConfig();
     addViewTags();
     routerActived.value = route.name;

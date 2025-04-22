@@ -56,8 +56,8 @@ class ApplyRefundShipDao
 
             DB::commit();
 
-            ApplyRefundJob::dispatch(ApplyRefundStatusEnum::BUYER_SEND_SHIP->value, $apply_refund->id, '卖家超时未确认收货，已退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time)->onQueue(config('cache.prefix'));
-        } catch (\Throwable $e) {
+            ApplyRefundJob::dispatch(ApplyRefundStatusEnum::BUYER_SEND_SHIP->value, $apply_refund->id, '卖家超时未确认收货，已退款给买家', ApplyRefundLog::TYPE_BUYER)->delay($delayed_time);
+        } catch (\Throwable $exception) {
             DB::rollBack();
 
             throw new BusinessException('填写退货物流失败');

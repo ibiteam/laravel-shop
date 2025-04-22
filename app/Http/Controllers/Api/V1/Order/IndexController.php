@@ -13,6 +13,7 @@ use App\Http\Resources\Api\OrderDetailResource;
 use App\Http\Resources\Api\OrderResourceCollection;
 use App\Models\Order;
 use App\Models\OrderEvaluate;
+use App\Models\ShopConfig;
 use App\Models\Transaction;
 use App\Models\UserAddress;
 use App\Services\OrderOperateService;
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -41,10 +43,12 @@ class IndexController extends BaseController
         $keywords = $request->get('keywords');
         $type = $request->get('type', self::SEARCH_ALL);
         $number = (int) $request->get('number', 10);
+
+        $tmp_can_show_after_sales = shop_config(ShopConfig::IS_SHOW_AFTER_SALES);
+
         $current_user = get_user();
         $order = Order::query()
-            ->withCount('detail')
-            ->withCount('orderDelivery')
+            ->withCount(['detail', 'orderDelivery'])
             ->with(['detail', 'detail.goods', 'evaluate', 'orderDelivery', 'orderDelivery.shipCompany'])
             ->latest()
             ->whereUserId($current_user->id)

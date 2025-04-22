@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\UserCoupon;
-use Illuminate\Http\Request;
 
 class UserCouponController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $coupon_id = $request->get('coupon_id');
         $user_name = $request->get('user_name');
         $data = UserCoupon::query()
             ->when($user_name, fn ($query) => $query->whereHas('user', fn ($query) => $query->where('user_name', 'like', "%{$user_name}%")))
             ->when($coupon_id, fn ($query) => $query->where('coupon_id', $coupon_id))
-            ->paginate(10);
+            ->paginate($request->per_page);
 
         $data->getCollection()->transform(function (UserCoupon $item) {
             return [

@@ -4,37 +4,30 @@ namespace App\Http\Dao;
 
 use App\Models\Category;
 use App\Models\Goods;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 
 class CategoryDao
 {
     /**
      * 获取商品分类（分类下没商品的不返回）.
      */
-    public function getGoodsCategory(): EloquentCollection|Collection
+    public function getGoodsCategory()
     {
         $categories = Category::query()
             ->with('allChildren')
             ->whereParentId(0)
             ->whereIsShow(Category::IS_SHOW_YES)
-            ->whereHas('goods', function (Builder $query) {
-                $query->where('status', Goods::STATUS_ON_SALE);
-            })
             ->get();
 
-        if ($categories->isEmpty()) {
-            return new Collection;
-        }
-
-        return $categories->map(fn (Category $category) => $this->categoryFormat($category));
+        return $categories->map(fn (Category $category) => $this->goodsCategoryFormat($category))
+            ->filter(function ($category) {
+                return ! empty($category);
+            });
     }
 
     /**
      * 获取树状分类.
      */
-    public function getTreeList(): EloquentCollection|Collection
+    public function getTreeList()
     {
         return Category::query()->with('allChildren')
             ->whereParentId(0)
@@ -43,25 +36,37 @@ class CategoryDao
     }
 
     /**
-     * 获取顶级分类.
-     *
-     * @param bool $is_show 是否只获取显示的顶级分类
+     * 递归处理树状结构数据（分类下没商品的不返回）.
      */
-    public function getTopCategory(bool $is_show = false): EloquentCollection|Collection
+    private function goodsCategoryFormat(Category $category): array
     {
-        return Category::query()
-            ->whereParentId(0)
-            ->when($is_show, fn (Builder $query) => $query->where('is_show', $is_show))
-            ->select(['parent_id', 'name', 'title', 'keywords', 'description', 'logo', 'sort', 'is_show'])
-            ->get();
-    }
+        $children = $category->allChildren->map(fn (Category $child) => $this->goodsCategoryFormat($child))
+            ->filter(function ($child) {
+                return ! empty($child);
+            });
 
-    /**
-     * 获取分类信息.
-     */
-    public function getInfoById(int $id): ?Category
-    {
-        return Category::query()->whereId($id)->first();
+        if ($children->isEmpty()) {
+            // 检查分类是否有上架商品
+            $category_goods_count = $category->goods()->where('status', Goods::STATUS_ON_SALE)->count();
+
+            if ($category_goods_count > 0) {
+                return [
+                    'id' => $category->id,
+                    'parent_id' => $category->parent_id,
+                    'name' => $category->name,
+                    'logo' => $category->logo,
+                ];
+            }
+
+            return [];
+        }
+
+        return [
+            'id' => $category->id,
+            'parent_id' => $category->parent_id,
+            'name' => $category->name,
+            'children' => $children->toArray(),
+        ];
     }
 
     /**

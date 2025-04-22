@@ -4,6 +4,7 @@ namespace App\Messages;
 
 use App\Enums\PhoneMsgTypeEnum;
 use App\Models\PhoneMsg;
+use App\Models\ShopConfig;
 use Illuminate\Support\Carbon;
 use Overtrue\EasySms\Contracts\GatewayInterface;
 
@@ -27,6 +28,6 @@ class PhoneCodeMessage extends BaseMessage
 
     public function getTemplate(?GatewayInterface $gateway = null)
     {
-        return config('custom.sms_templates.phone_code');
+        return shop_config(ShopConfig::SMS_TEMPLATE_PHONE_CODE);
     }
 }

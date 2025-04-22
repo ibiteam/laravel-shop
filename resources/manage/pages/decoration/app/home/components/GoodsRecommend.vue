@@ -94,7 +94,7 @@
                             <div class="item-title">标题设置</div>
                             <el-form-item label="小图标" label-position="top" :prop="['title', 'image']">
                                 <div>
-                                    <ImageUpload 
+                                    <ImageUpload
                                         :src="form.content.title.image"
                                         @material="() => {
                                             handleOpenUpload(['title', 'image'])
@@ -104,7 +104,7 @@
                                         }"
                                         @remove="() => {
                                             form.content.title.image = ''
-                                        }" 
+                                        }"
                                     />
                                     <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：32 * 32</p>
                                 </div>
@@ -175,7 +175,7 @@
                                                 callback(new Error('请输入数字'));
                                             } else if (!Number.isInteger(value * 1)) {
                                                 callback(new Error('请输入整数'));
-                                            } else { 
+                                            } else {
                                                 getIntelligentRecommendData()
                                                 callback();
                                             }
@@ -188,14 +188,14 @@
                             <template v-else>
                                 <el-form-item label="" label-position="top" :prop="['goods', 'goods_nos']" :rules="[
                                     { required: true, message: '最少选择1个商品', trigger: 'change' },
-                                    { 
+                                    {
                                         validator: (rule, value, callback) => {
                                             if (value.length <= 0) {
                                                 callback(new Error('最少选择1个商品'));
                                             } else if (value.length > 20) {
                                                 callback(new Error('最多选择20个商品'));
                                             } else { callback(); }
-                                        }, trigger: 'change' 
+                                        }, trigger: 'change'
                                     },
                                 ]">
                                     <div class="goods-form-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
@@ -222,11 +222,10 @@ import ImageUpload from '@/pages/decoration/components/ImageUpload.vue'
 import LinkInput from '@/pages/decoration/components/LinkInput.vue'
 import GoodsPrice from '@/pages/decoration/components/GoodsPrice.vue'
 import { Tag } from 'vant';
-import { ref, reactive, watch, getCurrentInstance, onMounted, nextTick } from 'vue'
-import { VueDraggable } from 'vue-draggable-plus'
-import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, MinGoodsNumber, RuleOption, SortTypeOption, RecommendGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
+import { ref, reactive, watch, getCurrentInstance } from 'vue'
+import { TempField, LayoutOption, TitleAlignOption, MaxGoodsNumber, RuleOption, SortTypeOption, RecommendGoodsNumber } from '@/pages/decoration/app/home/dataField/GoodsRecommend.js'
 import { updateNested } from '@/pages/decoration/utils/common.js'
-import { decorationIntelligentRecommendData } from '@/api/decoration.js'
+import Http from '@/utils/http'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -291,7 +290,7 @@ const updateGoodsComponentData = (res) => {
 }
 
 const getIntelligentRecommendData = () => {
-    decorationIntelligentRecommendData({sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
+    Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
         if (cns.$successCode(res.code)) {
             form.content.goods['goods_data'] = res.data
         }

@@ -1,5 +1,5 @@
 <template>
-    <DecorationLayout 
+    <DecorationLayout
         :pageName="decoration.app_website_data?.name"
         :time="decoration.app_website_data?.release_time"
         :id="decoration.app_website_data?.id"
@@ -58,7 +58,7 @@
 <script setup>
 import 'vant/lib/index.css';
 import { VueDraggable } from 'vue-draggable-plus'
-import DecorationLayout from '@/pages/decoration/DecorationLayout.vue'; 
+import DecorationLayout from '@/pages/decoration/DecorationLayout.vue';
 import ToolBar from './../../components/ToolBar.vue'
 // import BottomNavBar from './components/BottomNavBar.vue'
 import HomeSetting from './components/HomeSetting.vue'
@@ -72,8 +72,8 @@ import Recommend from './components/Recommend.vue';
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue'
 import LinkCenterDialog from '@/components/LinkCenter/Dialog.vue'
 import GoodsSelectDialog from '@/components/good/SelectDialog.vue'
-import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance, watch } from 'vue'
-import { appDecorationInit, appDecorationSave, decorationRecommendData } from '@/api/decoration.js'
+import { ref, reactive, onMounted, onUnmounted, nextTick, getCurrentInstance } from 'vue'
+import Http from '@/utils/http'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const decoration = reactive({
@@ -144,7 +144,7 @@ const updateDragPlaceholder = (index) => {
     dragData.placeholderIndex = index
 }
 const handleDragChoose = (e) => {
-    console.log(e)   
+    console.log(e)
 }
 
 const setTempItemRef = (el, id) => {
@@ -299,7 +299,7 @@ const decorationSave = (params) => {
         }
         console.log(save_decoration_data)
         console.log(saveData)
-        appDecorationSave((saveData)).then(res => {
+        Http.doPost('app_decoration/decoration/save', (saveData)).then(res => {
             decoration.loading = false
             if (cns.$successCode(res.code)) {
                 cns.$message.success('保存成功')
@@ -328,7 +328,14 @@ const decorationSave = (params) => {
 // 获取首页装修数据
 const getDecorationHome = () => {
     decoration.loading = true
-    appDecorationInit({id: cns.$route.query.id}).then(res => {
+    /**
+     * 移动端装修初始化
+     * @param {
+     *      id: 1
+     * }
+     * @returns
+     */
+    Http.doGet('app_decoration/decoration', {id: cns.$route.query.id}).then(res => {
         decoration.loading = false
         if (cns.$successCode(res.code)) {
             decoration.app_website_data = res.data.app_website_data
@@ -349,7 +356,7 @@ const getDecorationHome = () => {
 
 // 获取为您推荐数据
 const getDecorationRecommendData = () => {
-    decorationRecommendData().then(res => {
+    Http.doGet('app_decoration/recommend/data').then(res => {
         if (cns.$successCode(res.code)) {
             defaultRecommendData.value = res.data.list
         }
@@ -378,7 +385,7 @@ onMounted(() => {
                         // decoration.data[index] = {
                         //     ...tempRefs.value[item.id].getComponentData(),
                         //     is_show: !decoration.data[index].is_show ? 1 : 0
-                        // } 
+                        // }
                         decoration.data[index]['is_show'] = !decoration.data[index].is_show ? 1 : 0
                     }
                 })
@@ -551,7 +558,7 @@ export default {
                     background-color: rgba(125, 125, 125, 0.2);
                     -webkit-border-radius: 6px;
                     display: none;
-                    
+
                 }
                 &:hover {
                     &::-webkit-scrollbar-thumb:vertical {

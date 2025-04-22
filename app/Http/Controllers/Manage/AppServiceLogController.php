@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Manage;
 
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\AppServiceConfig;
 use App\Models\AppServiceLog;
@@ -9,16 +10,15 @@ use Illuminate\Http\Request;
 
 class AppServiceLogController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
-        $number = $request->input('number', 10);
         $query = AppServiceLog::query();
         $query = $this->getWhere($query, $request);
         $list = $query->select(['id', 'service_id', 'user_id', 'created_at', 'request_param', 'result_data'])
             ->with(['app_service_config:id,alias,name', 'user:id,user_name'])
-            ->orderByDesc('id')->paginate($number);
+            ->orderByDesc('id')->paginate($request->per_page);
         $list->getCollection()->transform(function (AppServiceLog $app_service_log) {
-            $app_service_log->user_name = "【{$app_service_log->user_id}】{$app_service_log->user?->user_name}";
+            $app_service_log->user_name = $app_service_log->user ? "【{$app_service_log->user->id}】{$app_service_log->user->user_name}" : '';
             $app_service_log->name = "{$app_service_log->app_service_config?->name}【{$app_service_log->app_service_config?->alias}】";
             $app_service_log->request_param = json_decode($app_service_log->request_param, true);
             $app_service_log->result_data = json_decode($app_service_log->result_data, true);

@@ -155,10 +155,9 @@
 <script setup lang="ts">
 import { Plus, QuestionFilled } from '@element-plus/icons-vue';
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
-import { paymentMethodChangeField, paymentMethodIndex, paymentMethodUpdate } from '@/api/set';
-import { fileUpload } from '@/api/common';
 import PageTable from '@/components/common/PageTable.vue'
 import SearchForm from '@/components/common/SearchForm.vue'
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -196,7 +195,7 @@ const getData = (page:number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    paymentMethodIndex(params).then(res => {
+    Http.doGet('payment', params).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data
@@ -214,7 +213,7 @@ const handleChange = (page:number,per_page:number) => {
 }
 /* 表格修改字段 */
 const handleFieldChange = (id:number,field:any,name:string) => {
-    paymentMethodChangeField({ id: id, field: field,name:name }).then((res:any) => {
+    Http.doPost('payment/change/field', { id: id, field: field,name:name }).then((res:any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
             getData(pagination.page)
@@ -272,7 +271,7 @@ const closeDetailDialog = () => {
 
 const uploadFile = async (request) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload',{ file: request.file });
         if (cns.$successCode(res.code)) {
             detailForm.icon = res.data.url;
         } else {
@@ -286,7 +285,7 @@ const submitDetailForm = () => {
     detailFormRef.value.validate((valid:any) => {
         if (valid) {
             detailSubmitLoading.value = true;
-            paymentMethodUpdate(detailForm).then((res:any) => {
+            Http.doPost('payment/update', detailForm).then((res:any) => {
                 detailSubmitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeDetailDialog();

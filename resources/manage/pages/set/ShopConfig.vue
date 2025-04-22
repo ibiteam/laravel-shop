@@ -195,6 +195,34 @@
                                         ></el-switch>
                                         <span class="co-999" style="width: 100%"><small>商品展示列表是否显示销量</small></span>
                                     </el-form-item>
+                                    <el-form-item label="是否显示评论：" prop="is_show_evaluate">
+                                        <el-switch
+                                            v-model="inputFrom.is_show_evaluate"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>商品详情是否展示评论</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="是否显示申请售后：" prop="is_show_after_sales">
+                                        <el-switch
+                                            v-model="inputFrom.is_show_after_sales"
+                                            active-color="#13ce66"
+                                            inactive-color="#EBE9E9"
+                                            :active-value="'1'"
+                                            :inactive-value="'0'"
+                                        ></el-switch>
+                                        <span class="co-999" style="width: 100%"><small>订单列表、订单详情是否展示申请售后按钮</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="价格格式化：" prop="currency_format">
+                                        <el-input v-model="inputFrom.currency_format" placeholder="请输入价格格式化格式"></el-input>
+                                        <span class="co-999" style="width: 100%"><small>价格格式化格式</small></span>
+                                    </el-form-item>
+                                    <el-form-item label="小数点后小数位数：" prop="price_format">
+                                        <el-input v-model="inputFrom.price_format" placeholder="请输入保留小数点后几位小数"></el-input>
+                                        <span class="co-999" style="width: 100%"><small>价格保留几位小数</small></span>
+                                    </el-form-item>
                                     <el-form-item>
                                         <el-button type="primary" :class="{disable:loading}" :loading="loading"
                                                    @click="submitForm()">提交
@@ -317,6 +345,30 @@
                                 </div>
                             </el-form>
                         </el-tab-pane>
+                        <el-tab-pane label="短信设置" name="group_sms">
+                            <el-form :model="inputFrom" ref="inputFromRef" label-width="220px">
+                                <div style="margin:0 auto 0 50px;width: 800px">
+                                    <el-form-item label="短信驱动：" prop="sms_driver">
+                                        <el-radio v-model="inputFrom.sms_driver" label="aliyun">阿里云</el-radio>
+                                    </el-form-item>
+                                    <el-form-item label="短信服务商 ACCESS KEY：" prop="sms_access_key">
+                                        <el-input v-model="inputFrom.sms_access_key" placeholder="短信服务商平台 access key"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信服务商 ACCESS SECRET：" prop="sms_access_secret">
+                                        <el-input v-model="inputFrom.sms_access_secret" placeholder="短信服务商平台 access secret"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信签名：" prop="sms_sign_name">
+                                        <el-input v-model="inputFrom.sms_sign_name" placeholder="短信签名"></el-input>
+                                    </el-form-item>
+                                    <el-form-item label="短信模板-验证码：" prop="sms_template_phone_code">
+                                        <el-input v-model="inputFrom.sms_template_phone_code" placeholder="短信验证码模板"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" :class="{disable:loading}" :loading="loading" @click="submitForm()">提交</el-button>
+                                    </el-form-item>
+                                </div>
+                            </el-form>
+                        </el-tab-pane>
                     </el-tabs>
                 </el-tab-pane>
                 <el-tab-pane label="系统对接" name="system_docking">
@@ -354,7 +406,6 @@
 
 <script setup>
 import { Plus, Delete } from '@element-plus/icons-vue';
-import { fileUpload } from '@/api/common.js';
 import Http from '@/utils/http';
 import { ref, reactive, onMounted, computed, getCurrentInstance } from 'vue';
 
@@ -392,6 +443,8 @@ const tab_label = computed(() => {
             return '退款售后';
         case 'group_articles':
             return '文章设置';
+        case 'group_sms':
+            return '短信设置';
         default:
             return '';
     }
@@ -412,7 +465,7 @@ const secondHandleClick = (tab, event) => {
 };
 
 const setInfo = (group_name) => {
-    Http.doGet('set/shop_config', { group_name: group_name }).then(res => {
+    Http.doGet('shop_config', { group_name: group_name }).then(res => {
         if (cns.$successCode(res.code)) {
             Object.assign(inputFrom, res.data.configs);
 
@@ -431,7 +484,7 @@ const setInfo = (group_name) => {
 
 const uploadFile = async (request, type) => {
     try {
-        const res = await fileUpload({ file: request.file });
+        const res = await Http.doUpload('upload', { file: request.file });
         if (cns.$successCode(res.code)) {
             inputFrom[type] = res.data.url;
         } else {
@@ -449,7 +502,7 @@ const handleRemoveOne = (type) => {
 const remoteSearchArticle = async (query, type) => {
     if (query !== '') {
         try {
-            const res = await Http.doGet('set/shop_config/search_article', { keywords: query });
+            const res = await Http.doGet('shop_config/search_article', { keywords: query });
             if (cns.$successCode(res.code)) {
                 if (type === 'user_agreement') {
                     userAgreementData.value = res.data;
@@ -477,7 +530,7 @@ const submitForm = () => {
             inputFrom.title = secondActiveName.value;
             inputFrom.tab_label = tab_label;
             loading.value = true;
-            Http.doPost('set/shop_config/update', inputFrom).then(res => {
+            Http.doPost('shop_config/update', inputFrom).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('提交成功');
                     Http.doGet('home/config').then(ret => {

@@ -8,7 +8,6 @@ use App\Enums\PayStatusEnum;
 use App\Enums\ShippingStatusEnum;
 use App\Models\Order;
 use App\Models\OrderDelivery;
-use App\Models\OrderDetail;
 
 class OrderDao
 {

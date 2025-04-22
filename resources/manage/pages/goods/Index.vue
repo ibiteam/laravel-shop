@@ -122,11 +122,11 @@
     </page-table>
 </template>
 <script setup lang="ts">
-import { categoryIndex, goodsIndex, goodsChangeStatus } from '@/api/goods.js';
 import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 const cns = getCurrentInstance().appContext.config.globalProperties
 const router = useRouter()
 
@@ -185,7 +185,7 @@ const getData = (page = defaultPage.page) => {
         per_page: pagination.per_page
     }
 
-    goodsIndex(params).then(res => {
+    Http.doGet('goods/info', params).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;
@@ -199,7 +199,7 @@ const getData = (page = defaultPage.page) => {
 
 // 修改上架状态
 const handleStatusChange = (id) => {
-    goodsChangeStatus({ id: id}).then(res => {
+    Http.doPost('goods/info/change/status', { id: id}).then(res => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message)
             getData(pagination.page)
@@ -213,7 +213,7 @@ const openDetail = (id) => {
 }
 
 onMounted( () => {
-    categoryIndex().then(res => {
+    Http.doGet('goods/category').then(res => {
         if (cns.$successCode(res.code)) {
             categoryOptions.value = res.data;
         }

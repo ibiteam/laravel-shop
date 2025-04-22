@@ -121,7 +121,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-<!--                                            <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>-->
                                             <div class="edit-icon-container">
                                                 <i class="iconfont edit-icon" @click="editMaterial(scope.row)">&#xe79a;</i>
                                             </div>
@@ -172,7 +171,7 @@
                                 placeholder="请选择上一级文件夹"
                                 :render-after-expand="false"
                                 style="width: 240px">
-                                <template #default="{ node, data }">
+                                <template #default="{ data }">
                                     <span>{{ data.name }}</span>
                                 </template>
                             </el-tree-select>
@@ -194,10 +193,10 @@
     </div>
 </template>
 <script setup>
-import { ref, reactive, getCurrentInstance, watch, onMounted } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
-import Page from '@/components/common/Pagination.vue'
-import { folderList, materialIndex, rename, newFolder, destory, batchDestory, batchMove, move, materialUpload } from '@/api/material.js';
+import Http from '@/utils/http'
+// import SearchForm from '@/components/common/SearchForm.vue'
 
 const tabValue = ref('1');
 const multipleSelection = ref([]);
@@ -208,6 +207,7 @@ const searchForm = ref({
     type: '0', // 素材类型 1、文件夹 2、文件
     time: '',
     page: 1,
+    per_page: 10,
     sort: '0', // 排序字段
     dir_type: 1, // 文件夹类型 1、图片 2、视频
     parent_id: 0, // 文件夹id
@@ -240,7 +240,6 @@ const pageInfo = reactive({
     current_page: 1
 });
 
-
 // 页码改变
 const handleCurrentChange = (val) => {
     getMaterialData(val);
@@ -248,7 +247,7 @@ const handleCurrentChange = (val) => {
 
 // 每页条数改变
 const handleSizeChange = (val) => {
-    searchForm.number = val;
+    searchForm.value.number = val;
     pageInfo.per_page = val;
     getMaterialData(1);
 }
@@ -264,15 +263,15 @@ onMounted( () => {
     getFolderData()
 });
 
-const uploadFile = async (request, type) => {
+const uploadFile = async (request) => {
     const info = {
         file: request.file,
         parent_id: searchForm.value.parent_id,
         dir_type: searchForm.value.dir_type
     }
     try {
-        const res = await materialUpload(info);
-        if (res.code === 200) {
+        const res = await Http.doPost('material/upload', info);
+        if (cns.$successCode(res.code)) {
             getFolderData()
         } else {
             cns.$message.error(res.message)
@@ -296,8 +295,8 @@ const getMaterialData = (page = 1) => {
     // 更新当前页码
     searchForm.value.page = page;
     tableListLoading.value = true;
-    materialIndex(searchForm.value).then(res => {
-        if (res.code === 200) {
+    Http.doGet('material', searchForm.value).then(res => {
+        if (cns.$successCode(res.code)) {
             tableList.value = res.data.list;
             // 更新分页信息
             setPageInfo(res.data.meta);
@@ -309,8 +308,8 @@ const getMaterialData = (page = 1) => {
 }
 
 const getFolderData = () => {
-    folderList({dir_type: tabValue.value}).then(res => {
-        if (res.code === 200) {
+    Http.doGet('material/folder/list', {dir_type: tabValue.value}).then(res => {
+        if (cns.$successCode(res.code)) {
             folderData.value = res.data;
             searchForm.value.dir_type = tabValue.value;
             getMaterialData()
@@ -424,8 +423,8 @@ const disableAllChildren = (children) => {
 const handleRenameMaterial = () => {
     ctrlMaterialRef.value.validate((valid) => {
         if (valid) {
-            rename(currentCtrlMaterial.value).then(res => {
-                if (res.code === 200) {
+            Http.doPost('material/rename', currentCtrlMaterial.value).then(res => {
+                if (cns.$successCode(res.code)) {
                     cns.$message.success('保存成功')
                     getFolderData()
                     editMaterialVisible.value = false;
@@ -442,8 +441,8 @@ const handleEditMaterial = () => {
     currentCtrlMaterial.value.dir_type = tabValue.value
     ctrlMaterialRef.value.validate((valid) => {
         if (valid) {
-            newFolder(currentCtrlMaterial.value).then(res => {
-                if (res.code === 200) {
+            Http.doPost('material/new/folder', currentCtrlMaterial.value).then(res => {
+                if (cns.$successCode(res.code)) {
                     cns.$message.success('保存成功')
                     getFolderData()
                     editMaterialVisible.value = false;
@@ -458,8 +457,8 @@ const handleEditMaterial = () => {
 }
 const handleDelete = (id) => {
     cns.$dialog.confirm({ message:'此操作将删除本文件和关联所有子文件, 是否继续?', title:'提示' }).then(() => {
-        destory({id: id}).then(res => {
-            if (res.code === 200) {
+        Http.doPost('material/destory', {id: id}).then(res => {
+            if (cns.$successCode(res.code)) {
                 cns.$message.success('删除成功')
                 getFolderData()
             } else {
@@ -474,8 +473,8 @@ const handleDelete = (id) => {
 }
 const handleBatchDelete = () => {
     cns.$dialog.confirm({ message:'此操作将删除选中文件和关联所有子文件, 是否继续?', title:'提示' }).then(() => {
-        batchDestory({ids: multipleSelection.value}).then(res => {
-            if (res.code === 200) {
+        Http.doPost('material/batch/destory', {ids: multipleSelection.value}).then(res => {
+            if (cns.$successCode(res.code)) {
                 cns.$message.success('删除成功')
                 getFolderData()
             } else {
@@ -493,8 +492,8 @@ const handleMove = () => {
         id: multipleSelectionId.value,
         target_directory_id: currentCtrlMaterial.value.parent_id
     }
-    move(info).then(res => {
-        if (res.code === 200) {
+    Http.doPost('material/move', info).then(res => {
+        if (cns.$successCode(res.code)) {
             editMaterialVisible.value = false
             cns.$message.success('保存成功')
             getFolderData()
@@ -510,9 +509,8 @@ const handleBatchMove = () => {
         ids: multipleSelection.value,
         target_directory_id: currentCtrlMaterial.value.parent_id
     }
-    console.log(info);
-    batchMove(info).then(res => {
-        if (res.code === 200) {
+    Http.doPost('material/batch/move', info).then(res => {
+        if (cns.$successCode(res.code)) {
             editMaterialVisible.value = false
             cns.$message.success('保存成功')
             getFolderData()
@@ -533,22 +531,22 @@ const changTab = () => {
     getFolderData()
 }
 const materialTableRef = ref(null);
-const handleDragStart = (node, ev) => {
+const handleDragStart = (node) => {
     console.log('drag start', node)
 }
-const handleDragEnter = (draggingNode, dropNode, ev) => {
+const handleDragEnter = (draggingNode, dropNode) => {
     console.log('tree drag enter:', dropNode.label)
 }
-const handleDragLeave = (draggingNode, dropNode, ev) => {
+const handleDragLeave = (draggingNode, dropNode) => {
     console.log('tree drag leave:', dropNode.label)
 }
-const handleDragOver = (draggingNode, dropNode, ev) => {
+const handleDragOver = (draggingNode, dropNode) => {
     console.log('tree drag over:', dropNode.label)
 }
-const handleDragEnd = (draggingNode, dropNode, dropType, ev) => {
+const handleDragEnd = (draggingNode, dropNode, dropType) => {
     console.log('tree drag end:', dropNode && dropNode.label, dropType)
 }
-const handleDrop = (draggingNode, dropNode, dropType, ev) => {
+const handleDrop = (draggingNode, dropNode, dropType) => {
     console.log('tree drop:', dropNode.label, dropType)
 }
 const allowDrop = (draggingNode, dropNode, type) => {

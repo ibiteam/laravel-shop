@@ -54,8 +54,8 @@ import { onBeforeUnmount, ref, shallowRef, onMounted, reactive, getCurrentInstan
 import { Boot, SlateTransforms } from '@wangeditor/editor'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import html2canvas from 'html2canvas-pro';
-import { fileUpload } from '@/api/common'
 import MaterialCenterDialog from '@/components/MaterialCenter/Dialog.vue';
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const editorRef = shallowRef()
@@ -604,7 +604,7 @@ const handleAfterUpload = (file) => {
             let reader = new FileReader();
             reader.readAsArrayBuffer(file);
             reader.onload = () => {
-                fileUpload({ file }).then((res) => {
+                Http.doUpload('upload', { file }).then((res) => {
                     if (res.code == 200) {
                         resolve({ status: 'success', url: res.data.url });
                     } else {

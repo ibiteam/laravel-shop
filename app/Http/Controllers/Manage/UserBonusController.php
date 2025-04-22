@@ -3,20 +3,21 @@
 namespace App\Http\Controllers\Manage;
 
 use App\Http\Controllers\Api\BaseController;
+use App\Http\Requests\Manage\IndexRequest;
 use App\Http\Resources\CommonResourceCollection;
 use App\Models\UserBonus;
 use Illuminate\Http\Request;
 
 class UserBonusController extends BaseController
 {
-    public function index(Request $request)
+    public function index(IndexRequest $request)
     {
         $bonus_id = $request->get('bonus_id');
         $user_name = $request->get('user_name');
         $data = UserBonus::query()
             ->when($user_name, fn ($query) => $query->whereHas('user', fn ($query) => $query->where('user_name', 'like', "%{$user_name}%")))
             ->when($bonus_id, fn ($query) => $query->where('bonus_id', $bonus_id))
-            ->paginate(10);
+            ->paginate($request->per_page);
 
         $data->getCollection()->transform(function (UserBonus $item) {
             return [

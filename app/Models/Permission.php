@@ -96,6 +96,10 @@ class Permission extends SpatiePermission
     public const WEBSITE_MANAGE = 'website.manage'; // 网站管理
     public const MANAGE_APP_DECORATION = 'manage.app_decoration.index'; // 移动端装修
     public const MANAGE_APP_DECORATION_UPDATE = 'manage.app_decoration.update'; // 移动端保存装修
+    public const ADVERT_MANAGE = 'advert.manage'; // 广告管理
+    public const MANAGE_APP_ADVERT_INDEX = 'manage.app_advert.index'; // app广告
+    public const MANAGE_APP_ADVERT_UPDATE = 'manage.app_advert.update'; // app广告新增|编辑
+    public const MANAGE_APP_ADVERT_DELETE = 'manage.app_advert.delete'; // app广告删除
 
     // 二级 商品部分
     public const GOODS_MANAGE = 'goods.manage'; // 商品管理

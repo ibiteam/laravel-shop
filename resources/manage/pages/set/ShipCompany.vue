@@ -74,9 +74,9 @@
 </template>
 <script setup lang="ts">
 import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
-import { shipCompanyChangeStatus, shipCompanyEdit, shipCompanyIndex, shipCompanyUpdate } from '@/api/set';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
+import Http from '@/utils/http';
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 
@@ -108,7 +108,7 @@ const getData = (page = 1) => {
         page: page,
         per_page: pagination.per_page
     }
-    shipCompanyIndex(params).then(res => {
+    Http.doGet('ship_company', params).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data
@@ -127,7 +127,7 @@ const handleChange = (page:number,per_page:number) => {
 
 // 表格修改字段
 const handleStatusChange = (itemId) => {
-    shipCompanyChangeStatus({ id: itemId }).then(res => {
+    Http.doPost('ship_company/change_status', { id: itemId }).then(res => {
         if (res.code === 200) {
             cns.$message.success(res.message);
             getData(pagination.page)
@@ -164,7 +164,7 @@ const openDetailDialog = (itemId) => {
     if (itemId > 0) {
         detailDialogTitle.value = '编辑快递公司'
         detailFormLoading.value = true;
-        shipCompanyEdit({ id: itemId }).then(res => {
+        Http.doGet('ship_company/edit', { id: itemId }).then(res => {
             detailFormLoading.value = false;
             if (res.code === 200) {
                 detailForm.id = res.data.id
@@ -199,7 +199,7 @@ const submitDetailForm = () => {
     detailFormRef.value.validate((valid) => {
         if (valid) {
             detailSubmitLoading.value = true;
-            shipCompanyUpdate(detailForm).then(res => {
+            Http.doPost('ship_company/update', detailForm).then(res => {
                 detailSubmitLoading.value = false;
                 if (res.code === 200) {
                     closeDetailDialog();

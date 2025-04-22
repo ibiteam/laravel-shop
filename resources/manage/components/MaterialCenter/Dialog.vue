@@ -22,7 +22,7 @@
                         :indent="6"
                         :expand-on-click-node="false"
                     >
-                        <template #default="{ node, data }">
+                        <template #default="{ data }">
                             <div class="custom-tree-node" @click="checkDir(data.id)">
                                 <i class="iconfont" style="color: var(--main-color);margin-right: 5px;">&#xe600;</i>
                                 <span>{{ data.name }}</span>
@@ -105,7 +105,7 @@
 import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } from 'vue'
 import Page from '@/components/common/Pagination.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
-import { folderList, materialIndex } from '@/api/material.js';
+import Http from '@/utils/http'
 
 
 const cns = getCurrentInstance().appContext.config.globalProperties
@@ -158,7 +158,7 @@ const viewerData = reactive({
 const check_group = ref([])
 
 // 表格行单击
-const handleRowClick = (row, column, event) => {
+const handleRowClick = (row) => {
     handleClickImageItem(row)
 }
 // 表格单选
@@ -202,7 +202,7 @@ const checkGroupIndex = (id) => {
 const handleClickViewer = (list) => {
     viewerData.index = list.$index
     viewerData.srcList = []
-    tableData.value.map((item,idx) => {
+    tableData.value.map((item) => {
         viewerData.srcList.push(item.file_path)
     })
     viewerData.show = true
@@ -236,7 +236,7 @@ const handleConfirm = () => {
 
 // 获取文件树
 const getFolderData = () => {
-    folderList({dir_type: 1}).then(res => {
+    Http.doGet('material/folder/list', {dir_type: 1}).then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             getMaterialData()
@@ -251,7 +251,7 @@ const getMaterialData = (params = {page: 1, number: 10}) => {
     searchForm.page = page;
     searchForm.number = number;
     tableLoading.value = true
-    materialIndex(searchForm).then(res => {
+    Http.doGet('material', searchForm).then(res => {
         if (res.code === 200) {
             tableData.value = res.data.list;
             // 更新分页信息
@@ -267,9 +267,9 @@ const getMaterialData = (params = {page: 1, number: 10}) => {
     })
 }
 
-const routeTo = () => {
-    cns.$router.push({name: 'manage.material_center.index'})
-}
+// const routeTo = () => {
+//     cns.$router.push({name: 'manage.material_center.index'})
+// }
 
 watch(() => props, (newVal) => {
     if (newVal) {

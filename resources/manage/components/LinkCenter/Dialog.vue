@@ -125,7 +125,7 @@
 import { ref, reactive , getCurrentInstance, defineEmits, onMounted, watch } from 'vue'
 import Page from '@/components/common/Pagination.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
-import {linkTableData, linkTreeList} from '@/api/link.js';
+import Http from '@/utils/http'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -238,7 +238,7 @@ const searchInfoData = () => {
 }
 // 获取文件树
 const getLinkTreeData = () => {
-    linkTreeList().then(res => {
+    Http.doGet('set/router_category/tree').then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             searchForm.page_name = res.data[0].page_name
@@ -252,11 +252,11 @@ const getLinkTreeData = () => {
 // 获取文件列表
 const getLinkTableData = (params = {page: 1, number: 10}) => {
     const {page, number} = params;
-    let searchInfo = searchInfoData()
+    const searchInfo = searchInfoData()
     searchInfo.page = page;
     searchInfo.number = number;
     tableLoading.value = true
-    linkTableData(searchInfo).then(res => {
+    Http.doGet(searchInfo.url, searchInfo).then(res => {
         if (res.code === 200) {
             if (searchForm.page_name == 'manage.category.index' || searchForm.page_name == 'manage.article_category.index'){
                 tableData.value = res.data;

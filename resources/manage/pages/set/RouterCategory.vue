@@ -152,7 +152,7 @@ const submitFormRules = reactive({
 const openStoreDialog = (categoryId = 0) => {
     storeDialogTitle.value = categoryId > 0 ? '编辑分类' : '添加分类';
     detailFormLoading.value = true;
-    Http.doGet('set/router_category/info', { id: categoryId }).then(res => {
+    Http.doGet('router_category/info', { id: categoryId }).then(res => {
         detailFormLoading.value = false;
         if (cns.$successCode(res.code)) {
             topCategories.value = res.data.top_categories;
@@ -200,7 +200,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            Http.doPost('set/router_category/update', submitForm).then(res => {
+            Http.doPost('router_category/update', submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -224,7 +224,7 @@ const handleDestroy = (categoryId) => {
         type: 'warning',
         center: true
     }).then(() => {
-        Http.doPost('set/router_category/destroy', { id: categoryId }).then(res => {
+        Http.doPost('router_category/destroy', { id: categoryId }).then(res => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -238,7 +238,7 @@ const handleDestroy = (categoryId) => {
 };
 
 const changeShow = (row) => {
-    Http.doPost('set/router_category/change_show', {
+    Http.doPost('router_category/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then(res => {
@@ -253,7 +253,7 @@ const changeShow = (row) => {
 const searchPages = (query) => {
     if (query !== '') {
         remoteLoading.value = true;
-        Http.doGet('set/router_category/pages', { keywords: query }).then(res => {
+        Http.doGet('router_category/pages', { keywords: query }).then(res => {
             remoteLoading.value = false;
             if (cns.$successCode(res.code)) {
                 pagePermissions.value = res.data;
@@ -269,7 +269,7 @@ const changeCategory = (form) => {
 
 const getData = () => {
     loading.value = true;
-    Http.doGet('set/router_category', query).then(res => {
+    Http.doGet('router_category', query).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

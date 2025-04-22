@@ -1,8 +1,9 @@
 <script setup>
-import { Plus, Search } from '@element-plus/icons-vue';
-import Page from '@/components/common/Pagination.vue'
-import { getAppService, getAppServiceToggleStatus, getAppServiceUpdate } from '@/api/app_service.js';
-import { ref, reactive, getCurrentInstance, onMounted, nextTick } from 'vue';
+import Http from '@/utils/http'
+import PageTable from '@/components/common/PageTable.vue'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import SearchForm from '@/components/common/SearchForm.vue'
+import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -11,14 +12,20 @@ const searchForm = reactive({
     alias: '',
     desc: '',
     is_enable: -1,
-    number: 10,
+    per_page: 10,
     page: 1
 });
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+
+const pagination = reactive({ ...defaultPage });
+
+const handlePageChange = (page, per_page) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
 const serviceInfoForm = ref({});
 const serviceInfoDialogVisible = ref(false);
 const tableData = ref([]);
@@ -68,9 +75,6 @@ const openStoreDialog = (row = {}) => {
         submitForm.config = [];
     }
     storeDialogVisible.value = true;
-    // nextTick(() => {
-    //     submitFormRef.value.clearValidate();
-    // });
 };
 
 const closeStoreDialog = () => {
@@ -92,7 +96,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            getAppServiceUpdate(submitForm).then(res => {
+            Http.doPost('app_service/update',submitForm).then(res => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -109,7 +113,7 @@ const onSubmit = () => {
 };
 
 const toggleStatus = (row, sign) => {
-    getAppServiceToggleStatus({
+    Http.doPost('app_service/toggle/status', {
         id: row.id,
         sign: sign
     }).then(res => {
@@ -124,11 +128,10 @@ const toggleStatus = (row, sign) => {
 const getData = (page = 1) => {
     loading.value = true;
     searchForm.page = page;
-    getAppService(searchForm).then(res => {
+    Http.doGet('app_service', searchForm).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
-            tableData.value = res.data.list;
-            setPageInfo(res.data.meta);
+            tableData.value = res.data;
         } else {
             cns.$message.error(res.message);
         }
@@ -138,26 +141,10 @@ const getData = (page = 1) => {
     });
 };
 
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-};
-// 页码改变
-const handleCurrentChange = (val) => {
-    getData(val);
-};
 // 页码改变
 const examine = (row) => {
     serviceInfoDialogVisible.value = true
     serviceInfoForm.value = row
-};
-// 每页条数改变
-const handleSizeChange = (val) => {
-    searchForm.number = val;
-    pageInfo.per_page = val;
-    getData(1);
 };
 
 onMounted(() => {
@@ -166,35 +153,33 @@ onMounted(() => {
 </script>
 <template>
     <div>
-        <el-header style="padding-top: 10px;">
-            <el-form :inline="true" :model="searchForm" class="search-form">
-                <el-form-item label="名称" prop="name">
-                    <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item label="别名" prop="alias">
-                    <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item label="描述" prop="desc">
-                    <el-input v-model="searchForm.desc" clearable placeholder="请输入" @keyup.enter="getData()" />
-                </el-form-item>
-                <el-form-item label="是否启用">
-                    <el-select v-model="searchForm.is_enable" placeholder="请选择">
-                        <el-option label="全部" :value="-1"></el-option>
-                        <el-option label="启用" :value="1"></el-option>
-                        <el-option label="不启用" :value="0"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item>
-                    <el-button :icon="Search" type="primary" @click="getData()">搜索</el-button>
-<!--                    <el-button :icon="Plus" type="warning" @click="openStoreDialog()">添加</el-button>-->
-                </el-form-item>
-            </el-form>
-        </el-header>
-        <el-table
+        <search-form :model="searchForm">
+            <el-form-item label="名称" prop="name">
+                <el-input v-model="searchForm.name" clearable placeholder="请输入" @keyup.enter="getData()" />
+            </el-form-item>
+            <el-form-item label="别名" prop="alias">
+                <el-input v-model="searchForm.alias" clearable placeholder="请输入" @keyup.enter="getData()" />
+            </el-form-item>
+            <el-form-item label="描述" prop="desc">
+                <el-input v-model="searchForm.desc" clearable placeholder="请输入" @keyup.enter="getData()" />
+            </el-form-item>
+            <el-form-item label="是否启用">
+                <el-select v-model="searchForm.is_enable" placeholder="请选择">
+                    <el-option label="全部" :value="-1"></el-option>
+                    <el-option label="启用" :value="1"></el-option>
+                    <el-option label="不启用" :value="0"></el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="getData()">搜索</el-button>
+            </el-form-item>
+        </search-form>
+        <page-table
             :data="tableData"
-            stripe border
-            v-loading="loading"
-            style="width: 100%;">
+            stripe
+            border
+            @change="handlePageChange"
+            v-loading="loading">
             <el-table-column label="ID" prop="id"></el-table-column>
             <el-table-column label="名称" prop="name"></el-table-column>
             <el-table-column label="别名" prop="alias"></el-table-column>
@@ -231,8 +216,7 @@ onMounted(() => {
                     <el-button link type="primary" size="large" @click="openStoreDialog(scope.row)">编辑</el-button>
                 </template>
             </el-table-column>
-        </el-table>
-        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
+        </page-table>
         <el-dialog
             width="700" center :before-close="closeStoreDialog"
             v-model="storeDialogVisible" :title="storeDialogTitle">
@@ -371,17 +355,5 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.search-form {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
 
-    :deep(.el-select) {
-        width: 200px;
-    }
-
-    :deep(.el-input) {
-        width: 200px;
-    }
-}
 </style>

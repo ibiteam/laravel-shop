@@ -34,7 +34,7 @@
 import { ref, getCurrentInstance } from 'vue';
 import { VueCropper } from 'vue-cropper';
 import 'vue-cropper/dist/index.css';
-import { fileUpload } from '@/api/common';
+import Http from '@/utils/http.js';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
@@ -118,7 +118,7 @@ const uploadFiles = async (file) => {
                         // 创建一个 Promise 数组来存储所有上传操作
                         const uploadPromises = selectedFiles.value.map(file => {
                             return new Promise((resolve, reject) => {
-                                fileUpload({ file }).then(res => {
+                                Http.doUpload('upload', { file }).then(res => {
                                     if (res.code == 200) {
                                         resolve(res.data.url);
                                     } else {
@@ -144,7 +144,7 @@ const uploadFiles = async (file) => {
             }, 100);
         } else {
             // 单选模式保持原有逻辑
-            fileUpload(file).then((res) => {
+            Http.doUpload('upload', file).then((res) => {
                 if (res.code == 200) {
                     emit('success', [res.data.url]);
                 }
@@ -183,7 +183,7 @@ const blobToFile = (blob) => {
 
 const cropImageConfirm = () => {
     cropperRef.value.getCropBlob((data) => {
-        fileUpload({ file: blobToFile(data) }).then((res) => {
+        Http.doUpload('upload', { file: blobToFile(data) }).then((res) => {
             cropperDialogShow.value = false;
             currentFileCropBlob.value = null;
             if (res.code == 200) {
