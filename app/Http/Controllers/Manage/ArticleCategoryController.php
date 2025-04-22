@@ -37,6 +37,7 @@ class ArticleCategoryController extends BaseController
             ->when($search_ids, fn ($query) => $query->whereIn('id', $search_ids))
             // ->when($name, fn ($query) => $query->where('name', 'like', '%'.$name.'%'))
             ->with(['allChildren'])->whereParentId(0)
+            ->orderByDesc('sort')
             ->get();
 
         $vue_app_url = rtrim(config('host.vue_app_url'), '/');

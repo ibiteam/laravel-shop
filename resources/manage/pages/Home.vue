@@ -241,7 +241,7 @@
                                                     <div class="menu-listRouter s-flex jc-bt ai-ct"
                                                          v-for="(ite,idx) in itas.children" :key="ite.value"
                                                          style="cursor: pointer;margin-left: 40px"
-                                                         @click="collectionFnc(ite,index,ids,idas,idx)">
+                                                         @click="collectionFnc(ite)">
                                                         <span>{{ ite.title }}</span>
                                                         <el-icon style="color: #ff6a00" v-if="ite.is_collection">
                                                             <StarFilled />
@@ -253,7 +253,7 @@
                                                 </template>
                                                 <template v-else>
                                                     <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
-                                                         @click="collectionFnc(itas,index,ids,idas)">
+                                                         @click="collectionFnc(itas)">
                                                         <span>{{ itas.title }}</span>
                                                         <el-icon style="color: #ff6a00" v-if="itas.is_collection">
                                                             <StarFilled />
@@ -267,7 +267,7 @@
                                         </template>
                                         <template v-else>
                                             <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
-                                                 @click="collectionFnc(its,index,ids)">
+                                                 @click="collectionFnc(its)">
                                                 <span>{{ its.title }}</span>
                                                 <el-icon style="color: #ff6a00" v-if="its.is_collection">
                                                     <StarFilled />
@@ -526,24 +526,10 @@ const searchMenusFnc = $public.debounce(() => {
     searchMenus.value = newArr;
 }, 500);
 
-const collectionFnc = (item, index, ids, idas, idx) => {
-    let is_collect = item.is_collection;
-    Http.doPost('home/collect_menu', item.index).then(res => {
+const collectionFnc = (item) => {
+    Http.doPost('home/collect_menu', {id:item.index}).then(res => {
         if (cns.$successCode(res.code)) {
-            if (is_collect) {
-                let collectIndex = my_collect.value.findIndex(a => a.name === item.name);
-                my_collect.value.splice(collectIndex, 1);
-            } else {
-                my_collect.value.push(item);
-            }
-            if (idx !== undefined) {
-                searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect;
-            } else if (idas !== undefined) {
-                searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect;
-            } else {
-                searchMenus.value[index].children[ids].is_collection = !is_collect;
-            }
-
+            openCollect()
         } else {
             cns.$message.error(res.message);
         }
@@ -552,17 +538,9 @@ const collectionFnc = (item, index, ids, idas, idx) => {
 
 const handleNodeCollect = (data) =>{
     if(data && !data.children){
-        console.log(data.is_collection)
-        let is_collect = data.is_collection
-        Http.doPost('home/collect_menu', data.index).then(res => {
+        Http.doPost('home/collect_menu', {id:data.index}).then(res => {
             if (cns.$successCode(res.code)) {
-                if (is_collect) {
-                    let collectIndex = my_collect.value.findIndex(a => a.name === data.name);
-                    my_collect.value.splice(collectIndex, 1);
-                } else {
-                    my_collect.value.push(data);
-                }
-                data.is_collection = !is_collect
+                openCollect()
             } else {
                 cns.$message.error(res.message);
             }

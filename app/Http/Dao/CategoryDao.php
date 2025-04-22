@@ -10,18 +10,21 @@ class CategoryDao
     /**
      * 获取商品分类（分类下没商品的不返回）.
      */
-    public function getGoodsCategory()
+    public function getGoodsCategory(): array
     {
         $categories = Category::query()
             ->with('allChildren')
             ->whereParentId(0)
             ->whereIsShow(Category::IS_SHOW_YES)
+            ->orderByDesc('sort')
             ->get();
 
-        return $categories->map(fn (Category $category) => $this->goodsCategoryFormat($category))
+        $categories->map(fn (Category $category) => $this->goodsCategoryFormat($category))
             ->filter(function ($category) {
                 return ! empty($category);
             });
+
+        return $categories->toArray();
     }
 
     /**
@@ -32,6 +35,7 @@ class CategoryDao
         return Category::query()->with('allChildren')
             ->whereParentId(0)
             ->whereIsShow(Category::IS_SHOW_YES)
+            ->orderByDesc('sort')
             ->get()->map(fn (Category $category) => $this->categoryFormat($category));
     }
 
