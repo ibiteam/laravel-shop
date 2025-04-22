@@ -153,7 +153,7 @@ class CartDao
     /**
      * 获取购物车有效商品数量.
      */
-    public function getValidCarNumber($user_id): int
+    public function getValidCarNumber(int $user_id): int
     {
         return Cart::query()->whereUserId($user_id)
             ->whereHas('goods', function ($query) {

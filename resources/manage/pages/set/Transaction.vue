@@ -175,7 +175,7 @@ const getData = (page:number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    Http.doGet('set/payment/transaction', params).then(res => {
+    Http.doGet('payment/transaction', params).then(res => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data
@@ -215,7 +215,7 @@ const submitRefundForm = () => {
     refundFormRef.value.validate((valid) => {
         if (valid) {
             submitRefundFormLoading.value = true;
-            Http.doPost('set/payment/transaction/refund', refundForm).then(res => {
+            Http.doPost('payment/transaction/refund', refundForm).then(res => {
                 submitRefundFormLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     getData(pagination.page)

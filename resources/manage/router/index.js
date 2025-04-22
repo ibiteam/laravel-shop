@@ -40,6 +40,7 @@ import Coupon from '@/pages/marketing/Coupon.vue';
 import UserCoupon from '@/pages/marketing/UserCoupon.vue';
 import AppServiceConfig from '@/pages/set/AppServiceConfig.vue';
 import AppServiceConfigLog from '@/pages/set/AppServiceConfigLog.vue';
+import AccessStatistic from '@/pages/data/AccessStatistic.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.VITE_MANAGE_PREFIX||'manage'),
@@ -96,6 +97,8 @@ const router = createRouter({
                 { path: '/marketing/user_bonus', component: UserBonus, name: 'manage.user_bonus.index',meta:{title:'用户红包'} },
                 { path: '/marketing/coupon', component: Coupon, name: 'manage.coupon.index',meta:{title:'优惠券'} },
                 { path: '/marketing/user_coupon', component: UserCoupon, name: 'manage.user_coupon.index',meta:{title:'用户优惠券'} },
+                // 数据
+                { path: '/access_statistic', component: AccessStatistic, name: 'manage.access_statistic.index',meta:{title:'访问统计'} },
                 //正在刷新
                 { path: '/refresh', component: Refresh, name: 'manage.refresh.index',meta:{title:'正在刷新'} },
                 // 移动端装修

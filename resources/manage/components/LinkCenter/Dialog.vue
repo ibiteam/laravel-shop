@@ -217,20 +217,20 @@ const searchInfoData = () => {
         // page_name:searchForm.page_name
     }
     if (searchForm.page_name == 'manage.router.index') {//基础连接,自定义链接
-        searchInfo.url = 'manage/set/router';
+        searchInfo.url = 'router';
         searchInfo.router_category_id = searchForm.id;
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     } else if (searchForm.page_name == 'manage.category.index') {//商品分类
-        searchInfo.url = 'manage/goods/category';
+        searchInfo.url = 'goods/category';
     } else if (searchForm.page_name == 'manage.goods.index') {//商品列表
-        searchInfo.url = 'manage/goods/info';
+        searchInfo.url = 'goods/info';
         searchInfo.keywords = searchForm.name;
         searchInfo.status = 1;
     } else if (searchForm.page_name == 'manage.article_category.index') {//文章分类
-        searchInfo.url = 'manage/article/category';
+        searchInfo.url = 'article/category';
     } else if (searchForm.page_name == 'manage.article.index') {//文章列表
-        searchInfo.url = 'manage/article/article';
+        searchInfo.url = 'article';
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     }
@@ -238,7 +238,7 @@ const searchInfoData = () => {
 }
 // 获取文件树
 const getLinkTreeData = () => {
-    Http.doGet('set/router_category/tree').then(res => {
+    Http.doGet('router_category/tree').then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             searchForm.page_name = res.data[0].page_name

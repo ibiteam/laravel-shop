@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Dao\AccessStatisticDao;
 use App\Services\AccessLog\AccessLogFormatter;
 use App\Services\AccessLog\AccessLogService;
 
@@ -23,4 +24,8 @@ it('test clickhouse access log service', function () {
     $formatter->setUserAgent('');
     $formatter->setRequestData([]);
     AccessLogService::init()->write($formatter);
+});
+
+it('test statistic', function () {
+    app(AccessStatisticDao::class)->statistic();
 });

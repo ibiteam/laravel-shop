@@ -22,7 +22,7 @@ class DoneController extends BaseController
     /**
      * 直接下单回显接口.
      */
-    public function directInit(Request $request, OrderService $order_service, GoodsFormatter $goods_formatter): JsonResponse
+    public function directInit(Request $request, OrderService $order_service): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -38,7 +38,8 @@ class DoneController extends BaseController
 
             $current_user = get_user();
 
-            $current_goods_format = $goods_formatter
+            $current_goods_format = (new GoodsFormatter)
+                ->getFormatter()
                 ->setUser($current_user)
                 ->setGoodsNo($validated['no'])
                 ->setSkuId($validated['sku_id'] ?? 0)
@@ -62,6 +63,7 @@ class DoneController extends BaseController
         } catch (ProcessDataException $process_data_exception) {
             return $this->error($process_data_exception->getMessage(), $process_data_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            dd($throwable);
             return $this->error('操作失败');
         }
     }
@@ -69,7 +71,7 @@ class DoneController extends BaseController
     /**
      * 直接下单接口.
      */
-    public function directDone(Request $request, UserAddressDao $user_address_dao, OrderService $order_service, GoodsFormatter $goods_formatter): JsonResponse
+    public function directDone(Request $request, UserAddressDao $user_address_dao, OrderService $order_service): JsonResponse
     {
         try {
             $validated = $request->validate([
@@ -95,7 +97,7 @@ class DoneController extends BaseController
                 throw new BusinessException('收货地址不存在');
             }
 
-            $current_goods_format = $goods_formatter->setUser($current_user)->setGoodsNo($validated['no'])->setSkuId($validated['sku_id'] ?? 0)->setBuyNumber($validated['buy_number'])->validate();
+            $current_goods_format = (new GoodsFormatter)->getFormatter()->setUser($current_user)->setGoodsNo($validated['no'])->setSkuId($validated['sku_id'] ?? 0)->setBuyNumber($validated['buy_number'])->validate();
 
             $data = $order_service
                 ->setUser($current_user)
@@ -137,7 +139,8 @@ class DoneController extends BaseController
             $current_user = get_user();
 
             $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
-                return app(GoodsFormatter::class)
+                return (new GoodsFormatter)
+                    ->getFormatter()
                     ->setUser($current_user)
                     ->setCartId($cart->id)
                     ->setGoods($cart->goods)
@@ -196,7 +199,8 @@ class DoneController extends BaseController
             }
 
             $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
-                return app(GoodsFormatter::class)
+                return (new GoodsFormatter)
+                    ->getFormatter()
                     ->setUser($current_user)
                     ->setCartId($cart->id)
                     ->setGoods($cart->goods)
