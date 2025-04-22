@@ -1,9 +1,9 @@
 <template>
-    <div class='seller-home'>
+    <div class='seller-home' :class="is_mobile_plat?'seller-home-mobile':''">
         <div class="home-container">
             <div class="home-content s-flex jc-bt">
                 <div class="home-left">
-                    <div class="information">
+                    <div class="information" v-if="!is_mobile_plat">
                         <div class="welcome">
                             <em class=""></em>
                             <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime()
@@ -316,6 +316,9 @@ const collectionVisible = ref<boolean>(false);
 const menus = ref([]);
 const searchMenus = ref([]);
 
+// 移动端打开
+const is_mobile_plat = ref(false)
+
 const getUvChartOption = (item) => {
     let xAxisData = [];
     let pc_uv = 0;
@@ -409,6 +412,15 @@ const getUvChartOption = (item) => {
 const resizeFnc = () => {
     lineRef.resize();
 };
+
+const initPlat = () => {
+    let desktopWidthThreshold = 768;
+    if (window.innerWidth <= desktopWidthThreshold){
+        is_mobile_plat.value = true
+    }else{
+        is_mobile_plat.value = false
+    }
+}
 
 const closeCollect = () => {
     searchMenus.value = [];
@@ -541,6 +553,7 @@ const clearCache = () => {
 };
 
 onMounted(() => {
+    initPlat()
     getData();
     window.addEventListener('resize', resizeFnc);
 });
@@ -1042,5 +1055,55 @@ onUnmounted(() => {
     font-size: 16px;
     color: #ccc;
     font-weight: 400;
+}
+
+//移动端
+.seller-home.seller-home-mobile{
+    .home-container{
+        min-width: unset;
+        .home-content{
+            display: block;
+            .home-left{
+                width: 100%;
+                >.module-main:nth-child(1){
+                    margin-top: 0;
+                }
+                .module-main{
+                    padding: 25px;
+                    border-radius: 20px;
+                    .module-title{
+                        font-weight: bold;
+                    }
+                    .module-content{
+                        margin-top: 20px;
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, 176px);
+                        gap: 20px 30px;
+                        justify-content: space-between;
+                        grid-template-columns: repeat(auto-fill, 70px);
+                    }
+                    .module-model{
+                        border-radius: 10px;
+                        cursor: pointer;
+                        width: 70px;
+                        height: 70px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        border: none;
+                        margin: 0;
+                    }
+                }
+            }
+            .home-right{
+                margin-top: 15px;
+                width: 100%;
+                .shortcut{
+                    padding: 25px;
+                    border-radius: 20px;
+                }
+            }
+        }
+    }
 }
 </style>
