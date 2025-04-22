@@ -6,6 +6,7 @@ use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
 use App\Models\Goods;
 use App\Models\Router;
+use App\Services\AppAdService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -14,7 +15,7 @@ use Illuminate\Validation\ValidationException;
  */
 class SpecialController extends BaseController
 {
-    public function index(Request $request)
+    public function index(Request $request, AppAdService $app_ad_service)
     {
         try {
             $validated = $request->validate([
@@ -32,12 +33,8 @@ class SpecialController extends BaseController
             $router = Router::query()->whereAlias($alias)->first();
             $title = $router ? $router->name : '';
 
-            // todo 根据别名获取专题页BANNER 这里先写死
-            $banner_list = [
-                'https://cdn.toodudu.com/2024/04/12/0bAiUiXtfMxIMXIqsdStKYp7aeabL8IjUNt8eHNa.jpg',
-                'https://cdn.toodudu.com/2021/03/24/i2DGzLEd3UrgZQYVqTl9xaqvsQIrvvFixl6aErJl.png',
-                'https://cdn.toodudu.com/1582c5ff87961214faad7bf3cee76a95.jpg',
-            ];
+            // 根据别名获取专题页BANNER
+            $banner_list = $app_ad_service->getAds(Router::$AdPath[$router->alias]);
 
             // 获取商品数据
             $good_list = Goods::query()->show()

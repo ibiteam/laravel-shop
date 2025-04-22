@@ -38,10 +38,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Router extends BaseModel
 {
-
-
     public const IS_SHOW_YES = 1; // 显示
     public const IS_SHOW_NO = 0; // 不显示
+
+    // 广告Banner对应别名
+    public static array $AdPath = [
+        RouterEnum::SUPERMARKET->value => AdCate::APP_SHOP_TOP_BANNER
+    ];
 
     protected $guarded = [];
 
