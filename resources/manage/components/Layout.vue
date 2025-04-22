@@ -179,7 +179,7 @@
                             <transition name="fade" mode="out-in">
                                 <div :key="route.path"
                                      :class="{'common-wrap': !['manage.home.index','manage.app_decoration.home','manage.goods.update'].includes(route.name)}"
-                                     style="height: 100%;overflow-y: auto">
+                                     style="min-height: 100%;">
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
