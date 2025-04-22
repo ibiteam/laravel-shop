@@ -195,7 +195,7 @@ const getData = (page:number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     }
-    Http.doGet('set/payment', params).then(res => {
+    Http.doGet('payment', params).then(res => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data
@@ -213,7 +213,7 @@ const handleChange = (page:number,per_page:number) => {
 }
 /* 表格修改字段 */
 const handleFieldChange = (id:number,field:any,name:string) => {
-    Http.doPost('set/payment/change/field', { id: id, field: field,name:name }).then((res:any) => {
+    Http.doPost('payment/change/field', { id: id, field: field,name:name }).then((res:any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
             getData(pagination.page)
@@ -285,7 +285,7 @@ const submitDetailForm = () => {
     detailFormRef.value.validate((valid:any) => {
         if (valid) {
             detailSubmitLoading.value = true;
-            Http.doPost('set/payment/update', detailForm).then((res:any) => {
+            Http.doPost('payment/update', detailForm).then((res:any) => {
                 detailSubmitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeDetailDialog();

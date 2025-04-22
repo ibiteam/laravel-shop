@@ -1,14 +1,13 @@
 <template>
     <!--新增编辑文章-->
-    <div v-loading="detailFormLoading" class="s-flex jc-ct">
+    <div v-loading="detailFormLoading">
         <el-form ref="submitFormRef" :model="submitForm" :rules="submitFormRules" label-width="120px">
             <el-form-item label="标题" prop="title">
                 <el-input v-model="submitForm.title" />
             </el-form-item>
             <el-form-item label="内容" prop="content">
                 <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
-                <Editor v-model="submitForm.content" height="500px" min-height="500px" placeholder="请输入文章内容"
-                        @change="handleChangeContent" v-else />
+                <Editor v-model="submitForm.content" style="height: 800px;" placeholder="请输入内容" v-else />
             </el-form-item>
             <el-form-item label="分类" prop="article_category_id">
                 <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
@@ -64,9 +63,9 @@
             <el-form-item label="点击次数" prop="click_count">
                 <el-input v-model="submitForm.click_count" />
             </el-form-item>
-            <el-form-item label="上传文件" prop="file_url">
+            <!--<el-form-item label="上传文件" prop="file_url">
                 <el-input v-model="submitForm.file_url" />
-            </el-form-item>
+            </el-form-item>-->
             <div class="">
                 <el-button type="primary" :loading="submitLoading" @click="onSubmit()">提交</el-button>
                 <el-button @click="closeArticleForm">返回</el-button>
@@ -91,7 +90,6 @@ const route = useRoute();
 const cns = getCurrentInstance().appContext.config.globalProperties;
 
 const detailFormLoading = ref(true);
-const isInitContent = ref(true);
 const submitFormRef = ref(null);
 const submitLoading = ref(false);
 const treeCategories = ref([]);
@@ -116,7 +114,7 @@ const submitForm = ref({
 
 const validateContent = (rule, value, callback) => {
     if (submitForm.value.content == '' || submitForm.value.content == '<p style="color: rgb(51, 51, 51); line-height: 2;"><br></p>' || submitForm.value.content == '<p style="line-height: 2; color: rgb(51, 51, 51);"><br></p>') {
-        callback(new Error('文章内容不能为空'));
+        callback(new Error('内容不能为空'));
     } else {
         callback();
     }
@@ -134,13 +132,6 @@ const submitFormRules = reactive({
     keywords: [{ required: true, message: '请输入关键字', trigger: 'blur' }]
 });
 
-const handleChangeContent = () => {
-    if (!isInitContent.value) {
-        submitFormRef.value.validateField('content');
-    } else {
-        isInitContent.value = false;
-    }
-};
 const uploadFile = async (request) => {
     try {
         const res = await Http.doUpload('upload', { file: request.file });
@@ -219,6 +210,15 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.resizable-editor){
+    height: calc(100% - 41px)!important;
+}
+:deep(.el-input){
+    width: 250px!important;
+}
+:deep(.el-textarea){
+    width: 400px!important;
+}
 :deep(.logo-uploader .el-upload) {
     border: none;
     border-radius: 6px;

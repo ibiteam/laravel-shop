@@ -126,7 +126,7 @@ const updateForm = () => {
     updateLoading.value = true
     subFormRef.value.validate((valid) => {
         if (valid) {
-            Http.doPost('manage/user/update', subForm.value).then(function (res) {
+            Http.doPost('user/update', subForm.value).then(function (res) {
                 if (res.code === 200) {
                     dialogFormVisible.value = false;
                     cns.$message.success('保存成功');

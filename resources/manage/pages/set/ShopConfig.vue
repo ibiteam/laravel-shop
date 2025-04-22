@@ -465,7 +465,7 @@ const secondHandleClick = (tab, event) => {
 };
 
 const setInfo = (group_name) => {
-    Http.doGet('set/shop_config', { group_name: group_name }).then(res => {
+    Http.doGet('shop_config', { group_name: group_name }).then(res => {
         if (cns.$successCode(res.code)) {
             Object.assign(inputFrom, res.data.configs);
 
@@ -502,7 +502,7 @@ const handleRemoveOne = (type) => {
 const remoteSearchArticle = async (query, type) => {
     if (query !== '') {
         try {
-            const res = await Http.doGet('set/shop_config/search_article', { keywords: query });
+            const res = await Http.doGet('shop_config/search_article', { keywords: query });
             if (cns.$successCode(res.code)) {
                 if (type === 'user_agreement') {
                     userAgreementData.value = res.data;
@@ -530,7 +530,7 @@ const submitForm = () => {
             inputFrom.title = secondActiveName.value;
             inputFrom.tab_label = tab_label;
             loading.value = true;
-            Http.doPost('set/shop_config/update', inputFrom).then(res => {
+            Http.doPost('shop_config/update', inputFrom).then(res => {
                 if (cns.$successCode(res.code)) {
                     cns.$message.success('提交成功');
                     Http.doGet('home/config').then(ret => {

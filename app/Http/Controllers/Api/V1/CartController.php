@@ -40,7 +40,7 @@ class CartController extends BaseController
         $user = get_user();
 
         try {
-            $data['number'] = $cart_dao->getValidCarNumber($user->id);
+            $data['number'] = $cart_dao->getValidCarNumber($user->id ?? 0);
 
             return $this->success($data);
         } catch (\Throwable $throwable) {
@@ -367,7 +367,8 @@ class CartController extends BaseController
 
         try {
             $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
-                return app(GoodsFormatter::class)
+                return (new GoodsFormatter)
+                    ->getFormatter()
                     ->setUser($current_user)
                     ->setCartId($cart->id)
                     ->setGoods($cart->goods)

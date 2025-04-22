@@ -45,6 +45,7 @@
                         style="width: 100%" height="100%"
                         row-key="id"
                         :tree-props="{ children: 'all_children', hasChildren: true,checkStrictly:true }"
+                        @row-click="rowClick"
                         @select="handleSelect">
                         <el-table-column fixed type="selection" width="55" v-if="searchForm.page_name"/>
                         <template v-if="searchForm.page_name == 'manage.router.index'">
@@ -54,7 +55,7 @@
                         </template>
                         <template v-if="searchForm.page_name == 'manage.goods.index'">
                             <el-table-column property="id" label="ID" width="100"/>
-                            <el-table-column label="商品" width="200">
+                            <el-table-column label="商品" width="300">
                                 <template #default="scope">
                                     <div class="s-flex ai-ct">
                                         <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.image" fit="scale-down" @click="handleClickViewer(scope,'image')">
@@ -108,7 +109,7 @@
                         </template>
                     </el-table>
                 </div>
-                <div class="pagination-wrapper s-flex ai-ct jc-ct" v-if="searchForm.page_name != 'manage.category.index'">
+                <div class="pagination-wrapper s-flex ai-ct jc-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">
                     <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
                 </div>
                 <div class="button-wrapper s-flex ai-ct jc-ct">
@@ -175,6 +176,15 @@ const handleSelect = (selection, row) => {
     }
     check_group.value = selection
 }
+
+const rowClick = (row) =>{
+    if (tableRef.value) {
+        tableRef.value.clearSelection()
+        tableRef.value.toggleRowSelection(row)
+        check_group.value = [row]
+        return
+    }
+}
 // 打开预览图片
 const handleClickViewer = (list,name) => {
     viewerData.index = list.$index
@@ -217,20 +227,20 @@ const searchInfoData = () => {
         // page_name:searchForm.page_name
     }
     if (searchForm.page_name == 'manage.router.index') {//基础连接,自定义链接
-        searchInfo.url = 'set/router';
+        searchInfo.url = 'router';
         searchInfo.router_category_id = searchForm.id;
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     } else if (searchForm.page_name == 'manage.category.index') {//商品分类
-        searchInfo.url = 'goods/category';
+        searchInfo.url = 'manage/goods/category';
     } else if (searchForm.page_name == 'manage.goods.index') {//商品列表
-        searchInfo.url = 'goods/info';
+        searchInfo.url = 'manage/goods/info';
         searchInfo.keywords = searchForm.name;
         searchInfo.status = 1;
     } else if (searchForm.page_name == 'manage.article_category.index') {//文章分类
-        searchInfo.url = 'article/category';
+        searchInfo.url = 'manage/article/category';
     } else if (searchForm.page_name == 'manage.article.index') {//文章列表
-        searchInfo.url = 'article/article';
+        searchInfo.url = 'article';
         searchInfo.keywords = searchForm.name;
         searchInfo.is_show = 1;
     }
@@ -238,7 +248,7 @@ const searchInfoData = () => {
 }
 // 获取文件树
 const getLinkTreeData = () => {
-    Http.doGet('set/router_category/tree').then(res => {
+    Http.doGet('router_category/tree').then(res => {
         if (res.code === 200) {
             treeData.value = res.data;
             searchForm.page_name = res.data[0].page_name
@@ -339,6 +349,9 @@ onMounted(() => {
         }
         :deep(.el-table__header-wrapper .el-table-column--selection>.cell){
             display: none;
+        }
+        :deep(.el-table__row){
+            cursor: pointer;
         }
         .pagination-wrapper {
             height: 50px;

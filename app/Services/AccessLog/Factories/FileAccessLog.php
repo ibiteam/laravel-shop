@@ -3,6 +3,7 @@
 namespace App\Services\AccessLog\Factories;
 
 use App\Services\AccessLog\AccessLogFormatter;
+use DateTimeInterface;
 
 class FileAccessLog implements AccessLogInterface
 {
@@ -22,6 +23,25 @@ class FileAccessLog implements AccessLogInterface
         }
 
         file_put_contents($file_path, $log_entry, FILE_APPEND);
+    }
+
+    public function read(?string $sql = null, ?DateTimeInterface $date = null): array
+    {
+        if (! $date) {
+            return [];
+        }
+
+        $file_name_date = $date->format('Y-m-d');
+
+        $file_path = storage_path('access_log/'.$this->getFileName($file_name_date));
+
+        if (! file_exists($file_path)) {
+            return [];
+        }
+
+        $contents = file_get_contents($file_path);
+
+        return explode(PHP_EOL, $contents);
     }
 
     private function getFileName(string $file_name_date = ''): string

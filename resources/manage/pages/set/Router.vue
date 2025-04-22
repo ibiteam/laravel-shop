@@ -202,7 +202,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid) => {
         if (valid) {
             submitLoading.value = true;
-            Http.doPost('set/router/update', submitForm).then((res: any) => {
+            Http.doPost('router/update', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -219,7 +219,7 @@ const onSubmit = () => {
 };
 
 const changeShow = (row) => {
-    Http.doPost('set/router/change_show', {
+    Http.doPost('router/change_show', {
         id: row.id,
         is_show: row.is_show
     }).then((res: any) => {
@@ -233,7 +233,7 @@ const changeShow = (row) => {
 
 /* 获取分类 */
 const getCategories = () => {
-    Http.doGet('set/router/categories').then((res: any) => {
+    Http.doGet('router/categories').then((res: any) => {
         if (cns.$successCode(res.code)) {
             categoriesData.value = res.data;
         }
@@ -248,7 +248,7 @@ const getData = (page: number = defaultPage.page) => {
         page: page,
         per_page: pagination.per_page
     };
-    Http.doGet('set/router', params).then((res: any) => {
+    Http.doGet('router', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

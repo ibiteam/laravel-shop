@@ -29,7 +29,6 @@ class RouterCategoryController extends BaseController
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
             ->with('allChildren')->whereParentId(0)
             ->orderByDesc('sort')
-            ->orderByDesc('id')
             ->get();
 
         // 批量获取权限名称以减少查询次数
@@ -284,6 +283,14 @@ class RouterCategoryController extends BaseController
 
             if (! $router_category) {
                 throw new BusinessException('访问地址分类不存在');
+            }
+
+            if ($validated['is_show'] == RouterCategory::IS_SHOW_NO) {
+                // 判断当前分类下是否存在子分类，且子分类没有关闭
+                $children_category = RouterCategory::query()->whereParentId($router_category->id)->whereIsShow(RouterCategory::IS_SHOW_YES)->first();
+                if ($children_category) {
+                    throw new BusinessException('请先关闭子分类');
+                }
             }
 
             $router_category->is_show = $validated['is_show'];

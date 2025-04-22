@@ -128,7 +128,7 @@ const onSubmit = () => {
     submitFormRef.value.validate((valid: any) => {
         if (valid) {
             submitLoading.value = true;
-            Http.doPost('order/apply_refund_reason/store', submitForm).then((res: any) => {
+            Http.doPost('apply_refund_reason/store', submitForm).then((res: any) => {
                 submitLoading.value = false;
                 if (cns.$successCode(res.code)) {
                     closeStoreDialog();
@@ -151,7 +151,7 @@ const handleDestroy = (id: number) => {
         type: 'warning',
         center: true
     }).then(() => {
-        Http.doPost('order/apply_refund_reason/destroy', { id: id }).then((res: any) => {
+        Http.doPost('apply_refund_reason/destroy', { id: id }).then((res: any) => {
             if (cns.$successCode(res.code)) {
                 getData();
                 cns.$message.success(res.message);
@@ -166,7 +166,7 @@ const handleDestroy = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    Http.doGet('order/apply_refund_reason', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
+    Http.doGet('apply_refund_reason', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

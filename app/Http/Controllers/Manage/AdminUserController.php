@@ -36,12 +36,8 @@ class AdminUserController extends BaseController
 
             $role_ids = $admin_user->modelHasRole->pluck('role_id')->toArray();
 
-            // 最新登录时间
-            $login_log = $admin_user->loginLog->last();
-            $latest_login_time = $login_log ? $login_log->created_at->format('Y-m-d H:i:s') : '';
             $admin_user->role_name = $role_names;
             $admin_user->role_ids = $role_ids;
-            $admin_user->latest_login_time = $latest_login_time;
 
             return $admin_user;
         });
@@ -77,6 +73,7 @@ class AdminUserController extends BaseController
         $validated = $request->validate([
             'user_name' => 'required|string|unique:admin_users,user_name,'.$id.',id|max:255',
             'password' => 'nullable|string|confirmed',
+            'password_confirmation' => 'nullable|string',
             'phone' => 'required|is_phone|unique:admin_users,phone,'.$id.',id',
             'job_no' => 'nullable|string|unique:admin_users,job_no,'.$id.',id',
             'role_ids' => 'required|array',
@@ -84,6 +81,7 @@ class AdminUserController extends BaseController
         ], [], [
             'user_name' => '用户名',
             'password' => '登录密码',
+            'password_confirmation' => '确认密码',
             'phone' => '手机号',
             'job_no' => '工号',
             'role_ids' => '所属角色',

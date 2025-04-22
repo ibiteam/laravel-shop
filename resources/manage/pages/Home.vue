@@ -1,9 +1,9 @@
 <template>
-    <div class='seller-home'>
+    <div class='seller-home' :class="is_mobile_plat?'seller-home-mobile':''">
         <div class="home-container">
             <div class="home-content s-flex jc-bt">
                 <div class="home-left">
-                    <div class="information">
+                    <div class="information" v-if="!is_mobile_plat">
                         <div class="welcome">
                             <em class=""></em>
                             <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime()
@@ -55,10 +55,10 @@
                                     <span>用户数据</span>
                                     <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <div class="mores" style="margin-right: 50px"
+                                <!--<div class="mores" style="margin-right: 50px"
                                      @click="toPage({name:'manage.user.index'})">
                                     <span>查看更多</span>
-                                </div>
+                                </div>-->
                             </div>
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>
@@ -197,93 +197,137 @@
                 </div>
             </div>
         </div>
-        <el-drawer
-            class="collection-drawer"
-            v-model="collectionVisible"
-            @close='closeCollect'
-            size="80%"
-            :append-to-body='false'
-            direction="rtl">
-            <div class="collection-box s-flex jc-bt">
-                <div class="right-collection flex-1">
-                    <template v-if="my_collect.length">
-                        <div class="menu-listRouter" v-for="(item,index) in my_collect" :key="item.value">
-                            <span>{{ item.title }}</span>
-                            <i class="el-icon-error" style="display: none;color: #ccc;"></i>
+        <template v-if="!is_mobile_plat">
+            <el-drawer
+                class="collection-drawer"
+                v-model="collectionVisible"
+                @close='closeCollect'
+                size="80%"
+                :append-to-body='false'
+                direction="rtl">
+                <div class="collection-box s-flex jc-bt">
+                    <div class="right-collection flex-1">
+                        <template v-if="my_collect.length">
+                            <div class="menu-listRouter" v-for="(item,index) in my_collect" :key="item.value">
+                                <span>{{ item.title }}</span>
+                                <i class="el-icon-error" style="display: none;color: #ccc;"></i>
+                            </div>
+                        </template>
+                        <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
+                            <span>暂无收藏</span>
                         </div>
-                    </template>
-                    <div class="no-data" v-else style="padding: 20px 20px 0 20px;height: 100%;">
-                        <span>暂无收藏</span>
                     </div>
-                </div>
-                <div class="left-collection">
-                    <div class="search-menu">
-                        <el-input placeholder="请输入关键词" v-model="searchtools" ref='searchtoolsRef'
-                                  @input='searchMenusFnc'>
-                            <template #prefix>
-                                <div style='font-size: 20px' class='s-flex ai-ct jc-ct'>
-                                    <Search style='width: 1.5em;height: 1.5em;color: var(--main-color)' />
-                                </div>
-                            </template>
-                        </el-input>
-                    </div>
-                    <div class='menu-overflow'>
-                        <div class="menu-scroll">
-                            <div class="menu-list" v-for="(item,index) in searchMenus" :key="item.value">
-                                <div class="menu-title"><span>{{ item.title }}</span></div>
-                                <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
-                                    <template v-if="its.children && its.children.length > 0">
-                                        <div class="menu-title"><span>{{ its.title }}</span></div>
-                                        <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
-                                            <template v-if="itas.children && itas.children.length > 0">
-                                                <div class="menu-title"><span>{{ itas.title }}</span></div>
-                                                <div class="menu-listRouter s-flex jc-bt ai-ct"
-                                                     v-for="(ite,idx) in itas.children" :key="ite.value"
-                                                     style="cursor: pointer;margin-left: 40px"
-                                                     @click="collectionFnc(ite,index,ids,idas,idx)">
-                                                    <span>{{ ite.title }}</span>
-                                                    <el-icon style="color: #ff6a00" v-if="ite.is_collection">
-                                                        <StarFilled />
-                                                    </el-icon>
-                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
-                                                        <StarFilled />
-                                                    </el-icon>
-                                                </div>
-                                            </template>
-                                            <template v-else>
-                                                <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
-                                                     @click="collectionFnc(itas,index,ids,idas)">
-                                                    <span>{{ itas.title }}</span>
-                                                    <el-icon style="color: #ff6a00" v-if="itas.is_collection">
-                                                        <StarFilled />
-                                                    </el-icon>
-                                                    <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
-                                                        <StarFilled />
-                                                    </el-icon>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </template>
-                                    <template v-else>
-                                        <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
-                                             @click="collectionFnc(its,index,ids)">
-                                            <span>{{ its.title }}</span>
-                                            <el-icon style="color: #ff6a00" v-if="its.is_collection">
-                                                <StarFilled />
-                                            </el-icon>
-                                            <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
-                                                <StarFilled />
-                                            </el-icon>
-                                        </div>
-                                    </template>
+                    <div class="left-collection">
+                        <div class="search-menu">
+                            <el-input placeholder="请输入关键词" v-model="searchtools" ref='searchtoolsRef'
+                                      @input='searchMenusFnc'>
+                                <template #prefix>
+                                    <div style='font-size: 20px' class='s-flex ai-ct jc-ct'>
+                                        <Search style='width: 1.5em;height: 1.5em;color: var(--main-color)' />
+                                    </div>
+                                </template>
+                            </el-input>
+                        </div>
+                        <div class='menu-overflow'>
+                            <div class="menu-scroll">
+                                <div class="menu-list" v-for="(item,index) in searchMenus" :key="item.value">
+                                    <div class="menu-title"><span>{{ item.title }}</span></div>
+                                    <div class="menu-second" v-for="(its,ids) in item.children" :key="its.value">
+                                        <template v-if="its.children && its.children.length > 0">
+                                            <div class="menu-title"><span>{{ its.title }}</span></div>
+                                            <div class="menu-third" v-for="(itas,idas) in its.children" :key="itas.value">
+                                                <template v-if="itas.children && itas.children.length > 0">
+                                                    <div class="menu-title"><span>{{ itas.title }}</span></div>
+                                                    <div class="menu-listRouter s-flex jc-bt ai-ct"
+                                                         v-for="(ite,idx) in itas.children" :key="ite.value"
+                                                         style="cursor: pointer;margin-left: 40px"
+                                                         @click="collectionFnc(ite)">
+                                                        <span>{{ ite.title }}</span>
+                                                        <el-icon style="color: #ff6a00" v-if="ite.is_collection">
+                                                            <StarFilled />
+                                                        </el-icon>
+                                                        <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                            <StarFilled />
+                                                        </el-icon>
+                                                    </div>
+                                                </template>
+                                                <template v-else>
+                                                    <div class="menu-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
+                                                         @click="collectionFnc(itas)">
+                                                        <span>{{ itas.title }}</span>
+                                                        <el-icon style="color: #ff6a00" v-if="itas.is_collection">
+                                                            <StarFilled />
+                                                        </el-icon>
+                                                        <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                            <StarFilled />
+                                                        </el-icon>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                        <template v-else>
+                                            <div class="menu-second-listRouter s-flex jc-bt ai-ct" style="cursor: pointer;"
+                                                 @click="collectionFnc(its)">
+                                                <span>{{ its.title }}</span>
+                                                <el-icon style="color: #ff6a00" v-if="its.is_collection">
+                                                    <StarFilled />
+                                                </el-icon>
+                                                <el-icon style="color: rgb(204, 204, 204);display: none" v-else>
+                                                    <StarFilled />
+                                                </el-icon>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-            </div>
-        </el-drawer>
+                </div>
+            </el-drawer>
+        </template>
+        <template v-else>
+            <el-drawer
+                class="phone-tree"
+                v-model="collectionVisible"
+                :show-close="false"
+                :with-header="false"
+                direction="ltr"
+                size="60%">
+                <div class="menu-treeBox">
+                    <el-tree
+                        :data="searchMenus"
+                        :props="{
+						  children: 'children',
+						  label: 'title'
+						}"
+                        node-key="index"
+                        :highlight-current="false"
+                        icon-class="el-icon-arrow-down"
+                        accordion
+                        @node-click="handleNodeCollect">
+                        <template #default="{ node, data }">
+                            <div :class="{'custom-tree-node' : true,'custom-tree-node-select' : !data.children}">
+                                <div class="tree-icon" style="margin-right: 8px;">
+                                    <template v-if="data.icon">
+                                        <img v-if="data.icon.indexOf('http') > -1" :src="data.icon" alt="" style="width:16px;height:16px">
+                                        <i v-if="data.icon.indexOf('icon-') > -1" class="iconfont"
+                                           :class="data.icon"></i>
+                                        <el-icon v-else>
+                                            <component :is="data.icon" />
+                                        </el-icon>
+                                    </template>
+                                    <el-icon style="color: #ff6a00" v-if="data.is_collection">
+                                        <StarFilled />
+                                    </el-icon>
+                                </div>
+                                <span>{{ node.label }}</span>
+                            </div>
+                        </template>
+                    </el-tree>
+                </div>
+            </el-drawer>
+        </template>
     </div>
 </template>
 
@@ -315,6 +359,9 @@ const access_statistic = ref({});
 const collectionVisible = ref<boolean>(false);
 const menus = ref([]);
 const searchMenus = ref([]);
+
+// 移动端打开
+const is_mobile_plat = ref(false)
 
 const getUvChartOption = (item) => {
     let xAxisData = [];
@@ -410,6 +457,15 @@ const resizeFnc = () => {
     lineRef.resize();
 };
 
+const initPlat = () => {
+    let desktopWidthThreshold = 768;
+    if (window.innerWidth <= desktopWidthThreshold){
+        is_mobile_plat.value = true
+    }else{
+        is_mobile_plat.value = false
+    }
+}
+
 const closeCollect = () => {
     searchMenus.value = [];
     searchtools.value = '';
@@ -422,7 +478,9 @@ const openCollect = () => {
             my_collect.value = res.data.collect_permissions;
             collectionVisible.value = true;
             setTimeout(() => {
-                searchtoolsRef.value.focus();
+                if (!is_mobile_plat.value){
+                    searchtoolsRef.value.focus();
+                }
             }, 500);
         } else {
             cns.$message.error(res.message);
@@ -468,29 +526,27 @@ const searchMenusFnc = $public.debounce(() => {
     searchMenus.value = newArr;
 }, 500);
 
-const collectionFnc = (item, index, ids, idas, idx) => {
-    let is_collect = item.is_collection;
-    Http.doGet('home/collect_menu', item.index).then(res => {
+const collectionFnc = (item) => {
+    Http.doPost('home/collect_menu', {id:item.index}).then(res => {
         if (cns.$successCode(res.code)) {
-            if (is_collect) {
-                let collectIndex = my_collect.value.findIndex(a => a.name === item.name);
-                my_collect.value.splice(collectIndex, 1);
-            } else {
-                my_collect.value.push(item);
-            }
-            if (idx !== undefined) {
-                searchMenus.value[index].children[ids].children[idas].children[idx].is_collection = !is_collect;
-            } else if (idas !== undefined) {
-                searchMenus.value[index].children[ids].children[idas].is_collection = !is_collect;
-            } else {
-                searchMenus.value[index].children[ids].is_collection = !is_collect;
-            }
-
+            openCollect()
         } else {
             cns.$message.error(res.message);
         }
     });
 };
+
+const handleNodeCollect = (data) =>{
+    if(data && !data.children){
+        Http.doPost('home/collect_menu', {id:data.index}).then(res => {
+            if (cns.$successCode(res.code)) {
+                openCollect()
+            } else {
+                cns.$message.error(res.message);
+            }
+        });
+    }
+}
 
 const getData = () => {
     Http.doGet('home/dashboard').then(res => {
@@ -541,6 +597,7 @@ const clearCache = () => {
 };
 
 onMounted(() => {
+    initPlat()
     getData();
     window.addEventListener('resize', resizeFnc);
 });
@@ -1042,5 +1099,187 @@ onUnmounted(() => {
     font-size: 16px;
     color: #ccc;
     font-weight: 400;
+}
+
+//移动端
+.seller-home.seller-home-mobile{
+    .home-container{
+        min-width: unset;
+        .home-content{
+            display: block;
+            .home-left{
+                width: 100%;
+                >.module-main:nth-child(1){
+                    margin-top: 0;
+                }
+                .module-main{
+                    padding: 25px;
+                    border-radius: 20px;
+                    .module-title{
+                        font-weight: bold;
+                    }
+                    .module-content{
+                        margin-top: 20px;
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, 176px);
+                        gap: 20px 30px;
+                        justify-content: space-between;
+                        grid-template-columns: repeat(auto-fill, 70px);
+                    }
+                    .module-model{
+                        border-radius: 10px;
+                        cursor: pointer;
+                        width: 70px;
+                        height: 70px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        border: none;
+                        margin: 0;
+                    }
+                }
+            }
+            .home-right{
+                margin-top: 15px;
+                width: 100%;
+                .shortcut{
+                    padding: 25px;
+                    border-radius: 20px;
+                }
+            }
+        }
+    }
+}
+
+/*移动端tree*/
+:deep(.phone-tree){
+    &.el-drawer{
+        width: 40% !important;
+    }
+    .el-drawer__body{
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        padding: 0;
+    }
+    .el-drawer__body::-webkit-scrollbar{
+        width: 0;
+        height: 0;
+    }
+    .el-drawer__body::-webkit-scrollbar-track{
+        display: none;
+    }
+    .menu-treeBox .el-tree-node__content{
+        height: 40px !important;
+        .custom-tree-node {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            margin: 0 5px;
+            border-radius: 4px;
+        }
+        .el-tree-node__expand-icon {
+            position: absolute;
+            right: 10px;
+            transform: rotate(270deg);
+            color: #31373D;
+            font-size: 14px;
+        }
+    }
+}
+
+/* tree */
+:deep(.menu-treeBox){
+    height: 100%;
+    transition: width 0.3s ease-out;
+    user-select: none;
+    .el-tree {
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 100%;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .el-tree::-webkit-scrollbar {
+        width: 0;
+        height: 0;
+    }
+    .el-tree::-webkit-scrollbar-track {
+        display: none;
+    }
+    .el-tree-node__content {
+        padding: 0 !important;
+        height: 50px !important;
+        width: 100%;
+        position: relative;
+        box-sizing: border-box;
+    }
+    .el-tree-node__content .custom-tree-node {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        margin: 0 10px;
+        border-radius: 6px;
+    }
+    .el-tree-node__content .custom-tree-node span{
+        font-weight: bold;
+        font-size: 14px;
+        color: #6666;
+        display: inline-block;
+        max-width: calc(5* 1em);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .el-tree-node__content .custom-tree-node.custom-tree-node-select span{
+        font-weight: 400;
+        font-size: 14px;
+        color: #666;
+    }
+    .el-tree-node__content .custom-tree-node.custom-tree-node-select.actived,
+    .el-tree-node:focus>.el-tree-node__content .custom-tree-node{
+        background-color: var(--shop-color-10);
+    }
+    .el-tree-node__content .custom-tree-node.custom-tree-node-select.actived span,
+    .el-tree-node:focus>.el-tree-node__content .custom-tree-node span,
+    .el-tree-node:focus>.el-tree-node__content .custom-tree-node .tree-icon i{
+        color: var(--shop-color);
+    }
+    .el-tree-node__content .custom-tree-node .tree-icon{
+        width: 16px;
+    }
+    .el-tree-node__content .custom-tree-node .tree-icon i{
+        font-size: 16px;
+        color: #31373D;
+    }
+    .el-tree-node__content .el-tree-node__expand-icon {
+        position: absolute;
+        right: 10px;
+        transform: rotate(180deg);
+        color: #31373D;
+    }
+    .el-tree-node__content .el-tree-node__expand-icon.expanded{
+        transform: rotate(360deg);
+    }
+    .el-tree-node__expand-icon.is-leaf{
+        display: none;
+    }
+    .el-tree-node:focus>.el-tree-node__content{
+        background-color: transparent;
+    }
+    .el-tree-node__content:hover, .el-upload-list__item:hover{
+        background-color: transparent;
+    }
+    .el-tree-node__content .custom-tree-node:hover, .el-upload-list__item .custom-tree-node:hover{
+        background-color: #F4F4F4 !important;
+    }
+    .el-tree-node{
+        margin: 2px 0;
+    }
 }
 </style>

@@ -159,6 +159,11 @@ class Permission extends SpatiePermission
     public const MANAGE_USER_BONUS_INDEX = 'manage.user_bonus.index'; // 查看用户红包
     public const MANAGE_COUPON_INDEX = 'manage.coupon.index'; // 优惠券
     public const MANAGE_USER_COUPON_INDEX = 'manage.user_coupon.index'; // 查看用户优惠券
+
+    // 二级 数据部分
+    public const STATISTIC_MANAGE = 'statistic.manage'; // 数据统计
+    public const MANAGE_ACCESS_STATISTIC_INDEX = 'manage.access_statistic.index'; // 访问统计
+
     public function __construct(array $attributes = [])
     {
         $attributes['guard_name'] = $this->guardName();

@@ -332,6 +332,7 @@ const changeShow = (row) => {
             cns.$message.success(res.message);
         } else {
             cns.$message.error(res.message);
+            getData();
         }
     });
 };
