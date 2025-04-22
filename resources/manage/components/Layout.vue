@@ -1,5 +1,5 @@
 <template>
-    <div class='seller-layout' v-if="pageLoad">
+    <div class='seller-layout' :class="is_mobile_plat?'seller-layout-mobile':''" v-if="pageLoad">
         <el-container>
             <el-aside :class="{'left-hidden':!leftShow}" v-if="!is_mobile_plat">
                 <div class='layout-left-header s-flex ai-ct jc-bt' @click="router.push({name:'manage.home.index'})">
@@ -64,12 +64,17 @@
                         </div>
                         <div class='header-left s-flex ai-ct' v-else>
                             <i class="iconfont icon-a-zhankai" style="color: #ffffff;margin-left: 10px" @click="visiblePhone = !visiblePhone"></i>
-                            <div class='mobile-logo s-flex ai-ct jc-ct flex-1'>
+                            <div class='mobile-logo s-flex ai-ct jc-ct' @click="router.push({name:'manage.home.index'})">
                                 <img :src="commonStore.shopConfig.shop_logo" v-if="commonStore.shopConfig.shop_logo" alt=''>
                             </div>
                         </div>
                         <div class='header-right s-flex ai-ct'>
+                            <el-icon style="color: #ffffff" :size="32" class="mobile-search-icon" v-if="is_mobile_plat && !searchShow" @click="openSearchShow()">
+                                <Search></Search>
+                            </el-icon>
                             <el-select
+                                ref="menuSelectRef"
+                                v-else
                                 v-model="menuValue"
                                 class="menu-select"
                                 filterable
@@ -78,6 +83,7 @@
                                 popper-class="menu-option-box"
                                 :remote-method="remoteMethod"
                                 @visible-change="changeSelect"
+                                @blur="blurSelect"
                                 :loading="menuLoading">
                                 <template #prefix>
                                     <el-icon style="color: #ffffff" :size="20">
@@ -273,6 +279,8 @@ const isRendered = ref(true);
 // 移动端打开
 const is_mobile_plat = ref(false)
 const visiblePhone = ref(false)
+const searchShow = ref(true)
+const menuSelectRef = ref(null)
 
 watch(() => route.path, (to) => {
     for (const index in commonStore.visitedViews) {
@@ -303,8 +311,10 @@ const initPlat = () => {
     let desktopWidthThreshold = 768;
     if (window.innerWidth <= desktopWidthThreshold){
         is_mobile_plat.value = true
+        searchShow.value = false
     }else{
         is_mobile_plat.value = false
+        searchShow.value = true
     }
 }
 
@@ -511,6 +521,17 @@ const logOut = () => {
         });
     });
 };
+
+const openSearchShow =() =>{
+    searchShow.value = true
+    nextTick(() => {
+        menuSelectRef.value.focus()
+    });
+}
+
+const blurSelect = () =>{
+    searchShow.value = false
+}
 
 onMounted(() => {
     initPlat()
@@ -906,6 +927,41 @@ img {
 }
 
 /*移动端tree*/
+.seller-layout.seller-layout-mobile{
+    .mobile-search-icon{
+        svg{
+            width: 20px;
+            height: 20px;
+        }
+    }
+    .menu-select{
+        margin-right: 10px!important;
+        width: 180px!important;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .user-info{
+        margin-right: 0!important;
+    }
+    .router-tabs{
+        padding: 4px 0;
+        :deep(.el-tabs){
+            .el-tabs__item{
+                border-radius: 20px!important;
+                border: none!important;
+            }
+            .el-tabs__item{
+                background: rgba(51, 51, 51, 0.05)!important;
+                color: #888888!important;
+                padding: 0 10px!important;
+            }
+            .el-tabs__item.is-active{
+                background: #1050a910!important;
+                color: #1050a9!important;
+                padding: 0 10px!important;
+            }
+        }
+    }
+}
 :deep(.phone-tree){
     &.el-drawer{
         width: 40% !important;
@@ -963,7 +1019,7 @@ img {
 }
 /**/
 .mobile-logo{
-    width: 113px;
+    width: 100px;
     height: 40px;
 }
 .mobile-logo img{
