@@ -939,10 +939,20 @@ img {
             height: 20px;
         }
     }
-    .menu-select{
-        margin-right: 10px!important;
-        width: 180px!important;
-        transition: width 0.3s ease, background-color 0.3s ease;
+    .el-header .seller-header .header-right{
+        .menu-select{
+            margin-right: 10px!important;
+            width: 180px;
+            animation: menuSelectAnim 0.5s ease-in-out 1;
+        }
+    }
+    @keyframes menuSelectAnim {
+        0% {
+            width: 50px;
+        }
+        100% {
+            width: 180px;
+        }
     }
     .user-info{
         margin-right: 0!important;
