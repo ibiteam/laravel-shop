@@ -40,7 +40,7 @@ class CartController extends BaseController
         $user = get_user();
 
         try {
-            $data['number'] = $cart_dao->getValidCarNumber($user->id);
+            $data['number'] = $cart_dao->getValidCarNumber($user->id ?? 0);
 
             return $this->success($data);
         } catch (\Throwable $throwable) {

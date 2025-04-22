@@ -30,7 +30,7 @@
                         </template>
                     </el-tree>
                 </div>
-                <el-link class="link-button" :underline="false" href="/router">前往访问地址</el-link>
+                <el-link class="link-button" :underline="false" href="/manage/set/router">前往访问地址</el-link>
             </div>
             <div class="right-wrapper">
                 <div class="search-wrapper s-flex ai-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">

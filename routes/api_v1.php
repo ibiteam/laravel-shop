@@ -68,6 +68,8 @@ Route::prefix('search')->group(function () {
 
 // 分类
 Route::get('category', [CategoryController::class, 'index']); // 树状结构
+// 购物车
+Route::get('cart/number', [CartController::class, 'number']); // 有效购物车数量
 
 // 地区数据
 Route::prefix('region')->group(function () {
@@ -88,6 +90,7 @@ Route::prefix('goods')->group(function () {
 Route::get('evaluate/goods', [EvaluateController::class, 'indexByGoods']);
 // 获取客服地址
 Route::get('chat/url', [ChatController::class, 'chatUrl']);
+
 
 /**
  * 登录可以访问路由.
@@ -163,7 +166,6 @@ Route::middleware('api.auth')->group(function () {
     // 购物车
     Route::prefix('cart')->group(function () {
         Route::get('list', [CartController::class, 'list']);        // 商品列表
-        Route::get('number', [CartController::class, 'number']);    // 有效购物车数量
         Route::post('store', [CartController::class, 'store']);     // 添加
         Route::post('destroy', [CartController::class, 'destroy']); // 删除
         Route::post('change_number', [CartController::class, 'changeNumber']);  // 变更数量
