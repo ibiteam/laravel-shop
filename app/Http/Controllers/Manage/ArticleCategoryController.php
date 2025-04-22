@@ -229,6 +229,14 @@ class ArticleCategoryController extends BaseController
                 throw new BusinessException('文章分类不存在');
             }
 
+            if ($validated['is_show'] == ArticleCategory::IS_SHOW_NO) {
+                // 判断当前分类下是否存在子分类，且子分类没有关闭
+                $children_category = ArticleCategory::query()->whereParentId($article_category->id)->whereIsShow(ArticleCategory::IS_SHOW_YES)->first();
+                if ($children_category) {
+                    throw new BusinessException('请先关闭子分类');
+                }
+            }
+
             $article_category->is_show = $validated['is_show'];
 
             if (! $article_category->save()) {

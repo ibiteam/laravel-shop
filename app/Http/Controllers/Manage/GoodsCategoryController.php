@@ -197,6 +197,15 @@ class GoodsCategoryController extends BaseController
             if (! $category) {
                 throw new BusinessException('商品分类不存在');
             }
+
+            if ($validated['is_show'] == Category::IS_SHOW_NO) {
+                // 判断当前分类下是否存在子分类，且子分类没有关闭
+                $children_category = Category::query()->whereParentId($category->id)->whereIsShow(Category::IS_SHOW_YES)->first();
+                if ($children_category) {
+                    throw new BusinessException('请先关闭子分类');
+                }
+            }
+
             $category->is_show = $validated['is_show'];
 
             if (! $category->save()) {
