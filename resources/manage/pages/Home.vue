@@ -55,10 +55,10 @@
                                     <span>用户数据</span>
                                     <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <div class="mores" style="margin-right: 50px"
+                                <!--<div class="mores" style="margin-right: 50px"
                                      @click="toPage({name:'manage.user.index'})">
                                     <span>查看更多</span>
-                                </div>
+                                </div>-->
                             </div>
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>

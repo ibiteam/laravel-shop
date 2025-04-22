@@ -1,13 +1,13 @@
 <template>
     <!--新增编辑文章-->
-    <div v-loading="detailFormLoading" class="s-flex jc-ct">
+    <div v-loading="detailFormLoading">
         <el-form ref="submitFormRef" :model="submitForm" :rules="submitFormRules" label-width="120px">
             <el-form-item label="标题" prop="title">
                 <el-input v-model="submitForm.title" />
             </el-form-item>
             <el-form-item label="内容" prop="content">
                 <div style="width: 100%;height: 500px;background: #f2f2f2;" v-if="detailFormLoading"></div>
-                <Editor v-model="submitForm.content" style="height: 500px;" placeholder="请输入内容" v-else />
+                <Editor v-model="submitForm.content" style="min-height: 500px;" placeholder="请输入内容" v-else />
             </el-form-item>
             <el-form-item label="分类" prop="article_category_id">
                 <el-cascader v-model="submitForm.article_category_id" placeholder="顶级分类"
