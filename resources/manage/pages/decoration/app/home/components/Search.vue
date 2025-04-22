@@ -25,97 +25,100 @@
                 </div>
             </template>
         </drag-wrapper>
-        <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.component_name">
-            <template #content>
-                <el-form :model="form.content" label-width="auto">
-                    <div class="setting-bar-item">
-                        <div class="item-title">搜索设置</div>
-                        <el-form-item label="logo" label-position="top" :prop="['logo']">
-                            <div>
-                                <ImageUpload 
-                                    :src="form.content.logo"
-                                    @material="() => {
-                                        handleOpenUpload(['logo'], form.component_name)
-                                    }"
-                                    @local="(image) => {
-                                        form.content.logo = image
-                                    }"
-                                    @remove="() => {
-                                        form.content.logo = ''
-                                    }" 
-                                />
-                                <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：140 * 60</p>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="关键词" label-position="top" :prop="['keywords']">
-                            <div>
-                                <el-input v-model="form.content.keywords"></el-input>
-                                <p class="item-title-info" style="margin-bottom: 0;">搜索框默认文字</p>
-                            </div>
-                        </el-form-item>
-                        <el-form-item label="按钮色值" label-position="top" :prop="['button_color']">
-                            <el-color-picker v-model="form.content.button_color" @change="() => {
-                                if (!form.content.button_color) {
-                                    form.content.button_color = '#f71111'
-                                }
-                            }"/>
-                        </el-form-item>
-                        <el-form-item label="切换时间(秒)" label-position="top" :prop="['interval']" :rules="
-                                [
-                                    { validator: (rule, value, callback) => {
-                                        if (isNaN(value)) {
-                                            callback(new Error('请输入数字'));
-                                        } else if (!Number.isInteger(value * 1)) {
-                                            callback(new Error('请输入整数'));
-                                        } else if (value < 1 || value > 10) {
-                                            callback('切换时间为1-10秒')
-                                        } else { callback(); }
-                                    }, trigger: 'blur' },
-                                ]
-                            ">
-                            <div>
-                                <el-input v-model="form.content.interval"></el-input>
-                            </div>
-                        </el-form-item>
-                    </div>
-                    <div class="setting-bar-item">
-                        <div class="item-title">搜索推荐</div>
-                        <p class="item-title-info">设置后搜索框将拿推荐的数据</p>
-                        <VueDraggable
-                            class="group-dragable"
-                            v-model="form.content.data"
-                            :animation="1000"
-                            :group="{name: form.id, pull: true, put: true}"
-                            handle=".icon-bars"
-                            >
-                            <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="item">
-                                <em class="iconfont icon-bars" style="font-size:20px"></em>
-                                <div class="group-content" style="width: 70%;">
-                                    <el-form-item label="名称">
-                                        <el-input v-model="item.title"></el-input>
-                                    </el-form-item>
-                                    <el-form-item label="链接">
-                                        <LinkInput
-                                            :name="item.url.name"
-                                            :value="item.url.value"
-                                            @select="handleOpenLink([index, 'url'], form.component_name)"
-                                            @input="(res) => {
-                                                item.url = res
-                                            }"
-                                            @clear="(res) => {
-                                                item.url = res
-                                            }"
-                                        />
-                                    </el-form-item>
+        <teleport to="#decorationAppMain">
+
+            <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.component_name">
+                <template #content>
+                    <el-form :model="form.content" label-width="auto">
+                        <div class="setting-bar-item">
+                            <div class="item-title">搜索设置</div>
+                            <el-form-item label="logo" label-position="top" :prop="['logo']">
+                                <div>
+                                    <ImageUpload 
+                                        :src="form.content.logo"
+                                        @material="() => {
+                                            handleOpenUpload(['logo'], form.component_name)
+                                        }"
+                                        @local="(image) => {
+                                            form.content.logo = image
+                                        }"
+                                        @remove="() => {
+                                            form.content.logo = ''
+                                        }" 
+                                    />
+                                    <p class="item-title-info" style="margin-bottom: 0;">建议尺寸：140 * 60</p>
                                 </div>
-                                <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
-                            </div>
-                        </VueDraggable>
-                        <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= TempFixedField[form.component_name]['MaxItemLength']" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ TempFixedField[form.component_name]['MaxItemLength'] }})</el-button>
-                    </div>
-                </el-form>
-            </template>
-        </setting-bar>
+                            </el-form-item>
+                            <el-form-item label="关键词" label-position="top" :prop="['keywords']">
+                                <div>
+                                    <el-input v-model="form.content.keywords"></el-input>
+                                    <p class="item-title-info" style="margin-bottom: 0;">搜索框默认文字</p>
+                                </div>
+                            </el-form-item>
+                            <el-form-item label="按钮色值" label-position="top" :prop="['button_color']">
+                                <el-color-picker v-model="form.content.button_color" @change="() => {
+                                    if (!form.content.button_color) {
+                                        form.content.button_color = '#f71111'
+                                    }
+                                }"/>
+                            </el-form-item>
+                            <el-form-item label="切换时间(秒)" label-position="top" :prop="['interval']" :rules="
+                                    [
+                                        { validator: (rule, value, callback) => {
+                                            if (isNaN(value)) {
+                                                callback(new Error('请输入数字'));
+                                            } else if (!Number.isInteger(value * 1)) {
+                                                callback(new Error('请输入整数'));
+                                            } else if (value < 1 || value > 10) {
+                                                callback('切换时间为1-10秒')
+                                            } else { callback(); }
+                                        }, trigger: 'blur' },
+                                    ]
+                                ">
+                                <div>
+                                    <el-input v-model="form.content.interval"></el-input>
+                                </div>
+                            </el-form-item>
+                        </div>
+                        <div class="setting-bar-item">
+                            <div class="item-title">搜索推荐</div>
+                            <p class="item-title-info">设置后搜索框将拿推荐的数据</p>
+                            <VueDraggable
+                                class="group-dragable"
+                                v-model="form.content.data"
+                                :animation="1000"
+                                :group="{name: form.id, pull: true, put: true}"
+                                handle=".icon-bars"
+                                >
+                                <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="item">
+                                    <em class="iconfont icon-drag" style="font-size:20px"></em>
+                                    <div class="group-content" style="width: 70%;">
+                                        <el-form-item label="名称">
+                                            <el-input v-model="item.title"></el-input>
+                                        </el-form-item>
+                                        <el-form-item label="链接">
+                                            <LinkInput
+                                                :name="item.url.name"
+                                                :value="item.url.value"
+                                                @select="handleOpenLink([index, 'url'], form.component_name)"
+                                                @input="(res) => {
+                                                    item.url = res
+                                                }"
+                                                @clear="(res) => {
+                                                    item.url = res
+                                                }"
+                                            />
+                                        </el-form-item>
+                                    </div>
+                                    <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
+                                </div>
+                            </VueDraggable>
+                            <el-button type="primary" style="width: 100%;" :disabled="form.content.data.length >= TempFixedField[form.component_name]['MaxItemLength']" @click="handleClickAddImageData">添加({{form.content.data.length}}/{{ TempFixedField[form.component_name]['MaxItemLength'] }})</el-button>
+                        </div>
+                    </el-form>
+                </template>
+            </setting-bar>
+        </teleport>
     </section>
 </template>
 

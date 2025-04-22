@@ -516,16 +516,21 @@ export default {
         height: 100%;
         padding: 20px 400px 20px 20px;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: auto hidden;
         position: relative;
         z-index: 1;
         background: #F4F4FA;
         .app-wrapper{
+            max-width: calc(100% - 420px);
+            min-width: 750px;
+            overflow-x: auto;
             // height: 780px;
             padding-top: 20px;
+            margin: 10vh auto 0;
             box-sizing: border-box;
             overflow: hidden;
             position: relative;
+            transform: scale(1.3);
             &::before {
                 content: '';
                 display: block;

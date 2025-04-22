@@ -73,16 +73,17 @@ onMounted(() => {
     }
     .form-group-item {
         width: 100%;
-        padding: 16px 20px 16px 0;
+        padding: 16px 20px 0 0;
         margin-bottom: 15px;
         border-radius: 10px;
         background-color: #f9f9f9;
         box-sizing: border-box;
         position: relative;
-        .icon-bars {
+        .icon-drag {
             padding: 10px;
             cursor: move;
             font-size: 20px;
+            color: #999;
         }
         .group-content {
             width: calc(100% - 40px);
