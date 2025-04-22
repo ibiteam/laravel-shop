@@ -421,7 +421,7 @@ onMounted(()=>{
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
             editorDomRef.value.style.width = `${startWidth + dx}px`;
-            editorDomRef.value.style.height = `${startHeight + dy}px`;
+            editorDomRef.value.style.minHeight = `${startHeight + dy}px`;
         }
     };
 
@@ -699,7 +699,8 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
         position: fixed!important;
     }
     .resizable-editor{
-        height: max-content!important;
+        flex: 1;
+        height: auto!important;
     }
     .resize-handle {
         position: absolute;

@@ -54,11 +54,11 @@
                                 v-model="form.content.data"
                                 :animation="1000"
                                 :group="{name: form.id, pull: true, put: true}"
-                                handle=".icon-bars"
+                                handle=".icon-drag"
                                 >
     
-                                <div class="form-group-item s-flex ai-ct jc-bt" v-for="(item, index) in form.content.data" :key="index">
-                                    <em class="iconfont icon-bars" style="font-size:20px"></em>
+                                <div class="form-group-item s-flex ai-fs jc-bt" v-for="(item, index) in form.content.data" :key="index">
+                                    <em class="iconfont icon-drag" style="font-size:20px;margin-top: 10px;"></em>
                                     <div class="group-content s-flex ai-fs jc-bt">
                                         <el-form-item class="not-required" label="" :prop="['data', index, 'image']" :rules="{ required: true, message: '请上传图片', trigger: 'blur' }">
                                             <ImageUpload 
@@ -75,10 +75,10 @@
                                             />
                                         </el-form-item>
                                         <div style="width: calc(100% - 70px);">
-                                            <el-form-item label="名称" :prop="['data', index, 'title']" :rules="{ required: true, message: '请填写名称', trigger: 'blur' }">
+                                            <el-form-item label="名称" :prop="['data', index, 'title']" :rules="{ required: true, message: '请填写名称', trigger: 'blur' }" style="margin-bottom:5px;">
                                                 <el-input v-model="item.title"/>
                                             </el-form-item>
-                                            <el-form-item label="链接" :prop="['data', index, 'url' ,'value']" :rules="{ required: true, message: '请填写链接', trigger: 'change' }">
+                                            <el-form-item label="链接" :prop="['data', index, 'url' ,'value']" :rules="{ required: true, message: '请填写链接', trigger: 'change' }" style="margin-bottom:5px;">
                                                 <LinkInput
                                                     :name="item.url.name"
                                                     :value="item.url.value"
@@ -91,11 +91,9 @@
                                                     }"
                                                 />
                                             </el-form-item>
-                                            <div class="s-flex ai-ct jc-bt">
-                                                <el-form-item label="" style="margin-bottom: 0;">
-                                                    <el-switch v-model="item.is_show" :active-value="1" :inactive-value="0" active-text="显示" inactive-text="隐藏"/>
-                                                </el-form-item>
-                                                <em class="iconfont icon-shanchu remove-btn" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
+                                            <div class="s-flex ai-ct jc-fe">
+                                                <el-switch v-model="item.is_show" :active-value="1" :inactive-value="0"/>
+                                                <em class="iconfont icon-shanchu remove-btn ml-10" @click.stop="handleClickDeleteData(index, `data`)" title="删除"></em>
                                             </div>
                                         </div>
                                     </div>

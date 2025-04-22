@@ -210,6 +210,7 @@ const handlematerialCenterDialogConfirm = (res) => {
 
 // 接收路由中心弹窗数据
 const handleLinkCenterDialogConfirm = (res) => {
+    console.log(res)
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
@@ -516,16 +517,21 @@ export default {
         height: 100%;
         padding: 20px 400px 20px 20px;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow: auto hidden;
         position: relative;
         z-index: 1;
         background: #F4F4FA;
         .app-wrapper{
+            max-width: calc(100% - 420px);
+            min-width: 750px;
+            overflow-x: auto;
             // height: 780px;
             padding-top: 20px;
+            margin: 10vh auto 0;
             box-sizing: border-box;
             overflow: hidden;
             position: relative;
+            transform: scale(1.3);
             &::before {
                 content: '';
                 display: block;
