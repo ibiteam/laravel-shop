@@ -367,7 +367,8 @@ class CartController extends BaseController
 
         try {
             $goods_formatters = $cart_dao->getDoneCartGoods($current_user->id)->map(function (Cart $cart) use ($current_user) {
-                return app(GoodsFormatter::class)
+                return (new GoodsFormatter)
+                    ->getFormatter()
                     ->setUser($current_user)
                     ->setCartId($cart->id)
                     ->setGoods($cart->goods)

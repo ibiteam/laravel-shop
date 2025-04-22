@@ -124,7 +124,7 @@ class OrderService
         $item_format = [];
 
         foreach ($this->getGoodsFormatters() as $goods_formatter) {
-            $item_format[] = $goods_formatter->initFormat();
+            $item_format[] = $goods_formatter->settlementFormat();
         }
 
         $payment_methods = [];
@@ -209,7 +209,7 @@ class OrderService
             $destroy_cart_ids = [];
 
             foreach ($this->getGoodsFormatters() as $goods_formatter) {
-                $order->detail()->create($goods_formatter->getOrderDetailFormat());
+                $order->detail()->create($goods_formatter->buildOrderItem());
 
                 $goods_formatter->decrementStock();
 

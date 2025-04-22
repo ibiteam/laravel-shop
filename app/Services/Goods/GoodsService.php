@@ -321,7 +321,8 @@ class GoodsService
      */
     public function checkGoodsNumber(Goods $goods, User $user, int $request_sku_id, int $number): array
     {
-        return app(GoodsFormatter::class)
+        return (new GoodsFormatter)
+            ->getFormatter()
             ->setUser($user)
             ->setGoods($goods)
             ->setSkuId($request_sku_id)
