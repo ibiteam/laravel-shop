@@ -1,5 +1,5 @@
 <template>
-    <div style="border: 1px solid #ccc;max-width:100%;position: relative;" class="editor-wrap" ref="editorDomRef">
+    <div style="border: 1px solid #ccc;max-width:100%;position: relative;overflow: hidden;display: flex;flex-direction: column;flex-wrap: nowrap;" class="editor-wrap" ref="editorDomRef">
         <Toolbar
             ref="toolbarRef"
             style="border-bottom: 1px solid #ccc"
@@ -699,7 +699,10 @@ const handleInsertHtmlToEditor = (html, editorInstance) => {
         position: fixed!important;
     }
     .resizable-editor{
-        height: max-content!important;
+        flex: 1;
+        height: auto!important;
+        max-height: 100%;
+        overflow-y: hidden;
     }
     .resize-handle {
         position: absolute;

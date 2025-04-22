@@ -45,6 +45,7 @@
                         style="width: 100%" height="100%"
                         row-key="id"
                         :tree-props="{ children: 'all_children', hasChildren: true,checkStrictly:true }"
+                        @row-click="rowClick"
                         @select="handleSelect">
                         <el-table-column fixed type="selection" width="55" v-if="searchForm.page_name"/>
                         <template v-if="searchForm.page_name == 'manage.router.index'">
@@ -54,7 +55,7 @@
                         </template>
                         <template v-if="searchForm.page_name == 'manage.goods.index'">
                             <el-table-column property="id" label="ID" width="100"/>
-                            <el-table-column label="商品" width="200">
+                            <el-table-column label="商品" width="300">
                                 <template #default="scope">
                                     <div class="s-flex ai-ct">
                                         <el-image style="width: 35px; height: 35px; margin-right: 5px;cursor: pointer;" :src="scope.row.image" fit="scale-down" @click="handleClickViewer(scope,'image')">
@@ -108,7 +109,7 @@
                         </template>
                     </el-table>
                 </div>
-                <div class="pagination-wrapper s-flex ai-ct jc-ct" v-if="searchForm.page_name != 'manage.category.index'">
+                <div class="pagination-wrapper s-flex ai-ct jc-ct" v-if="searchForm.page_name != 'manage.category.index' && searchForm.page_name != 'manage.article_category.index'">
                     <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
                 </div>
                 <div class="button-wrapper s-flex ai-ct jc-ct">
@@ -174,6 +175,15 @@ const handleSelect = (selection, row) => {
         return
     }
     check_group.value = selection
+}
+
+const rowClick = (row) =>{
+    if (tableRef.value) {
+        tableRef.value.clearSelection()
+        tableRef.value.toggleRowSelection(row)
+        check_group.value = [row]
+        return
+    }
 }
 // 打开预览图片
 const handleClickViewer = (list,name) => {
@@ -339,6 +349,9 @@ onMounted(() => {
         }
         :deep(.el-table__header-wrapper .el-table-column--selection>.cell){
             display: none;
+        }
+        :deep(.el-table__row){
+            cursor: pointer;
         }
         .pagination-wrapper {
             height: 50px;

@@ -213,6 +213,12 @@ onMounted(() => {
 :deep(.resizable-editor){
     height: calc(100% - 41px)!important;
 }
+:deep(.el-input){
+    width: 250px!important;
+}
+:deep(.el-textarea){
+    width: 400px!important;
+}
 :deep(.logo-uploader .el-upload) {
     border: none;
     border-radius: 6px;

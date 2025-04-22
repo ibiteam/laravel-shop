@@ -22,7 +22,10 @@ class GoodsCategoryController extends BaseController
      */
     public function index(Request $request): JsonResponse
     {
-        $data = Category::query()->whereParentId(0)->with('allChildren')->get();
+        $data = Category::query()->with('allChildren')
+            ->whereParentId(0)
+            ->orderByDesc('sort')
+            ->get();
         $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $data = $data->map(function (Category $category) use ($vue_app_url) {
             $category->setAttribute('h5_url', $vue_app_url.'/category?cat_id='.$category->id);  // 分类h5地址
@@ -86,13 +89,13 @@ class GoodsCategoryController extends BaseController
                 'is_show' => '是否显示',
             ]);
 
-            if ($validated['parent_id']) {
-                $parent_category = Category::query()->whereId($validated['parent_id'])->first();
-
-                if ($parent_category->parent_id > 0) {
-                    throw new BusinessException('仅支持二级分类');
-                }
-            }
+            // if ($validated['parent_id']) {
+            //     $parent_category = Category::query()->whereId($validated['parent_id'])->first();
+            //
+            //     if ($parent_category->parent_id > 0) {
+            //         throw new BusinessException('仅支持二级分类');
+            //     }
+            // }
             $tmp_data = Arr::only($validated, ['parent_id', 'name', 'title', 'keywords', 'description', 'logo', 'sort', 'is_show']);
 
             if ($validated['id'] > 0) {
@@ -102,14 +105,14 @@ class GoodsCategoryController extends BaseController
                     throw new BusinessException('商品分类未找到');
                 }
 
-                if ($validated['parent_id']) {
-                    // 判断当前分类下是否存在子分类
-                    $children_category = Category::query()->whereParentId($goods_category->id)->first();
-
-                    if ($children_category instanceof Category) {
-                        throw new BusinessException('二级分类下不能再添加分类');
-                    }
-                }
+                // if ($validated['parent_id']) {
+                //     // 判断当前分类下是否存在子分类
+                //     $children_category = Category::query()->whereParentId($goods_category->id)->first();
+                //
+                //     if ($children_category instanceof Category) {
+                //         throw new BusinessException('二级分类下不能再添加分类');
+                //     }
+                // }
 
                 if (! $goods_category->update($tmp_data)) {
                     throw new BusinessException('更新失败');
@@ -197,6 +200,15 @@ class GoodsCategoryController extends BaseController
             if (! $category) {
                 throw new BusinessException('商品分类不存在');
             }
+
+            if ($validated['is_show'] == Category::IS_SHOW_NO) {
+                // 判断当前分类下是否存在子分类，且子分类没有关闭
+                $children_category = Category::query()->whereParentId($category->id)->whereIsShow(Category::IS_SHOW_YES)->first();
+                if ($children_category) {
+                    throw new BusinessException('请先关闭子分类');
+                }
+            }
+
             $category->is_show = $validated['is_show'];
 
             if (! $category->save()) {

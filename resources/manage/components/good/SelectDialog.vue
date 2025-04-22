@@ -114,7 +114,7 @@
                     :forceFallback="false"
                     >
                     <div class="goods-item s-flex ai-ct jc-bt mb-10" v-for="(item, index) in check.data" :key="item.no">
-                        <em class="iconfont icon-bars goods-bars" style="font-size:20px"></em>
+                        <em class="iconfont icon-drag goods-bars" style="font-size:20px"></em>
                         <em class="iconfont icon-guanbi" @click.stop="handleRemove(index)"></em>
                         <el-image :src="item.image" fit="fill" :style="{ width: '50px', height: '50px', borderRadius: '4px'}">
                             <template #placeholder>

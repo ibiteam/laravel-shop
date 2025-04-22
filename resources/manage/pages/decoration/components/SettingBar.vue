@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref, getCurrentInstance, defineEmits, onMounted, nextTick } from 'vue'
+import { ref, getCurrentInstance, defineEmits, onMounted, nextTick, onUnmounted } from 'vue'
 
 const cns = getCurrentInstance().appContext.config.globalProperties
 const props = defineProps({
@@ -34,12 +34,21 @@ const handleCancle = () => {
     // cns.$bus.emit('chooseDragItem', {temp_index: ''})
 }
 
-onMounted(() => {
+const resizeHandler = () => {
     nextTick(() => {
         const element = document.querySelector('.decoration-layout-container')
         clientHeight.value = element.clientHeight
         computedStyle.value = window.getComputedStyle(document.getElementById('shopLayoutView'))
     })
+}
+
+onMounted(() => {
+    resizeHandler()
+    window.addEventListener('resize', resizeHandler)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', resizeHandler)
 })
 
 </script>
@@ -73,16 +82,17 @@ onMounted(() => {
     }
     .form-group-item {
         width: 100%;
-        padding: 16px 20px 16px 0;
+        padding: 16px 20px 0 0;
         margin-bottom: 15px;
         border-radius: 10px;
         background-color: #f9f9f9;
         box-sizing: border-box;
         position: relative;
-        .icon-bars {
+        .icon-drag {
             padding: 10px;
             cursor: move;
             font-size: 20px;
+            color: #999;
         }
         .group-content {
             width: calc(100% - 40px);

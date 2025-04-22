@@ -178,8 +178,12 @@
                         <router-view v-slot="{ Component }" v-if="isRendered">
                             <transition name="fade" mode="out-in">
                                 <div :key="route.path"
-                                     :class="{'common-wrap': !['manage.home.index','manage.app_decoration.home','manage.goods.update'].includes(route.name)}"
+                                    v-if="route.name != 'manage.app_decoration.home'"
+                                     :class="{'common-wrap': !['manage.home.index','manage.goods.update'].includes(route.name)}"
                                      style="min-height: 100%;">
+                                    <component :is="Component"></component>
+                                </div>
+                                <div style="height: 100%" :key="route.path" v-else>
                                     <component :is="Component"></component>
                                 </div>
                             </transition>
@@ -399,6 +403,7 @@ const formatMenu = () => {
 const openMenu = (e) => {
     if (typeof (e.children) === 'undefined' || e.children.length === 0) {
         router.push({ name: e.name });
+        visiblePhone.value = false
     } else {
         return false;
     }
@@ -934,10 +939,20 @@ img {
             height: 20px;
         }
     }
-    .menu-select{
-        margin-right: 10px!important;
-        width: 180px!important;
-        transition: width 0.3s ease, background-color 0.3s ease;
+    .el-header .seller-header .header-right{
+        .menu-select{
+            margin-right: 10px!important;
+            width: 180px;
+            animation: menuSelectAnim 0.5s ease-in-out 1;
+        }
+    }
+    @keyframes menuSelectAnim {
+        0% {
+            width: 50px;
+        }
+        100% {
+            width: 180px;
+        }
     }
     .user-info{
         margin-right: 0!important;
@@ -959,6 +974,11 @@ img {
                 color: #1050a9!important;
                 padding: 0 10px!important;
             }
+        }
+    }
+    :deep(.el-pagination){
+        .el-pagination__sizes, .el-pagination__total,.el-pagination__jump{
+            display: none!important;
         }
     }
 }
