@@ -54,6 +54,7 @@ class ArticleController extends BaseController
                 'article_category_id' => $article->article_category_id,
                 'title' => $article->title,
                 'cover' => $article->cover,
+                'name' => $article->title,
                 'h5_url' => $vue_app_url.'/article/agreement?article_id='.$article->id,
                 'author' => $article->author,
                 'is_show' => $article->is_show,
