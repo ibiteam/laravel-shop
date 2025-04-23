@@ -250,7 +250,7 @@ class OrderService
     }
     public function setGoodsAmount(float $goods_amount): void
     {
-        $this->goods_amount = $goods_amount;
+        $this->goods_amount = to_number_format($goods_amount);
     }
 
     public function getGoodsIntegral(): int
