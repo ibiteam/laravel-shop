@@ -18,6 +18,7 @@ import Payment from '@/pages/set/Payment.vue';
 import AppDecoration from '@/pages/decoration/app/Index.vue';
 import Refresh from '@/pages/refresh/refresh.vue';
 import ShipCompany from '@/pages/set/ShipCompany.vue';
+import Region from '@/pages/set/Region.vue';
 import Order from '@/pages/order/Index.vue';
 import OrderDetail from '@/pages/order/Detail.vue';
 import ApplyRefundReason from '@/pages/order/ApplyRefundReason.vue';
@@ -67,6 +68,7 @@ const router = createRouter({
                 { path: '/set/payment', component: Payment, name: 'manage.payment.index',meta:{title:'支付方式'} },
                 { path: '/set/transaction', component: Transaction, name: 'manage.transaction.index',meta:{title:'交易记录'} },
                 { path: '/set/ship_company', component: ShipCompany, name: 'manage.ship_company.index',meta:{title:'快递公司'} },
+                { path: '/set/region', component: Region, name: 'manage.region.index',meta:{title:'地区管理'} },
                 { path: '/set/app_ad', component: AppAd, name: 'manage.app_advert.index',meta:{title:'App广告'} },
                 // 商品
                 { path: '/goods/index', component: Goods , name: 'manage.goods.index',meta:{title:'商品列表'}},

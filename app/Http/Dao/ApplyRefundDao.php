@@ -30,7 +30,7 @@ class ApplyRefundDao
      */
     public function getListByUser(User $user, string $keywords = '', int $page = 1, int $number = 10): LengthAwarePaginator
     {
-        return ApplyRefund::query()->with(['user', 'order', 'orderDetail'])
+        return ApplyRefund::query()->with(['user', 'order', 'orderDetail', 'orderDetail.goods'])
             ->when($keywords, function (Builder $query) use ($keywords) {
                 $query->where(function (Builder $query) use ($keywords) {
                     $query->whereLike('no', "%$keywords%")->orWhereHas('orderDetail', function (Builder $query) use ($keywords) {
@@ -225,11 +225,12 @@ class ApplyRefundDao
         }
 
         if ($refund_success_transactions->isNotEmpty()) {
-            if ($apply_refund->money > $pay_success_transaction->amount + $refund_success_transactions->sum('amount')) {
+            $allow_money = $pay_success_transaction->amount + $refund_success_transactions->sum('amount');
+            if (bccomp($apply_refund->money, $allow_money, 2) > 0) {
                 throw new BusinessException('累计退款总金额超过支付金额');
             }
         } else {
-            if ($apply_refund->money > $pay_success_transaction->amount) {
+            if (bccomp($apply_refund->money, $pay_success_transaction->amount, 2) > 0) {
                 throw new BusinessException('退款金额超过支付金额');
             }
         }

@@ -58,18 +58,19 @@
                 </div>
 
                 <div class="btn" style="margin-bottom: 10px;">
-                    <el-button type="danger" @click="agree" v-if="detail.status==0&&detail.type==0">同意退款</el-button>
+                    <el-button type="danger" :loading="agreeBtnLoading" @click="agree" v-if="detail.status==0&&detail.type==0">同意退款</el-button>
                     <el-button type="danger" @click="agreeOpen" v-if="detail.status==0&&detail.type==1">同意退款</el-button>
-                    <el-button type="info" @click="refuse(1)" v-if="detail.status==0&&detail.type==0">已发货</el-button>
+                    <el-button type="info" :loading="refuseBtnLoading" @click="refuse(1)" v-if="detail.status==0&&detail.type==0">已发货</el-button>
                     <el-button type="info" @click="openRefuse" v-if="detail.status==0&&detail.type==1">拒绝退款</el-button>
-                    <el-button type="danger" @click="receive" v-if="detail.status==3">确认收货</el-button>
+                    <el-button type="danger" :loading="receiveBtnLoading" @click="receive" v-if="detail.status==3">确认收货</el-button>
                 </div>
 
                 <div class="fs16 co-333" style="padding: 20px 0 10px;" v-if="log&&log.length">协商记录</div>
                 <div v-if="log&&log.length">
                     <div class="log-item s-flex" v-for="(item,i) in log" :key="`${i}log`">
                         <div class="img-box">
-                            <img :src="item.avatar" v-if="item.avatar" alt="">
+                            <img v-if="item.avatar" :src="item.avatar" alt="">
+                            <img v-else src="@/assets/images/portait.jpeg" alt="">
                         </div>
                         <div class="flex-1">
                             <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
@@ -170,7 +171,7 @@
             </div>
         </div>
 
-        <el-dialog title="拒绝退款" :visible.sync="refuseVisible" width="30%">
+        <el-dialog title="拒绝退款" v-model="refuseVisible" width="600px">
             <el-form ref="refuseFormRef" :rules="reasonRule" :model="refuseForm">
                 <el-form-item label="原因：" label-width="100px" prop="refuseReason">
                     <el-input v-model="refuseForm.refuseReason" autocomplete="off" type="textarea" rows="5"
@@ -180,21 +181,21 @@
 
             <div slot="footer" class="dialog-footer">
                 <el-button @click="refuseVisible = false">取 消</el-button>
-                <el-button type="primary" @click="refuse">确 定</el-button>
+                <el-button type="primary" :loading="refuseBtnLoading" @click="refuse">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="同意退款" :visible.sync="agreeVisible" width="30%">
+        <el-dialog title="同意退款" v-model="agreeVisible" width="600px">
             <p style="padding-bottom: 20px;">确定同意退款吗？</p>
             <el-form ref="agreeFormRef" :rules="agreeRule" :model="agreeForm">
                 <el-form-item label="退款类型：" label-width="100px" prop="type">
-                    <el-select v-model="agreeForm.type">
+                    <el-select v-model="agreeForm.type" style="width: 300px;">
                         <el-option :value="1" label="退货退款"></el-option>
                         <el-option :value="0" label="仅退款"></el-option>
                     </el-select>
                 </el-form-item>
 
                 <el-form-item label="退款金额：" label-width="100px" prop="price">
-                    <el-input v-model="agreeForm.price" autocomplete="off" style="width: 200px;"
+                    <el-input v-model="agreeForm.price" autocomplete="off" style="width: 300px;"
                               @paste.native.capture.prevent="inputPress" maxlength="10">
                         <template slot="prepend">￥</template>
                     </el-input>
@@ -203,7 +204,7 @@
 
             <div slot="footer" class="dialog-footer">
                 <el-button @click="agreeVisible = false">取 消</el-button>
-                <el-button type="primary" @click="agree" :loading="refundIng">确 定</el-button>
+                <el-button type="primary" :loading="agreeBtnLoading" @click="agree">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -233,9 +234,11 @@ const agreeForm = ref({ // 同意退款form
 });
 const agreeFormRef = ref(null);
 const refuseFormRef = ref(null);
-const refundIng = ref(false);
 const log = ref([]);
 const detail = ref({});
+const agreeBtnLoading = ref(false)
+const refuseBtnLoading = ref(false)
+const receiveBtnLoading = ref(false)
 const status = ref({ // 状态配置
     0: '请处理退款申请',
     1: '卖家已拒绝退款',
@@ -361,16 +364,16 @@ const agreeOpen = () => {
 };
 
 const agree = () => {
-    if (refundIng.value) {
+    if (agreeBtnLoading.value) {
         return;
     }
-    refundIng.value = true;
+    agreeBtnLoading.value = true;
     if (detail.value.type == 0) { // 仅退款
         let params = {
             id: route.params.id
         };
         Http.doPost('apply_refund/execute_refund', params).then((res) => {
-            refundIng.value = false;
+            agreeBtnLoading.value = false;
             if (cns.$successCode(res.code)) {
                 getData();
             } else {
@@ -387,7 +390,7 @@ const agree = () => {
                         money: agreeForm.value.price
                     };
                     Http.doPost('apply_refund/execute_refund', params).then((res) => {
-                        refundIng.value = false;
+                        agreeBtnLoading.value = false;
                         if (cns.$successCode(res.code)) {
                             getData();
                             agreeVisible.value = false;
@@ -403,7 +406,7 @@ const agree = () => {
                         money: agreeForm.value.price
                     };
                     Http.doPost('apply_refund/agree_apply', params).then((res) => {
-                        refundIng.value = false;
+                        agreeBtnLoading.value = false;
                         if (cns.$successCode(res.code)) {
                             getData();
                             agreeVisible.value = false;
@@ -414,7 +417,7 @@ const agree = () => {
                     });
                 }
             } else {
-                refundIng.value = false;
+                agreeBtnLoading.value = false;
             }
         });
     }
@@ -429,11 +432,16 @@ const openRefuse = () => {
 };
 
 const refuse = (e) => {
+    if (refuseBtnLoading.value) {
+        return;
+    }
+    refuseBtnLoading.value = true;
     if (e === 1) { // 已发货操作
         let params = {
             id: route.params.id
         };
         Http.doPost('apply_refund/close_apply', params).then((res) => {
+            refuseBtnLoading.value = false
             if (cns.$successCode(res.code)) {
                 getData();
             } else {
@@ -449,6 +457,7 @@ const refuse = (e) => {
                     result: refuseForm.value.refuseReason
                 };
                 Http.doPost('apply_refund/refuse_refund', params).then((res) => {
+                    refuseBtnLoading.value = false
                     if (cns.$successCode(res.code)) {
                         getData();
                         refuseVisible.value = false;
@@ -458,16 +467,23 @@ const refuse = (e) => {
                     }
                 });
 
+            }else{
+                refuseBtnLoading.value = false
             }
         });
     }
 };
 
 const receive = () => {
+    if (receiveBtnLoading.value) {
+        return;
+    }
+    receiveBtnLoading.value = true;
     let params = {
         id: route.params.id
     };
     Http.doPost('apply_refund/confirm_receipt', params).then((res) => {
+        receiveBtnLoading.value = false;
         if (cns.$successCode(res.code)) {
             getData();
         } else {

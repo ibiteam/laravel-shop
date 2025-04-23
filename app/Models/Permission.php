@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Permission\Models\Permission as SpatiePermission;
 use Spatie\Permission\PermissionRegistrar;
@@ -47,8 +46,6 @@ use Spatie\Permission\PermissionRegistrar;
  */
 class Permission extends SpatiePermission
 {
-
-
     // 是否在左侧菜单栏
     public const NOT_IS_LEFT_NAV = 0;
     public const IS_LEFT_NAV = 1;
@@ -93,6 +90,7 @@ class Permission extends SpatiePermission
     public const MANAGE_BASIC_SET_DISTRIBUTION = 'manage.basic_set.distribution'; // 配送管理
     public const MANAGE_SHIP_COMPANY_INDEX = 'manage.ship_company.index'; // 快递公司
     public const MANAGE_SHIP_COMPANY_UPDATE = 'manage.ship_company.update'; // 快递公司编辑
+    public const MANAGE_REGION_INDEX = 'manage.region.index'; // 地区管理
     public const WEBSITE_MANAGE = 'website.manage'; // 网站管理
     public const MANAGE_APP_DECORATION = 'manage.app_decoration.index'; // 移动端装修
     public const MANAGE_APP_DECORATION_UPDATE = 'manage.app_decoration.update'; // 移动端保存装修

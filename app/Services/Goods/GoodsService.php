@@ -368,7 +368,7 @@ class GoodsService
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
 
         $items = Goods::query()
-            ->select('no', 'image', 'name', 'price', 'label', 'sub_name')
+            ->select('no', 'image', 'name', 'price', 'integral', 'label', 'sub_name')
             ->when($goods_no, fn ($query) => $query->where('no', '<>', $goods_no))
             ->whereStatus(Goods::STATUS_ON_SALE)
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))

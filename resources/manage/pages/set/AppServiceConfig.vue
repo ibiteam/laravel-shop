@@ -1,156 +1,3 @@
-<script setup>
-import Http from '@/utils/http'
-import PageTable from '@/components/common/PageTable.vue'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import SearchForm from '@/components/common/SearchForm.vue'
-import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
-
-const cns = getCurrentInstance().appContext.config.globalProperties;
-
-const searchForm = reactive({
-    name: '',
-    alias: '',
-    desc: '',
-    is_enable: -1,
-    per_page: 10,
-    page: 1
-});
-const defaultPage = {
-    page: 1,
-    per_page: 10
-};
-
-const pagination = reactive({ ...defaultPage });
-
-const handlePageChange = (page, per_page) => {
-    pagination.per_page = per_page;
-    getData(page);
-};
-const serviceInfoForm = ref({});
-const serviceInfoDialogVisible = ref(false);
-const tableData = ref([]);
-const loading = ref(false);
-const storeDialogVisible = ref(false);
-const storeDialogTitle = ref('');
-const submitFormRef = ref(null);
-const submitLoading = ref(false);
-const submitForm = reactive({
-    id: 0,
-    name: '',
-    is_enable: 1,
-    desc: '',
-    is_record: 1,
-    error_number: 0,
-    stop_number: 0,
-    config: [],
-});
-const submitFormRules = reactive({
-    router_category_id: [{ required: true, message: '请选择所属分类', trigger: 'blur' }],
-    name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-    alias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
-    h5_url: [{ required: true, message: '请输入H5地址', trigger: 'blur' }],
-});
-
-const openStoreDialog = (row = {}) => {
-    storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
-    if (row.id) {
-        submitForm.id = row.id;
-        submitForm.name = row.name;
-        submitForm.alias = row.alias;
-        submitForm.is_enable = row.is_enable;
-        submitForm.desc = row.desc;
-        submitForm.is_record = row.is_record;
-        submitForm.error_number = row.error_number;
-        submitForm.stop_number = row.stop_number;
-        submitForm.config = row.config;
-    } else {
-        submitForm.id = 0;
-        submitForm.name = '';
-        submitForm.alias = '';
-        submitForm.is_enable = 1;
-        submitForm.desc = '';
-        submitForm.is_record = 1;
-        submitForm.error_number = 0;
-        submitForm.stop_number = 0;
-        submitForm.config = [];
-    }
-    storeDialogVisible.value = true;
-};
-
-const closeStoreDialog = () => {
-    storeDialogTitle.value = '';
-    submitForm.id = 0;
-    submitForm.name = '';
-    submitForm.alias = '';
-    submitForm.is_enable = 1;
-    submitForm.desc = '';
-    submitForm.is_record = 1;
-    submitForm.error_number = 0;
-    submitForm.stop_number = 0;
-    submitForm.config = [];
-    storeDialogVisible.value = false;
-};
-
-/* 提交 */
-const onSubmit = () => {
-    submitFormRef.value.validate((valid) => {
-        if (valid) {
-            submitLoading.value = true;
-            Http.doPost('app_service/update',submitForm).then(res => {
-                submitLoading.value = false;
-                if (cns.$successCode(res.code)) {
-                    closeStoreDialog();
-                    getData();
-                } else {
-                    cns.$message.error(res.message);
-                }
-            });
-        } else {
-            cns.$message.error('表单验证失败');
-            return false;
-        }
-    });
-};
-
-const toggleStatus = (row, sign) => {
-    Http.doPost('app_service/toggle/status', {
-        id: row.id,
-        sign: sign
-    }).then(res => {
-        if (cns.$successCode(res.code)) {
-            cns.$message.success(res.message);
-        } else {
-            cns.$message.error(res.message);
-        }
-    });
-};
-
-const getData = (page = 1) => {
-    loading.value = true;
-    searchForm.page = page;
-    Http.doGet('app_service', searchForm).then(res => {
-        loading.value = false;
-        if (cns.$successCode(res.code)) {
-            tableData.value = res.data;
-        } else {
-            cns.$message.error(res.message);
-        }
-    }).catch(() => {
-        loading.value = false;
-        cns.$message.error('获取数据失败');
-    });
-};
-
-// 页码改变
-const examine = (row) => {
-    serviceInfoDialogVisible.value = true
-    serviceInfoForm.value = row
-};
-
-onMounted(() => {
-    getData();
-});
-</script>
 <template>
     <div>
         <search-form :model="searchForm">
@@ -286,9 +133,9 @@ onMounted(() => {
                     </el-form-item>
                     <el-form-item label="是否记录" prop="is_record">
                         <el-switch
-                        v-model="submitForm.is_record"
-                        :active-value="1" :inactive-value="0"
-                        active-color="#13ce66" inactive-color="#ff4949">
+                            v-model="submitForm.is_record"
+                            :active-value="1" :inactive-value="0"
+                            active-color="#13ce66" inactive-color="#ff4949">
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="异常数量" prop="error_number">
@@ -353,6 +200,161 @@ onMounted(() => {
         </el-dialog>
     </div>
 </template>
+
+<script setup lang="ts">
+import Http from '@/utils/http'
+import PageTable from '@/components/common/PageTable.vue'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import SearchForm from '@/components/common/SearchForm.vue'
+import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
+
+const cns = getCurrentInstance().appContext.config.globalProperties;
+
+const searchForm = reactive({
+    name: '',
+    alias: '',
+    desc: '',
+    is_enable: -1,
+    per_page: 10,
+    page: 1
+});
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+
+const pagination = reactive({ ...defaultPage });
+
+const handlePageChange = (page: number, per_page: number) => {
+    pagination.per_page = per_page;
+    getData(page);
+};
+const serviceInfoForm = ref();
+const serviceInfoDialogVisible = ref(false);
+const tableData = ref([]);
+const loading = ref(false);
+const storeDialogVisible = ref(false);
+const storeDialogTitle = ref('');
+const submitFormRef = ref(null);
+const submitLoading = ref(false);
+const submitForm = reactive({
+    id: 0,
+    name: '',
+    is_enable: 1,
+    desc: '',
+    alias: '',
+    is_record: 1,
+    error_number: 0,
+    stop_number: 0,
+    config: {},
+});
+const submitFormRules = reactive({
+    router_category_id: [{ required: true, message: '请选择所属分类', trigger: 'blur' }],
+    name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+    alias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
+    h5_url: [{ required: true, message: '请输入H5地址', trigger: 'blur' }],
+});
+
+const openStoreDialog = (row: any) => {
+    storeDialogTitle.value = row.id > 0 ? '编辑' : '添加';
+    if (row.id) {
+        submitForm.id = row.id;
+        submitForm.name = row.name;
+        submitForm.alias = row.alias;
+        submitForm.is_enable = row.is_enable;
+        submitForm.desc = row.desc;
+        submitForm.is_record = row.is_record;
+        submitForm.error_number = row.error_number;
+        submitForm.stop_number = row.stop_number;
+        submitForm.config = row.config;
+    } else {
+        submitForm.id = 0;
+        submitForm.name = '';
+        submitForm.alias = '';
+        submitForm.is_enable = 1;
+        submitForm.desc = '';
+        submitForm.is_record = 1;
+        submitForm.error_number = 0;
+        submitForm.stop_number = 0;
+        submitForm.config = [];
+    }
+    storeDialogVisible.value = true;
+};
+
+const closeStoreDialog = () => {
+    storeDialogTitle.value = '';
+    submitForm.id = 0;
+    submitForm.name = '';
+    submitForm.alias = '';
+    submitForm.is_enable = 1;
+    submitForm.desc = '';
+    submitForm.is_record = 1;
+    submitForm.error_number = 0;
+    submitForm.stop_number = 0;
+    submitForm.config = [];
+    storeDialogVisible.value = false;
+};
+
+/* 提交 */
+const onSubmit = () => {
+    submitFormRef.value?.validate((valid: boolean) => {
+        if (valid) {
+            submitLoading.value = true;
+            Http.doPost('app_service/update',submitForm).then((res: any) => {
+                submitLoading.value = false;
+                if (cns.$successCode(res.code)) {
+                    closeStoreDialog();
+                    getData();
+                } else {
+                    cns.$message.error(res.message);
+                }
+            });
+        } else {
+            cns.$message.error('表单验证失败');
+            return false;
+        }
+    });
+};
+
+const toggleStatus = (row: any, sign: string) => {
+    Http.doPost('app_service/toggle/status', {
+        id: row.id,
+        sign: sign
+    }).then((res: any) => {
+        if (cns.$successCode(res.code)) {
+            cns.$message.success(res.message);
+        } else {
+            cns.$message.error(res.message);
+        }
+    });
+};
+
+const getData = (page = 1) => {
+    loading.value = true;
+    searchForm.page = page;
+    Http.doGet('app_service', searchForm).then((res: any) => {
+        loading.value = false;
+        if (cns.$successCode(res.code)) {
+            tableData.value = res.data;
+        } else {
+            cns.$message.error(res.message);
+        }
+    }).catch(() => {
+        loading.value = false;
+        cns.$message.error('获取数据失败');
+    });
+};
+
+// 页码改变
+const examine = (row: any) => {
+    serviceInfoDialogVisible.value = true
+    serviceInfoForm.value = row
+};
+
+onMounted(() => {
+    getData();
+});
+</script>
 
 <style scoped lang="scss">
 

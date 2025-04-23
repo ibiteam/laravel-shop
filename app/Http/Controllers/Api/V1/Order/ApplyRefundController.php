@@ -113,7 +113,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('申请售后发起异常~'.$throwable->getMessage());
+            return $this->error('申请售后发起异常~');
         }
     }
 

@@ -6,6 +6,10 @@
 git clone https://github.com/ibiteam/laravel-shop.git
 composer install
 cp .env.example .env
+php artisan migrate --force
+php artisan db:seed --force
+# access log and error log driver selected clickhouse driver execute
+php artisan migrate --path=database/migrations/clickhouse
 ```
 
 ## 本地nginx 配置

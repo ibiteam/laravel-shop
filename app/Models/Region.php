@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-
-
 /**
- *
- *
- * @property int $id
- * @property int|null $parent_id 父级ID
- * @property int $code 行政区划代码
- * @property string $name 区域名称
- * @property int $type 区域类型 1、省 2、市 3、区
+ * @property int         $id
+ * @property int|null    $parent_id  父级ID
+ * @property int         $code       行政区划代码
+ * @property string      $name       区域名称
+ * @property int         $type       区域类型 1、省 2、市 3、区
  * @property string|null $created_at
  * @property string|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Region> $allChildren
@@ -19,6 +15,7 @@ namespace App\Models;
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Region> $children
  * @property-read int|null $children_count
  * @property-read Region|null $parent
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region query()
@@ -29,11 +26,15 @@ namespace App\Models;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Region whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  */
 class Region extends BaseModel
 {
-    public const ENABLE = 1; // 启用
+    // 区域类型
+    public const REGION_TYPE_PROVINCE = 1;
+    public const REGION_TYPE_CITY = 2;
+    public const REGION_TYPE_DISTRICT = 3;
 
     public $timestamps = false;
 
