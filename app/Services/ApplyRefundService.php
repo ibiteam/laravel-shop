@@ -278,6 +278,7 @@ class ApplyRefundService
             'reason_id' => $reason_id,
             'description' => $description,
             'certificate' => $certificate,
+            'result' => '',
             'job_time' => $delayed_time,
             'count' => $count,
         ];

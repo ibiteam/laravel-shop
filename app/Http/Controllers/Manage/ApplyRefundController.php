@@ -529,7 +529,7 @@ class ApplyRefundController extends BaseController
                     $item->setAttribute('money', price_format($apply_refund_data['money']));
                     $item->setAttribute('number', get_new_price($apply_refund_data['number']));
                     $item->setAttribute('reason', ApplyRefundReason::query()->whereId($apply_refund_data['reason_id'])->value('content') ?? '');
-                    $item->setAttribute('result', $apply_refund_data['result']);
+                    $item->setAttribute('result', $apply_refund_data['result'] ?? '');
                     $item->setAttribute('certificate', $apply_refund_data['certificate']);
                 } else {
                     $item->setAttribute('money', price_format($apply_refund->money));
