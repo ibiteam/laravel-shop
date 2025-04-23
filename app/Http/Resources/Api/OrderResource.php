@@ -101,7 +101,7 @@ class OrderResource extends JsonResource
                 break;
 
             case OrderConstantEnum::STATUS_WAIT_SHIP:
-                if (shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
+                if ($this->resource->detail_count === 1 && shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
                     $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
                 }
 
@@ -112,7 +112,7 @@ class OrderResource extends JsonResource
                 break;
 
             case OrderConstantEnum::STATUS_PART:
-                if (shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
+                if ($this->resource->detail_count === 1 && shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
                     $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
                 }
 

@@ -21,11 +21,11 @@ class ShipCompanyController extends BaseController
     public function index(Request $request): JsonResponse
     {
         $name = $request->get('name');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $list = ShipCompany::query()
             ->latest()
             ->when($name, fn (Builder $query) => $query->whereLike('name', "%$name%"))
-            ->paginate($number);
+            ->paginate($per_page);
 
         return $this->success(new CommonResourceCollection($list));
     }
