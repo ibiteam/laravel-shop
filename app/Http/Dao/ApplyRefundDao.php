@@ -225,11 +225,12 @@ class ApplyRefundDao
         }
 
         if ($refund_success_transactions->isNotEmpty()) {
-            if ($apply_refund->money > $pay_success_transaction->amount + $refund_success_transactions->sum('amount')) {
+            $allow_money = $pay_success_transaction->amount + $refund_success_transactions->sum('amount');
+            if (bccomp($apply_refund->money, $allow_money, 2) > 0) {
                 throw new BusinessException('累计退款总金额超过支付金额');
             }
         } else {
-            if ($apply_refund->money > $pay_success_transaction->amount) {
+            if (bccomp($apply_refund->money, $pay_success_transaction->amount, 2) > 0) {
                 throw new BusinessException('退款金额超过支付金额');
             }
         }
