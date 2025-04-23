@@ -103,7 +103,7 @@ class ApplyRefundController extends BaseController
     }
 
     /**
-     * 同意申请.
+     * 同意申请（退货退款）.
      */
     public function agreeApply(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
@@ -132,7 +132,10 @@ class ApplyRefundController extends BaseController
             }
 
             if ($money && $apply_refund->money != $money) {
-                $apply_refund->money = $money;  // 这里需要检测修改的退款金额
+                if ($money > $apply_refund->money) {
+                    throw new BusinessException('退款金额不能超过申请金额');
+                }
+                $apply_refund->money = $money;
             }
 
             // 退款交易检测
@@ -159,7 +162,7 @@ class ApplyRefundController extends BaseController
 
                 DB::commit();
 
-                // 添加job 等待买家在 5 天内操作退货流程
+                // 等待买家操作退货流程
                 ApplyRefundJob::dispatch(ApplyRefundStatusEnum::REFUSE_EXAMINE->value, $apply_refund->id, '买家退货超时，退款流程系统自动关闭', ApplyRefundLog::TYPE_BUYER)->delay($job_time);
             } catch (\Exception $exception) {
                 DB::rollBack();
@@ -178,7 +181,7 @@ class ApplyRefundController extends BaseController
     }
 
     /**
-     * 关闭申请.
+     * 关闭申请（已发货）.
      */
     public function closeApply(Request $request, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
@@ -232,7 +235,7 @@ class ApplyRefundController extends BaseController
     }
 
     /**
-     * 执行退款(卖家主动同意退款给买家).
+     * 同意退款（退货退款可修改金额money）.
      */
     public function executeRefund(Request $request, ApplyRefundDao $apply_refund_dao, ApplyRefundLogDao $apply_refund_log_dao, OrderLogDao $order_log_dao)
     {
@@ -241,14 +244,14 @@ class ApplyRefundController extends BaseController
         try {
             $validated = $request->validate([
                 'id' => 'required|integer',
-                'money' => 'required|numeric',
+                'money' => 'nullable|numeric',
             ], [], [
                 'id' => '申请售后ID',
                 'money' => '金额',
             ]);
 
             $id = $validated['id'];
-            $money = (float) $validated['money'];
+            $money = (float) ($validated['money'] ?? 0);
 
             $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundReason'])->whereId($id)
                 ->whereStatus(ApplyRefundStatusEnum::NOT_PROCESSED->value)
@@ -263,7 +266,11 @@ class ApplyRefundController extends BaseController
             }
 
             if ($money && $apply_refund->money != $money) {
-                $apply_refund->money = $money;  // 这里需要检测修改的退款金额
+                if ($money > $apply_refund->money) {
+                    throw new BusinessException('退款金额不能超过申请金额');
+                }
+
+                $apply_refund->money = $money;
             }
 
             // 微信退款
@@ -298,7 +305,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('执行退款异常');
+            return $this->error('执行退款异常'.$throwable);
         }
     }
 

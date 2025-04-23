@@ -244,7 +244,7 @@
     </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { nextTick, onUnmounted, ref, onMounted, getCurrentInstance, watch } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
