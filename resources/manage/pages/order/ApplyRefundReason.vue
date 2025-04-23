@@ -89,8 +89,6 @@ const submitFormRules = reactive({
 
 const defaultQuery = reactive({
     type: null,
-    number: 10,
-    page: 1
 });
 const query = reactive({ ...defaultQuery });
 
@@ -166,7 +164,12 @@ const handleDestroy = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    Http.doGet('apply_refund_reason', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
+    const params = {
+        ...query,
+        page: page,
+        per_page: pagination.per_page
+    };
+    Http.doGet('apply_refund_reason', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

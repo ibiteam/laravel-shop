@@ -134,8 +134,6 @@ const defaultQuery = reactive({
     status: null,
     start_time: '',
     end_time: '',
-    number: 10,
-    page: 1
 });
 const query = reactive({ ...defaultQuery });
 
@@ -165,7 +163,12 @@ const openDetail = (id: number) => {
 
 const getData = (page: number = defaultPage.page) => {
     loading.value = true;
-    Http.doGet('apply_refund', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
+    const params = {
+        ...query,
+        page: page,
+        per_page: pagination.per_page
+    };
+    Http.doGet('apply_refund', params).then((res: any) => {
         loading.value = false;
         if (cns.$successCode(res.code)) {
             tableData.value = res.data;

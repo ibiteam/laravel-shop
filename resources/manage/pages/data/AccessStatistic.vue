@@ -62,7 +62,6 @@ const query = reactive({
     start_time: '',
     end_time: '',
     referer: '',
-    page: 1
 });
 const defaultPage = {
     page: 1,

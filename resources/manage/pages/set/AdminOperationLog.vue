@@ -69,8 +69,6 @@ const defaultQuery = reactive({
     description: '',
     role_id: '',
     ip: '',
-    page: 1,
-    number: 10
 });
 const query = reactive({ ...defaultQuery });
 

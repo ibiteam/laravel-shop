@@ -23,7 +23,7 @@ class RouterController extends BaseController
         $alias = $request->get('alias');
         $router_category_id = intval($request->get('router_category_id'));
         $is_show = intval($request->get('is_show'));
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $keywords = $request->get('keywords', '');
 
         $data = Router::query()->with('routerCategory')
@@ -35,7 +35,7 @@ class RouterController extends BaseController
             ->when($alias, fn ($query) => $query->where('alias', 'like', '%'.$alias.'%'))
             ->when($router_category_id, fn ($query) => $query->where('router_category_id', '=', $router_category_id))
             ->when($is_show > -1, fn ($query) => $query->where('is_show', '=', $is_show))
-            ->orderByDesc('sort')->orderByDesc('id')->paginate($number);
+            ->orderByDesc('sort')->orderByDesc('id')->paginate($per_page);
 
         $data->getCollection()->transform(function (Router $router) use ($router_service) {
             return [

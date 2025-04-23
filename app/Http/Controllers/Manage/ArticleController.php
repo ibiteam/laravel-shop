@@ -29,7 +29,7 @@ class ArticleController extends BaseController
         $is_top = $request->get('is_top');
         $start_time = $request->get('start_time', '');
         $end_time = $request->get('end_time', '');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $keywords = $request->get('keywords', '');
 
         $data = Article::query()->with(['articleCategory', 'adminUser'])
@@ -44,7 +44,7 @@ class ArticleController extends BaseController
             ->when(! is_null($is_top), fn ($query) => $query->where('is_top', '=', $is_top))
             ->when($start_time, fn ($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
             ->when($end_time, fn ($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
-            ->orderByDesc('sort')->orderByDesc('id')->paginate($number);
+            ->orderByDesc('sort')->orderByDesc('id')->paginate($per_page);
 
         $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $data->getCollection()->transform(function (Article $article) use ($vue_app_url) {

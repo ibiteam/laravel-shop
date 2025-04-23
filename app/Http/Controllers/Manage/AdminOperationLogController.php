@@ -20,7 +20,7 @@ class AdminOperationLogController extends BaseController
         $description = $request->get('description', '');
         $role_id = $request->get('role_id', '');
         $ip = $request->get('ip', '');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
 
         $query = AdminOperationLog::query()->with(['adminUser', 'modelHasRole.role'])
             ->orderByDesc('created_at')->orderByDesc('id');
@@ -53,7 +53,7 @@ class AdminOperationLogController extends BaseController
             $query->where('ip', 'like', "%{$ip}%");
         }
 
-        $data = $query->paginate($number);
+        $data = $query->paginate($per_page);
 
         $data->getCollection()->transform(function (AdminOperationLog $admin_operation_log) {
             $role_names = $admin_operation_log->modelHasRole->filter(function ($modelHasRole) {

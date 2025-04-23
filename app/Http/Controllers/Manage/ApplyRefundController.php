@@ -34,7 +34,7 @@ class ApplyRefundController extends BaseController
         $type = $request->get('type');
         $start_time = $request->get('start_time', '');
         $end_time = $request->get('end_time', '');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
 
         $data = ApplyRefund::query()
             ->with(['user', 'order', 'orderDetail', 'applyRefundReason'])
@@ -46,7 +46,7 @@ class ApplyRefundController extends BaseController
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
             ->when($start_time, fn ($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
             ->when($end_time, fn ($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
-            ->orderByDesc('id')->paginate($number);
+            ->orderByDesc('id')->paginate($per_page);
         $data->getCollection()->transform(function (ApplyRefund $apply_refund) {
             return [
                 'id' => $apply_refund->id,
@@ -213,7 +213,7 @@ class ApplyRefundController extends BaseController
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家已发货，退款流程关闭，交易正常进行', ApplyRefundLog::TYPE_SELLER);
 
-                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '关闭了售后申请');
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家已发货，退款流程关闭，交易正常进行');
 
                 admin_operation_log("关闭了退款申请记录：{$apply_refund->id}");
 
@@ -286,7 +286,7 @@ class ApplyRefundController extends BaseController
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
 
-                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
+                // $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家同意了退款');
 
@@ -347,7 +347,7 @@ class ApplyRefundController extends BaseController
 
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家拒绝了退货退款', ApplyRefundLog::TYPE_SELLER);
 
-                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家拒绝了退款');
+                $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家拒绝了退货退款');
 
                 admin_operation_log("拒绝了退款申请记录：{$apply_refund->id}");
 
@@ -410,9 +410,9 @@ class ApplyRefundController extends BaseController
                 // $apply_refund->result = '款项已原路返回买家账号';
                 // $apply_refund->save();
 
-                $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货', ApplyRefundLog::TYPE_SELLER);
-
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
+
+                // $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家确认收货，已退款给买家');
 
