@@ -30,7 +30,7 @@ class ApplyRefundDao
      */
     public function getListByUser(User $user, string $keywords = '', int $page = 1, int $number = 10): LengthAwarePaginator
     {
-        return ApplyRefund::query()->with(['user', 'order', 'orderDetail'])
+        return ApplyRefund::query()->with(['user', 'order', 'orderDetail', 'orderDetail.goods'])
             ->when($keywords, function (Builder $query) use ($keywords) {
                 $query->where(function (Builder $query) use ($keywords) {
                     $query->whereLike('no', "%$keywords%")->orWhereHas('orderDetail', function (Builder $query) use ($keywords) {

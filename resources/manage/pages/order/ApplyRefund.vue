@@ -54,14 +54,14 @@
         v-loading="loading"
         @change="handlePageChange"
     >
-        <el-table-column label="ID" prop="id"></el-table-column>
+        <el-table-column label="ID" prop="id" width="80"></el-table-column>
+        <el-table-column label="退款单号" prop="no"></el-table-column>
         <el-table-column label="用户名称" prop="user_name"></el-table-column>
         <el-table-column label="商品名称" prop="goods_name"></el-table-column>
         <el-table-column label="订单号" prop="order_sn"></el-table-column>
-        <el-table-column label="退款单号" prop="no"></el-table-column>
-        <el-table-column label="退款金额" prop="money"></el-table-column>
-        <el-table-column label="退款数量" prop="number"></el-table-column>
-        <el-table-column label="类型">
+        <el-table-column label="退款金额" prop="money" width="85"></el-table-column>
+        <el-table-column label="退款数量" prop="number" width="85"></el-table-column>
+        <el-table-column label="类型" width="85">
             <template #default="{ row }">
                 <span v-if="row.type == 0">退款</span>
                 <span v-if="row.type == 1">退货退款</span>
@@ -78,14 +78,14 @@
                 </el-image>
             </template>
         </el-table-column>
-        <el-table-column label="是否撤销">
+        <el-table-column label="是否撤销" width="85">
             <template #default="{ row }">
                 <span v-if="row.is_revoke == 0">否</span>
                 <span v-if="row.is_revoke == 1">是</span>
             </template>
         </el-table-column>
         <el-table-column label="结果描述" prop="result"></el-table-column>
-        <el-table-column label="申请次数" prop="count"></el-table-column>
+        <el-table-column label="申请次数" prop="count" width="85"></el-table-column>
         <el-table-column label="申请时间" prop="created_at"></el-table-column>
         <el-table-column label="更新时间" prop="updated_at"></el-table-column>
         <el-table-column label="退款状态">
