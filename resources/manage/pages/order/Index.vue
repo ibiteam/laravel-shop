@@ -83,8 +83,8 @@
         <el-table-column label="订单ID" prop="id" width="80px"></el-table-column>
         <el-table-column label="订单编号" width="180px">
             <template #default="{ row }">
-                <el-button link type="primary" @click="copyOrderSn(row.order_sn)">
-                    {{ row.order_sn }}<el-icon><DocumentCopy /></el-icon>
+                <el-button link type="primary" @click="copyOrderSn(row.order_sn)" @mouseenter="showIcon[row.id] = true" @mouseleave="showIcon[row.id] = false">
+                    {{ row.order_sn }}<el-icon v-show="showIcon[row.id]"><DocumentCopy /></el-icon>
                 </el-button>
             </template>
         </el-table-column>
@@ -215,6 +215,8 @@ const copyOrderSn = (orderSn: string) => {
     document.body.removeChild(tempInput)
     cns.$message.success('订单编号已复制')
 }
+// 定义每个订单编号的图标显示状态
+const showIcon = ref({})
 
 onMounted( () => {
     if (route.query.pay_status !== undefined){
