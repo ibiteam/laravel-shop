@@ -19,7 +19,7 @@ const regionChecked = ref([]);
 const loading = ref(false);
 
 const clearCache = () => {
-    Http.doPost('region/clear_cache').then((res: any) => {
+    Http.doPost('region/clear_cache', {}).then((res: any) => {
         if (cns.$successCode(res.code)) {
             cns.$message.success(res.message);
             getData();
@@ -54,10 +54,14 @@ onMounted(() => {
 
 <style scoped lang="scss">
 :deep(.el-scrollbar.el-cascader-menu) {
-    height: 600px;
+    height: 800px;
 }
 
 :deep(.el-cascader-menu__wrap.el-scrollbar__wrap) {
-    height: 620px;
+    height: 820px;
+}
+
+:deep(.el-cascader-menu__list) {
+    padding: 6px 0 20px 0;
 }
 </style>

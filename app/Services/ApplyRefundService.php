@@ -163,8 +163,8 @@ class ApplyRefundService
     public function launchRefund(User $user, array $params)
     {
         $apply_refund_id = $params['apply_refund_id'] ?? 0;
-        $order_sn = $params['order_sn'];
-        $order_detail_id = $params['order_detail_id'];
+        $order_sn = $params['order_sn'] ?? '';
+        $order_detail_id = $params['order_detail_id'] ?? 0;
         $type = $params['type'];
         $money = $params['money'];
         $number = $params['number'];
