@@ -2,6 +2,7 @@
 
 namespace App\Http\Dao;
 
+use App\Enums\RefererEnum;
 use App\Models\AccessStatistic;
 use App\Services\AccessLog\AccessLogService;
 use App\Services\AccessLog\Factories\AccessLogInterface;
@@ -16,7 +17,12 @@ class AccessStatisticDao
         $datetime = Carbon::yesterday();
         $statistic_date = $datetime->toDateString();
 
-        $referer_map = ['pc', 'h5', 'app', 'wechat_mini'];
+        $referer_map = [
+            RefererEnum::H5->value,
+            RefererEnum::PC->value,
+            RefererEnum::APP->value,
+            RefererEnum::WECHAT_MINI->value
+        ];
 
         $log_data = [];
 

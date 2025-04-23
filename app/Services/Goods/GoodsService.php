@@ -342,7 +342,8 @@ class GoodsService
     {
         // 是否展示销量
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
-        $query = Goods::select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
+        $query = Goods::query()->select('no', 'name', 'image', 'price', 'total', 'sub_name', 'label')
+            ->show()
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"));
 
         switch ($rule) {
@@ -370,7 +371,7 @@ class GoodsService
         $items = Goods::query()
             ->select('no', 'image', 'name', 'price', 'integral', 'label', 'sub_name')
             ->when($goods_no, fn ($query) => $query->where('no', '<>', $goods_no))
-            ->whereStatus(Goods::STATUS_ON_SALE)
+            ->show()
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->orderByDesc('sales_volume')
             ->orderByDesc('id')
