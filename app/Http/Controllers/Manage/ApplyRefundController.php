@@ -16,6 +16,7 @@ use App\Services\ExpressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 // 申请售后/退款
@@ -176,6 +177,8 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            Log::error('同意申请异常~'.$throwable);
+
             return $this->error('同意申请异常');
         }
     }
@@ -230,6 +233,8 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            Log::error('关闭申请异常~'.$throwable);
+
             return $this->error('关闭申请异常');
         }
     }
@@ -279,14 +284,7 @@ class ApplyRefundController extends BaseController
             DB::beginTransaction();
 
             try {
-                // $apply_refund->type = ApplyRefund::TYPE_REFUND_MONEY;
-                // $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
-                // $apply_refund->result = '卖家同意了退款';
-                // $apply_refund->save();
-
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家同意了退款', ApplyRefundLog::TYPE_SELLER);
-
-                // $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家主动同意退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家同意了退款');
 
@@ -305,7 +303,9 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('执行退款异常'.$throwable);
+            Log::error('执行退款异常~'.$throwable);
+
+            return $this->error('执行退款异常');
         }
     }
 
@@ -367,6 +367,8 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            Log::error('拒绝退款异常~'.$throwable);
+
             return $this->error('拒绝退款异常');
         }
     }
@@ -405,14 +407,7 @@ class ApplyRefundController extends BaseController
             DB::beginTransaction();
 
             try {
-                // $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
-                // $apply_refund->job_time = null;
-                // $apply_refund->result = '款项已原路返回买家账号';
-                // $apply_refund->save();
-
                 $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
-
-                // $apply_refund_log_dao->addLog($apply_refund->id, $current_user->user_name, '卖家确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, '卖家确认收货，已退款给买家');
 
@@ -431,6 +426,8 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
+            Log::error('确认收货异常~'.$throwable);
+
             return $this->error('确认收货异常');
         }
     }
