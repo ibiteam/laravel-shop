@@ -6,8 +6,7 @@
                     <div class="information" v-if="!is_mobile_plat">
                         <div class="welcome">
                             <em class=""></em>
-                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime()
-                                }}，{{ commonStore.adminUser.user_name }}</span>
+                            <span><em style="font-size: 30px;margin-right: 5px;">👏</em>{{ firendlyTime() }}，{{ commonStore.adminUser.user_name }}</span>
                         </div>
                         <div class="quick-view-box s-flex flex-wrap">
                             <div class="quick-view s-flex ai-ct" @click="toPage({name:'manage.user.index'})">
@@ -55,10 +54,10 @@
                                     <span>用户数据</span>
                                     <span style="font-size: 12px;color: #4E5969">（近7日）</span>
                                 </div>
-                                <!--<div class="mores" style="margin-right: 50px"
-                                     @click="toPage({name:'manage.user.index'})">
+                                <div class="mores" style="margin-right: 50px"
+                                     @click="toPage({name:'manage.access_statistic.index'})">
                                     <span>查看更多</span>
-                                </div>-->
+                                </div>
                             </div>
                             <div style="width: 100%;height:400px;" id="access-data"></div>
                         </div>
@@ -411,10 +410,9 @@ const getUvChartOption = (item) => {
             axisLine: {
                 show: false // 隐藏 Y 轴的边框线
             }
-
         },
         series: [
-            {
+            /*{
                 name: 'PC用户数',
                 type: 'line',
                 data: pc_uv,
@@ -426,11 +424,9 @@ const getUvChartOption = (item) => {
                 },
                 label: {
                     show: true // 显示数据值
-
                 },
                 smooth: true
-
-            },
+            },*/
             {
                 name: 'H5用户数',
                 type: 'line',
@@ -443,12 +439,9 @@ const getUvChartOption = (item) => {
                 },
                 label: {
                     show: true // 显示数据值
-
                 },
                 smooth: true
-
             }
-
         ]
     };
 };

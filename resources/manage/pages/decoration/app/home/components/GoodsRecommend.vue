@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="goods-wrapper3 s-flex ai-ct jc-bt flex-wrap" v-if="form.content.layout == 3 && form.content.goods.goods_data">
+                        <div class="goods-wrapper3 s-flex ai-ct jc-fs flex-wrap" v-if="form.content.layout == 3 && form.content.goods.goods_data">
                             <div class="goods-item" v-for="item in form.content.goods.goods_data" :key="item.no">
                                 <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%', radius: '10px 10px 0 0' }"/>
                                 <div class="goods-info s-flex jc-bt flex-dir">
@@ -205,7 +205,7 @@
                                         </div>
                                     </div>
                                 </el-form-item>
-                                <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_nos.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_nos.length}}/{{MaxGoodsNumber}})</el-button>
+                                <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_data.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_data.length}}/{{MaxGoodsNumber}})</el-button>
                             </template>
                         </div>
                     </el-form>
@@ -403,6 +403,10 @@ watch([() => props.component], (newValue) => {
                     margin-bottom: 4px;
                 }
             }
+        }
+        .goods-item:nth-child(2n) {
+            margin-left: 7.5px;
+            margin-right: 7.5px;
         }
     }
     .fs10 {

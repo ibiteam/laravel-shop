@@ -56,7 +56,7 @@ class HomeController extends BaseController
         // 数量统计
         $number_data['user_number'] = User::query()->count();  // 用户数
         $number_data['order_number'] = Order::query()->count();  // 订单数
-        $number_data['total_transaction_value'] = Transaction::query()->sum('amount');  // 总交易额
+        $number_data['total_transaction_value'] = Transaction::query()->whereStatus(Transaction::STATUS_SUCCESS)->sum('amount');  // 总交易额
 
         // 用户数据
         $statistic_time = [date('Y-m-d', strtotime('-1 week')), date('Y-m-d', strtotime('-1 day'))];
@@ -67,7 +67,7 @@ class HomeController extends BaseController
             array_multisort(array_column($access_statistics, 'statistic_date'), SORT_ASC, $access_statistics);
             $referer_group = collect($access_statistics)->groupBy('referer');
             $accessStatistic['h5'] = $this->getOption($referer_group, 'H5', RefererEnum::H5->value);
-            $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', RefererEnum::PC->value);
+            // $accessStatistic['pc'] = $this->getOption($referer_group, 'PC', RefererEnum::PC->value);
         }
 
         // 我的收藏
