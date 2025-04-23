@@ -81,7 +81,7 @@ class CartController extends BaseController
                     throw new BusinessException('商品规格发生变更');
                 }
 
-                if (! GoodsSku::whereId($goods_sku_id)->whereGoodsId($goods->id)->first()) {
+                if (! GoodsSku::whereId($goods_sku_id)->whereGoodsId($goods->id)->whereIsShow(GoodsSku::SHOW)->first()) {
                     throw new BusinessException('商品规格错误');
                 }
             } else {
