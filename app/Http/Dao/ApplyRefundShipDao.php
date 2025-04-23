@@ -52,7 +52,7 @@ class ApplyRefundShipDao
             $apply_refund->status = ApplyRefundStatusEnum::BUYER_SEND_SHIP->value;
             $apply_refund->save();
 
-            app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->user_name, '买家提交了物流单号', ApplyRefundLog::TYPE_BUYER, $apply_refund_ship->id);
+            app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->user_name, '买家提交了物流单号', ApplyRefundLog::TYPE_BUYER, $apply_refund_ship->id);
 
             DB::commit();
 

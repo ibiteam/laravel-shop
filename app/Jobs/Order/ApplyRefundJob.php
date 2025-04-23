@@ -108,7 +108,7 @@ class ApplyRefundJob implements ShouldQueue
 
             // 买家超时未申请，不记录日志
             if ($status === ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
+                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
         } catch (BusinessException|\Exception $exception) {
@@ -136,13 +136,13 @@ class ApplyRefundJob implements ShouldQueue
 
             // 发起申请售后 超时未处理 增加2条记录
             if ($status === ApplyRefundStatusEnum::NOT_PROCESSED->value) {
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未处理', ApplyRefundLog::TYPE_SELLER);
+                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未处理', ApplyRefundLog::TYPE_SELLER);
             }
 
             if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
-                app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, '卖家超时未确认收货', ApplyRefundLog::TYPE_SELLER);
+                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未确认收货', ApplyRefundLog::TYPE_SELLER);
             }
-            app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $apply_refund->user?->user_name, $action, $type);
+            app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
 
             // 微信退款
             app(ApplyRefundDao::class)->wechatRefund($apply_refund);

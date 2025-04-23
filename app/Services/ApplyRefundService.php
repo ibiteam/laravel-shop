@@ -287,7 +287,7 @@ class ApplyRefundService
         try {
             $apply_refund->fill($data)->save();
 
-            app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
+            app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -388,7 +388,7 @@ class ApplyRefundService
         $apply_refund->save();
 
         // 添加日志
-        app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
+        app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
     }
 
     private function detailFormat(ApplyRefund $apply_refund, Order $order, OrderDetail $order_detail, User $user): array
