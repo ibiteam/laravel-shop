@@ -6,7 +6,6 @@ use Monolog\Handler\SyslogUdpHandler;
 use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Log Channel
@@ -51,7 +50,6 @@ return [
     */
 
     'channels' => [
-
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_STACK', 'single')),
@@ -126,7 +124,16 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
-
+        'clickhouse' => [
+            'driver' => 'monolog',
+            'handler' => \App\Logging\ClickHouseHandler::class,
+            'formatter' => Monolog\Formatter\NormalizerFormatter::class,
+            'formatter_with' => [
+                'dateFormat' => 'Y-m-d H:i:s',
+            ],
+            'processors' => [
+                Monolog\Processor\WebProcessor::class, // 将当前请求 URI、请求方法和客户端 IP 添加到日志记录中
+            ],
+        ],
     ],
-
 ];
