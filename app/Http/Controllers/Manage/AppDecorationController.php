@@ -36,17 +36,9 @@ class AppDecorationController extends BaseController
             ->whereParentId(Constant::ZERO);
         $list = $query->paginate($request->input('number', 10));
         $list->getCollection()->transform(function (AppDecoration $app_decoration) {
+            $app_decoration->path = $app_decoration->url;
 
-            return [
-                'id' => $app_decoration->id,
-                'admin_user_id' => $app_decoration->admin_user_id,
-                'name' => $app_decoration->name,
-                'title' => $app_decoration->title,
-                'url' => $app_decoration->url,
-                'created_at' => $app_decoration->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $app_decoration->updated_at->format('Y-m-d H:i:s'),
-                'admin_user_name' => $app_decoration->adminUser?->user_name ?? '--',
-            ];
+            return $app_decoration;
         });
 
         return $this->success(new CommonResourceCollection($list));
