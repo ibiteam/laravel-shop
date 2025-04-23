@@ -12,17 +12,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
- * @property int                             $id
- * @property string                          $name          名称
- * @property int                             $is_show       是否显示
- * @property string                          $alias         页面别名
- * @property int                             $parent_id     父级集合id
- * @property int                             $admin_user_id 最后一次装修人ID/管理员ID
- * @property string                          $image_url     封面地址
- * @property string|null                     $title         网页TDK:标题
- * @property string|null                     $keywords      网页TDK:关键词
- * @property string|null                     $description   网页TDK:描述
- * @property string|null                     $release_time  发布时间
+ * @property int         $id
+ * @property string      $name          名称
+ * @property int         $is_show       是否显示
+ * @property string      $alias         页面别名
+ * @property int         $parent_id     父级集合id
+ * @property int         $admin_user_id 最后一次装修人ID/管理员ID
+ * @property string      $image_url     封面地址
+ * @property string|null $title         网页TDK:标题
+ * @property string|null $keywords      网页TDK:关键词
+ * @property string|null $description   网页TDK:描述
+ * @property string|null $release_time  发布时间
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read AdminUser|null $adminUser
@@ -106,6 +106,8 @@ class AppDecoration extends BaseModel
                 if ($this->alias == self::ALIAS_HOME) {
                     return $routerService->getRouterPath(RouterEnum::HOME->value);
                 }
+
+                return '';
             }
         );
     }
