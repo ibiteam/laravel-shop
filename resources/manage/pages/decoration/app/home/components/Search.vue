@@ -165,7 +165,7 @@ const form = reactive({
 const swiperModules = [Autoplay]
 
 const handleChooseDragItem = () => {
-    cns.$bus.emit('chooseDragItem', {temp_index: form.component_name})
+    cns.$bus.emit('chooseDragItem', {temp_index: form.id})
 }
 // 通知打开选择图片弹窗
 const handleOpenUpload = (keys, not_for_data) => {

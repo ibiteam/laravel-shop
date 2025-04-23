@@ -320,7 +320,6 @@ const getGoodsList = (params = {page: 1}) => {
     Http.doPost('app_decoration/goods/list', {...queryParams, page}).then(res => {
         if (cns.$successCode(res.code)) {
             tableData.value = tableData.value.concat(res.data.list);
-            console.log(check.nos)
             handleCheckedChange(check.nos)
             // // 更新分页信息
             pageInfo.total = res.data.meta.total;

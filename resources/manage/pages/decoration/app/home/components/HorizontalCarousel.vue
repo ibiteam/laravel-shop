@@ -16,20 +16,22 @@
                                 'disableOnInteraction': false,
                                 'waitForTransition': true,
                             },
-                            loop: form.content.data.length >= 3 ? true : false,
+                            loop: false,
                             pagination: {
                                 'clickable': false,
                             },
                             modules: swiperModules
                         }" class="cards-swiper">
-                            <template v-if="form.content.data.length <= 3">
-                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in [...form.content.data, ...form.content.data]" :key="index">
+                            <template v-if="form.content.data.length <= 3" v-for="(item, index) in form.content.data">
+                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-if="item.is_show" :key="index">
                                     <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
                                 </swiper-slide>
                             </template>
-                            <swiper-slide v-else class="scroll-item" v-slot="{ isActive }" v-for="(item, index) in form.content.data" :key="index">
-                                <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
-                            </swiper-slide>
+                            <template v-else v-for="(item, index) in form.content.data">
+                                <swiper-slide class="scroll-item" v-slot="{ isActive }" v-if="item.is_show" :key="index">
+                                    <image-wrapper v-bind="{fit: isActive ? 'fill' : 'cover', src: item.image, width: '100%', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '0'}" />
+                                </swiper-slide>
+                            </template>
                         </swiper>
                         <!-- 平铺 -->
                         <swiper v-if="form.content.style == 1" v-bind="{
@@ -37,17 +39,19 @@
                             autoplay: {
                                 'delay': (form.content.interval || 3) * 1000,
                             },
-                            loop: form.content.data.length >= 3 ? true : false,
+                            loop: dataIsShowLength(form.content.data) >= 3 ? true : false,
                             pagination: {
                                 'clickable': false,
                             },
                             modules: swiperModules
                         }" class="scroll-wrapper">
-                            <swiper-slide class="scroll-item" v-for="(item, index) in form.content.data" :key="index" :style="{width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px'}">
-                                <image-wrapper
-                                    v-bind="{src: item.image, width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '10px', fit: 'cover'}" 
-                                />
-                            </swiper-slide>
+                            <template v-for="(item, index) in form.content.data">
+                                <swiper-slide class="scroll-item" v-if="item.is_show" :key="index" :style="{width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px'}">
+                                    <image-wrapper
+                                        v-bind="{src: item.image, width: form.content.width / 2 + 'px', height: (form.content.height ? form.content.height / 2 : 100) + 'px', radius: '10px', fit: 'cover'}" 
+                                    />
+                                </swiper-slide>
+                            </template>
                         </swiper>
                     </div>
                 </div>
@@ -230,6 +234,15 @@ const swiperSlideWidth = (style, width) => {
     return width / 2 + 'px'
 }
 
+const dataIsShow = (value) => {
+    return value.filter(item => item.is_show == 1)
+}
+const dataIsShowLength = (value) => {
+    const array = value.filter(item => item.is_show == 1)
+    return array.length
+}
+
+
 const handleChooseDragItem = () => {
     cns.$bus.emit('chooseDragItem', {temp_index: form.id})
 }
@@ -289,7 +302,6 @@ watch([() => props.component], (newValue) => {
             form[key] = temp[key]
 
         })
-        console.log(form)
     }
 }, {
     immediate: true,
