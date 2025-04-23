@@ -132,7 +132,7 @@
                     <div class="slide"></div>
                     <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
-                    <p v-if="detail.goods_number"><span>退款数量：</span>{{ detail.goods_number }}</p>
+                    <p v-if="detail.number"><span>退款数量：</span>{{ detail.number }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
                          v-if="detail.certificate&&detail.certificate.length">
@@ -454,7 +454,7 @@ const refuse = (e) => {
                         refuseVisible.value = false;
                     } else {
                         getData();
-                        $message(res.message);
+                        cns.$message(res.message);
                     }
                 });
 
