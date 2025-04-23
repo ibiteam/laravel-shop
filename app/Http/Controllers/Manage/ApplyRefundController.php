@@ -144,7 +144,8 @@ class ApplyRefundController extends BaseController
             $apply_refund_dao->refundTransactionCheck($apply_refund);
 
             $buyer_refund_time = intval(shop_config(ShopConfig::BUYER_REFUND_TIME));
-            $job_time = Carbon::now()->addDays($buyer_refund_time);
+            // $job_time = Carbon::now()->addDays($buyer_refund_time);
+            $job_time = Carbon::now()->addMinutes($buyer_refund_time);
 
             DB::beginTransaction();
 
@@ -336,7 +337,8 @@ class ApplyRefundController extends BaseController
             }
 
             $buyer_change_time = intval(shop_config(ShopConfig::BUYER_CHANGE_TIME));
-            $job_time = Carbon::now()->addHours($buyer_change_time);
+            // $job_time = Carbon::now()->addHours($buyer_change_time);
+            $job_time = Carbon::now()->addMinutes($buyer_change_time);
 
             DB::beginTransaction();
 

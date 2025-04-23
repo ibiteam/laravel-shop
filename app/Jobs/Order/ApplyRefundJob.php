@@ -57,28 +57,28 @@ class ApplyRefundJob implements ShouldQueue
         switch ($this->status) {
             case ApplyRefundStatusEnum::NOT_PROCESSED->value: // 状态:待处理
                 if ($apply_refund->status == ApplyRefundStatusEnum::NOT_PROCESSED->value) {
-                    $this->applyRefund($this->action, $this->type, $this->status);
+                    $this->executeRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::REFUSE->value: // 状态: 已拒绝退款
                 if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
-                    $this->applyRefundClose($this->action, $this->type, $this->status);
+                    $this->closeRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::REFUSE_EXAMINE->value: // 状态: 退货审核成功 待买家发货
                 if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
-                    $this->applyRefundClose($this->action, $this->type, $this->status);
+                    $this->closeRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
 
             case ApplyRefundStatusEnum::BUYER_SEND_SHIP->value:  // 状态: 买家已发货 待卖家收货
                 if ($apply_refund->status == ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
-                    $this->applyRefund($this->action, $this->type, $this->status);
+                    $this->executeRefund($this->action, $this->type, $this->status);
                 }
 
                 break;
@@ -95,7 +95,7 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function applyRefundClose($action, $type, $status): void
+    public function closeRefund($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['user'])->whereId($this->apply_refund_id)->first();
 
@@ -111,8 +111,11 @@ class ApplyRefundJob implements ShouldQueue
                 app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
             }
             DB::commit();
-        } catch (BusinessException|\Exception $exception) {
-            Log::error('关闭退款队列异常~'.$exception->getMessage());
+        } catch (BusinessException $business_exception) {
+            Log::error('关闭退款队列错误~'.$business_exception->getMessage());
+            DB::rollBack();
+        } catch (\Throwable $throwable) {
+            Log::error('关闭退款队列异常~'.$throwable->getMessage());
             DB::rollBack();
         }
     }
@@ -122,7 +125,7 @@ class ApplyRefundJob implements ShouldQueue
      *
      * @throws \Throwable
      */
-    public function applyRefund($action, $type, $status): void
+    public function executeRefund($action, $type, $status): void
     {
         $apply_refund = ApplyRefund::query()->with(['order', 'user', 'applyRefundReason'])->whereId($this->apply_refund_id)->first();
 
@@ -134,23 +137,25 @@ class ApplyRefundJob implements ShouldQueue
         try {
             $apply_refund->save();
 
-            // 发起申请售后 超时未处理 增加2条记录
+            // 发起申请售后 超时未处理
             if ($status === ApplyRefundStatusEnum::NOT_PROCESSED->value) {
-                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未处理', ApplyRefundLog::TYPE_SELLER);
+                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未处理，已退款给买家', ApplyRefundLog::TYPE_SELLER);
             }
 
             if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
-                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未确认收货', ApplyRefundLog::TYPE_SELLER);
+                app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
             }
-            app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
+            // app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
 
             // 微信退款
             app(ApplyRefundDao::class)->wechatRefund($apply_refund);
 
             DB::commit();
-        } catch (BusinessException|\Exception $exception) {
-            Log::error('执行退款队列异常~'.$exception->getMessage());
-
+        } catch (BusinessException $business_exception) {
+            Log::error('执行退款队列错误~'.$business_exception->getMessage());
+            DB::rollBack();
+        } catch (\Throwable $throwable) {
+            Log::error('执行退款队列异常~'.$throwable->getMessage());
             DB::rollBack();
         }
     }
