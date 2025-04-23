@@ -28,7 +28,7 @@ class ClickHouseHandler extends AbstractProcessingHandler
             } else {
                 $data = [
                     'channel' => $formatted['channel'],
-                    'level' => $formatted['level'],
+                    'level' => $formatted['level_name'] ?? $formatted['level'],
                     'message' => $formatted['message'],
                     'context' => json_encode($formatted['context'], JSON_UNESCAPED_UNICODE + JSON_UNESCAPED_SLASHES),
                     'datetime' => $formatted['datetime'],
