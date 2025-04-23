@@ -34,7 +34,7 @@ class ChatController extends BaseController
             if ($user) {
                 $data = [
                     'platform_id' => $platform_id,
-                    'user_id' => $user->user_id,
+                    'user_id' => $user->id,
                     'user_name' => $user->user_name,
                     'user_phone' => $user->phone,
                     'user_head_img' => $user->avatar,
