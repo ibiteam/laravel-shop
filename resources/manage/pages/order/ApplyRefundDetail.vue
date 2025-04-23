@@ -335,7 +335,7 @@ const openShip = () => {
             shipList.value = res.data.ship_list;
             shipCode.value = res.data.ship_no;
         } else {
-            cns.$message(res.message);
+            cns.$message.error(res.message);
         }
     });
 };
@@ -513,7 +513,7 @@ const receive = () => {
             });
         } else {
             getData();
-            cns.$message(res.message);
+            cns.$message.error(res.message);
         }
     });
 };
