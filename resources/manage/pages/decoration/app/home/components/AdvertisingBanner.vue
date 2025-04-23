@@ -29,7 +29,7 @@
                             <div v-for="(item, index) in form.content.data" :key="index" 
                                 :style="{
                                     width: (form.content.width / 2 - (form.content.background ? '5' : 0)) + 'px',
-                                    marginBottom: (form.content.background ? '10px' : 0)
+                                    marginBottom: '10px'
                                 }"
                             >
                                 <image-wrapper 
