@@ -22,7 +22,7 @@
                 <div style="margin-bottom: 10px;border-bottom: 1px solid #eee;padding-bottom: 10px;">
                     <div class="status" style="margin-bottom: 10px;">
                         {{ status[detail.status] }}
-                        <span v-if="detail.status==0||detail.status==3">
+                        <span v-if="(detail.status==0||detail.status==3) && (end_time >= server_time)">
                             <img src="@/assets/images/refund/time-icon.png">还剩
                             <span class="co-red">
                                 <template v-if="countdown_data.day&&countdown_data.day!=='00'">{{ countdown_data.day }}天</template>
@@ -214,6 +214,7 @@
 import { ref, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Http from '@/utils/http';
+import { tabRemove } from '@/router/tabs';
 
 const router = useRouter();
 const route = useRoute();
@@ -375,10 +376,17 @@ const agree = () => {
         Http.doPost('apply_refund/execute_refund', params).then((res) => {
             agreeBtnLoading.value = false;
             if (cns.$successCode(res.code)) {
+                cns.$message.success(res.message);
                 getData();
+                nextTick(() => {
+                    router.replace({
+                        name: 'manage.apply_refund.index'
+                    });
+                    tabRemove('manage.apply_refund.detail')
+                });
             } else {
                 getData();
-                cns.$message(res.message);
+                cns.$message.error(res.message);
             }
         });
     } else {
@@ -392,11 +400,18 @@ const agree = () => {
                     Http.doPost('apply_refund/execute_refund', params).then((res) => {
                         agreeBtnLoading.value = false;
                         if (cns.$successCode(res.code)) {
+                            cns.$message.success(res.message);
                             getData();
                             agreeVisible.value = false;
+                            nextTick(() => {
+                                router.replace({
+                                    name: 'manage.apply_refund.index'
+                                });
+                                tabRemove('manage.apply_refund.detail')
+                            });
                         } else {
                             getData();
-                            cns.$message(res.message);
+                            cns.$message.error(res.message);
                         }
                     });
                 } else {
@@ -408,11 +423,12 @@ const agree = () => {
                     Http.doPost('apply_refund/agree_apply', params).then((res) => {
                         agreeBtnLoading.value = false;
                         if (cns.$successCode(res.code)) {
+                            cns.$message.success(res.message);
                             getData();
                             agreeVisible.value = false;
                         } else {
                             getData();
-                            cns.$message(res.message);
+                            cns.$message.error(res.message);
                         }
                     });
                 }
@@ -443,10 +459,11 @@ const refuse = (e) => {
         Http.doPost('apply_refund/close_apply', params).then((res) => {
             refuseBtnLoading.value = false
             if (cns.$successCode(res.code)) {
+                cns.$message.success(res.message);
                 getData();
             } else {
                 getData();
-                cns.$message(res.message);
+                cns.$message.error(res.message);
             }
         });
     } else {
@@ -459,11 +476,12 @@ const refuse = (e) => {
                 Http.doPost('apply_refund/refuse_refund', params).then((res) => {
                     refuseBtnLoading.value = false
                     if (cns.$successCode(res.code)) {
+                        cns.$message.success(res.message);
                         getData();
                         refuseVisible.value = false;
                     } else {
                         getData();
-                        cns.$message(res.message);
+                        cns.$message.error(res.message);
                     }
                 });
 
@@ -485,7 +503,14 @@ const receive = () => {
     Http.doPost('apply_refund/confirm_receipt', params).then((res) => {
         receiveBtnLoading.value = false;
         if (cns.$successCode(res.code)) {
+            cns.$message.success(res.message);
             getData();
+            nextTick(() => {
+                router.replace({
+                    name: 'manage.apply_refund.index'
+                });
+                tabRemove('manage.apply_refund.detail')
+            });
         } else {
             getData();
             cns.$message(res.message);
