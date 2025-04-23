@@ -24,6 +24,7 @@ use App\Models\ShopConfig;
 use App\Models\Transaction;
 use App\Services\ExpressService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -89,7 +90,7 @@ class OrderController extends BaseController
                 'id' => '订单ID',
             ]);
 
-            $order = Order::query()->with(['transactions', 'transactions.payment', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->first();
+            $order = Order::query()->with(['transactions', 'transactions.payment', 'detail', 'user', 'province:id,name', 'city:id,name', 'district:id,name'])->whereId($validated['id'])->firstOrFail();
 
             return $this->success([
                 'order_items' => $order->detail->map(function (OrderDetail $order_detail) {
@@ -174,10 +175,12 @@ class OrderController extends BaseController
             ]);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
+        } catch (ModelNotFoundException $model_not_found_exception) {
+            return $this->error('订单不存在');
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('操作失败'.$throwable->getMessage());
+            return $this->error('操作失败');
         }
     }
 
