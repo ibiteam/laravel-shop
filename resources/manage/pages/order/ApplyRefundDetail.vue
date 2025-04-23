@@ -209,7 +209,7 @@
     </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Http from '@/utils/http';
