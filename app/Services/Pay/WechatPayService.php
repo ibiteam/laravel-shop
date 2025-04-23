@@ -101,7 +101,7 @@ class WechatPayService implements PayInterface
             $parent_transaction->transaction_no,
             $refund_transaction_no,
             $refund_amount,
-            $refund_amount,
+            $parent_transaction->amount,
             $reason
         );
         $parent_transaction->update(['can_refund' => false]);

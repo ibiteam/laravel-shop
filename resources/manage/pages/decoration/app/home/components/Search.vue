@@ -1,6 +1,6 @@
 <template>
     <section>
-        <drag-wrapper v-bind="{component, select: temp_index == form.component_name}" @hiddenModel="handleChooseDragItem">
+        <drag-wrapper v-bind="{component, select: temp_index == form.id}" @hiddenModel="handleChooseDragItem">
             <template #content>
                 <div class="search-wrapper s-flex ai-ct jc-bt" @click="handleChooseDragItem">
                     <div class="search-logo" v-if="form.content.logo">
@@ -27,7 +27,7 @@
         </drag-wrapper>
         <teleport to="#decorationAppMain">
 
-            <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.component_name">
+            <setting-bar v-bind="{name: form.name}" v-if="temp_index == form.id">
                 <template #content>
                     <el-form :model="form.content" label-width="auto">
                         <div class="setting-bar-item">
