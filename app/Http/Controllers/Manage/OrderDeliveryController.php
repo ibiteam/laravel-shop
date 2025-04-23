@@ -34,7 +34,7 @@ class OrderDeliveryController extends BaseController
         $order_sn = $request->get('order_sn', null);
         $created_start_time = $request->get('created_start_time', null);
         $created_end_time = $request->get('created_end_time', null);
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $list = OrderDelivery::query()
             ->latest()
             ->with(['order:id,order_sn', 'shipCompany:id,name', 'adminUser:id,user_name'])
@@ -42,7 +42,7 @@ class OrderDeliveryController extends BaseController
             ->when(! is_null($order_sn), fn (Builder $query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', $order_sn)))
             ->when(! is_null($created_start_time), fn (Builder $query) => $query->where('shipped_at', '>=', $created_start_time))
             ->when(! is_null($created_end_time), fn (Builder $query) => $query->where('shipped_at', '<=', $created_end_time))
-            ->paginate($number);
+            ->paginate($per_page);
 
         return $this->success($list);
     }
