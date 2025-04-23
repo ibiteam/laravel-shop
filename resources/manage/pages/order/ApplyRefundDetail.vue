@@ -132,7 +132,7 @@
                     <div class="slide"></div>
                     <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
-                    <p v-if="detail.number"><span>退款数量：</span>{{ detail.number }}</p>
+                    <p v-if="detail.goods_number"><span>退款数量：</span>{{ detail.goods_number }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
                          v-if="detail.certificate&&detail.certificate.length">
@@ -170,7 +170,7 @@
             </div>
         </div>
 
-        <el-dialog title="拒绝退款" :visible.sync="refuseVisible" width="30%">
+        <el-dialog title="拒绝退款" v-model="refuseVisible" width="600px">
             <el-form ref="refuseFormRef" :rules="reasonRule" :model="refuseForm">
                 <el-form-item label="原因：" label-width="100px" prop="refuseReason">
                     <el-input v-model="refuseForm.refuseReason" autocomplete="off" type="textarea" rows="5"
@@ -183,18 +183,18 @@
                 <el-button type="primary" @click="refuse">确 定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="同意退款" :visible.sync="agreeVisible" width="30%">
+        <el-dialog title="同意退款" v-model="agreeVisible" width="600px">
             <p style="padding-bottom: 20px;">确定同意退款吗？</p>
             <el-form ref="agreeFormRef" :rules="agreeRule" :model="agreeForm">
                 <el-form-item label="退款类型：" label-width="100px" prop="type">
-                    <el-select v-model="agreeForm.type">
+                    <el-select v-model="agreeForm.type" style="width: 300px;">
                         <el-option :value="1" label="退货退款"></el-option>
                         <el-option :value="0" label="仅退款"></el-option>
                     </el-select>
                 </el-form-item>
 
                 <el-form-item label="退款金额：" label-width="100px" prop="price">
-                    <el-input v-model="agreeForm.price" autocomplete="off" style="width: 200px;"
+                    <el-input v-model="agreeForm.price" autocomplete="off" style="width: 300px;"
                               @paste.native.capture.prevent="inputPress" maxlength="10">
                         <template slot="prepend">￥</template>
                     </el-input>
@@ -454,7 +454,7 @@ const refuse = (e) => {
                         refuseVisible.value = false;
                     } else {
                         getData();
-                        cns.$message(res.message);
+                        $message(res.message);
                     }
                 });
 
