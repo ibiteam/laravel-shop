@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RouterEnum;
-
+use App\Services\RouterService;
 
 
 /**
@@ -46,12 +46,11 @@ use App\Enums\RouterEnum;
  * @property-read int|null $item_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AppDecorationItemDraft> $itemDraft
  * @property-read int|null $item_draft_count
+ * @property-read mixed $url
  * @mixin \Eloquent
  */
 class AppDecoration extends BaseModel
 {
-
-
     protected $guarded = [];
 
     public static array $path = [
@@ -91,5 +90,17 @@ class AppDecoration extends BaseModel
     public function itemDraft(): \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AppDecorationItemDraft::class, 'app_decoration_id', 'id')->orderBy('sort');
+    }
+
+    public function getUrlAttribute()
+    {
+        $routerService = new RouterService();
+        $url = '';
+
+        if ($this->alias == self::ALIAS_HOME) {
+            $url = $routerService->getRouterPath(RouterEnum::HOME->value);
+        }
+
+        return $url;
     }
 }
