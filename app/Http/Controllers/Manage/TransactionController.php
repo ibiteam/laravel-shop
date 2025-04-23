@@ -36,7 +36,7 @@ class TransactionController extends BaseController
         $status = $request->get('status', null);
         $paid_start_time = $request->get('paid_start_time', null);
         $paid_end_time = $request->get('paid_end_time', null);
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $list = Transaction::query()
             ->with(['typeInfo', 'user:id,user_name', 'payment:id,name', 'parent'])
             ->latest()
@@ -53,7 +53,7 @@ class TransactionController extends BaseController
             })
             ->when($paid_start_time, fn (Builder $query) => $query->where('paid_at', '>=', $paid_start_time))
             ->when($paid_end_time, fn (Builder $query) => $query->where('paid_at', '<=', $paid_end_time))
-            ->paginate($number);
+            ->paginate($per_page);
 
         return $this->success(new TransactionResourceCollection($list));
     }
