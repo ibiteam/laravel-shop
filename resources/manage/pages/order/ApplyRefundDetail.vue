@@ -75,6 +75,7 @@
                             <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
                             <div>{{ item.action }}</div>
                             <div v-if="item.money">退款金额：{{ item.money }}</div>
+                            <div v-if="item.number">退款数量：{{ item.number }}</div>
                             <div v-if="item.reason">退款原因：{{ item.reason }}</div>
                             <div v-if="item.result">退款描述：{{ item.result }}</div>
                             <template v-if="item.certificate">
@@ -131,6 +132,7 @@
                     <div class="slide"></div>
                     <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
+                    <p v-if="detail.goods_number"><span>退款数量：</span>{{ detail.goods_number }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
                          v-if="detail.certificate&&detail.certificate.length">
@@ -143,11 +145,10 @@
                     <p v-if="detail.description"><span>说&#12288;&#12288;明：</span>{{ detail.description }}</p>
                 </div>
                 <div class="ship" v-if="detail.isShipped">
-                    <div class="co-333 fs14 title s-flex ai-ct" style="padding: 0 10px;">
+                    <div class="co-333 fs14 title s-flex ai-ct" style="padding: 0 10px;" @click="openShip">
                         <span>物流跟踪</span>
-                        <i class="iconfont icon-icon-check_top-copy" v-if="!showShip" @click="openShip"></i>
+                        <i class="iconfont icon-to_right" v-if="!showShip"></i>
                     </div>
-                    <!-- <i class="iconfont icon-check_top"></i>  -->
                     <div v-if="showShip">
                         <div class="ship-title">
                             <span>物流单号：{{ shipCode }}</span>
@@ -336,10 +337,10 @@ const openShip = () => {
 };
 
 const Countdown_new = (val, nowTime) => {
-    countdown_data.value.day = String((val - nowTime) / 86400) > 0 ? Charall(parseInt(String((val - nowTime) / 86400))) : '00';
-    countdown_data.value.hour = String(((val - nowTime) % 86400) / 3600) > 0 ? Charall(String((val - nowTime) % 86400 / 3600)) : '00';
-    countdown_data.value.minute = String((((val - nowTime) % 86400) % 3600) / 60) > 0 ? Charall(String((((val - nowTime) % 86400) % 3600) / 60)) : '00';
-    countdown_data.value.second = String((((val - nowTime) % 86400) % 3600) % 60) > 0 ? Charall(String((((val - nowTime) % 86400) % 3600) % 60)) : '00';
+    countdown_data.value.day = parseInt((val - nowTime) / 86400) > 0 ? Charall(parseInt((val - nowTime) / 86400)) : '00'
+    countdown_data.value.hour = parseInt(((val - nowTime) % 86400) / 3600) > 0 ? Charall(parseInt((val - nowTime)% 86400 / 3600)) : '00'
+    countdown_data.value.minute = parseInt((((val - nowTime) % 86400) % 3600) / 60) > 0 ? Charall(parseInt((((val - nowTime) % 86400) % 3600) / 60)) : '00'
+    countdown_data.value.second = parseInt((((val - nowTime) % 86400) % 3600) % 60) > 0 ? Charall(parseInt((((val - nowTime) % 86400) % 3600) % 60)) : '00'
 };
 
 const Charall = (val) => {
@@ -607,6 +608,7 @@ onMounted(() => {
 /*物流追踪样式*/
 .content-right .ship {
     padding: 10px 0;
+    cursor: pointer;
 }
 
 .content-right .ship .title i {
