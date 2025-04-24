@@ -2,8 +2,8 @@
 
 namespace App\Http\Dao;
 
-use App\Models\Permission;
 use App\Models\AccessRecord;
+use App\Models\Permission;
 
 class AccessRecordDao
 {
@@ -12,7 +12,7 @@ class AccessRecordDao
      */
     public function updateOrCreate(int $admin_user_id, ?string $name): void
     {
-        if ($admin_user_id <= 0 || !$name) {
+        if ($admin_user_id <= 0 || ! $name) {
             return;
         }
 
@@ -20,7 +20,8 @@ class AccessRecordDao
             ->where('parent_id', '>', 0)
             ->whereIsLeftNav(Permission::IS_LEFT_NAV)
             ->where('name', $name)->first();
-        if (!$permission) {
+
+        if (! $permission) {
             return;
         }
 
@@ -38,6 +39,7 @@ class AccessRecordDao
             ->whereIsShow(AccessRecord::IS_SHOW_YES)
             ->orderByDesc('updated_at')
             ->pluck('permission_id')->toArray();
+
         if (empty($permission_ids)) {
             return [];
         }
