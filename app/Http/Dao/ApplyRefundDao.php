@@ -206,7 +206,7 @@ class ApplyRefundDao
 
         $pay_success_transaction = null;
 
-        if ($order->order_amount > 0) {// 纯积分订单 不检测支付交易记录
+        if (floatval($apply_refund->money)) {// 纯积分 不检测支付交易记录
             // 获取成功的支付交易记录
             $pay_success_transaction = $order->transactions
                 ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
@@ -260,10 +260,9 @@ class ApplyRefundDao
     public function operationRefund(ApplyRefund $apply_refund): void
     {
         try {
-            if (! $apply_refund->money && $apply_refund->integral) {
+            if (! floatval($apply_refund->money) && intval($apply_refund->integral)) {
                 // 直接只退积分
                 app(OrderOperateService::class)->applyRefund($apply_refund);
-
             } else {
                 $pay_success_transaction = $this->refundTransactionCheck($apply_refund);
 
@@ -291,7 +290,7 @@ class ApplyRefundDao
                 $apply_refund->update(['transaction_id' => $result['transaction']->id ?? 0]);
             }
         } catch (\Throwable $exception) {
-            Log::error('申请售后微信退款异常: '.$exception->getMessage());
+            Log::error('申请售后微信退款异常: '.$exception);
 
             throw new BusinessException('申请售后微信退款异常');
         }

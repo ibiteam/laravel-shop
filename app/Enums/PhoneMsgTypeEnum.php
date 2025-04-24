@@ -21,18 +21,6 @@ enum PhoneMsgTypeEnum: int
         };
     }
 
-    public static function getEnumValue($action): self
-    {
-        return match ($action) {
-            SmsService::ACTION_LOGIN => self::PHONE_LOGIN,
-            SmsService::ACTION_FORGET_PASSWORD => self::PHONE_FORGET_PASSWORD,
-            SmsService::ACTION_EDIT_PASSWORD => self::PHONE_EDIT_PASSWORD,
-            SmsService::ACTION_EDIT_PHONE => self::PHONE_EDIT,
-            SmsService::ACTION_VERIFY_PHONE => self::ACTION_VERIFY_PHONE,
-            default => throw new BusinessException('Unexpected match value'),
-        };
-    }
-
     /**
      * @throws BusinessException
      */
