@@ -196,12 +196,14 @@
                         <el-option :value="0" label="仅退款"></el-option>
                     </el-select>
                 </el-form-item>
-
                 <el-form-item label="退款金额：" label-width="100px" prop="price">
                     <el-input v-model="agreeForm.price" autocomplete="off" style="width: 300px;"
                               @paste.native.capture.prevent="inputPress" maxlength="10">
                         <template slot="prepend">￥</template>
                     </el-input>
+                </el-form-item>
+                <el-form-item label="退款积分：" label-width="100px">
+                    <el-input v-model="agreeForm.integral" autocomplete="off" style="width: 300px;" disabled maxlength="10"></el-input>
                 </el-form-item>
             </el-form>
 
