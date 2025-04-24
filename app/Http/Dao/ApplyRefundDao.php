@@ -206,7 +206,7 @@ class ApplyRefundDao
 
         $pay_success_transaction = null;
 
-        if (! floatval($apply_refund->money) && $apply_refund->integral) {// 纯积分 不检测支付交易记录
+        if (floatval($apply_refund->money)) {// 纯积分 不检测支付交易记录
             // 获取成功的支付交易记录
             $pay_success_transaction = $order->transactions
                 ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
