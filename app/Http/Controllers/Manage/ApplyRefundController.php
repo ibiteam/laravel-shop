@@ -550,15 +550,17 @@ class ApplyRefundController extends BaseController
                     $item->setAttribute('integral', $apply_refund_data['integral'] ?? 0);
                     $item->setAttribute('number', get_new_price($apply_refund_data['number']));
                     $item->setAttribute('reason', ApplyRefundReason::query()->whereId($apply_refund_data['reason_id'])->value('content') ?? '');
-                    $item->setAttribute('result', $apply_refund_data['result'] ?? '');
+                    $item->setAttribute('description', $apply_refund_data['description'] ?? '');
                     $item->setAttribute('certificate', $apply_refund_data['certificate']);
+                    $item->setAttribute('result', $apply_refund_data['result'] ?? '');
                 } else {
                     $item->setAttribute('money', price_format($apply_refund->money));
                     $item->setAttribute('integral', $apply_refund->integral);
                     $item->setAttribute('number', get_new_price($apply_refund->number));
                     $item->setAttribute('reason', $apply_refund->applyRefundReason?->content);
-                    $item->setAttribute('result', $apply_refund->result);
+                    $item->setAttribute('description', $apply_refund->description);
                     $item->setAttribute('certificate', $apply_refund->certificate);
+                    $item->setAttribute('result', $apply_refund->result);
                 }
 
                 if ($item->apply_refund_ship_id > 0) {
@@ -568,7 +570,7 @@ class ApplyRefundController extends BaseController
                     $item->setAttribute('applyRefundShip', null);
                 }
 
-                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'integral', 'number', 'reason', 'result', 'certificate', 'add_time', 'applyRefundShip');
+                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'integral', 'number', 'reason', 'result', 'description', 'certificate', 'add_time', 'applyRefundShip');
             })->toArray(),
         ];
     }
