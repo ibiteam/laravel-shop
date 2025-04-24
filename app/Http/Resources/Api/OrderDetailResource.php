@@ -61,7 +61,7 @@ class OrderDetailResource extends JsonResource
                 'money_paid' => price_number_format($this->resource->money_paid),
                 'shipping_fee' => price_number_format($this->resource->shipping_fee),
                 'coupon_amount' => price_number_format($this->resource->coupon_amount),
-                'integral' => $this->resource->integral,
+                'integral' => price_number_format($this->resource->integral),
                 'order_amount' => price_number_format($this->resource->order_amount),
             ],
         ];
