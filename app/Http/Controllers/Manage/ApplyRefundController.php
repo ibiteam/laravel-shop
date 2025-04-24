@@ -517,7 +517,7 @@ class ApplyRefundController extends BaseController
             'goods_image' => $orderDetail->goods->image ?? '',
             'goods_price' => price_format($orderDetail->goods_price),
             'goods_amount' => price_format($orderDetail->goods_amount),
-            'goods_integral' => price_format($orderDetail->goods_integral),
+            'goods_integral' => $orderDetail->goods_integral,
             'goods_attr' => $orderDetail->skuValue(),
             'no' => $apply_refund->no,
             'type' => $apply_refund->type,
