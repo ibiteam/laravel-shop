@@ -36,18 +36,18 @@ class ApplyRefundController extends BaseController
         $type = $request->get('type');
         $start_time = $request->get('start_time', '');
         $end_time = $request->get('end_time', '');
-        $per_page = (int)$request->get('per_page', 10);
+        $per_page = (int) $request->get('per_page', 10);
 
         $data = ApplyRefund::query()
             ->with(['user', 'order', 'orderDetail', 'applyRefundReason'])
-            ->when($user_name, fn($query) => $query->whereHas('user', fn($query) => $query->where('user_name', 'like', '%' . $user_name . '%')))
-            ->when($goods_name, fn($query) => $query->whereHas('orderDetail', fn($query) => $query->where('goods_name', 'like', '%' . $goods_name . '%')))
-            ->when($order_sn, fn($query) => $query->whereHas('order', fn($query) => $query->where('order_sn', 'like', '%' . $order_sn . '%')))
-            ->when($no, fn($query) => $query->where('no', 'like', '%' . $no . '%'))
-            ->when(!is_null($status), fn($query) => $query->where('status', '=', $status))
-            ->when(!is_null($type), fn($query) => $query->where('type', '=', $type))
-            ->when($start_time, fn($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
-            ->when($end_time, fn($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
+            ->when($user_name, fn ($query) => $query->whereHas('user', fn ($query) => $query->where('user_name', 'like', '%'.$user_name.'%')))
+            ->when($goods_name, fn ($query) => $query->whereHas('orderDetail', fn ($query) => $query->where('goods_name', 'like', '%'.$goods_name.'%')))
+            ->when($order_sn, fn ($query) => $query->whereHas('order', fn ($query) => $query->where('order_sn', 'like', '%'.$order_sn.'%')))
+            ->when($no, fn ($query) => $query->where('no', 'like', '%'.$no.'%'))
+            ->when(! is_null($status), fn ($query) => $query->where('status', '=', $status))
+            ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
+            ->when($start_time, fn ($query) => $query->where('created_at', '>=', date('Y-m-d H:i:s', strtotime($start_time))))
+            ->when($end_time, fn ($query) => $query->where('created_at', '<=', date('Y-m-d H:i:s', strtotime($end_time))))
             ->orderByDesc('id')->paginate($per_page);
         $data->getCollection()->transform(function (ApplyRefund $apply_refund) {
             return [
@@ -59,6 +59,7 @@ class ApplyRefundController extends BaseController
                 'type' => strval($apply_refund->type),
                 'status' => $apply_refund->status,
                 'money' => $apply_refund->money,
+                'integral' => $apply_refund->integral,
                 'number' => $apply_refund->number,
                 'reason' => $apply_refund->applyRefundReason?->content,
                 'description' => $apply_refund->description,
@@ -90,14 +91,14 @@ class ApplyRefundController extends BaseController
                 return $query->select('id', 'order_sn', 'user_id', 'created_at');
             }])
             ->with(['orderDetail' => function ($query) {
-                return $query->select(['id', 'goods_id', 'goods_name', 'goods_number', 'goods_price', 'goods_amount', 'goods_unit', 'goods_sku_id', 'goods_sku_value'])
+                return $query->select(['id', 'goods_id', 'goods_name', 'goods_number', 'goods_price', 'goods_amount', 'goods_integral', 'goods_total_integral', 'goods_unit', 'goods_sku_id', 'goods_sku_value'])
                     ->with(['goods' => function ($query) {
                         return $query->select(['id', 'image', 'unit']);
                     }]);
             }])
             ->whereId($id)->first();
 
-        if (!$apply_refund) {
+        if (! $apply_refund) {
             return $this->error('未找到申请记录');
         }
 
@@ -115,13 +116,16 @@ class ApplyRefundController extends BaseController
             $validated = $request->validate([
                 'id' => 'required|integer',
                 'money' => 'required|numeric',
+                'integral' => 'nullable|numeric',
             ], [], [
                 'id' => '申请售后ID',
                 'money' => '金额',
+                'integral' => '积分',
             ]);
 
             $id = $validated['id'];
-            $money = (float)$validated['money'];
+            $money = (float) $validated['money'];
+            $integral = (int) ($validated['integral'] ?? 0);
 
             $apply_refund = ApplyRefund::query()
                 ->whereId($id)
@@ -129,19 +133,26 @@ class ApplyRefundController extends BaseController
                 ->whereStatus(ApplyRefundStatusEnum::NOT_PROCESSED->value)
                 ->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('申请记录不存在');
             }
+
+            // 退款交易检测
+            $apply_refund_dao->refundTransactionCheck($apply_refund);
 
             if ($money && $apply_refund->money != $money) {
                 if ($money > $apply_refund->money) {
                     throw new BusinessException('退款金额不能超过申请金额');
                 }
-                $apply_refund->money = $money;
+                $apply_refund->money = $money;  // 修改退款金额
             }
 
-            // 退款交易检测
-            $apply_refund_dao->refundTransactionCheck($apply_refund);
+            if ($integral && $apply_refund->integral != $integral) {
+                if ($integral > $apply_refund->integral) {
+                    throw new BusinessException('退款积分不能超过申请积分');
+                }
+                $apply_refund->integral = $integral;    // 修改退款积分
+            }
 
             $buyer_refund_time = intval(shop_config(ShopConfig::BUYER_REFUND_TIME));
             // $job_time = Carbon::now()->addDays($buyer_refund_time);
@@ -151,13 +162,13 @@ class ApplyRefundController extends BaseController
 
             try {
                 $typeMsg = '退货退款';
-                $apply_refund->money = $money;   // 修改退款金额
+                // $apply_refund->money = $money; // 修改退款金额(上面有了)
                 $apply_refund->job_time = $job_time;
                 $apply_refund->status = ApplyRefundStatusEnum::REFUSE_EXAMINE->value;
                 $apply_refund->result = "卖家同意了本次{$typeMsg}申请";
                 $apply_refund->save();
 
-                $apply_refund_log_dao->addLog($apply_refund, $current_user->user_name, '卖家同意了' . $typeMsg, ApplyRefundLog::TYPE_SELLER);
+                $apply_refund_log_dao->addLog($apply_refund, $current_user->user_name, '卖家同意了'.$typeMsg, ApplyRefundLog::TYPE_SELLER);
 
                 $order_log_dao->storeByAdminUser($current_user, $apply_refund->order, "卖家同意了{$typeMsg}");
 
@@ -179,7 +190,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            Log::error('同意申请异常~' . $throwable);
+            Log::error('同意申请异常~'.$throwable);
 
             return $this->error('同意申请异常');
         }
@@ -205,7 +216,7 @@ class ApplyRefundController extends BaseController
                 ->whereStatus(ApplyRefundStatusEnum::NOT_PROCESSED->value)
                 ->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('申请记录不存在');
             }
 
@@ -235,7 +246,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            Log::error('关闭申请异常~' . $throwable);
+            Log::error('关闭申请异常~'.$throwable);
 
             return $this->error('关闭申请异常');
         }
@@ -252,19 +263,22 @@ class ApplyRefundController extends BaseController
             $validated = $request->validate([
                 'id' => 'required|integer',
                 'money' => 'nullable|numeric',
+                'integral' => 'nullable|numeric',
             ], [], [
                 'id' => '申请售后ID',
                 'money' => '金额',
+                'integral' => '积分',
             ]);
 
             $id = $validated['id'];
-            $money = (float)($validated['money'] ?? 0);
+            $money = (float) ($validated['money'] ?? 0);
+            $integral = (int) ($validated['integral'] ?? 0);
 
-            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundReason'])->whereId($id)
+            $apply_refund = ApplyRefund::query()->with(['order', 'orderDetail', 'user', 'applyRefundReason'])->whereId($id)
                 ->whereStatus(ApplyRefundStatusEnum::NOT_PROCESSED->value)
                 ->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('申请记录不存在');
             }
 
@@ -280,8 +294,16 @@ class ApplyRefundController extends BaseController
                 $apply_refund->money = $money;
             }
 
-            // 微信退款
-            $apply_refund_dao->wechatRefund($apply_refund);
+            if ($integral && $apply_refund->integral != $integral) {
+                if ($integral > $apply_refund->integral) {
+                    throw new BusinessException('退款积分不能超过申请积分');
+                }
+
+                $apply_refund->integral = $integral;
+            }
+
+            // 操作退款
+            $apply_refund_dao->operationRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -305,7 +327,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            Log::error('执行退款异常~' . $throwable);
+            Log::error('执行退款异常~'.$throwable);
 
             return $this->error('执行退款异常');
         }
@@ -332,7 +354,7 @@ class ApplyRefundController extends BaseController
 
             $apply_refund = ApplyRefund::query()->whereId($id)->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('申请记录不存在');
             }
 
@@ -370,7 +392,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            Log::error('拒绝退款异常~' . $throwable);
+            Log::error('拒绝退款异常~'.$throwable);
 
             return $this->error('拒绝退款异常');
         }
@@ -392,11 +414,11 @@ class ApplyRefundController extends BaseController
 
             $id = $validated['id'];
 
-            $apply_refund = ApplyRefund::query()->with(['order', 'applyRefundReason'])->whereId($id)
+            $apply_refund = ApplyRefund::query()->with(['order', 'orderDetail', 'user', 'applyRefundReason'])->whereId($id)
                 ->whereStatus(ApplyRefundStatusEnum::BUYER_SEND_SHIP->value)
                 ->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('未找到待申请记录');
             }
 
@@ -404,8 +426,8 @@ class ApplyRefundController extends BaseController
                 throw new BusinessException('已执行退款，请勿重复操作');
             }
 
-            // 微信退款
-            $apply_refund_dao->wechatRefund($apply_refund);
+            // 操作退款
+            $apply_refund_dao->operationRefund($apply_refund);
 
             DB::beginTransaction();
 
@@ -429,7 +451,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            Log::error('确认收货异常~' . $throwable);
+            Log::error('确认收货异常~'.$throwable);
 
             return $this->error('确认收货异常');
         }
@@ -451,13 +473,13 @@ class ApplyRefundController extends BaseController
 
             $apply_refund = ApplyRefund::query()->whereId($id)->first();
 
-            if (!$apply_refund) {
+            if (! $apply_refund) {
                 throw new BusinessException('未找到待申请记录');
             }
 
             $shipping = $apply_refund->applyRefundShip;
 
-            if (!$shipping) {
+            if (! $shipping) {
                 throw new BusinessException('未找到发货信息');
             }
 
@@ -482,7 +504,7 @@ class ApplyRefundController extends BaseController
         $order = $apply_refund->order;
         $orderDetail = $apply_refund->orderDetail;
 
-        if (!$order || !$orderDetail || !$user) {
+        if (! $order || ! $orderDetail || ! $user) {
             return [];
         }
 
@@ -495,18 +517,20 @@ class ApplyRefundController extends BaseController
             'goods_image' => $orderDetail->goods->image ?? '',
             'goods_price' => price_format($orderDetail->goods_price),
             'goods_amount' => price_format($orderDetail->goods_amount),
+            'goods_integral' => price_format($orderDetail->goods_integral),
             'goods_attr' => $orderDetail->skuValue(),
             'no' => $apply_refund->no,
             'type' => $apply_refund->type,
             'number' => get_new_price($apply_refund->number),
             'money' => $apply_refund->money,
+            'integral' => $apply_refund->integral,
             'format_money' => price_format($apply_refund->money),
             'reason' => $apply_refund->applyRefundReason?->content,
             'description' => $apply_refund->description,
             'certificate' => $apply_refund->certificate,
             'result' => $apply_refund->result,
             'status' => $apply_refund->status,
-            'isShipped' => (bool)$apply_refund->applyRefundShip,
+            'isShipped' => (bool) $apply_refund->applyRefundShip,
             'time' => intval(strtotime($apply_refund->job_time)),
             'end_time' => $apply_refund->updated_at->format('Y-m-d H:i:s'),
             'server_time' => time(),
@@ -520,21 +544,17 @@ class ApplyRefundController extends BaseController
                 }
                 $item->setAttribute('add_time', $item->created_at->format('Y-m-d H:i:s'));
 
-                $item->setAttribute('money', price_format($apply_refund->money));
-                $item->setAttribute('number', get_new_price($apply_refund->number));
-                $item->setAttribute('reason', $apply_refund->applyRefundReason?->content);
-                $item->setAttribute('result', $apply_refund->result);
-                $item->setAttribute('certificate', $apply_refund->certificate);
-
                 if ($item->apply_refund_data) {
                     $apply_refund_data = json_decode($item->apply_refund_data, true);
                     $item->setAttribute('money', price_format($apply_refund_data['money']));
+                    $item->setAttribute('integral', $apply_refund_data['integral'] ?? 0);
                     $item->setAttribute('number', get_new_price($apply_refund_data['number']));
                     $item->setAttribute('reason', ApplyRefundReason::query()->whereId($apply_refund_data['reason_id'])->value('content') ?? '');
                     $item->setAttribute('result', $apply_refund_data['result'] ?? '');
                     $item->setAttribute('certificate', $apply_refund_data['certificate']);
                 } else {
                     $item->setAttribute('money', price_format($apply_refund->money));
+                    $item->setAttribute('integral', $apply_refund->integral);
                     $item->setAttribute('number', get_new_price($apply_refund->number));
                     $item->setAttribute('reason', $apply_refund->applyRefundReason?->content);
                     $item->setAttribute('result', $apply_refund->result);
@@ -548,7 +568,7 @@ class ApplyRefundController extends BaseController
                     $item->setAttribute('applyRefundShip', null);
                 }
 
-                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'number', 'reason', 'result', 'certificate', 'add_time', 'applyRefundShip');
+                return $item->only('user_name', 'avatar', 'action', 'type', 'money', 'integral', 'number', 'reason', 'result', 'certificate', 'add_time', 'applyRefundShip');
             })->toArray(),
         ];
     }

@@ -16,13 +16,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int                             $type            类型
  * @property int                             $status          售后状态
  * @property string                          $money           退款金额
+ * @property int                             $integral        退款积分
  * @property string                          $number          退款数量
  * @property int                             $reason_id       退款原因表ID
  * @property string|null                     $description     补充描述
  * @property array                           $certificate     退款凭证,号分割
  * @property int                             $is_revoke       是否撤销：0否 1是
  * @property int                             $count           申请次数
- * @property int                             $transaction_id  交易流水ID
+ * @property int|null                        $transaction_id  交易流水ID
  * @property string|null                     $result          结果
  * @property string|null                     $job_time        定时任务执行时间
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -44,6 +45,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereIntegral($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereIsRevoke($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereJobTime($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ApplyRefund whereMoney($value)
