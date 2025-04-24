@@ -85,9 +85,9 @@ export const RuleOption = [{
 export const SortTypeOption = [{
     value: 1,
     label: '销量'
-}, {
-    value: 2,
-    label: '好评'
+// }, {
+//     value: 2,
+//     label: '好评'
 }, {
     value: 3,
     label: '低价'

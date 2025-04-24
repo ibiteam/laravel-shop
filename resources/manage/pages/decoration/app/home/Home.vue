@@ -133,8 +133,6 @@ const findNotForData = (component_name) => {
 }
 // 拖拽克隆完成
 const handleDragAdd = (e) => {
-    console.log('handleDragAdd:')
-    console.log(e)
     const { clonedData } = e
     decoration.temp_index = clonedData.id
     pageSetting.value = false
@@ -144,7 +142,7 @@ const updateDragPlaceholder = (index) => {
     dragData.placeholderIndex = index
 }
 const handleDragChoose = (e) => {
-    console.log(e)
+    // console.log(e)
 }
 
 const setTempItemRef = (el, id) => {
@@ -210,7 +208,6 @@ const handlematerialCenterDialogConfirm = (res) => {
 
 // 接收路由中心弹窗数据
 const handleLinkCenterDialogConfirm = (res) => {
-    console.log(res)
     linkCenterDialogData.show = false
     const updateData = {...linkCenterDialogData, link: {
         name: res[0]?.name,
@@ -298,8 +295,6 @@ const decorationSave = (params) => {
             description: app_website_data.description,
             data: JSON.stringify(save_decoration_data)
         }
-        console.log(save_decoration_data)
-        console.log(saveData)
         Http.doPost('app_decoration/decoration/save', (saveData)).then(res => {
             decoration.loading = false
             if (cns.$successCode(res.code)) {
@@ -345,7 +340,6 @@ const getDecorationHome = () => {
             decoration.data = res.data.data
             decoration.not_for_data = res.data.not_for_data
             decoration.preview_path = res.data.preview_path
-            console.log(tempRefs.value)
         } else {
             cns.$message.error(res.message)
         }
