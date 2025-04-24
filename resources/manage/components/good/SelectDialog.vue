@@ -242,6 +242,7 @@ const handleCheckedChange = (value) => {
     const checkedData = tableData.value.filter(item => {
         return value.includes(item.no)
     })
+    check.data = checkedData
     check.all = checkedData.length === tableData.value.length
     check.isIndeterminate = checkedData.length > 0 && checkedData.length < tableData.value.length
 }

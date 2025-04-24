@@ -201,7 +201,7 @@
                                     <div class="goods-form-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
                                         <div class="goods-thumb-wrapper" v-for="(item,index) in form.content.goods.goods_data" :key="item.no">
                                             <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%' }" style="z-index: 2;"/>
-                                            <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 3">+{{ form.content.goods.goods_nos.length - 4 }}</div>
+                                            <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 4">+{{ form.content.goods.goods_nos.length - 4 }}</div>
                                         </div>
                                     </div>
                                 </el-form-item>
