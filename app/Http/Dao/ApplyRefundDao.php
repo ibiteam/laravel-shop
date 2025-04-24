@@ -260,7 +260,7 @@ class ApplyRefundDao
     public function operationRefund(ApplyRefund $apply_refund): void
     {
         try {
-            if (! $apply_refund->money && $apply_refund->integral) {
+            if (! floatval($apply_refund->money) && intval($apply_refund->integral)) {
                 // 直接只退积分
                 app(OrderOperateService::class)->applyRefund($apply_refund);
 
@@ -291,7 +291,7 @@ class ApplyRefundDao
                 $apply_refund->update(['transaction_id' => $result['transaction']->id ?? 0]);
             }
         } catch (\Throwable $exception) {
-            Log::error('申请售后微信退款异常: '.$exception->getMessage());
+            Log::error('申请售后微信退款异常: '.$exception);
 
             throw new BusinessException('申请售后微信退款异常');
         }
