@@ -114,7 +114,7 @@ class OrderResource extends JsonResource
                 break;
 
             case OrderConstantEnum::STATUS_PART:
-                if ($this->resource->detail_count === 1 && shop_config(ShopConfig::IS_SHOW_AFTER_SALES)) {
+                if ($this->resource->detail_count === 1 && shop_config(ShopConfig::IS_SHOW_AFTER_SALES) && $this->resource->order_amount <= floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY))) {
                     $buttons[] = ['text' => '申请售后', 'action' => 'refund'];
                 }
 
