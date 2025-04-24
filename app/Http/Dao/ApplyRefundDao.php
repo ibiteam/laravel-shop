@@ -146,7 +146,7 @@ class ApplyRefundDao
                     $success_integral = $apply_refund->sum('integral');
                     $success_number = $apply_refund->sum('number');
 
-                    if ($success_number >= $order_detail->goods_number && $success_money >= $order_detail->goods_amount && $success_integral >= $order_detail->goods_integral) {
+                    if ($success_number >= $order_detail->goods_number && $success_money >= $order_detail->goods_amount && $success_integral >= $order_detail->goods_total_integral) {
                         $after_sales_button_status = 3;
                     }
                 }
