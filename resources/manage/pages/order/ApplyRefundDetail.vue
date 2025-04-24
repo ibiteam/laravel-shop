@@ -85,8 +85,9 @@
                                 <div class="log-img" v-if="item.certificate">
                                     <el-image
                                         style="width: 87px; height: 87px" :src="c"
-                                        v-for="c in item.certificate"
-                                        :preview-src-list="item.certificate">
+                                        v-for="(c,idx) in item.certificate"
+                                        :preview-src-list="item.certificate"
+                                        :initial-index="idx">
                                     </el-image>
                                 </div>
                             </template>
@@ -98,8 +99,9 @@
                                 <div class="log-img" v-if="item.applyRefundShip.certificate">
                                     <el-image
                                         style="width: 87px; height: 87px" :src="c"
-                                        v-for="c in item.applyRefundShip.certificate"
-                                        :preview-src-list="item.applyRefundShip.certificate">
+                                        v-for="(c,idx) in item.applyRefundShip.certificate"
+                                        :preview-src-list="item.applyRefundShip.certificate"
+                                        :initial-index="idx">
                                     </el-image>
                                 </div>
                                 <div v-if="item.applyRefundShip.description">
@@ -142,8 +144,9 @@
                          v-if="detail.certificate&&detail.certificate.length">
                         <el-image
                             style="width: 87px; height: 87px" :src="c"
-                            v-for="c in detail.certificate"
-                            :preview-src-list="detail.certificate">
+                            v-for="(c,idx) in detail.certificate"
+                            :preview-src-list="detail.certificate"
+                            :initial-index="idx">
                         </el-image>
                     </div>
                     <p v-if="detail.description"><span>说&#12288;&#12288;明：</span>{{ detail.description }}</p>
