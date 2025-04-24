@@ -49,6 +49,7 @@ class OrderDetailResource extends JsonResource
                     'goods_unit' => $item->goods_unit,
                     'goods_image' => $item->goods?->image,
                     'goods_price' => price_number_format($item->goods_price),
+                    'goods_integral' => price_number_format($item->goods_integral),
                     'number' => $item->goods_number,
                     'sku_value' => $item->skuValue(),
                     'sku_id' => $item->goods_sku_id,
