@@ -107,9 +107,9 @@ class ApplyRefundDao
         $is_show_after_sales = intval(shop_config(ShopConfig::IS_SHOW_AFTER_SALES));
 
         if ($is_show_after_sales) {
-
-            if (!$order->order_amount && $order->pay_status == PayStatusEnum::PAYED->value) {
+            if (! floatval($order->order_amount) && $order->pay_status == PayStatusEnum::PAYED->value) {
                 // 纯积分支付
+
                 $after_sales_button_status = 1;
             } else {
                 // 有金额支付
