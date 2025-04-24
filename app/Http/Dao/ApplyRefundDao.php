@@ -107,37 +107,47 @@ class ApplyRefundDao
         $is_show_after_sales = intval(shop_config(ShopConfig::IS_SHOW_AFTER_SALES));
 
         if ($is_show_after_sales) {
-            $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
 
-            if ($order->order_amount <= $after_sales_max_money) {
-                // 成功支付记录
-                $pay_success_transaction = $order->transactions()
-                    ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
-                    ->where('status', Transaction::STATUS_SUCCESS)
-                    ->first();
+            if (!$order->order_amount && $order->pay_status == PayStatusEnum::PAYED->value) {
+                // 纯积分支付
+                $after_sales_button_status = 1;
+            } else {
+                // 有金额支付
+                $after_sales_max_money = floatval(shop_config(ShopConfig::AFTER_SALES_MAX_MONEY));
 
-                if ($pay_success_transaction) {
-                    $after_sales_button_status = 1;
+                if ($order->order_amount <= $after_sales_max_money) {
+                    // 成功支付记录
+                    $pay_success_transaction = $order->transactions()
+                        ->where('transaction_type', Transaction::TRANSACTION_TYPE_PAY)
+                        ->where('status', Transaction::STATUS_SUCCESS)
+                        ->first();
 
-                    // 这里看订单下指定明细的
-                    $apply_refunding = ApplyRefund::query()
+                    if ($pay_success_transaction) {
+                        $after_sales_button_status = 1;
+                    }
+                }
+            }
+
+            if ($after_sales_button_status == 1) {
+                // 这里看订单下指定明细的
+                $apply_refunding = ApplyRefund::query()
+                    ->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
+                    ->whereIn('status', ApplyRefund::$statusInProgressMap)
+                    ->orderByDesc('created_at')->first();
+
+                if ($apply_refunding) {
+                    $after_sales_button_status = 2;
+                } else {
+                    $apply_refund = ApplyRefund::query()
                         ->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
-                        ->whereIn('status', ApplyRefund::$statusInProgressMap)
-                        ->orderByDesc('created_at')->first();
+                        ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
+                        ->select(['money', 'integral', 'number'])->get();
+                    $success_money = $apply_refund->sum('money');
+                    $success_integral = $apply_refund->sum('integral');
+                    $success_number = $apply_refund->sum('number');
 
-                    if ($apply_refunding) {
-                        $after_sales_button_status = 2;
-                    } else {
-                        $apply_refund = ApplyRefund::query()
-                            ->whereOrderId($order->id)->whereOrderDetailId($order_detail->id)
-                            ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
-                            ->select(['money', 'number'])->get();
-                        $success_money = $apply_refund->sum('money');
-                        $success_number = $apply_refund->sum('number');
-
-                        if ($success_number >= $order_detail->goods_number && $success_money >= $order_detail->goods_amount) {
-                            $after_sales_button_status = 3;
-                        }
+                    if ($success_number >= $order_detail->goods_number && $success_money >= $order_detail->goods_amount && $success_integral >= $order_detail->goods_integral) {
+                        $after_sales_button_status = 3;
                     }
                 }
             }
