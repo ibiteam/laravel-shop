@@ -178,7 +178,7 @@ watch(() => props.id, (newValue) => {
         overflow: hidden;
         .main-content-wrapper {
             position: relative;
-            height: calc(100% - 50px);
+            height: calc(100% - 55px);
         }
     }
 }

@@ -264,7 +264,7 @@ const getLinkTableData = (params = {page: 1, number: 10}) => {
     const {page, number} = params;
     const searchInfo = searchInfoData()
     searchInfo.page = page;
-    searchInfo.number = number;
+    searchInfo.per_page = number;
     tableLoading.value = true
     Http.doGet(searchInfo.url, searchInfo).then(res => {
         if (res.code === 200) {

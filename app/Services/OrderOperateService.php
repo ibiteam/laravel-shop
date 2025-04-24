@@ -214,13 +214,13 @@ class OrderOperateService
             ]);
 
             // 更新订单付费金额
-            $order->update(['money_paid' => $order->money_paid - $apply_refund->money]);
+            $update_money_paid = $order->money_paid - $apply_refund->money;
+            $order->update(['money_paid' => max($update_money_paid, 0)]);
 
             // 回退积分
-            if ($order_detail->goods_integral > 0) {
-                $refund_integral = $order_detail->goods_integral * $apply_refund->number;
-                app(UserDao::class)->incrementIntegralByDoneOrder($user, $refund_integral, '用户订单售后退款，回退积分');
-                $order->integral = $order->integral - $refund_integral;
+            if ($apply_refund->integral > 0) {
+                app(UserDao::class)->incrementIntegralByDoneOrder($user, $apply_refund->integral, '用户订单售后退款，回退积分');
+                $order->integral = $order->integral - $apply_refund->integral;
                 $order->save();
             }
 
@@ -232,13 +232,14 @@ class OrderOperateService
             // 订单下 所有成功的售后退款
             $success_apply_refund = ApplyRefund::whereOrderId($order->id)
                 ->whereStatus(ApplyRefundStatusEnum::REFUND_SUCCESS->value)
-                ->select(['money', 'number'])->get();
+                ->select(['money', 'integral', 'number'])->get();
 
             $success_money = $success_apply_refund->sum('money');
+            $success_integral = $success_apply_refund->sum('integral');
             $success_number = $success_apply_refund->sum('number');
 
-            // 交易关闭：退款数量大于等于 订单明细数量时 && 退款金额 大于等于 订单金额
-            if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount) {
+            // 交易关闭：退款数量>=订单明细数量时 && 退款金额>=订单金额 && 退款积分>=订单消耗积分数量
+            if ($success_number >= $order->detail->sum('goods_number') && $success_money >= $order->order_amount && $success_integral >= $order->integral) {
                 // 更新订单状态
                 if (! $order->update([
                     'order_status' => OrderStatusEnum::CANCELLED->value,

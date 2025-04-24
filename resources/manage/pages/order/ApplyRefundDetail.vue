@@ -33,6 +33,7 @@
                     <h5 v-if="detail.status==5||detail.status==6">退款{{ detail.status == 5 ? '成功' : '关闭' }}时间:{{ detail.end_time }}</h5>
                     <h5 v-if="detail.result">{{ detail.result }}</h5>
                     <h5 v-if="detail.status==5">退款金额：{{ detail.format_money }}</h5>
+                    <h5 v-if="detail.status==5 && detail.integral">退款积分：{{ detail.integral }}积分</h5>
                 </div>
 
                 <ul style="margin-bottom: 10px;" v-if="detail.status==0">
@@ -76,6 +77,7 @@
                             <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
                             <div>{{ item.action }}</div>
                             <div v-if="item.money">退款金额：{{ item.money }}</div>
+                            <div v-if="item.integral">退款积分：{{ item.integral }}积分</div>
                             <div v-if="item.number">退款数量：{{ item.number }}</div>
                             <div v-if="item.reason">退款原因：{{ item.reason }}</div>
                             <div v-if="item.result">退款描述：{{ item.result }}</div>
@@ -128,11 +130,12 @@
                     <p><span>买&#12288;&#12288;家：</span>{{ detail.buyer_name }}</p>
                     <p><span>订单编号：</span>{{ detail.order_sn }}</p>
                     <p><span>成交时间：</span>{{ detail.created_at }}</p>
-                    <p><span>单&#12288;&#12288;价：</span>{{ detail.goods_price }}*{{ detail.goods_number }}</p>
+                    <p><span>单&#12288;&#12288;价：</span>{{ detail.goods_price }}<template v-if="detail.goods_integral">+{{detail.goods_integral}}积分</template>*{{ detail.goods_number }}</p>
                     <p><span>商品总价：</span>{{ detail.goods_amount }}</p>
                     <div class="slide"></div>
                     <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
+                    <p v-if="detail.integral"><span>退款积分：</span>{{ detail.integral }}积分</p>
                     <p v-if="detail.number"><span>退款数量：</span>{{ detail.number }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
@@ -215,9 +218,11 @@ import { ref, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Http from '@/utils/http';
 import { tabRemove } from '@/router/tabs';
+import { useCommonStore } from '@/store'
 
 const router = useRouter();
 const route = useRoute();
+const commonStore = useCommonStore()
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 const detailFormLoading = ref(false);
@@ -231,7 +236,8 @@ const refuseForm = ref({
 });
 const agreeForm = ref({ // 同意退款form
     type: '', // 类型
-    price: '' // 改价价格
+    price: '', // 改价价格
+    integral:''
 });
 const agreeFormRef = ref(null);
 const refuseFormRef = ref(null);
@@ -362,6 +368,7 @@ const agreeOpen = () => {
     });
     agreeForm.value.type = '';
     agreeForm.value.price = detail.value.money;
+    agreeForm.value.integral = detail.value.integral
 };
 
 const agree = () => {
@@ -371,7 +378,8 @@ const agree = () => {
     agreeBtnLoading.value = true;
     if (detail.value.type == 0) { // 仅退款
         let params = {
-            id: route.params.id
+            id: route.params.id,
+            integral:detail.value.integral,
         };
         Http.doPost('apply_refund/execute_refund', params).then((res) => {
             agreeBtnLoading.value = false;
@@ -395,7 +403,8 @@ const agree = () => {
                 if (agreeForm.value.type == 0) {
                     let params = {
                         id: route.params.id,
-                        money: agreeForm.value.price
+                        money: agreeForm.value.price,
+                        integral:agreeForm.value.integral,
                     };
                     Http.doPost('apply_refund/execute_refund', params).then((res) => {
                         agreeBtnLoading.value = false;
@@ -418,7 +427,8 @@ const agree = () => {
                     let params = {
                         id: route.params.id,
                         type: agreeForm.value.type,
-                        money: agreeForm.value.price
+                        money: agreeForm.value.price,
+                        integral:agreeForm.value.integral,
                     };
                     Http.doPost('apply_refund/agree_apply', params).then((res) => {
                         agreeBtnLoading.value = false;
@@ -519,6 +529,11 @@ const receive = () => {
 };
 
 onMounted(() => {
+    let title = '退款详情'
+    if (route.query.no) {
+        title = '退款详情-' + route.query.no;
+        commonStore.updateVisitedViewsTitle(route, title);
+    }
     getData();
 });
 </script>

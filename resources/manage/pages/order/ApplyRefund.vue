@@ -60,6 +60,7 @@
         <el-table-column label="商品名称" prop="goods_name"></el-table-column>
         <el-table-column label="订单号" prop="order_sn"></el-table-column>
         <el-table-column label="退款金额" prop="money" width="85"></el-table-column>
+        <el-table-column label="退款积分" prop="integral" width="85"></el-table-column>
         <el-table-column label="退款数量" prop="number" width="85"></el-table-column>
         <el-table-column label="类型" width="85">
             <template #default="{ row }">
@@ -94,7 +95,7 @@
                     <el-button
                         link type="primary" size="large"
                         v-if="row.status == item.value"
-                        @click="openDetail(row.id)">
+                        @click="openDetail(row)">
                         <span>{{ item.label }}</span>
                     </el-button>
                 </template>
@@ -157,8 +158,8 @@ const imageShow = (url: string) => {
     window.open(url);
 };
 
-const openDetail = (id: number) => {
-    router.push({ name: 'manage.apply_refund.detail', params: { id: id } });
+const openDetail = (row:any) => {
+    router.push({ name: 'manage.apply_refund.detail', params: { id: row.id }, query: { no: row.no } });
 };
 
 const getData = (page: number = defaultPage.page) => {
