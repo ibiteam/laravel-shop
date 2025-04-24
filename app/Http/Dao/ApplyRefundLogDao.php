@@ -5,6 +5,7 @@ namespace App\Http\Dao;
 use App\Exceptions\BusinessException;
 use App\Models\ApplyRefund;
 use App\Models\ApplyRefundLog;
+use App\Models\ApplyRefundReason;
 use App\Models\User;
 
 class ApplyRefundLogDao
@@ -12,13 +13,14 @@ class ApplyRefundLogDao
     /**
      * 添加记录.
      */
-    public function addLog($apply_refund_id, $action_name, $action, $type, $apply_refund_ship_id = 0)
+    public function addLog(ApplyRefund $apply_refund, $action_name, $action, $type, $apply_refund_ship_id = 0, $apply_refund_data = null)
     {
         return ApplyRefundLog::query()->create([
-            'apply_refund_id' => $apply_refund_id,
+            'apply_refund_id' => $apply_refund->id,
             'action_name' => $action_name,
             'action' => $action,
             'type' => $type,
+            'apply_refund_data' => json_encode($apply_refund->toArray()),
             'apply_refund_ship_id' => $apply_refund_ship_id,
         ]);
     }
@@ -35,7 +37,7 @@ class ApplyRefundLogDao
             ->whereUserId($user->id)->whereId($apply_refund_id)
             ->first();
 
-        if (! $apply_refund instanceof ApplyRefund) {
+        if (!$apply_refund instanceof ApplyRefund) {
             throw new BusinessException('退款信息不存在');
         }
 
@@ -52,7 +54,7 @@ class ApplyRefundLogDao
                     $temp_name = $temp_user->user_name ?? '';
                     $temp_img = $temp_user->avatar ?? '';
                 } else {
-                    $temp_name = '卖家';
+                    $temp_name = '商家';
                     $temp_img = '';
                 }
                 $temp_apply_refund_shipping = null;
@@ -67,19 +69,25 @@ class ApplyRefundLogDao
                     ];
                 }
 
+                if ($apply_refund_log->apply_refund_data) {
+                    $apply_refund_data = json_decode($apply_refund_log->apply_refund_data, true);
+                } else {
+                    $apply_refund_data = $apply_refund_log->applyRefund()->first()->toArray();
+                }
+
                 return [
                     'img' => $temp_img,
                     'name' => $temp_name,
+                    'unit' => $temp_unit,
                     'created_at' => $apply_refund_log->created_at->format('Y-m-d H:i:s'),
                     'action' => $apply_refund_log->action,
                     'type' => $apply_refund_log->type,
-                    'reason' => $apply_refund_log->applyRefund->applyRefundReason->content,
-                    'refund_money' => $apply_refund_log->applyRefund->money,
-                    'refund_number' => get_new_price($apply_refund_log->applyRefund->number),
-                    'unit' => $temp_unit,
-                    'certificate' => $apply_refund_log->applyRefund->certificate,
-                    'description' => $apply_refund_log->applyRefund->description,
-                    'refund_type' => $apply_refund_log->applyRefund->type,
+                    'reason' => ApplyRefundReason::query()->whereId($apply_refund_data['reason_id'])->value('content'),
+                    'refund_money' => $apply_refund_data['money'],
+                    'refund_number' => $apply_refund_data['number'],
+                    'certificate' => $apply_refund_data['certificate'],
+                    'description' => $apply_refund_data['description'],
+                    'refund_type' => $apply_refund_data['type'],
                     'apply_refund_shipping' => $temp_apply_refund_shipping,
                 ];
             })->toArray();

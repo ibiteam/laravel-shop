@@ -261,9 +261,11 @@ class ApplyRefundService
         $seller_confirm_time = intval(shop_config(ShopConfig::SELLER_CONFIRM_TIME)); // 卖家处理响应时间（小时）
 
         if ($type == ApplyRefund::TYPE_REFUND_GOODS) {
-            $delayed_time = Carbon::now()->addHours($seller_shipped_time);
+            // $delayed_time = Carbon::now()->addHours($seller_shipped_time);
+            $delayed_time = Carbon::now()->addMinutes($seller_shipped_time);
         } else {
-            $delayed_time = Carbon::now()->addHours($seller_confirm_time);
+            // $delayed_time = Carbon::now()->addHours($seller_confirm_time);
+            $delayed_time = Carbon::now()->addMinutes($seller_confirm_time);
         }
 
         $data = [
@@ -278,6 +280,7 @@ class ApplyRefundService
             'reason_id' => $reason_id,
             'description' => $description,
             'certificate' => $certificate,
+            'result' => '',
             'job_time' => $delayed_time,
             'count' => $count,
         ];
@@ -287,7 +290,7 @@ class ApplyRefundService
         try {
             $apply_refund->fill($data)->save();
 
-            app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
+            app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -388,7 +391,7 @@ class ApplyRefundService
         $apply_refund->save();
 
         // 添加日志
-        app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
+        app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
     }
 
     private function detailFormat(ApplyRefund $apply_refund, Order $order, OrderDetail $order_detail, User $user): array
