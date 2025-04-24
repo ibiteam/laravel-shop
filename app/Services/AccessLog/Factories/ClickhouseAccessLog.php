@@ -20,7 +20,7 @@ class ClickhouseAccessLog implements AccessLogInterface
 
             // 判断表是否存在
             if (! $this->tableExists($table_name)) {
-                $this->createTable($table_name);
+                return;
             }
         }
 
@@ -74,41 +74,6 @@ class ClickhouseAccessLog implements AccessLogInterface
             return $response;
         } catch (\Exception $e) {
             return false;
-        }
-    }
-
-    /**
-     * 不存在则创建表.
-     */
-    private function createTable(string $table_name): void
-    {
-        try {
-            DB::connection('clickhouse')->statement(
-                <<<SQL
-            create table {$table_name}
-            (
-                id              UUID     default generateUUIDv4(),
-                user_id         String,
-                ip              String,
-                url             String,
-                source          String,
-                method          String,
-                referer_url     String,
-                user_agent      String,
-                browser         String,
-                system          String,
-                request_data    String,
-                access_datetime DateTime default now()
-            )
-                engine = MergeTree PARTITION BY toYYYYMM(access_datetime)
-                    ORDER BY toYYYYMM(access_datetime)
-                    SETTINGS index_granularity = 8192;
-            SQL
-            );
-
-            return;
-        } catch (\Exception $e) {
-            return;
         }
     }
 }
