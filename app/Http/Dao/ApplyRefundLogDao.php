@@ -84,11 +84,11 @@ class ApplyRefundLogDao
                     'type' => $apply_refund_log->type,
                     'reason' => ApplyRefundReason::query()->whereId($apply_refund_data['reason_id'])->value('content'),
                     'refund_money' => $apply_refund_data['money'],
-                    'refund_integral' => $apply_refund_data['integral'],
+                    'refund_integral' => $apply_refund_data['integral'] ?? 0,
                     'refund_number' => $apply_refund_data['number'],
                     'certificate' => $apply_refund_data['certificate'],
                     'description' => $apply_refund_data['description'],
-                    'result' => $apply_refund_data['result'],
+                    'result' => $apply_refund_data['result'] ?? '',
                     'refund_type' => $apply_refund_data['type'],
                     'apply_refund_shipping' => $temp_apply_refund_shipping,
                 ];

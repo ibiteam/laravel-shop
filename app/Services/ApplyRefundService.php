@@ -268,11 +268,9 @@ class ApplyRefundService
         $seller_confirm_time = intval(shop_config(ShopConfig::SELLER_CONFIRM_TIME)); // 卖家处理响应时间（小时）
 
         if ($type == ApplyRefund::TYPE_REFUND_GOODS) {
-            // $delayed_time = Carbon::now()->addHours($seller_shipped_time);
-            $delayed_time = Carbon::now()->addMinutes($seller_shipped_time);
+            $delayed_time = Carbon::now()->addHours($seller_shipped_time);
         } else {
-            // $delayed_time = Carbon::now()->addHours($seller_confirm_time);
-            $delayed_time = Carbon::now()->addMinutes($seller_confirm_time);
+            $delayed_time = Carbon::now()->addHours($seller_confirm_time);
         }
 
         $data = [
