@@ -154,7 +154,7 @@
                         </div>
                         <div class="setting-bar-item">
                             <div class="item-title">商品设置</div>
-                            <el-form-item label="推荐规则" label-position="top" :prop="['goods', 'rule']" required>
+                            <el-form-item label="推荐规则" label-position="top" :prop="['goods', 'rule']" required @change="getIntelligentRecommendData">
                                 <el-radio-group v-model="form.content.goods.rule" fill="var(--main-color)">
                                     <el-radio v-for="rule in RuleOption" :value="rule.value" :key="rule.value">{{rule.label}}</el-radio>
                                 </el-radio-group>
@@ -290,11 +290,18 @@ const updateGoodsComponentData = (res) => {
 }
 
 const getIntelligentRecommendData = () => {
-    Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
-        if (cns.$successCode(res.code)) {
-            form.content.goods['goods_data'] = res.data
-        }
-    })
+    if (form.content.goods.rule === '') return
+    if (form.content.goods.rule == 1) {
+        Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
+            if (cns.$successCode(res.code)) {
+                form.content.goods['goods_data'] = res.data
+            }
+        })
+    } else {
+        form.content.goods.goods_data = []
+        form.content.goods['goods_nos'] = []
+    }
+
 }
 
 // 保存
@@ -404,7 +411,7 @@ watch([() => props.component], (newValue) => {
                 }
             }
         }
-        .goods-item:nth-child(2n) {
+        .goods-item:nth-child(3n+2) {
             margin-left: 7.5px;
             margin-right: 7.5px;
         }

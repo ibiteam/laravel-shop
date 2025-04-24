@@ -238,6 +238,11 @@ const handleCheckAllChange = (val) => {
 }
 // 单选
 const handleCheckedChange = (value) => {
+    if (!tableData.value.length) {
+        check.all = false
+        check.isIndeterminate = false
+        return
+    }
     const checkedCount = value.length
     const checkedData = tableData.value.filter(item => {
         return value.includes(item.no)
