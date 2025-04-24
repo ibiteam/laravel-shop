@@ -236,7 +236,8 @@ const refuseForm = ref({
 });
 const agreeForm = ref({ // 同意退款form
     type: '', // 类型
-    price: '' // 改价价格
+    price: '', // 改价价格
+    integral:''
 });
 const agreeFormRef = ref(null);
 const refuseFormRef = ref(null);
@@ -367,6 +368,7 @@ const agreeOpen = () => {
     });
     agreeForm.value.type = '';
     agreeForm.value.price = detail.value.money;
+    agreeForm.value.integral = detail.value.integral
 };
 
 const agree = () => {
@@ -376,7 +378,8 @@ const agree = () => {
     agreeBtnLoading.value = true;
     if (detail.value.type == 0) { // 仅退款
         let params = {
-            id: route.params.id
+            id: route.params.id,
+            integral:detail.value.integral,
         };
         Http.doPost('apply_refund/execute_refund', params).then((res) => {
             agreeBtnLoading.value = false;
@@ -400,7 +403,8 @@ const agree = () => {
                 if (agreeForm.value.type == 0) {
                     let params = {
                         id: route.params.id,
-                        money: agreeForm.value.price
+                        money: agreeForm.value.price,
+                        integral:agreeForm.value.integral,
                     };
                     Http.doPost('apply_refund/execute_refund', params).then((res) => {
                         agreeBtnLoading.value = false;
@@ -423,7 +427,8 @@ const agree = () => {
                     let params = {
                         id: route.params.id,
                         type: agreeForm.value.type,
-                        money: agreeForm.value.price
+                        money: agreeForm.value.price,
+                        integral:agreeForm.value.integral,
                     };
                     Http.doPost('apply_refund/agree_apply', params).then((res) => {
                         agreeBtnLoading.value = false;
