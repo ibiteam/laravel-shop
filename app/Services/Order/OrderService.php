@@ -394,14 +394,14 @@ class OrderService
     {
         $this->is_set_calculate_price = true;
 
-        $goods_amount = $goods_integral = 0;
+        $goods_amount = $goods_total_integral = 0;
 
         foreach ($this->getGoodsFormatters() as $goods_formatter) {
             $goods_amount += $goods_formatter->getGoodsAmount();
-            $goods_integral += $goods_formatter->getGoodsIntegral();
+            $goods_total_integral += $goods_formatter->getGoodsTotalIntegral();
         }
         $this->setGoodsAmount($goods_amount);
-        $this->setGoodsIntegral($goods_integral);
+        $this->setGoodsIntegral($goods_total_integral);
 
         return $this;
     }

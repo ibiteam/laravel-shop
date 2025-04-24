@@ -75,7 +75,7 @@ class NormalGoodsFormatter extends BaseGoodsFormatter
             $this->setSkuValue($sku_value);
             // 设置商品规格信息
             $this->setGoodsSku($goods_sku);
-            $this->setGoodsIntegral((float) to_number_format($goods_sku->integral * $this->getBuyNumber()));
+            $this->setGoodsTotalIntegral((int) ($goods_sku->integral * $this->getBuyNumber()));
             $this->setGoodsAmount((float) to_number_format($goods_sku->price * $this->getBuyNumber()));
         } else {
             if ($goods->total <= 0) {
@@ -91,7 +91,7 @@ class NormalGoodsFormatter extends BaseGoodsFormatter
             }
 
             $this->setNumberData(true, $goods->total);
-            $this->setGoodsIntegral((float) to_number_format($goods->integral * $this->getBuyNumber()));
+            $this->setGoodsTotalIntegral((int) ($goods->integral * $this->getBuyNumber()));
             $this->setGoodsAmount((float) to_number_format($goods->price * $this->getBuyNumber()));
         }
 
