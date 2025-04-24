@@ -54,23 +54,23 @@
                center
                width="500">
         <el-form :model="subForm" :rules="rules" ref="subFormRef">
-            <el-form-item label="用户名" prop="user_name" :label-width="formLabelWidth">
+            <el-form-item label="用户名" prop="user_name">
                 <el-input v-model="subForm.user_name" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
+            <el-form-item label="手机号" prop="phone">
                 <el-input v-model="subForm.phone" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="密码" :prop="subForm.id ? '' : 'password'" :label-width="formLabelWidth">
+            <el-form-item label="密码" :prop="subForm.id ? '' : 'password'">
                 <el-input v-model="subForm.password" type="password" autocomplete="off" />
             </el-form-item>
-            <el-form-item label="确认密码" :prop="subForm.id ? '' : 'confirm_password'" :label-width="formLabelWidth">
+            <el-form-item label="确认密码" :prop="subForm.id ? '' : 'confirm_password'">
                 <el-input v-model="subForm.confirm_password" type="password" autocomplete="off" />
             </el-form-item>
         </el-form>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="closePasswordDialog('subForm')">关闭</el-button>
-                <el-button type="primary" v-loading="updateLoading" @click="updateForm('subForm')">确认</el-button>
+                <el-button @click="closePasswordDialog()">关闭</el-button>
+                <el-button type="primary" v-loading="updateLoading" @click="updateForm()">确认</el-button>
             </div>
         </template>
     </el-dialog>
@@ -82,7 +82,7 @@ import Http from '@/utils/http.js';
 import SearchForm from '@/components/common/SearchForm.vue';
 import PageTable from '@/components/common/PageTable.vue';
 
-const cns = getCurrentInstance().appContext.config.globalProperties
+const cns = getCurrentInstance()!.appContext.config.globalProperties
 const router = useRouter()
 
 // 添加查询参数对象，增加搜索条件
@@ -96,15 +96,10 @@ const defaultPage = {
     per_page: 10,
 }
 const pagination = reactive({...defaultPage})
-/* 重置搜索条件 */
-const resetSearch = () => {
-    Object.assign(query, defaultQuery)
-    Object.assign(pagination, defaultPage)
-    getData()
-}
+
 const getData = (page:number = defaultPage.page) => {
     loading.value = true;
-    Http.doGet('user/index', { ...query, page: page, per_page: pagination.per_page }).then(res => {
+    Http.doGet('user/index', { ...query, page: page, per_page: pagination.per_page }).then((res: any) => {
         loading.value = false;
         if (res.code === 200) {
             tableData.value = res.data
@@ -121,12 +116,11 @@ const handlePageChange = (page:number,per_page:number) => {
     getData(page)
 }
 
-
 const updateForm = () => {
     updateLoading.value = true
-    subFormRef.value.validate((valid) => {
+    subFormRef.value.validate((valid: boolean) => {
         if (valid) {
-            Http.doPost('user/update', subForm.value).then(function (res) {
+            Http.doPost('user/update', subForm.value).then(function (res: any) {
                 if (res.code === 200) {
                     dialogFormVisible.value = false;
                     cns.$message.success('保存成功');
@@ -144,16 +138,15 @@ const updateForm = () => {
     })
 };
 
-const userAddress = (row) => {
+const userAddress = (row: any) => {
     router.push({ name: 'manage.user.address' , query: {user_id: row.id}})
 };
 
-const modifyUser = (row) => {
+const modifyUser = (row: any) => {
     subForm.value = {
         id: row.id,
         user_name: row.user_name,
         phone: row.phone,
-        avatar: row.avatar,
         password: "",
         confirm_password: "",
     }
@@ -168,21 +161,19 @@ const addUser = () => {
         phone: "",
         password: "",
         confirm_password: "",
-        avatar: "",
     }
     dialogFormVisible.value = true
     updateTitle.value = '添加用户'
 };
 
 // 关闭弹窗
-const closePasswordDialog = (form) => {
+const closePasswordDialog = () => {
     subForm.value = {
         id: 0,
         user_name: "",
         phone: "",
         password: "",
         confirm_password: "",
-        avatar: "",
     }
     subFormRef.value.resetFields()
     dialogFormVisible.value = false;
@@ -194,19 +185,21 @@ onMounted( () => {
 
 const tableData = ref([]);
 const updateTitle = ref('');
-const subFormRef = ref(null);
+const subFormRef = ref<any>({});
 const updateLoading = ref(false);
 const loading = ref(false);
 const dialogFormVisible = ref(false);
 const subForm = ref({
     id: 0,
+    phone: "",
+    user_name: "",
     password: "",
     confirm_password: "",
 });
-const validateConfirmPassword = (rule, value, callback) => {
+const validateConfirmPassword = (rule: any, value: any, callback: any) => {
     if (value === '') {
         callback(new Error('请输入确认密码'));
-    } else if (value !== subForm.password) {
+    } else if (value !== subForm.value.password) {
         callback(new Error('两次输入密码不一致!'));
     } else {
         callback();
@@ -222,11 +215,11 @@ const rules = reactive({
     ],
     password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 8, max: 30, message: '长度在 8 到 30 个字符', trigger: 'blur' }
+        { min: 8, max: 30, message: '长度在 8 到 20 个字符', trigger: 'blur' }
     ],
     confirm_password: [
         { required: true, message: '请输入确认密码', trigger: 'blur' },
-        { min: 8, max: 30, message: '长度在 8 到 30 个字符', trigger: 'blur' },
+        { min: 8, max: 30, message: '长度在 8 到 20 个字符', trigger: 'blur' },
         { validator: validateConfirmPassword, trigger: 'blur'}
     ],
 })

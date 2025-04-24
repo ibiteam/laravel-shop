@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\UserAddress;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderService
 {
@@ -236,9 +237,10 @@ class OrderService
         } catch (BusinessException $business_exception) {
             DB::rollBack();
 
-            throw new BusinessException($business_exception->getMessage(), $business_exception->getCodeEnum());
+            throw $business_exception;
         } catch (\Throwable $throwable) {
             DB::rollBack();
+            Log::error('生成订单失败'.$throwable->getMessage(), $throwable->getTrace());
 
             throw new BusinessException('生成订单失败');
         }
@@ -394,14 +396,14 @@ class OrderService
     {
         $this->is_set_calculate_price = true;
 
-        $goods_amount = $goods_integral = 0;
+        $goods_amount = $goods_total_integral = 0;
 
         foreach ($this->getGoodsFormatters() as $goods_formatter) {
             $goods_amount += $goods_formatter->getGoodsAmount();
-            $goods_integral += $goods_formatter->getGoodsIntegral();
+            $goods_total_integral += $goods_formatter->getGoodsTotalIntegral();
         }
         $this->setGoodsAmount($goods_amount);
-        $this->setGoodsIntegral($goods_integral);
+        $this->setGoodsIntegral($goods_total_integral);
 
         return $this;
     }

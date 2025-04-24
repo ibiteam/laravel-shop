@@ -176,7 +176,8 @@ class GoodsController extends BaseController
                 'category' => $category_dao->getShowTreeList(),
                 'info' => $info,
                 'settings' => [
-                    'is_open_integral' => shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                    'is_open_integral' => (bool) shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                    'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
                 ],
             ]);
         } catch (ValidationException $validation_exception) {

@@ -271,7 +271,7 @@
                             <div class="more-input s-flex jc-fe" style="width: 100%;">
                                 <div class="more-li" v-if="settings.is_open_integral">
                                     <label>
-                                        <span>积分</span>
+                                        <span>{{ settings.integral_name }}</span>
                                     </label>
                                     <el-input v-model="moreInput.integral" style="width: 80px;" size="small" placeholder="" @input="moreInput.integral = formatInput(moreInput.integral)"></el-input>
                                 </div>
@@ -331,7 +331,7 @@
                                         </div>
                                     </template>
                                 </el-table-column>
-                                <el-table-column v-if="settings.is_open_integral" label="积分" align="center" min-width="120">
+                                <el-table-column v-if="settings.is_open_integral" :label="settings.integral_name" align="center" min-width="120">
                                     <template #default="scope">
                                         <el-form-item :prop="'sku_data.' + scope.$index + '.integral'" :rules="moreIntegralPrice(scope.$index)">
                                             <el-input v-model="scope.row.integral" placeholder="" @input="scope.row.integral = formatInput(scope.row.integral)"></el-input>
@@ -368,7 +368,8 @@
                         <el-form-item label="价格" v-else>
                             <div class="s-flex ai-ct">
                                 <el-form-item prop="integral" v-if="settings.is_open_integral">
-                                    <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral')">积分</el-checkbox>
+                                    <el-checkbox v-model="integralMoneyShow" @change="(val) => setCheck(val,'integral')">
+                                        {{ settings.integral_name }}</el-checkbox>
                                     <el-input style="width: 100px;margin:0 10px;" @input="updateForm.integral = formatInput(updateForm.integral)" v-model="updateForm.integral" placeholder=""></el-input>
                                 </el-form-item>
                                 <el-form-item prop="price">
@@ -751,7 +752,8 @@ const updateFormRules = ref({
 });
 /* 设置信息 */
 const settings = ref({
-    is_open_integral: false
+    is_open_integral: false,
+    integral_name: '',
 })
 // 价格/规格 相关
 const shopPriceShow = ref(false);

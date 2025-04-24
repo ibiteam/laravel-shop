@@ -72,8 +72,8 @@ class GoodsFormatter
     /**
      * 获取商品积分.
      */
-    public function getGoodsIntegral(): float|int
+    public function getGoodsTotalIntegral(): int
     {
-        return $this->formatter->getGoodsIntegral();
+        return $this->formatter->getGoodsTotalIntegral();
     }
 }
