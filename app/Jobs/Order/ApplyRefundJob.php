@@ -127,7 +127,7 @@ class ApplyRefundJob implements ShouldQueue
      */
     public function executeRefund($action, $type, $status): void
     {
-        $apply_refund = ApplyRefund::query()->with(['order', 'user', 'applyRefundReason'])->whereId($this->apply_refund_id)->first();
+        $apply_refund = ApplyRefund::query()->with(['order', 'orderDetail', 'user', 'applyRefundReason'])->whereId($this->apply_refund_id)->first();
 
         $apply_refund->status = ApplyRefundStatusEnum::REFUND_SUCCESS->value;
         $apply_refund->result = '卖家超时未处理，退款成功';
@@ -145,10 +145,9 @@ class ApplyRefundJob implements ShouldQueue
             if ($status === ApplyRefundStatusEnum::BUYER_SEND_SHIP->value) {
                 app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, '卖家超时未确认收货，已退款给买家', ApplyRefundLog::TYPE_SELLER);
             }
-            // app(ApplyRefundLogDao::class)->addLog($apply_refund, $apply_refund->user?->user_name, $action, $type);
 
-            // 微信退款
-            app(ApplyRefundDao::class)->wechatRefund($apply_refund);
+            // 操作退款
+            app(ApplyRefundDao::class)->operationRefund($apply_refund);
 
             DB::commit();
         } catch (BusinessException $business_exception) {

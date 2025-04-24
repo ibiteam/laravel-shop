@@ -215,9 +215,11 @@ import { ref, getCurrentInstance, onMounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Http from '@/utils/http';
 import { tabRemove } from '@/router/tabs';
+import { useCommonStore } from '@/store'
 
 const router = useRouter();
 const route = useRoute();
+const commonStore = useCommonStore()
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
 const detailFormLoading = ref(false);
@@ -519,6 +521,11 @@ const receive = () => {
 };
 
 onMounted(() => {
+    let title = '退款详情'
+    if (route.query.no) {
+        title = '退款详情-' + route.query.no;
+        commonStore.updateVisitedViewsTitle(route, title);
+    }
     getData();
 });
 </script>
