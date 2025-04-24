@@ -33,6 +33,7 @@
                     <h5 v-if="detail.status==5||detail.status==6">退款{{ detail.status == 5 ? '成功' : '关闭' }}时间:{{ detail.end_time }}</h5>
                     <h5 v-if="detail.result">{{ detail.result }}</h5>
                     <h5 v-if="detail.status==5">退款金额：{{ detail.format_money }}</h5>
+                    <h5 v-if="detail.status==5 && detail.integral">退款积分：{{ detail.integral }}积分</h5>
                 </div>
 
                 <ul style="margin-bottom: 10px;" v-if="detail.status==0">
@@ -76,6 +77,7 @@
                             <div class="s-flex jc-bt"><span>{{ item.user_name }}</span><span>{{ item.add_time }}</span></div>
                             <div>{{ item.action }}</div>
                             <div v-if="item.money">退款金额：{{ item.money }}</div>
+                            <div v-if="item.integral">退款积分：{{ item.integral }}积分</div>
                             <div v-if="item.number">退款数量：{{ item.number }}</div>
                             <div v-if="item.reason">退款原因：{{ item.reason }}</div>
                             <div v-if="item.result">退款描述：{{ item.result }}</div>
@@ -128,11 +130,12 @@
                     <p><span>买&#12288;&#12288;家：</span>{{ detail.buyer_name }}</p>
                     <p><span>订单编号：</span>{{ detail.order_sn }}</p>
                     <p><span>成交时间：</span>{{ detail.created_at }}</p>
-                    <p><span>单&#12288;&#12288;价：</span>{{ detail.goods_price }}*{{ detail.goods_number }}</p>
+                    <p><span>单&#12288;&#12288;价：</span>{{ detail.goods_price }}<template v-if="detail.goods_integral">+{{detail.goods_integral}}积分</template>*{{ detail.goods_number }}</p>
                     <p><span>商品总价：</span>{{ detail.goods_amount }}</p>
                     <div class="slide"></div>
                     <p v-if="detail.no"><span>退款编号：</span>{{ detail.no }}</p>
                     <p v-if="detail.format_money"><span>退款金额：</span>{{ detail.format_money }}</p>
+                    <p v-if="detail.integral"><span>退款积分：</span>{{ detail.integral }}积分</p>
                     <p v-if="detail.number"><span>退款数量：</span>{{ detail.number }}</p>
                     <p v-if="detail.reason"><span>退款原因：</span>{{ detail.reason }}</p>
                     <div class="log-img" style="margin-bottom: 10px;"
