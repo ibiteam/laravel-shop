@@ -36,8 +36,7 @@ class ClickhouseAccessLog implements AccessLogInterface
 
         try {
             AdminAccessLog::create($admin_access_log_formatter->toArray());
-        } catch (\Throwable $vars) {
-            dd($vars);
+        } catch (\Throwable) {
         }
     }
 
