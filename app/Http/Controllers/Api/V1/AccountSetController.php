@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\ApplyRefundStatusEnum;
 use App\Enums\PhoneMsgTypeEnum;
 use App\Exceptions\BusinessException;
 use App\Http\Controllers\Api\BaseController;
+use App\Models\ApplyRefund;
 use App\Models\Order;
 use App\Models\OrderEvaluate;
 use App\Models\User;
@@ -39,6 +41,7 @@ class AccountSetController extends BaseController
             $data['wait_pay_count'] = Order::query()->whereUserId($user->id)->searchWaitPay()->count();
             $data['wait_ship_count'] = Order::query()->whereUserId($user->id)->searchWaitShip()->count();
             $data['wait_evaluate_count'] = Order::query()->whereUserId($user->id)->searchWaitEvaluate($evaluate_ids)->count();
+            $data['refund_after_sale_count'] = ApplyRefund::query()->whereUserId($user->id)->whereIsRevoke(ApplyRefund::REVOKE_NO)->whereStatus(ApplyRefundStatusEnum::REFUND_CLOSE->value)->count();
         }
 
         return $this->success($data);

@@ -10,6 +10,7 @@ enum RouterEnum: string
             self::PAY_SUCCESS => '支付成功',
             self::ORDER_SUCCESS => '下单成功',
             self::HOME_PREVIEW => '首页预览',
+            self::HOME => '首页',
             self::SUPERMARKET => '多多超市',
             default => '',
         };
@@ -26,6 +27,7 @@ enum RouterEnum: string
             'pay_success' => self::PAY_SUCCESS,
             'order_success' => self::ORDER_SUCCESS,
             'home_preview' => self::HOME_PREVIEW,
+            'home' => self::HOME,
             'supermarket' => self::SUPERMARKET,
             default => null
         };
@@ -35,4 +37,5 @@ enum RouterEnum: string
     case ORDER_SUCCESS = 'order_success';
     case SUPERMARKET = 'supermarket';
     case HOME_PREVIEW = 'home_preview';
+    case HOME = 'home';
 }

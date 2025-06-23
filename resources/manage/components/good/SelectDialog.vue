@@ -44,15 +44,15 @@
                                     ></el-cascader>
                                 </el-form-item>
                             </div>
-                            <el-button type="primary" :disabled="tableLoading" @click="getGoodsList({page: 1})">查询</el-button>
+                            <el-button type="primary" :disabled="tableLoading" @click="handleSearch">查询</el-button>
                         </el-form>
                         <div style="margin-top: 20px;">
                             <el-checkbox v-model="check.all" :indeterminate="check.isIndeterminate" @change="handleCheckAllChange">全选</el-checkbox>
                         </div>
-                        <el-checkbox-group v-model="check.data" :max="max" @change="handleCheckedChange">
-                            <div class="table-wrapper" v-infinite-scroll="handleLoad" :infinite-scroll-disabled="tableLoading || tableData.length >= pageInfo.total">
+                        <el-checkbox-group v-model="check.nos" :max="max" @change="handleCheckedChange" v-loading="tableLoading">
+                            <div class="table-wrapper" v-infinite-scroll="handleLoad" :infinite-scroll-disabled="tableData.length >= pageInfo.total">
                                 <div class="goods-item" v-for="item in tableData" :key="item.no">
-                                    <el-checkbox class="icon-check" :value="item">
+                                    <el-checkbox class="icon-check" :value="item.no">
                                         <template #default>
                                             <div class="s-flex ai-ct jc-bt">
                                                 <el-image :src="item.image" fit="fill" :style="{ width: '50px', height: '50px', borderRadius: '4px'}">
@@ -78,6 +78,7 @@
                                         </template>
                                     </el-checkbox>
                                 </div>
+                                <p style="text-align:center; margin: 10px; width: 100%;" class="co-999" v-if="tableData.length >= pageInfo.total">没有更多了</p>
                             </div>
                         </el-checkbox-group>
                     </el-tab-pane>
@@ -237,14 +238,24 @@ const handleCheckAllChange = (val) => {
 }
 // 单选
 const handleCheckedChange = (value) => {
+    if (!tableData.value.length) {
+        check.all = false
+        check.isIndeterminate = false
+        return
+    }
     const checkedCount = value.length
-    check.all = checkedCount === tableData.value.length
-    check.isIndeterminate = checkedCount > 0 && checkedCount < tableData.value.length
+    const checkedData = tableData.value.filter(item => {
+        return value.includes(item.no)
+    })
+    check.data = checkedData
+    check.all = checkedData.length === tableData.value.length
+    check.isIndeterminate = checkedData.length > 0 && checkedData.length < tableData.value.length
 }
 
 // 全部删除
 const handleRemoveAll = () => {
     check.data = []
+    check.nos = []
     handleCheckedChange([])
     handleCheckAllChange(false)
 }
@@ -252,7 +263,8 @@ const handleRemoveAll = () => {
 // 单个删除
 const handleRemove = (index) => {
     check.data.splice(index, 1)
-    handleCheckedChange(check.data)
+    check.nos = check.data.map(item => item.no)
+    handleCheckedChange(check.nos)
 }
 
 const handleClose = () => {
@@ -298,7 +310,13 @@ const handleImport = () => {
 
 const handleLoad = () => {
     if (tableLoading.value) return
-    getGoodsList({page: pageInfo.current_page++})
+    getGoodsList({page: ++pageInfo.current_page})
+}
+
+const handleSearch = () => {
+    if (tableLoading.value) return
+    tableData.value = []
+    getGoodsList({page: 1})
 }
 
 const getGoodsList = (params = {page: 1}) => {
@@ -307,7 +325,8 @@ const getGoodsList = (params = {page: 1}) => {
     tableLoading.value = true
     Http.doPost('app_decoration/goods/list', {...queryParams, page}).then(res => {
         if (cns.$successCode(res.code)) {
-            tableData.value = res.data.list;
+            tableData.value = tableData.value.concat(res.data.list);
+            handleCheckedChange(check.nos)
             // // 更新分页信息
             pageInfo.total = res.data.meta.total;
             pageInfo.per_page = Number(res.data.meta.per_page);
@@ -333,15 +352,16 @@ const getCategory = () => {
 watch([() => props], (newVal) => {
     if (newVal[0]) {
         dialogVisible.value = newVal[0].show
-        if (dialogVisible.value) {
-            getGoodsList()
-            getCategory()
-        }
+        
         if (newVal[0].default_goods.length > 0) {
             check.data = JSON.parse(JSON.stringify(newVal[0].default_goods))
             check.nos = check.data.map(item => {
                 return item.no
             })
+        }
+        if (dialogVisible.value) {
+            getGoodsList()
+            getCategory()
         }
     }
 }, {

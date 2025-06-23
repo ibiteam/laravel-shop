@@ -88,7 +88,6 @@ class AdminUserController extends BaseController
             'status' => '状态',
         ]);
         $password = $validated['password'] ?? '';
-        $confirm_password = $validated['password_confirmation'] ?? '';
 
         if ($id) {
             $admin_user = AdminUser::whereId($id)->firstOrFail();
@@ -98,11 +97,7 @@ class AdminUserController extends BaseController
 
         // 密码处理
         if ($password) {
-            if ($password != $confirm_password) {
-                return $this->error('登录密码和确认密码不一致');
-            }
-
-            if (! preg_match('/^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/', $confirm_password)) {
+            if (! preg_match('/^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z0-9\W_!@#$%^&*`~()-+=]+$)(?![a-z0-9]+$)(?![a-z\W_!@#$%^&*`~()-+=]+$)(?![0-9\W_!@#$%^&*`~()-+=]+$)[a-zA-Z0-9\W_!@#$%^&*`~()-+=]/', $password)) {
                 return $this->error('密码必须包含大写字母，小写字母，数字，特殊字符`@#$%^&*`~()-+=`中的任意三种');
             }
             $admin_user->password = $password;
@@ -136,12 +131,12 @@ class AdminUserController extends BaseController
         }
 
         if ($id) {
-            $log = "编辑管理员[id:{$admin_user->id}]".implode(',', array_map(function ($k, $v) {
+            $log = "编辑管理员[id:$admin_user->id]".implode(',', array_map(function ($k, $v) {
                 return sprintf('%s=`%s`', $k, $v);
             }, array_keys($admin_user->getChanges()), $admin_user->getChanges()));
             admin_operation_log($log);
         } else {
-            $log = "新增管理员[id:{$admin_user->id}]";
+            $log = "新增管理员[id:$admin_user->id]";
             admin_operation_log($log, AdminOperationLog::TYPE_STORE);
         }
 

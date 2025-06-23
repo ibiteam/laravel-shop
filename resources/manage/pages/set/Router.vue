@@ -112,8 +112,6 @@ const defaultQuery = reactive({
     alias: '',
     router_category_id: '',
     is_show: '-1',
-    number: 10,
-    page: 1
 });
 const query = reactive({ ...defaultQuery });
 

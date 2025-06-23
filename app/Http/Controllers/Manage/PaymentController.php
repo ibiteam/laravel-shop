@@ -23,12 +23,12 @@ class PaymentController extends BaseController
     {
         $name = $request->get('name');
         $is_enabled = $request->get('is_enabled', null);
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $list = Payment::query()
             ->latest()
             ->when($name, fn (Builder $query) => $query->whereLike('name', "%{$name}%"))
             ->when(! is_null($is_enabled), fn (Builder $query) => $query->whereIsEnabled($is_enabled))
-            ->paginate($number);
+            ->paginate($per_page);
 
         return $this->success(new CommonResourceCollection($list));
     }

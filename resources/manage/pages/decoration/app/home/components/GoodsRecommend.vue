@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="goods-wrapper3 s-flex ai-ct jc-bt flex-wrap" v-if="form.content.layout == 3 && form.content.goods.goods_data">
+                        <div class="goods-wrapper3 s-flex ai-ct jc-fs flex-wrap" v-if="form.content.layout == 3 && form.content.goods.goods_data">
                             <div class="goods-item" v-for="item in form.content.goods.goods_data" :key="item.no">
                                 <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%', radius: '10px 10px 0 0' }"/>
                                 <div class="goods-info s-flex jc-bt flex-dir">
@@ -154,7 +154,7 @@
                         </div>
                         <div class="setting-bar-item">
                             <div class="item-title">商品设置</div>
-                            <el-form-item label="推荐规则" label-position="top" :prop="['goods', 'rule']" required>
+                            <el-form-item label="推荐规则" label-position="top" :prop="['goods', 'rule']" required @change="getIntelligentRecommendData">
                                 <el-radio-group v-model="form.content.goods.rule" fill="var(--main-color)">
                                     <el-radio v-for="rule in RuleOption" :value="rule.value" :key="rule.value">{{rule.label}}</el-radio>
                                 </el-radio-group>
@@ -201,11 +201,11 @@
                                     <div class="goods-form-wrapper" v-if="form.content.goods.goods_data && form.content.goods.goods_data.length">
                                         <div class="goods-thumb-wrapper" v-for="(item,index) in form.content.goods.goods_data" :key="item.no">
                                             <image-wrapper v-bind="{ src: item.image, width: '100%', height: '100%' }" style="z-index: 2;"/>
-                                            <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 3">+{{ form.content.goods.goods_nos.length - 4 }}</div>
+                                            <div class="goods-thumb-mask s-flex ai-ct jc-ct" v-if="index == 3 && form.content.goods.goods_nos.length > 4">+{{ form.content.goods.goods_nos.length - 4 }}</div>
                                         </div>
                                     </div>
                                 </el-form-item>
-                                <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_nos.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_nos.length}}/{{MaxGoodsNumber}})</el-button>
+                                <el-button type="primary" style="width: 100%;" :disabled="form.content.goods.goods_data.length >= MaxGoodsNumber" @click="handleAddGoods">添加({{form.content.goods.goods_data.length}}/{{MaxGoodsNumber}})</el-button>
                             </template>
                         </div>
                     </el-form>
@@ -290,11 +290,18 @@ const updateGoodsComponentData = (res) => {
 }
 
 const getIntelligentRecommendData = () => {
-    Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
-        if (cns.$successCode(res.code)) {
-            form.content.goods['goods_data'] = res.data
-        }
-    })
+    if (form.content.goods.rule === '') return
+    if (form.content.goods.rule == 1) {
+        Http.doPost('app_decoration/goods/intelligent', {sort_type: form.content.goods.sort_type, number: form.content.goods.number}).then(res => {
+            if (cns.$successCode(res.code)) {
+                form.content.goods['goods_data'] = res.data
+            }
+        })
+    } else {
+        form.content.goods.goods_data = []
+        form.content.goods['goods_nos'] = []
+    }
+
 }
 
 // 保存
@@ -403,6 +410,10 @@ watch([() => props.component], (newValue) => {
                     margin-bottom: 4px;
                 }
             }
+        }
+        .goods-item:nth-child(3n+2) {
+            margin-left: 7.5px;
+            margin-right: 7.5px;
         }
     }
     .fs10 {

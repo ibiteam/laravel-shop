@@ -136,17 +136,25 @@ class AdvertisingBannerComponent extends PageComponent
         $items = collect($content['data'])
 //            ->sortByDesc('sort')
             ->map(function ($item) use (&$items) {
+                if (!$item['is_show']) {
+                    return null;
+                }
+                $time = date('Y-m-d H:i:s');
+                if ($item['date_type'] == AppDecorationItem::CUSTOM_TIME) {
+                    $start_time = $item['time'][0] ?? '';
+                    $end_time = $item['time'][1] ?? '';
+                    if ($start_time > $time || $end_time < $time) {
+                        return null;
+                    }
+                }
+
                 $data['image'] = $item['image'] ?? '';
                 $data['url'] = $item['url'];
                 $data['date_type'] = $item['date_type'];
                 $data['time'] = $item['time'];
                 $data['sort'] = $item['sort'] ?? 0;
 
-                if ($item['is_show']) {
-                    return $data;
-                }
-
-                return null;
+                return $data;
             })->filter()->values()->toArray();
 
         return [

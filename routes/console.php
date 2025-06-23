@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use App\Http\Dao\AccessStatisticDao;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// 访问统计
+Schedule::call(function () {
+    app(AccessStatisticDao::class)->statistic();
+})->dailyAt('08:30');
+// 删除过期的token
+Schedule::command('sanctum:prune-expired --hours=24')->daily();

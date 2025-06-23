@@ -244,7 +244,7 @@
     </div>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { nextTick, onUnmounted, ref, onMounted, getCurrentInstance, watch } from 'vue';
 
 const cns = getCurrentInstance().appContext.config.globalProperties;
@@ -458,9 +458,6 @@ const refresh = (view) => {
 };
 
 const closeSelectedTag = (view) => {
-    if (route.meta.keepAlive) {
-        route.meta.keepAlive = false;
-    }
     tabRemove(view.name);
 };
 

@@ -1,6 +1,7 @@
 <template>
     <div>
         <el-table
+            @selection-change="handleSelectionChange"
             :data="data.list"
             border
             stripe
@@ -27,7 +28,8 @@
 import { defineEmits,computed } from 'vue';
 
 const emit = defineEmits<{
-    (e: 'change', page: number, per_page: number): void
+    (e: 'change' ,page: number, per_page: number): void
+    (e: 'selection-change' , val: any): void
 }>()
 
 const props = defineProps({
@@ -57,6 +59,10 @@ const layout = computed(() => {
 })
 const handleSizeChange = (per_page: number) => {
     emit('change',1,per_page)
+};
+
+const handleSelectionChange = (val: any) => {
+    emit('selection-change', val)
 };
 
 const handleCurrentChange = (page: number) => {

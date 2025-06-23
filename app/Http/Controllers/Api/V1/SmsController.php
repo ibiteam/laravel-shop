@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\BaseController;
 use App\Rules\PhoneRule;
 use App\Services\SmsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class SmsController extends BaseController
@@ -73,42 +74,26 @@ class SmsController extends BaseController
                     'required',
                     'string',
                     'in:'.implode(',', [
-                        SmsService::ACTION_LOGIN,
-                        SmsService::ACTION_FORGET_PASSWORD,
-                        SmsService::ACTION_EDIT_PASSWORD,
                         SmsService::ACTION_VERIFY_PHONE,
-                        SmsService::ACTION_EDIT_PHONE,
                     ]),
-                ],
-                'phone' => [
-                    'required_if:action,'.implode(',', [
-                        SmsService::ACTION_LOGIN,
-                        SmsService::ACTION_FORGET_PASSWORD,
-                        SmsService::ACTION_EDIT_PHONE,
-                    ]), 'integer', new PhoneRule,
                 ],
                 'code' => 'required|string',
             ], [], [
                 'action' => '操作类型',
-                'phone' => '手机号',
                 'code' => '验证码',
             ]);
+            $user = get_user();
 
-            if (in_array($validated['action'], [SmsService::ACTION_LOGIN, SmsService::ACTION_FORGET_PASSWORD, SmsService::ACTION_EDIT_PHONE])) {
-                $phone = $validated['phone'] ?? 0;
-            } else {
-                $phone = get_user()?->phone ?: 0;
-            }
-
-            if (! $phone) {
+            if (! $user) {
                 throw new BusinessException('用户未登录', ConstantEnum::UNAUTHORIZED);
             }
 
-            if (! $sms_service->verifyOtp($phone, $validated['code'], PhoneMsgTypeEnum::getEnumValue($validated['action']))) {
+            if (! $sms_service->verifyOtp($user->phone, $validated['code'], PhoneMsgTypeEnum::ACTION_VERIFY_PHONE)) {
                 throw new BusinessException('验证码输入错误');
             }
+            $data['token'] = Cache::put("{$user->id}_{$validated['action']}_{$user->phone}", md5($user->phone.time()), now()->addMinutes(5));
 
-            return $this->success('验证成功');
+            return $this->success($data);
         } catch (ValidationException $validation_exception) {
             return $this->error($validation_exception->validator->errors()->first());
         } catch (BusinessException $business_exception) {

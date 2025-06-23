@@ -103,7 +103,7 @@ class ApplyRefundController extends BaseController
     public function store(ApplyRefundStoreRequest $request, ApplyRefundService $apply_refund_service)
     {
         try {
-            $params = $request->only(['apply_refund_id', 'type', 'order_sn', 'order_detail_id', 'number', 'money', 'reason_id', 'description', 'certificate']);
+            $params = $request->only(['apply_refund_id', 'type', 'order_sn', 'order_detail_id', 'number', 'money', 'integral', 'reason_id', 'description', 'certificate']);
 
             $apply_refund = $apply_refund_service->launchRefund(get_user(), $params);
 
@@ -113,7 +113,7 @@ class ApplyRefundController extends BaseController
         } catch (BusinessException $business_exception) {
             return $this->error($business_exception->getMessage(), $business_exception->getCodeEnum());
         } catch (\Throwable $throwable) {
-            return $this->error('申请售后发起异常~'.$throwable->getMessage());
+            return $this->error('申请售后发起异常~');
         }
     }
 

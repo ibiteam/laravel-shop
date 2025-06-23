@@ -17,13 +17,14 @@ class AccessStatisticController extends BaseController
         $start_time = $request->get('start_time', '');
         $end_time = $request->get('end_time', '');
         $referer = $request->get('referer', '');
+        $per_page = (int) $request->get('per_page', 10);
 
         $data = AccessStatistic::query()
             ->when(! is_null($referer), fn ($query) => $query->where('referer', '=', $referer))
             ->when($start_time, fn ($query) => $query->where('statistic_date', '>=', date('Y-m-d', strtotime($start_time))))
             ->when($end_time, fn ($query) => $query->where('statistic_date', '<=', date('Y-m-d', strtotime($end_time))))
             ->orderByDesc('statistic_date')
-            ->paginate($request->per_page);
+            ->paginate($per_page);
 
         $data->getCollection()->transform(function (AccessStatistic $access_statistic) {
             return [

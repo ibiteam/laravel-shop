@@ -76,6 +76,7 @@ class ApplyRefundService
                 'goods_price' => $tmp_goods_price,
                 'goods_price_format' => price_format($tmp_goods_price),
                 'goods_integral' => $order_detail->goods_integral,
+                'goods_total_integral' => $order_detail->goods_total_integral,
                 'goods_amount' => $order_detail->goods_amount,
                 'goods_sku_id' => $order_detail->goods_sku_id,
                 'goods_sku_value' => $order_detail->goods_sku_value,
@@ -135,13 +136,14 @@ class ApplyRefundService
             'pay_time' => $order->paid_at,
         ];
 
-        [$refund_max_amount, $refund_max_number] = app(ApplyRefundDao::class)->getMaxAmountAndNumber($order_detail, $order, $user);
+        [$refund_max_amount, $refund_max_integral, $refund_max_number] = app(ApplyRefundDao::class)->getRefundMaxLimit($order_detail, $order, $user);
         $temp_order_detail['refund_max_amount'] = $refund_max_amount;
+        $temp_order_detail['refund_max_integral'] = $refund_max_integral;
         $temp_order_detail['refund_max_number'] = $refund_max_number;
 
         $reason = ApplyRefundReason::query()->whereType($type)->orderByDesc('sort')->select(['id', 'content'])->get()->toArray();
 
-        $explain = '1、订单退款后，退款金额将按支付方式原路返回，订单关闭；
+        $explain = '1、订单退款后，退款金额和积分将按支付方式原路返回，订单关闭；
 2、订单关闭后，无法恢复；
 3、如订单已使用的优惠券，订单关闭后优惠券不返还；
 4、如遇订单拆分，部分订单退款后优惠券不返还。';
@@ -163,10 +165,11 @@ class ApplyRefundService
     public function launchRefund(User $user, array $params)
     {
         $apply_refund_id = $params['apply_refund_id'] ?? 0;
-        $order_sn = $params['order_sn'];
-        $order_detail_id = $params['order_detail_id'];
+        $order_sn = $params['order_sn'] ?? '';
+        $order_detail_id = $params['order_detail_id'] ?? 0;
         $type = $params['type'];
         $money = $params['money'];
+        $integral = $params['integral'];
         $number = $params['number'];
         $reason_id = $params['reason_id'];
         $description = $params['description'] ?? null;
@@ -239,10 +242,10 @@ class ApplyRefundService
             throw new BusinessException('退款金额不能超过'.$after_sales_max_money);
         }
 
-        [$refund_max_amount, $refund_max_number] = app(ApplyRefundDao::class)->getMaxAmountAndNumber($order_detail, $order, $user, $apply_refund_id);
+        [$refund_max_amount, $refund_max_integral, $refund_max_number] = app(ApplyRefundDao::class)->getRefundMaxLimit($order_detail, $order, $user, $apply_refund_id);
 
-        if ($refund_max_amount == 0) {
-            throw new BusinessException('可退款金额为0，暂不支持申请');
+        if ($refund_max_amount == 0 && $refund_max_integral == 0) {
+            throw new BusinessException('可退款金额和积分为0，暂不支持申请');
         }
 
         if ($refund_max_number == 0) {
@@ -251,6 +254,10 @@ class ApplyRefundService
 
         if ($money > $refund_max_amount) {
             throw new BusinessException('最多退款金额为'.$refund_max_amount);
+        }
+
+        if ($integral > $refund_max_integral) {
+            throw new BusinessException('最多退款积分为'.$refund_max_integral);
         }
 
         if ($number > $refund_max_number) {
@@ -274,10 +281,12 @@ class ApplyRefundService
             'type' => $type,
             'status' => ApplyRefundStatusEnum::NOT_PROCESSED->value,
             'money' => $money,
+            'integral' => $integral,
             'number' => $number,
             'reason_id' => $reason_id,
             'description' => $description,
             'certificate' => $certificate,
+            'result' => '',
             'job_time' => $delayed_time,
             'count' => $count,
         ];
@@ -287,7 +296,7 @@ class ApplyRefundService
         try {
             $apply_refund->fill($data)->save();
 
-            app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
+            app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, $reason_message, ApplyRefundLog::TYPE_BUYER);
 
             DB::commit();
         } catch (\Exception $exception) {
@@ -388,7 +397,7 @@ class ApplyRefundService
         $apply_refund->save();
 
         // 添加日志
-        app(ApplyRefundLogDao::class)->addLog($apply_refund->id, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
+        app(ApplyRefundLogDao::class)->addLog($apply_refund, $user->nickname, '因买家撤销退款申请，退款已关闭', ApplyRefundLog::TYPE_BUYER);
     }
 
     private function detailFormat(ApplyRefund $apply_refund, Order $order, OrderDetail $order_detail, User $user): array
@@ -399,6 +408,7 @@ class ApplyRefundService
             'goods_image' => $order_detail->goods?->image,
             'goods_price' => price_format($order_detail->goods_price),
             'goods_integral' => $order_detail->goods_integral,
+            'goods_total_integral' => $order_detail->goods_total_integral,
             'goods_number' => get_new_price($order_detail->goods_number),
             'goods_unit' => $order_detail->goods_unit,
             'goods_sku_id' => $order_detail->goods_sku_id,
@@ -417,10 +427,11 @@ class ApplyRefundService
         if ($apply_refund->status == ApplyRefundStatusEnum::REFUSE->value) {
             $temp_comment = '拒绝原因：'.$apply_refund->result;
 
-            [$refund_max_amount, $refund_max_number] = app(ApplyRefundDao::class)->getMaxAmountAndNumber($order_detail, $order, $user, $apply_refund->id);
+            [$refund_max_amount, $refund_max_integral, $refund_max_number] = app(ApplyRefundDao::class)->getRefundMaxLimit($order_detail, $order, $user, $apply_refund->id);
             $from_init = [
                 'reason' => ApplyRefundReason::query()->whereType($apply_refund->type)->orderByDesc('sort')->select(['id', 'content'])->get()->toArray(),
                 'refund_max_amount' => $refund_max_amount,
+                'refund_max_integral' => $refund_max_integral,
                 'refund_max_number' => $refund_max_number,
             ];
         } elseif ($apply_refund->status == ApplyRefundStatusEnum::REFUSE_EXAMINE->value) {
@@ -447,6 +458,7 @@ class ApplyRefundService
                 'status' => $apply_refund->status,
                 'money_format' => price_format($apply_refund->money),
                 'money' => get_new_price($apply_refund->money),
+                'integral' => get_new_price($apply_refund->integral),
                 'number' => get_new_price($apply_refund->number),
                 'reason_id' => $apply_refund->reason_id,
                 'reason_content' => $apply_refund->applyRefundReason?->content,

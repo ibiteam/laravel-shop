@@ -116,8 +116,6 @@ const defaultQuery = reactive({
     is_top: null,
     start_time: '',
     end_time: '',
-    number: 10,
-    page: 1
 });
 const query = reactive({ ...defaultQuery });
 

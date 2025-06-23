@@ -26,21 +26,24 @@
                             </div>
                         </div>
                         <div class="ad-banner-wrapper s-flex ai-ct jc-bt flex-wrap">
-                            <div v-for="(item, index) in form.content.data" :key="index" 
-                                :style="{
-                                    width: (form.content.width / 2 - (form.content.background ? '5' : 0)) + 'px',
-                                    marginBottom: (form.content.background ? '10px' : 0)
-                                }"
-                            >
-                                <image-wrapper 
-                                    v-bind="{
-                                        src: item.image,
-                                        width: '100%',
-                                        height: (form.content.height ? form.content.height / 2 : 100) + 'px', 
-                                        radius: '0'
-                                    }" 
-                                />
-                            </div>
+                            <template v-for="(item, index) in form.content.data">
+                                <div :key="index"
+                                    v-if="item.is_show"
+                                    :style="{
+                                        width: (form.content.width / 2 - (form.content.background ? '5' : 0)) + 'px',
+                                        marginBottom: '10px'
+                                    }"
+                                >
+                                    <image-wrapper 
+                                        v-bind="{
+                                            src: item.image,
+                                            width: '100%',
+                                            height: (form.content.height ? form.content.height / 2 : 100) + 'px', 
+                                            radius: '0'
+                                        }" 
+                                    />
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </div>

@@ -10,7 +10,8 @@ enum RefererEnum: string
             self::PC => 'PC端',
             self::H5 => 'H5端',
             self::APP => 'APP端',
-            self::WECHAT_MINI => '微信小程序'
+            self::WECHAT_MINI => '微信小程序',
+            self::MANAGE => '后台'
         };
     }
 
@@ -25,6 +26,7 @@ enum RefererEnum: string
             'pc' => self::PC,
             'app' => self::APP,
             'wechat_mini' => self::WECHAT_MINI,
+            'manage' => self::MANAGE,
             default => self::H5,
         };
     }
@@ -33,4 +35,5 @@ enum RefererEnum: string
     case H5 = 'h5';
     case APP = 'app';
     case WECHAT_MINI = 'wechat_mini';
+    case MANAGE = 'manage';
 }

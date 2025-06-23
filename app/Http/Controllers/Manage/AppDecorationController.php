@@ -36,7 +36,7 @@ class AppDecorationController extends BaseController
             ->whereParentId(Constant::ZERO);
         $list = $query->paginate($request->input('number', 10));
         $list->getCollection()->transform(function (AppDecoration $app_decoration) {
-            $app_decoration->admin_user_name = $app_decoration->adminUser?->user_name ?? '--';
+            $app_decoration->path = $app_decoration->url;
 
             return $app_decoration;
         });
@@ -217,7 +217,8 @@ class AppDecorationController extends BaseController
                 $query->where('no', 'like', "%{$keywords}%")
                     ->orWhere('name', 'like', "%{$keywords}%");
             }))
-            ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
+            ->show()
+            ->select('no', 'name', 'image', 'price', 'integral', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->paginate($number);
 
@@ -231,8 +232,9 @@ class AppDecorationController extends BaseController
         $goods_nos = $request->get('goods_nos', []);
         $is_show_sales_volume = shop_config(ShopConfig::IS_SHOW_SALES_VOLUME);
         $data = Goods::query()
+            ->show()
             ->where(fn ($query) => $query->whereIn('id', $goods_ids)->orWhereIn('no', $goods_nos))
-            ->select('no', 'name', 'image', 'price', 'total', 'label', 'sub_name')
+            ->select('no', 'name', 'image', 'price', 'integral', 'total', 'label', 'sub_name')
             ->addSelect(DB::raw("CASE WHEN {$is_show_sales_volume} THEN sales_volume ELSE NULL END AS sales_volume"))
             ->latest()->get();
 

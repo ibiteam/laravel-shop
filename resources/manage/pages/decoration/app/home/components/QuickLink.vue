@@ -16,14 +16,16 @@
                         },
                         modules: swiperModules
                     }" class="scroll-wrapper">
-                        <swiper-slide class="scroll-item" v-for="(item, index) in form.content.data" :key="index">
-                            <div class="link-item s-flex ai-ct jc-ct flex-dir">
-                                <image-wrapper
-                                    v-bind="{src: item.image, width: '45px', height: '45px'}" 
-                                />
-                                <p class="elli-1 title">{{item.title}}</p>
-                            </div>
-                        </swiper-slide>
+                        <template v-for="(item, index) in form.content.data">
+                            <swiper-slide class="scroll-item" v-if="item.is_show" :key="index">
+                                <div class="link-item s-flex ai-ct jc-ct flex-dir">
+                                    <image-wrapper
+                                        v-bind="{src: item.image, width: '45px', height: '45px'}" 
+                                    />
+                                    <p class="elli-1 title">{{item.title}}</p>
+                                </div>
+                            </swiper-slide>
+                        </template>
                     </swiper>
                 </div>
             </template>
@@ -208,7 +210,6 @@ watch([() => props.component], (newValue) => {
             form[key] = temp[key]
 
         })
-        console.log(form)
     }
 }, {
     immediate: true,

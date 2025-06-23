@@ -36,7 +36,7 @@ class GoodsController extends BaseController
         $created_end_time = $request->get('created_end_time');
         $updated_start_time = $request->get('updated_start_time');
         $updated_end_time = $request->get('updated_end_time');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
         $keywords = $request->get('keywords', '');
 
         $list = Goods::query()->withTrashed()->latest()->with('category:id,name')
@@ -54,7 +54,7 @@ class GoodsController extends BaseController
             ->when($updated_start_time, fn (Builder $query) => $query->where('updated_at', '>=', $updated_start_time))
             ->when($updated_end_time, fn (Builder $query) => $query->where('updated_at', '<=', $updated_end_time))
             ->select(['id', 'name', 'category_id', 'image', 'name', 'sub_name', 'sales_volume', 'no', 'price', 'total', 'sort', 'status', 'created_at', 'updated_at'])
-            ->paginate($number);
+            ->paginate($per_page);
 
         $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $list->getCollection()->transform(function (Goods $goods) use ($vue_app_url) {
@@ -176,7 +176,8 @@ class GoodsController extends BaseController
                 'category' => $category_dao->getShowTreeList(),
                 'info' => $info,
                 'settings' => [
-                    'is_open_integral' => shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                    'is_open_integral' => (bool) shop_config(ShopConfig::IS_OPEN_INTEGRAL),
+                    'integral_name' => shop_config(ShopConfig::INTEGRAL_NAME),
                 ],
             ]);
         } catch (ValidationException $validation_exception) {

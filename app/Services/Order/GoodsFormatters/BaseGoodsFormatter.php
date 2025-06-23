@@ -20,13 +20,10 @@ abstract class BaseGoodsFormatter implements GoodsFormatterInterface
     private ?GoodsSku $goods_sku = null; // 商品规格
     private int $cart_id = 0; // 购物车ID
     private int|float $goods_amount; // 购买商品所需总金额
-    private int|float $goods_integral; // 购买商品所需总积分
+    private int $goods_total_integral; // 购买商品所需总积分
     private array $sku_value = []; // 商品规格值
     private string $goods_image = ''; // 商品图片
-    private array $number_data = [
-        'can_buy' => false,
-        'total' => 0,
-    ]; // 设置可以购买的最大数量以及是否可以购买
+    private array $number_data = ['can_buy' => false, 'total' => 0]; // 设置可以购买的最大数量以及是否可以购买
 
     /**
      * @throws BusinessException
@@ -125,6 +122,7 @@ abstract class BaseGoodsFormatter implements GoodsFormatterInterface
             'goods_number' => $this->getBuyNumber(),
             'goods_price' => $tmp_price,
             'goods_integral' => $tmp_integral,
+            'goods_total_integral' => $this->getGoodsTotalIntegral(),
             'goods_amount' => $this->getGoodsAmount(),
             'goods_unit' => $goods->unit ?: '',
             'goods_sku_id' => $this->getSkuId(),
@@ -257,17 +255,17 @@ abstract class BaseGoodsFormatter implements GoodsFormatterInterface
 
     public function setGoodsAmount(float|int $goods_amount): void
     {
-        $this->goods_amount = $goods_amount;
+        $this->goods_amount = to_number_format($goods_amount);
     }
 
-    public function getGoodsIntegral(): float|int
+    public function getGoodsTotalIntegral(): int
     {
-        return $this->goods_integral;
+        return $this->goods_total_integral;
     }
 
-    public function setGoodsIntegral(float|int $goods_integral): void
+    public function setGoodsTotalIntegral(int $goods_total_integral): void
     {
-        $this->goods_integral = $goods_integral;
+        $this->goods_total_integral = $goods_total_integral;
     }
 
     protected function getSkuValue(): array

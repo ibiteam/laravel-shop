@@ -2,25 +2,24 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Builder;
-
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int                          $id
- * @property int                          $order_id        订单ID
- * @property int                          $goods_id        商品ID
- * @property string                       $goods_no        商品编号
- * @property string                       $goods_name      商品名称
- * @property int                          $goods_number    商品数量
- * @property numeric                      $goods_price     商品价格
- * @property int                          $goods_integral  商品积分数量
- * @property numeric                      $goods_amount    商品总价
- * @property string                       $goods_unit      商品单位
- * @property int                          $goods_sku_id    商品 SKU ID
- * @property array<array-key, mixed>|null $goods_sku_value 商品规格值
+ * @property int                          $order_id             订单ID
+ * @property int                          $goods_id             商品ID
+ * @property string                       $goods_no             商品编号
+ * @property string                       $goods_name           商品名称
+ * @property int                          $goods_number         商品数量
+ * @property numeric                      $goods_price          商品价格
+ * @property int                          $goods_integral       商品积分数量
+ * @property numeric                      $goods_amount         商品总价
+ * @property int                          $goods_total_integral 商品总积分
+ * @property string                       $goods_unit           商品单位
+ * @property int                          $goods_sku_id         商品 SKU ID
+ * @property array<array-key, mixed>|null $goods_sku_value      商品规格值
  * @property Carbon|null                  $created_at
  * @property Carbon|null                  $updated_at
  * @property-read Goods $goods
@@ -38,6 +37,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|OrderDetail whereGoodsPrice($value)
  * @method static Builder<static>|OrderDetail whereGoodsSkuId($value)
  * @method static Builder<static>|OrderDetail whereGoodsSkuValue($value)
+ * @method static Builder<static>|OrderDetail whereGoodsTotalIntegral($value)
  * @method static Builder<static>|OrderDetail whereGoodsUnit($value)
  * @method static Builder<static>|OrderDetail whereId($value)
  * @method static Builder<static>|OrderDetail whereOrderId($value)
@@ -47,8 +47,6 @@ use Illuminate\Support\Carbon;
  */
 class OrderDetail extends BaseModel
 {
-
-
     protected $guarded = [];
 
     public function goods(): BelongsTo

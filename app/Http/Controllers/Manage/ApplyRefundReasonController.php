@@ -18,11 +18,11 @@ class ApplyRefundReasonController extends BaseController
     public function index(Request $request)
     {
         $type = $request->get('type');
-        $number = (int) $request->get('number', 10);
+        $per_page = (int) $request->get('per_page', 10);
 
         $data = ApplyRefundReason::query()
             ->when(! is_null($type), fn ($query) => $query->where('type', '=', $type))
-            ->orderByDesc('sort')->orderByDesc('created_at')->paginate($number);
+            ->orderByDesc('sort')->orderByDesc('created_at')->paginate($per_page);
         $data->getCollection()->transform(function (ApplyRefundReason $apply_refund_reason) {
             return [
                 'id' => $apply_refund_reason->id,

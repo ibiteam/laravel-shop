@@ -66,7 +66,7 @@ Route::prefix('admin_user')->group(function () {
     });
     Route::middleware(['manage.permission:'.Permission::MANAGE_ADMIN_USER_UPDATE])->group(function () {
         Route::post('update', [AdminUserController::class, 'update']);
-        Route::post('change/field', [AdminUserController::class, 'changeField']);
+        Route::post('change_field', [AdminUserController::class, 'changeField']);
     });
 });
 
@@ -102,7 +102,6 @@ Route::prefix('admin_operation_log')->group(function () {
     });
 });
 
-
 // 外部服务
 Route::prefix('app_service')->group(function () {
     Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_CONFIG_INDEX])->group(function () {
@@ -118,11 +117,6 @@ Route::prefix('app_service_log')->group(function () {
     Route::middleware(['manage.permission:'.Permission::MANAGE_APP_SERVICE_LOG_INDEX])->group(function () {
         Route::get('/', [AppServiceLogController::class, 'index'])->name(Permission::MANAGE_APP_SERVICE_LOG_INDEX);
     });
-});
-
-// 配送管理-地区
-Route::prefix('region')->group(function () {
-    Route::get('tree', [RegionController::class, 'regionTree']);
 });
 
 // 移动端装修
@@ -155,8 +149,8 @@ Route::prefix('app_ads')->group(function () {
         Route::post('/update/ad_image', [AppAdController::class, 'updateAdImage']); // 更换广告图
         Route::post('/toggle/status', [AppAdController::class, 'toggleStatus']); // 切换广告图状态
     });
-    Route::middleware(['manage.permission:'.Permission:: MANAGE_APP_ADVERT_DELETE])->group(function () {
-        Route::post('/delete', [AppAdController::class, 'delete'])->name(Permission:: MANAGE_APP_ADVERT_DELETE); // 删除广告图
+    Route::middleware(['manage.permission:'.Permission::MANAGE_APP_ADVERT_DELETE])->group(function () {
+        Route::post('/delete', [AppAdController::class, 'delete'])->name(Permission::MANAGE_APP_ADVERT_DELETE); // 删除广告图
     });
 });
 
@@ -173,12 +167,21 @@ Route::prefix('payment')->group(function () {
     });
 });
 
-// 配送管理-快递公司
+// 快递公司
 Route::prefix('ship_company')->group(function () {
     Route::get('/', [ShipCompanyController::class, 'index'])->name(Permission::MANAGE_SHIP_COMPANY_INDEX)->middleware('manage.permission');
     Route::middleware('manage.permission:'.Permission::MANAGE_SHIP_COMPANY_UPDATE)->group(function () {
         Route::get('edit', [ShipCompanyController::class, 'edit']);
         Route::post('update', [ShipCompanyController::class, 'update']);
         Route::post('change_status', [ShipCompanyController::class, 'changeStatus']);
+    });
+});
+
+// 地区管理
+Route::prefix('region')->group(function () {
+    Route::middleware(['manage.permission:'.Permission::MANAGE_REGION_INDEX])->group(function () {
+        Route::get('/', [RegionController::class, 'index'])->name(Permission::MANAGE_REGION_INDEX);
+        Route::get('tree', [RegionController::class, 'regionTree']);
+        Route::post('clear_cache', [RegionController::class, 'clearCache']);
     });
 });

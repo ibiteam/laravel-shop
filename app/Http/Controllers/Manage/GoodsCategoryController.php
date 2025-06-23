@@ -29,6 +29,21 @@ class GoodsCategoryController extends BaseController
         $vue_app_url = rtrim(config('host.vue_app_url'), '/');
         $data = $data->map(function (Category $category) use ($vue_app_url) {
             $category->setAttribute('h5_url', $vue_app_url.'/category?cat_id='.$category->id);  // 分类h5地址
+            if ($category->allChildren->isNotEmpty()) {
+                $category->allChildren->map(function (Category $category) use ($vue_app_url) {
+                    $category->setAttribute('h5_url', $vue_app_url . '/search?cat_id=' . $category->id);
+                    if ($category->allChildren->isNotEmpty()) {
+                        $category->allChildren->map(function (Category $category) use ($vue_app_url) {
+                            $category->setAttribute('h5_url', $vue_app_url . '/search?cat_id=' . $category->id);
+                            if ($category->allChildren->isNotEmpty()) {
+                                $category->allChildren->map(function (Category $category) use ($vue_app_url) {
+                                    $category->setAttribute('h5_url', $vue_app_url . '/search?cat_id=' . $category->id);
+                                });
+                            }
+                        });
+                    }
+                });
+            }
 
             return $category;
         })->toArray();

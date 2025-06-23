@@ -12,7 +12,7 @@ class UserIntegralController extends BaseController
     public function index(Request $request)
     {
         $user = get_user();
-        $type = $request->get('types') ?: 0;
+        $type = $request->get('type') ?: 0;
         $data = UserIntegral::query()->whereUserId($user?->id)
             ->when($type > 0, fn ($query) => $query->whereType($type))
             ->select(['number', 'type', 'desc', 'created_at'])

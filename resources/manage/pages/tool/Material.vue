@@ -80,8 +80,8 @@
                             </div>
                         </div>
                         <div class="material-ctrl" style="padding: 10px 0;">
-                            <el-button type="default" size="small" @click="handleBatchDelete">批量删除</el-button>
-                            <el-button type="default" size="small" @click="batchMoveTo">批量移动</el-button>
+                            <el-button size="small" @click="handleBatchDelete">批量删除</el-button>
+                            <el-button size="small" @click="batchMoveTo">批量移动</el-button>
                             <el-select placeholder="排序方式" v-model="searchForm.sort" style="width: 150px;margin-left: 10px;" size="small">
                                 <el-option label="默认排序" value="0"></el-option>
                                 <el-option label="最新上传在前" value="1"></el-option>
@@ -93,13 +93,14 @@
                             </el-select>
                         </div>
                         <div class="material-list">
-                            <el-table
+                            <page-table
                                 :data="tableList"
                                 @selection-change="handleSelectionChange"
                                 style="width: 100%"
                                 v-loading="tableListLoading"
                                 row-key="id"
                                 ref="materialTableRef"
+                                @change="handlePageChange"
                             >
                                 <el-table-column type="selection" width="55" />
                                 <el-table-column prop="name" label="素材名称" width="220">
@@ -115,7 +116,8 @@
                                                 <div v-else>
                                                     <div class="material-table-item-name">
                                                         <div class="material-img">
-                                                            <img :src="scope.row.file_path" alt="" />
+                                                            <img v-if="scope.row.dir_type === 1" :src="scope.row.file_path" alt="" />
+                                                            <img v-else src="@/assets/images/video.png" alt="" />
                                                         </div>
                                                         {{scope.row.name}}
                                                     </div>
@@ -136,12 +138,12 @@
                                 </el-table-column>
                                 <el-table-column prop="px" label="尺寸" width="120">
                                     <template #default="scope">
-                                        {{scope.row.type == 2 && scope.row.dir_type == 1 ? scope.row.width+'*'+scope.row.height : '--'}}
+                                        {{scope.row.type === 2 && scope.row.dir_type === 1 ? scope.row.width+'*'+scope.row.height : '--'}}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="size" label="大小" width="100">
                                     <template #default="scope">
-                                        {{scope.row.type == 1?'--':scope.row.size}}
+                                        {{scope.row.type === 1?'--':scope.row.size}}
                                     </template>
                                 </el-table-column>
                                 <el-table-column prop="updated_at" label="更新时间"/>
@@ -151,11 +153,8 @@
                                         <el-button type="text" size="small" @click="handleDelete(scope.row.id)">删除</el-button>
                                     </template>
                                 </el-table-column>
-                            </el-table>
-
+                            </page-table>
                         </div>
-                        <!-- 添加分页组件 -->
-                        <Page :pageInfo="pageInfo" @sizeChange="handleSizeChange" @currentChange="handleCurrentChange" />
                     </div>
                 </div>
             </div>
@@ -186,7 +185,7 @@
                     <el-button v-else-if="editMaterialType == 'only-name'" type="primary" @click="handleRenameMaterial">确定</el-button>
                     <el-button v-else-if="editMaterialType == 'move'" type="primary" @click="handleMove">确定</el-button>
                     <el-button v-else type="primary" @click="handleBatchMove">确定</el-button>
-                    <el-button type="default" @click="closeMaterialDialog">取消</el-button>
+                    <el-button @click="closeMaterialDialog">取消</el-button>
                 </div>
             </el-dialog>
         </div>
@@ -197,6 +196,19 @@ import { ref, reactive, getCurrentInstance, onMounted } from 'vue';
 const cns = getCurrentInstance().appContext.config.globalProperties
 import Http from '@/utils/http'
 // import SearchForm from '@/components/common/SearchForm.vue'
+import PageTable from '@/components/common/PageTable.vue'
+
+const defaultPage = {
+    page: 1,
+    per_page: 10
+};
+
+const pagination = reactive({ ...defaultPage });
+
+const handlePageChange = (page, per_page) => {
+    pagination.per_page = per_page;
+    getMaterialData(page);
+};
 
 const tabValue = ref('1');
 const multipleSelection = ref([]);
@@ -232,32 +244,6 @@ const ctrlMaterialRules = ref({
 const editMaterialVisible = ref(false);
 const editMaterialTitle = ref('');
 const editMaterialType = ref('');
-
-// 添加分页相关状态
-const pageInfo = reactive({
-    total: 0,
-    per_page: 10,
-    current_page: 1
-});
-
-// 页码改变
-const handleCurrentChange = (val) => {
-    getMaterialData(val);
-}
-
-// 每页条数改变
-const handleSizeChange = (val) => {
-    searchForm.value.number = val;
-    pageInfo.per_page = val;
-    getMaterialData(1);
-}
-
-// 设置分页数据
-const setPageInfo = (meta) => {
-    pageInfo.total = meta.total;
-    pageInfo.per_page = Number(meta.per_page);
-    pageInfo.current_page = meta.current_page;
-}
 
 onMounted( () => {
     getFolderData()
@@ -297,9 +283,7 @@ const getMaterialData = (page = 1) => {
     tableListLoading.value = true;
     Http.doGet('material', searchForm.value).then(res => {
         if (cns.$successCode(res.code)) {
-            tableList.value = res.data.list;
-            // 更新分页信息
-            setPageInfo(res.data.meta);
+            tableList.value = res.data;
         } else {
             cns.$message.error(res.message)
         }
@@ -312,13 +296,12 @@ const getFolderData = () => {
         if (cns.$successCode(res.code)) {
             folderData.value = res.data;
             searchForm.value.dir_type = tabValue.value;
-            getMaterialData()
+            getMaterialData(searchForm.value.page)
         } else {
             cns.$message.error(res.message)
         }
     }).catch(() => {})
 }
-
 
 const editMaterial = (item) => {
     currentCtrlMaterial.value = item;
@@ -472,6 +455,7 @@ const handleDelete = (id) => {
     })
 }
 const handleBatchDelete = () => {
+    console.log(multipleSelection.value);
     cns.$dialog.confirm({ message:'此操作将删除选中文件和关联所有子文件, 是否继续?', title:'提示' }).then(() => {
         Http.doPost('material/batch/destory', {ids: multipleSelection.value}).then(res => {
             if (cns.$successCode(res.code)) {
@@ -524,7 +508,7 @@ const handleBatchMove = () => {
 const checkDir = (id, type) => {
     if (type === 1 || id === 0) {
         searchForm.value.parent_id = id
-        getMaterialData()
+        getMaterialData(searchForm.value.page)
     }
 }
 const changTab = () => {
